@@ -1,8 +1,8 @@
 
-import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
+import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
-export class User{
+export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
 	@Column()
@@ -14,17 +14,17 @@ export class User{
 	admin: boolean;
 
 	@AfterInsert()
-	logInsert(){
+	logInsert() {
 		console.log(`insert User with id ${this.id}`);
 	}
 
 	@AfterUpdate()
-	logUpdate(){
+	logUpdate() {
 		console.log(`update User with id ${this.id}`);
 	}
 
 	@AfterRemove()
-	logRemove(){
+	logRemove() {
 		console.log(`remove User with id ${this.id}`);
 	}
 }
