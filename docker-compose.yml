@@ -19,3 +19,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend
+  backend:
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    env_file:
+      - ./docker/backend/.env
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+    networks:
+      - backend
