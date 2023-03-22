@@ -6,20 +6,24 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configService } from './config/config.service';
 
 @Module({
-  imports: [
-	TypeOrmModule.forRootAsync({
-		inject: [ConfigService],
-		useFactory : (config: ConfigService) =>{
-			return {
+	imports: [
+		ConfigModule.forRoot({
+			isGlobal: true,
+			envFilePath: '.env',
+		}),
+		TypeOrmModule.forRootAsync({
+			inject: [ConfigService],
+			useFactory: async (config: ConfigService) => ({
 				type: 'postgres',
-				database: config.get<string>("POSTGRES_DATABASE"),
-				user: config.get<string>("POSTGRES_USER"),
 				host: config.get<string>("POSTGRES_HOST"),
-				port: config.get<string>("POSTGRES_PORT"),
-			}
-		}
-	})],
-  controllers: [AppController],
-  providers: [AppService],
+				database: config.get<string>("POSTGRES_DB"),
+				username: config.get<string>("POSTGRES_USER"),
+				password: config.get<string>("POSTGRES_PASSWORD"),
+				synchronize: true
+			})
+		}),
+	],
+	controllers: [AppController],
+	providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
