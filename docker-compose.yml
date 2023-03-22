@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    env_file:
+      - ./docker/postgres/.env
+    restart: always
+    ports:
+      - 5432:5432
+    
