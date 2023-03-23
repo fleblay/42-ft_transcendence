@@ -22,15 +22,16 @@ services:
   backend:
     build:
       context: .
-      dockerfile: ./docker/backend/Dockerfile
+      dockerfile: ./backend/Dockerfile
+      target: ${NODE_ENV}
     env_file:
-      - ./docker/backend/.env
+      - .env
     restart: always
     ports:
       - 3000:3000
-    volumes:
-      - ./backend:/app
     depends_on:
       - postgres
+    volumes:
+      - ./backend:/usr/src/app
     networks:
       - backend
