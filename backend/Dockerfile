@@ -15,9 +15,6 @@ COPY package*.json ./
 # Install app dependencies using the `npm ci` command instead of `npm install`
 RUN npm ci
 
-# Bundle app source
-COPY . .
-
 CMD [ "npm", "run", "start:dev" ]
 
 ###################
@@ -30,10 +27,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# In order to run `npm run build` we need access to the Nest CLI which is a dev dependency. In the previous development stage we ran `npm ci` which installed all dependencies, so we can copy over the node_modules directory from the development image
-COPY --from=development /usr/src/app/node_modules ./node_modules
-
-COPY . .
+RUN npm ci
 
 # Run the build command which creates the production bundle
 RUN npm run build
