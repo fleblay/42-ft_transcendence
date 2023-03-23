@@ -21,8 +21,7 @@ services:
       - backend
   backend:
     build:
-      context: .
-      dockerfile: ./backend/Dockerfile
+      context: ./backend
       target: ${NODE_ENV}
     env_file:
       - .env
