@@ -11,8 +11,16 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
 # Copying this first prevents re-running npm install on every code change.
 COPY package*.json ./
+COPY tsconfig*.json ./
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
+RUN npm install -g @nestjs/cli #Utiliser le chemin relatif pour la CMD si installation non globale ex CMD ["./node_modules/...../npm", "run", "start:dev"]
+RUN npm install --save-dev @nestjs/common
+RUN npm install --save-dev @nestjs/core
+RUN npm install --save-dev @nestjs/config
+RUN npm install --save-dev @nestjs/typeorm
+RUN npm install --save-dev @types/node
+
 RUN npm ci
 
 CMD [ "npm", "run", "start:dev" ]

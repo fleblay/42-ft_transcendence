@@ -6,7 +6,7 @@ ALL_NETWORK			:= $(shell docker network ls --filter type=custom -q)
 all: .env
 	docker-compose up &
 
-build:
+build: .env
 	docker-compose up --build &
 
 .env: .env.template
