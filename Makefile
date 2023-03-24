@@ -18,6 +18,9 @@ down:
 
 clean: stop-all rm-all rm-vol rm-net
 
+fclean : clean
+	docker system prune -f --volumes -a
+
 #####CLEANING#####
 stop-all :
 ifneq ($(strip $(RUNNING_CONTAINERS)), )
