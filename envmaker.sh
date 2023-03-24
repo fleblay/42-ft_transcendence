@@ -1,4 +1,4 @@
-#!bash
+#!/bin/bash
 
 RANDOMINPUT=()
 for i in `seq 0 4`
@@ -7,10 +7,16 @@ do
 done
 
 cp .env.template .env
-sed -i .backup "s/\(POSTGRES_USER=\).*/\1${RANDOMINPUT[0]}/" .env
-sed -i .backup "s/\(POSTGRES_PASSWORD=\).*/\1${RANDOMINPUT[1]}/" .env
-sed -i .backup "s/\(COOKIE_KEY=\).*/\1${RANDOMINPUT[2]}/" .env
-sed -i .backup "s/\(RANDOM_NUMBER1=\).*/\1${RANDOMINPUT[3]}/" .env
-sed -i .backup "s/\(RANDOM_NUMBER2=\).*/\1${RANDOMINPUT[4]}/" .env
 
-rm .env.backup
+if [ $(uname) = 'Darwin' ]
+then
+	EXTENSION=".backup"
+fi
+
+sed -i $EXTENSION "s/\(POSTGRES_USER=\).*/\1${RANDOMINPUT[0]}/" .env
+sed -i $EXTENSION "s/\(POSTGRES_PASSWORD=\).*/\1${RANDOMINPUT[1]}/" .env
+sed -i $EXTENSION "s/\(COOKIE_KEY=\).*/\1${RANDOMINPUT[2]}/" .env
+sed -i $EXTENSION "s/\(RANDOM_NUMBER1=\).*/\1${RANDOMINPUT[3]}/" .env
+sed -i $EXTENSION "s/\(RANDOM_NUMBER2=\).*/\1${RANDOMINPUT[4]}/" .env
+
+rm -rf .env.backup
