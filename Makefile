@@ -3,22 +3,22 @@ ALL_CONTAINERS		:= $(shell docker ps -a -q)
 ALL_VOLUMES			:= $(shell docker volume ls -q)
 ALL_NETWORK			:= $(shell docker network ls --filter type=custom -q)
 
-all: .env
-	docker-compose up &
+all: build
+	docker-compose up --no-build
 
-build: .env
-	docker-compose up --build &
-
-.env: .env.template
+build: .env.template backend/Dockerfile
 	bash envmaker.sh
+	docker-compose build
 
 down:
-	docker-compose down -t 5
-	rm -rf .env
+	docker-compose down -t 3
+
+rm-modules:
+	rm -rf ./backend/node_modules
 
 clean: stop-all rm-all rm-vol rm-net
 
-fclean : clean
+fclean : clean rm-modules
 	docker system prune -f --volumes -a
 
 #####CLEANING#####

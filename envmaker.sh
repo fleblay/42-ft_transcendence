@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ -f ".env" ]
+then
+	echo -e "\x1b[33mEnv File already exists, nothing to be done\x1b[0m"
+	exit
+fi
+
 RANDOMINPUT=()
 for i in `seq 0 4`
 do
@@ -20,3 +26,5 @@ sed -i $EXTENSION "s/\(RANDOM_NUMBER1=\).*/\1${RANDOMINPUT[3]}/" .env
 sed -i $EXTENSION "s/\(RANDOM_NUMBER2=\).*/\1${RANDOMINPUT[4]}/" .env
 
 rm -rf .env.backup
+
+echo -e "\x1b[32mEnv File successfully created\x1b[0m"
