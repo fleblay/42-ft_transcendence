@@ -1,29 +1,50 @@
-import { FormEvent, useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
+import axios from "axios";
 
-type NameSelectorProps = {
-    onSelect : (name: string) => void;  
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
 }
 
-export function NameSelector({onSelect}: NameSelectorProps)
-{
+export function MyForm() {
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-    const [error, setError] = useState('');
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        const name = new FormData(e.currentTarget as HTMLFormElement).get('name');
-        if (!name){
-            setError('You need choose a name');
-            return;
-        }
-        onSelect(name.toString());
-    }
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    axios
+      .post("http://localhost:3000/api", formData)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
-    return <>
-        <h1> you need choose a name</h1>
-        <form action="" onSubmit={handleSubmit}>
-              <label htmlFor="name"> Your name</label>
-            <input type="text" id="name" name="name" required />
-            <button> Choose </button>
-        </form>
-        </>
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="name">Name:</label>
+        <input type="text" name="name" onChange={handleInputChange} />
+      </div>
+      <div>
+        <label htmlFor="email">Email:</label>
+        <input type="email" name="email" onChange={handleInputChange} />
+      </div>
+      <div>
+        <label htmlFor="password">password:</label>
+        <input type="text" name="password" onChange={handleInputChange}></input>
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  );
 }
