@@ -17,7 +17,7 @@ export function MyForm() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     axios
-      .post("http://localhost:3000/api", formData)
+      .post("http://localhost:4243/api/signup", formData)
       .then((response) => {
         console.log(response);
       })

@@ -12,7 +12,8 @@ export class AppController {
 
 	@Post('/signup')
 	async createUser(@Body() body: any, @Session() session: any) {
-		//return this.appService.createUser();
+		console.log("/signup");
+		return body;
 	}
 
 }
