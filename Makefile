@@ -4,7 +4,7 @@ ALL_VOLUMES			:= $(shell docker volume ls -q)
 ALL_NETWORK			:= $(shell docker network ls --filter type=custom -q)
 
 all: build
-	docker-compose up --no-build
+	docker-compose up --no-build &
 
 build: .env.template backend/Dockerfile
 	bash envmaker.sh
