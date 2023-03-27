@@ -1,14 +1,14 @@
-import { useState } from 'react'
 import { MyForm } from './screen/NameSelector'
 import { GetAll } from './screen/getall'
+import { GameCanvas } from './game/game'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <div className="App">
      <MyForm/>
 	 <GetAll></GetAll>
+	 <GameCanvas/>
     </div>
   )
 }
