@@ -19,7 +19,7 @@ WORKDIR /usr/src/app
 #RUN npm i -> useless, no package.json in container before directory is mounted
 
 COPY launch.sh .
-CMD ./launch.sh
+CMD ["./launch.sh"]
 
 ###################
 # BUILD FOR PRODUCTION
@@ -32,6 +32,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN npm ci
+
+COPY . .
 
 # Run the build command which creates the production bundle
 RUN npm run build

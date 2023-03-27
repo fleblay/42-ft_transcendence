@@ -33,10 +33,9 @@ services:
   vite:
     build:
       context: ./vite
-      target: ${NODE_ENV}
     env_file:
       - .env
-    restart: always
+    restart: on-failure
     volumes:
       - ./vite:/www/vite/
     networks:
@@ -45,14 +44,10 @@ services:
   nginx:
     build:
       context: ./nginx
-      target: ${NODE_ENV}
     restart: always
     ports:
-      - 4243:4243
-    depends_on:
-      - vite
+      - 8080:8080
     volumes:
-      #- ./nginx/dev_nginx.conf:/etc/nginx/nginx.conf
       - ./vite/dist:/www/vite/dist
     networks:
       - backend
