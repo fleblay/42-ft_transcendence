@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MyForm } from './screen/NameSelector'
+import { GetAll } from './screen/getall'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -7,6 +8,7 @@ function App() {
   return (
     <div className="App">
      <MyForm/>
+	 <GetAll></GetAll>
     </div>
   )
 }

@@ -2,14 +2,14 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 
 interface FormData {
-  name: string;
+  username: string;
   email: string;
   password: string;
 }
 
 export function MyForm() {
   const [formData, setFormData] = useState<FormData>({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -17,7 +17,7 @@ export function MyForm() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     axios
-      .post("http://localhost:4243/api/signup", formData)
+      .post("http://localhost:4243/api/users/signup", formData)
       .then((response) => {
         console.log(response);
       })
@@ -33,8 +33,8 @@ export function MyForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="name">Name:</label>
-        <input type="text" name="name" onChange={handleInputChange} />
+        <label htmlFor="username">Username:</label>
+        <input type="text" name="username" onChange={handleInputChange} />
       </div>
       <div>
         <label htmlFor="email">Email:</label>

@@ -5,13 +5,13 @@ import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGenerated
 export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
+
+	@Column()
+	username: string;
 	@Column()
 	email: string;
 	@Column()
 	password: string;
-
-	@Column({ default: true })
-	admin: boolean;
 
 	@AfterInsert()
 	logInsert() {
