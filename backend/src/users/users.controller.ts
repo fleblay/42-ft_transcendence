@@ -21,7 +21,7 @@ export class UsersController {
 	@UseGuards(LocalAuthGuard)
 	@Post('/login')
 	async login(@Request() req){
-		return req.user;
+		return {msg: 'Logged in successfully', user: req.user};
 	}
 
 
@@ -30,6 +30,6 @@ export class UsersController {
 	async findAll()
 	{
 		const allUser = await this.usersService.find("*");
-		return allUser; 
+		return allUser;
 	}
 }
