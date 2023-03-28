@@ -28,3 +28,10 @@ sed -i $EXTENSION "s/\(RANDOM_NUMBER2=\).*/\1${RANDOMINPUT[4]}/" .env
 rm -rf .env.backup
 
 echo -e "\x1b[32mEnv File successfully created\x1b[0m"
+
+VOLUME=$(docker volume ls -q | grep "ft_transcendence_postgres_data")
+
+if [ "$VOLUME" != "" ]
+then
+	docker volume rm "$VOLUME"
+fi
