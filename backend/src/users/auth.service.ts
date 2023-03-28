@@ -29,10 +29,11 @@ export class AuthService {
 	async signup(dataUser : CreateUserDto)
 	{
 		const user = await this.usersService.create(dataUser);
-		const payload = { username: dataUser.username, sub: user.id};
+
+		const payload = { username: dataUser.username, sub: user.id}; // sub >
 		const options = {expiresIn: '1d'};
 		return {
-			access_token: this.jwtService.sign(payload),
+			access_token: this.jwtService.sign(payload, options),
 		};
 	}
 
