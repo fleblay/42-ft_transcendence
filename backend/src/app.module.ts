@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { User } from './model/user.entity'
+import { EventsModule } from './events/events.module';
 
 @Module({
 	imports: [
@@ -25,6 +26,7 @@ import { User } from './model/user.entity'
 			})
 		}),
 		UsersModule,
+		EventsModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
