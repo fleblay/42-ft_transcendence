@@ -1,0 +1,7 @@
+POST http://localhost:8080/api/users/login
+
+{
+	"id" : 1,
+	"email" : "jonathan.prudent13@gmail.com",
+	"password" : "saf"
+}

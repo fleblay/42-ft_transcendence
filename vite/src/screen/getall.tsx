@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
+import { getToken } from "../session/session";
 
 interface FormData {
   username: string;
@@ -12,8 +13,16 @@ export function GetAll() {
 	const [value, setValue] = useState('no data yer');
 
   const handleClick = () => {
+
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': 'Bearer ' + getToken().access_token
+		}
+	}
+	console.log(getToken().access_token);
     axios
-      .get("/api/users/all")
+      .get("/api/users/all", config)
       .then((response) => {
 		return (JSON.stringify(response.data))
 	  })

@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
-import { saveSession } from "../session/session";
+import { saveToken } from "../session/session";
 
 interface FormData {
   username: string;
@@ -21,7 +21,7 @@ export function MyForm() {
       .post("/api/users/signup", formData)
       .then((response) => {
         console.log(response);
-		const user = saveSession(response.data);
+		const user = saveToken(response.data);
       })
       .catch((error) => {
         console.log(error);

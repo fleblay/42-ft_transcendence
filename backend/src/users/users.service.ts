@@ -27,6 +27,12 @@ export class UsersService {
 		return await this.repo.findOneBy({ id });
 	}
 
+	async findOneByEmail(email: string) {
+		if (!email) return null;
+		return await this.repo.findOneBy({ email });
+	}
+	
+
 	async update(id: number, dataUser: CreateUserDto) {
 		await this.repo.update(id, dataUser);
 		return this.findOne(id);

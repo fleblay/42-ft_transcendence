@@ -1,14 +1,14 @@
 import { userSession } from "../types";
 
-export function saveSession(user: userSession) {
+export function saveToken(token : string) {
 
-  localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("token", JSON.stringify(token));
 }
 
-export function getSession() {
-	const user = localStorage.getItem("user");
+export function getToken() {
+	const token = localStorage.getItem("token");
 	
-	if (user) {
-		return JSON.parse(user);
+	if (token) {
+		return JSON.parse(token);
   }
 }

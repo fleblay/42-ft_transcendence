@@ -5,6 +5,7 @@ import { UsersService } from './users.service';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { AuthentificatedGuard } from './authenticated.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -20,12 +21,10 @@ export class UsersController {
 
 	@UseGuards(LocalAuthGuard)
 	@Post('/login')
-	async login(@Request() req){
-		return {msg: 'Logged in successfully', user: req.user};
-	}
+	async login(@Body() body: CreateUserDto, @Request() req){
+		return this.authService.login(body);};
 
-
-	@UseGuards(AuthentificatedGuard)
+	@UseGuards(JwtAuthGuard)
 	@Get('/all')
 	async findAll()
 	{

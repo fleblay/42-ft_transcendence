@@ -7,12 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import passport, { Passport } from 'passport';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
-import { SessionSerializer } from './session.serializer';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './jwt.strategy';
 
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User]), PassportModule.register({session: true})], // PassportModule.register({session: true}) is used to enable session support
+	imports: [TypeOrmModule.forFeature([User]), PassportModule, JwtModule.register({
+		secret: 'secret', // not secure at all need to be changed in production  put in a .env file
+		signOptions: { expiresIn: '60s' },
+	})], 
   controllers: [UsersController],
-  providers: [AuthService, UsersService, LocalStrategy, SessionSerializer]
+  providers: [AuthService, UsersService, LocalStrategy, JwtStrategy],
+  exports: [AuthService]
 })
 export class UsersModule {}
