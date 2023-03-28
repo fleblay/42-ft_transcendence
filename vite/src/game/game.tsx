@@ -4,7 +4,7 @@ import { appContext } from "../App";
 const paddleLength = 40
 const paddleWidth = 5
 const ballSize = 5
-const ballSpeed = 10
+const ballSpeed = 5
 const playerSpeed = 5
 const canvasHeight = 250
 const canvasWidth = 500
@@ -39,9 +39,9 @@ export function GameCanvas() {
 		if (y < ballSize && dirY == -1)
 			dirY = 1
 		//Colision paddle
-		if (x + dirX > canvasWidth - ballSize - paddleWidth && (y > posPlayerTwo - paddleLength / 2 && y < posPlayerTwo + paddleLength / 2))
+		if (x + dirX >= canvasWidth - ballSize - paddleWidth && (y > posPlayerTwo && y < posPlayerTwo + paddleLength))
 			dirX = -1
-		if (x < ballSize + paddleWidth && (y > posPlayerOne - paddleLength / 2 && y < posPlayerOne + paddleLength / 2))
+		if (x <= ballSize + paddleWidth && (y > posPlayerOne && y < posPlayerOne + paddleLength))
 			dirX = 1
 		setPosBall({
 			x: x + dirX,
