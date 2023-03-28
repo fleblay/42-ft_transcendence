@@ -34,4 +34,5 @@ VOLUME=$(docker volume ls -q | grep "ft_transcendence_postgres_data")
 if [ "$VOLUME" != "" ]
 then
 	docker volume rm "$VOLUME"
+	echo -e "\x1b[33mRemoving already existing postgres database volume\x1b[0m"
 fi
