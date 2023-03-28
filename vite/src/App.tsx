@@ -16,7 +16,7 @@ ws.onopen = (event) => {
 
 ws.onmessage = (event) => {
 	const json = JSON.parse(event.data)
-	console.log(json)
+	//console.log(json)
 }
 
 function App() {
