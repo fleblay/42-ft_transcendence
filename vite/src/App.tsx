@@ -4,20 +4,30 @@ import { GameCanvas } from './game/game'
 import React from 'react'
 
 const apiCall = {
-	event: "bts:subscribe",
-	data: {channel: "order_book_btcusd"}
+	event : 'gameinfo',
+	data: 'coucou'
 }
 
-const ws = new WebSocket("wss://ws.bitstamp.net")
+const socket = new WebSocket('ws://localhost:8080/ws/')
+socket.onopen = function() {
 
-ws.onopen = (event) => {
-	ws.send(JSON.stringify(apiCall))
-}
+	// Send an initial message
+	socket.send(JSON.stringify(apiCall));
 
-ws.onmessage = (event) => {
-	const json = JSON.parse(event.data)
-	//console.log(json)
-}
+	// Listen for messages
+	socket.onmessage = function(event) {
+		console.log('Client received a message',event);
+	};
+
+	// Listen for socket closes
+	socket.onclose = function(event) {
+		console.log('Client notified socket has closed',event);
+	};
+
+	// To close the socket....
+	//socket.close()
+
+};
 
 function App() {
 
@@ -26,6 +36,7 @@ function App() {
      <MyForm/>
 	 <GetAll></GetAll>
 	{/*<GameCanvas/>*/}
+	<button onClick={() => {socket.send(JSON.stringify(apiCall))}}>Say hello to everyone</button>
     </div>
   )
 }
