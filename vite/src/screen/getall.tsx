@@ -13,7 +13,7 @@ export function GetAll() {
 
   const handleClick = () => {
     axios
-      .get("http://localhost:4243/api/users/all")
+      .get("/api/users/all")
       .then((response) => {
 		return (JSON.stringify(response.data))
 	  })

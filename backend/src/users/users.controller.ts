@@ -4,7 +4,7 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
-import { AuthenticatedGuard } from './authenticated.guard';
+import { AuthentificatedGuard } from './authenticated.guard';
 
 @Controller('users')
 export class UsersController {
@@ -25,7 +25,7 @@ export class UsersController {
 	}
 
 
-	@UseGuards(AuthenticatedGuard)
+	@UseGuards(AuthentificatedGuard)
 	@Get('/all')
 	async findAll()
 	{

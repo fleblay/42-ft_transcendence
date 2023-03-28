@@ -6,10 +6,11 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 // If the method returns true, the route is accessible
 // If the method returns false, the route is not accessible
 @Injectable()
-export class AuthenticatedGuard implements CanActivate {
+export class AuthentificatedGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
 	const request = context.switchToHttp().getRequest(); // get the request object from the context object	
+	console.log("AuthentificatedGuard: " + request.user);
 	return request.isAuthenticated(); // check if the user is authenticated
   }
 }
