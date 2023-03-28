@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
+import { saveSession } from "../session/session";
 
 interface FormData {
   username: string;
@@ -20,6 +21,7 @@ export function MyForm() {
       .post("http://localhost:4243/api/users/signup", formData)
       .then((response) => {
         console.log(response);
+		const user = saveSession(response.data);
       })
       .catch((error) => {
         console.log(error);

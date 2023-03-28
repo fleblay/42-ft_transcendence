@@ -21,4 +21,19 @@ export class UsersService {
 		console.log("find :", email);
 		return this.repo.find();
 	}
+
+	async findOne(id: number) {
+		if (!id) return null;
+		return await this.repo.findOneBy({ id });
+	}
+
+	async update(id: number, dataUser: CreateUserDto) {
+		await this.repo.update(id, dataUser);
+		return this.findOne(id);
+	}
+
+	async remove(id: number) {
+		await this.repo.delete(id);
+		return true;
+	}
 }
