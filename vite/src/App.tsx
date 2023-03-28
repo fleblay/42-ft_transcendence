@@ -1,9 +1,14 @@
 import { MyForm } from './screen/NameSelector'
 import { GetAll } from './screen/getall'
 import { GameCanvas } from './game/game'
-import React from 'react'
+import React, { createContext } from 'react'
 
-const apiCall = {
+interface IWSData {
+	event: string;
+	data: any;
+}
+
+const apiCall: IWSData = {
 	event: 'gameinfo',
 	data: 'coucou'
 }
@@ -26,17 +31,20 @@ socket.onopen = function () {
 
 	// To close the socket....
 	//socket.close()
-
 };
+
+export const appContext = createContext<{socket: WebSocket}>({ socket });
 
 function App() {
 
 	return (
 		<div className="App">
-			<MyForm />
-			<GetAll></GetAll>
-			{/*<GameCanvas/>*/}
-			<button onClick={() => { socket.send(JSON.stringify(apiCall)) }}>Say hello to everyone</button>
+			<appContext.Provider value={{ socket }}>
+				<MyForm />
+				<GetAll />
+				<GameCanvas />
+				<button onClick={() => { socket.send(JSON.stringify(apiCall)) }}>Say hello to everyone</button>
+			</appContext.Provider>
 		</div>
 	)
 }

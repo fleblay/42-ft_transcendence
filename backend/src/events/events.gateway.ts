@@ -12,4 +12,9 @@ export class EventsGateway {
 		this.server.clients.forEach((c) => {c.send('hi all ' + this.server.clients.size)})
 		return 'Hello world!!';
 	}
+
+	@SubscribeMessage('keyPress')
+	handleKey(client: any, data: any) {
+		console.log(data)
+	}
 }
