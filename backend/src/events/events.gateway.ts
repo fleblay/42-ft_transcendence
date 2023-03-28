@@ -9,6 +9,7 @@ export class EventsGateway {
 	@SubscribeMessage('gameinfo')
 	handleMessage(client: any, data: any): string {
 		console.log(data)
+		this.server.clients.forEach((c) => {c.send('hi all ' + this.server.clients.size)})
 		return 'Hello world!!';
 	}
 }

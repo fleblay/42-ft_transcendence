@@ -8,11 +8,11 @@ const apiCall = {
 	data: 'coucou'
 }
 
-const socket = new WebSocket('ws://localhost:8080/api')
-socket.onopen = function(event) {
+const socket = new WebSocket('ws://localhost:8080/ws/')
+socket.onopen = function() {
 
 	// Send an initial message
-	socket.send('I am the client and I\'m listening!');
+	socket.send(JSON.stringify(apiCall));
 
 	// Listen for messages
 	socket.onmessage = function(event) {
@@ -36,6 +36,7 @@ function App() {
      <MyForm/>
 	 <GetAll></GetAll>
 	{/*<GameCanvas/>*/}
+	<button onClick={() => {socket.send(JSON.stringify(apiCall))}}>Say hello to everyone</button>
     </div>
   )
 }
