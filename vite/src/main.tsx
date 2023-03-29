@@ -14,16 +14,12 @@ import { GetAll } from './pages/getall';
 const router = createBrowserRouter([
 	{
 	  path: "/",
-	  element: <>
-	  				<MyForm />
-				<GetAll />
-	  <div><Link to={'/login'}>Hello world!</Link></div>,
-	  </>
+	  element : <App />,
 	},
 	{
 		path: '/login',
 		element: <LoginForm />
-	}
+	},
   ]);
 
 
