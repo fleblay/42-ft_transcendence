@@ -1,5 +1,5 @@
-import { MyForm } from './screen/NameSelector'
-import { GetAll } from './screen/getall'
+import { MyForm } from './pages/NameSelector'
+import { GetAll } from './pages/getall'
 import { GameCanvas } from './game/game'
 import React, { createContext } from 'react'
 import {io} from 'socket.io-client'
