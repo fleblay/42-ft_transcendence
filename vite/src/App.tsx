@@ -49,18 +49,18 @@ socket.onopen = function () {
 };
 */
 
-export const appContext = createContext<any>({ socket });
+export const AppContext = createContext<any>({ socket });
 
 function App() {
 
 	return (
 		<div className="App">
-			<appContext.Provider value={{ socket }}>
+			<AppContext.Provider value={{ socket }}>
 				<MyForm />
 				<GetAll />
 				<GameCanvas />
 				<button onClick={() => { socket.send(JSON.stringify(apiCall)) }}>Say hello to everyone</button>
-			</appContext.Provider>
+			</AppContext.Provider>
 		</div>
 	)
 }
