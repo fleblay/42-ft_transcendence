@@ -22,6 +22,7 @@ export class UsersController {
 	@UseGuards(LocalAuthGuard)
 	@Post('/login')
 	async login(@Body() body: CreateUserDto, @Request() req){
+		console.log("login", req.user);
 		return this.authService.login(body);};
 
 	@UseGuards(JwtAuthGuard)

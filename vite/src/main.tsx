@@ -10,6 +10,7 @@ import {
 import { LoginForm } from './pages/LoginPage';
 import { MyForm } from './pages/NameSelector';
 import { GetAll } from './pages/getall';
+import { RegisterForm } from './pages/RegisterPage';
 
 const router = createBrowserRouter([
 	{
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
 	{
 		path: '/login',
 		element: <LoginForm />
+	},
+	{
+		path: '/register',
+		element: <RegisterForm />
 	},
   ]);
 
