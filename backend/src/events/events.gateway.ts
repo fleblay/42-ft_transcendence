@@ -1,5 +1,4 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
-//import { Server } from 'ws'
+import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
 import {Server, Socket } from 'socket.io'
 
 @WebSocketGateway({
@@ -13,13 +12,13 @@ export class EventsGateway {
 	@WebSocketServer() server: Server
 
 	@SubscribeMessage('ping')
-	onPing(client: Socket, data:any): void
+	handleMessage(client: Socket, data:any): void
 	{
-		console.log('ici')
-		console.log(data)
-		client.emit('pong', {message: 'this is pong'})
+		client.broadcast.emit('message', `Server : new challenger`)
+		client.emit('message', `Acknowledgde connection`)
 	}
 }
+
 /*
 @WebSocketGateway()
 export class EventsGateway {

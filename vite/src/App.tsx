@@ -17,9 +17,9 @@ const apiCall: IWSData = {
 const socket = io()
 
 socket.on('connect', () => {
-	console.log('Emiting a ping 0')
+	console.log('Emiting a ping beging')
 	socket.emit('ping', 'This is my first ping')
-	console.log('Emiting a ping 1')
+	console.log('Emiting a ping end')
 })
 
 socket.on('message', (data) => {
