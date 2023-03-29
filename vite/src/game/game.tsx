@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { appContext } from "../App";
+import { AppContext } from "../App";
 
 const paddleLength = 40
 const paddleWidth = 5
@@ -29,7 +29,7 @@ export function GameCanvas() {
 	const [posPlayerTwo, setPosPlayerTwo] = useState<number>(canvasHeight / 2); // pour rerender le div au changement slider
 	const [timer, setTimer] = useState<boolean>(false);
 
-	const { socket } = useContext(appContext)
+	const { socket } = useContext(AppContext)
 
 	setTimeout(() => {
 		let { x, y, dirX, dirY } = posBall
@@ -65,7 +65,7 @@ export function GameCanvas() {
 
 		// Clear canvas
 		context.current.clearRect(0, 0, canvasWidth, canvasHeight);
-		
+
 		// Set color of players
 		context.current.fillStyle = "rgb(200, 0, 0, 1)";
 
