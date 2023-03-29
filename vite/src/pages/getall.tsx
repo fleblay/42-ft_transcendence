@@ -1,6 +1,6 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState} from "react";
 import axios from "axios";
-import { getToken } from "../session/session";
+import { getToken } from "../token/token";
 
 interface FormData {
   username: string;
@@ -17,10 +17,10 @@ export function GetAll() {
 	const config = {
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': 'Bearer ' + getToken().access_token
+			'Authorization': 'Bearer ' + getToken()
 		}
 	}
-	console.log(getToken().access_token);
+	console.log(getToken())
     axios
       .get("/api/users/all", config)
       .then((response) => {

@@ -3,6 +3,7 @@ import { GetAll } from './pages/getall'
 import { GameCanvas } from './game/game'
 import React, { createContext } from 'react'
 import {io} from 'socket.io-client'
+import {getToken } from './token/token'
 
 interface IWSData {
 	event: string;
@@ -14,7 +15,11 @@ const apiCall: IWSData = {
 	data: 'coucou'
 }
 
-const socket = io()
+const socket = io({
+	auth: {
+		token: getToken()
+	}
+})
 
 socket.on('connect', () => {
 	console.log('Emiting a ping beging')

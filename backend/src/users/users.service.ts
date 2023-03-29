@@ -31,7 +31,6 @@ export class UsersService {
 		if (!email) return null;
 		return await this.repo.findOneBy({ email });
 	}
-	
 
 	async update(id: number, dataUser: CreateUserDto) {
 		await this.repo.update(id, dataUser);
