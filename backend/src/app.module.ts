@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { User } from './model/user.entity'
 import { EventsModule } from './events/events.module';
-import { LoggingMiddleware } from './app.middleware';
+import { LogMiddleware } from './app.middleware';
 
 @Module({
 	imports: [
@@ -34,6 +34,6 @@ import { LoggingMiddleware } from './app.middleware';
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-	  consumer.apply(LoggingMiddleware).forRoutes('*');
+	  consumer.apply(LogMiddleware).forRoutes('*');
 	}
 }

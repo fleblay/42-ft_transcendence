@@ -2,16 +2,15 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/webs
 //import { Server } from 'ws'
 import {Server, Socket } from 'socket.io'
 
-
 @WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
+	path: '/socket.io/',
+	cors: {
+		origin: '*',
+	},
 })
 export class EventsGateway {
 
-	@WebSocketServer()
-	server: Server
+	@WebSocketServer() server: Server
 
 	@SubscribeMessage('ping')
 	onPing(client: Socket, data:any): void
