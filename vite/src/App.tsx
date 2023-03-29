@@ -2,6 +2,7 @@ import { MyForm } from './screen/NameSelector'
 import { GetAll } from './screen/getall'
 import { GameCanvas } from './game/game'
 import React, { createContext } from 'react'
+import {io} from 'socket.io-client'
 
 interface IWSData {
 	event: string;
@@ -9,10 +10,24 @@ interface IWSData {
 }
 
 const apiCall: IWSData = {
-	event: 'gameinfo',
+	event: 'ping',
 	data: 'coucou'
 }
 
+const socket = io()
+
+socket.on('connect', () => {
+	console.log('Emiting a ping 0')
+	socket.emit('ping', 'This is my first ping')
+	console.log('Emiting a ping 1')
+})
+
+socket.on('message', (data) => {
+	console.log('Receiving a message')
+	console.log(data)
+})
+
+/*
 const socket = new WebSocket(`ws://${window.location.host}/ws/`)
 socket.onopen = function () {
 
@@ -32,8 +47,9 @@ socket.onopen = function () {
 	// To close the socket....
 	//socket.close()
 };
+*/
 
-export const appContext = createContext<{socket: WebSocket}>({ socket });
+export const appContext = createContext<any>({ socket });
 
 function App() {
 

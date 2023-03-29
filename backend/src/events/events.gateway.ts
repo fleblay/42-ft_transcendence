@@ -1,6 +1,27 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
-import { Server } from 'ws'
+//import { Server } from 'ws'
+import {Server, Socket } from 'socket.io'
 
+
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
+export class EventsGateway {
+
+	@WebSocketServer()
+	server: Server
+
+	@SubscribeMessage('ping')
+	onPing(client: Socket, data:any): void
+	{
+		console.log('ici')
+		console.log(data)
+		client.emit('pong', {message: 'this is pong'})
+	}
+}
+/*
 @WebSocketGateway()
 export class EventsGateway {
 
@@ -18,3 +39,4 @@ export class EventsGateway {
 		console.log(data)
 	}
 }
+*/

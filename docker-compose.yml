@@ -30,6 +30,8 @@ services:
       - ./backend:/usr/src/app
     networks:
       - backend
+    ports:
+      - 3000:3000
   vite:
     build:
       context: ./vite
