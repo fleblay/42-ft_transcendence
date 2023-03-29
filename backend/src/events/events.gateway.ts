@@ -4,9 +4,10 @@ import {Server, Socket } from 'socket.io'
 
 
 @WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
+	path: '/socket.io/',
+	cors: {
+		origin: '*',
+	},
 })
 export class EventsGateway {
 
