@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
-import { WsAdapter } from '@nestjs/platform-ws'
 
 // doc express-session: https://www.npmjs.com/package/express-session
 
@@ -16,7 +15,6 @@ async function bootstrap() {
 			cookie: { maxAge: 360000 } // 1 hour
 		})
 	);
-	app.useWebSocketAdapter(new WsAdapter(app));
 	app.use(passport.initialize()); // initialize passport
 	app.use(passport.session()); // persistent login sessions
 	await app.listen(3000);
