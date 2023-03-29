@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
-import { saveToken } from "../session/session";
+import { saveToken } from "../token/token";
 
 interface FormData {
   username: string;

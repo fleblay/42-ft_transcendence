@@ -3,6 +3,7 @@ import { GetAll } from './pages/getall'
 import { GameCanvas } from './game/game'
 import React, { createContext } from 'react'
 import {io} from 'socket.io-client'
+import {getToken } from './token/token'
 
 interface IWSData {
 	event: string;
@@ -14,12 +15,16 @@ const apiCall: IWSData = {
 	data: 'coucou'
 }
 
-const socket = io()
+const socket = io({
+	auth: {
+		token: getToken()
+	}
+})
 
 socket.on('connect', () => {
-	console.log('Emiting a ping 0')
+	console.log('Emiting a ping beging')
 	socket.emit('ping', 'This is my first ping')
-	console.log('Emiting a ping 1')
+	console.log('Emiting a ping end')
 })
 
 socket.on('message', (data) => {
@@ -49,18 +54,18 @@ socket.onopen = function () {
 };
 */
 
-export const appContext = createContext<any>({ socket });
+export const AppContext = createContext<any>({ socket });
 
 function App() {
 
 	return (
 		<div className="App">
-			<appContext.Provider value={{ socket }}>
+			<AppContext.Provider value={{ socket }}>
 				<MyForm />
 				<GetAll />
 				<GameCanvas />
 				<button onClick={() => { socket.send(JSON.stringify(apiCall)) }}>Say hello to everyone</button>
-			</appContext.Provider>
+			</AppContext.Provider>
 		</div>
 	)
 }

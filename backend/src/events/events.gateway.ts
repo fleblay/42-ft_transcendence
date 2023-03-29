@@ -1,6 +1,7 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
-//import { Server } from 'ws'
+import {ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
+import {UseGuards} from '@nestjs/common';
 import {Server, Socket } from 'socket.io'
+import {EventGuard} from './guards/event.guard'
 
 @WebSocketGateway({
 	path: '/socket.io/',
@@ -8,18 +9,26 @@ import {Server, Socket } from 'socket.io'
 		origin: '*',
 	},
 })
+
+
 export class EventsGateway {
 
 	@WebSocketServer() server: Server
 
+	@UseGuards(EventGuard)
 	@SubscribeMessage('ping')
-	onPing(client: Socket, data:any): void
+	handleMessage(client: Socket, data:any): void
 	{
-		console.log('ici')
-		console.log(data)
-		client.emit('pong', {message: 'this is pong'})
+		client.broadcast.emit('message', `Server : new challenger`)
+		client.emit('message', `Acknowledgde connection from ${client.handshake.auth.token}`)
 	}
+
+	/*
+	@SubscribeMessage('createLobby')
+	createLobby(
+	*/
 }
+
 /*
 @WebSocketGateway()
 export class EventsGateway {
