@@ -85,7 +85,12 @@ function App() {
 				<MyForm />
 				<GetAll />
 				<GameCanvas />
-				<button onClick={() => { socket.emit('ping', 'Coucou') }}>Say hello to everyone</button>
+				<div>
+				<button onClick={() => { socket.emit('ping', {word: 'Coucou'}) }}>Say hello to everyone</button>
+				</div>
+				<div>
+				<button onClick={() => { socket.emit('createLobby') }}>Create a game Lobby</button>
+				</div>
 				<Router.Link to="/login"> go login</Router.Link>
 			</AppContext.Provider>
 		</div>

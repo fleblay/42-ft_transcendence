@@ -1,7 +1,10 @@
-import {ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
-import {UseGuards} from '@nestjs/common';
+import {ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody } from '@nestjs/websockets';
+import {UseGuards, UseInterceptors} from '@nestjs/common';
 import {Server, Socket } from 'socket.io'
 import {EventGuard} from './guards/event.guard'
+import {WebSocketUserInterceptor} from './interceptors/WebSocketUser.interceptor'
+import {EventUserDecorator} from './decorators/EventUser.decorator'
+import {User} from '../model/user.entity'
 
 @WebSocketGateway({
 	path: '/socket.io/',
@@ -10,41 +13,23 @@ import {EventGuard} from './guards/event.guard'
 	},
 })
 
-
+@UseGuards(EventGuard)
+// Adds client info into data of message -> Needed for EventUserDecorator
+@UseInterceptors(WebSocketUserInterceptor)
 export class EventsGateway {
 
 	@WebSocketServer() server: Server
 
-	@UseGuards(EventGuard)
 	@SubscribeMessage('ping')
-	handleMessage(client: Socket, data:any): void
+	handleMessage(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:any): void
 	{
 		client.broadcast.emit('message', `Server : new challenger`)
-		client.emit('message', `Acknowledgde connection from ${client.handshake.auth.token}`)
+		client.emit('message', {log: 'data is', data}) //
+		client.emit('message', user)
 	}
 
-	/*
 	@SubscribeMessage('createLobby')
-	createLobby(
-	*/
-}
-
-/*
-@WebSocketGateway()
-export class EventsGateway {
-
-	@WebSocketServer() server: Server
-
-	@SubscribeMessage('gameinfo')
-	handleMessage(client: any, data: any): string {
-		console.log(data)
-		this.server.clients.forEach((c) => {c.send('hi all ' + this.server.clients.size)})
-		return 'Hello world!!';
-	}
-
-	@SubscribeMessage('keyPress')
-	handleKey(client: any, data: any) {
-		console.log(data)
+	createLobby(client: Socket):void
+	{
 	}
 }
-*/
