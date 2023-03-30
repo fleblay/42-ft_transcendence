@@ -8,36 +8,18 @@ import { LoginForm } from './pages/LoginPage'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fakeAuthProvider } from './auth'
 
-/*
-const socket = new WebSocket(`ws://${window.location.host}/ws/`)
-socket.onopen = function () {
-
-	// Send an initial message
-	socket.send(JSON.stringify(apiCall));
-
-	// Listen for messages
-	socket.onmessage = function (event) {
-		console.log('Client received a message', event);
-	};
-
-	// Listen for socket closes
-	socket.onclose = function (event) {
-		console.log('Client notified socket has closed', event);
-	};
-
-	// To close the socket....
-	//socket.close()
-};
-*/
-
+//0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
 	user: any;
 	login: (user: string, callback: VoidFunction) => void;
 	logout: (callback: VoidFunction) => void;
 }
 
+//1.Definit la value passe pour tous les enfants du AuthContext.Provider
 let AuthContext = React.createContext<AuthContextType>(null!);
 
+//2.Definit la value passe pour tous les enfants du AuthContext.Provider
+//3.Renvoie la balise AuthContext.Provider
 function AuthService({ children }: { children: React.ReactNode }) {
 	let [user, setUser] = React.useState<any>(null);
 
@@ -56,9 +38,53 @@ function AuthService({ children }: { children: React.ReactNode }) {
 	};
 
 	let value = { user, login, logout };
-
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+interface SocketContextType {
+	socket: Socket
+}
+
+let SocketContext = React.createContext<SocketContextType>(null!)
+// Appeler par AuthService quand auth.user change de valeur.
+// Creer le socket quand auth.user est defini (On est connecter)
+function SocketProvider({ children }: { children: React.ReactNode }) {
+	const auth = useAuthService()
+
+	React.useEffect(() => {
+		if (!auth.user) return
+		function onConnect() {
+			console.log('Connected to socket')
+			socket.emit('ping', {message: "This is my first ping"}, (response: any)  => {
+				console.log(response)
+			})
+		}
+
+		function onMessage(data: any) {
+			console.log('Receiving a message')
+			console.log(data)
+		}
+
+		socket.on('connect', onConnect);
+		socket.on('message', onMessage)
+		return () => {
+			socket.off('connect', onConnect);
+			socket.off('message', onMessage);
+		}
+	}, [auth.user])
+	if(!auth.user) return <>{children}</>;
+
+	const socket = io({
+			auth: {
+				token: getToken()
+			}
+		})
+
+	const value = { socket }
+	console.log("Socket Creation")
+	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
+}
+
 function useAuthService() {
 	return React.useContext(AuthContext);
 }
@@ -156,36 +182,39 @@ function Header() {
 	);
 }
 
-export const AppContext = createContext<any>({});
+//export const AppContext = createContext<any>({});
 
 function App() {
 
 	return (
 		<AuthService>
-			<Routes>
-				<Route element={<Header />}>
-					<Route path="/" element={
-						<RequireAuth>
-							<div>Game</div>
-						</RequireAuth>
-					} />
-					<Route path='/public' element={<div>Public</div>} />
-					<Route
-						path="/chat"
-						element={
+			<SocketProvider>
+				<Routes>
+					<Route element={<Header />}>
+						<Route path="/" element={
 							<RequireAuth>
-								<>
-								<label>w</label>
-								<LoginForm />
-								</>
+								<div>Game</div>
 							</RequireAuth>
-						}
-					/>
-					<Route path="/login" element={<LoginPage />} />
-				</Route>
-			</Routes>
+						} />
+						<Route path='/public' element={<div>Public</div>} />
+						<Route
+							path="/chat"
+							element={
+								<RequireAuth>
+									<>
+									<label>w</label>
+									<LoginForm />
+									</>
+								</RequireAuth>
+							}
+						/>
+						<Route path="/login" element={<LoginPage />} />
+					</Route>
+				</Routes>
+			</SocketProvider>
 		</AuthService>
 	);
+/*
 	function newSocket() {
 		return io({
 			auth: {
@@ -252,6 +281,7 @@ function App() {
 			</AppContext.Provider>
 		</div>
 	)
+	*/
 }
 
 export default App
