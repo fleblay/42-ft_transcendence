@@ -13,7 +13,7 @@ import {User} from '../model/user.entity'
 	},
 })
 
-@UseGuards(EventGuard)
+//@UseGuards(EventGuard)
 // Adds client info into data of message -> Needed for EventUserDecorator
 @UseInterceptors(WebSocketUserInterceptor)
 export class EventsGateway {
@@ -24,12 +24,13 @@ export class EventsGateway {
 	handleMessage(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:any): void
 	{
 		client.broadcast.emit('message', `Server : new challenger`)
-		client.emit('message', {log: 'data is', data}) //
-		client.emit('message', user)
+		//client.emit('message', {log: 'data is', data}) //
+		//client.emit('message', user)
 	}
 
 	@SubscribeMessage('createLobby')
 	createLobby(client: Socket):void
 	{
+		client.broadcast.emit('newLobby', 'Lobby id 1');
 	}
 }

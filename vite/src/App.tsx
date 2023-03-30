@@ -184,6 +184,25 @@ function Header() {
 
 //export const AppContext = createContext<any>({});
 
+function GamePage() {
+	const {socket} = React.useContext(SocketContext);
+
+	React.useEffect(()=>{
+		function onNewLobby(data: any){
+			console.log('new lobby', data)
+		}
+		socket.on('newLobby', onNewLobby)
+		return () => {
+			socket.off('newLobby', onNewLobby)
+		}
+	}, [])
+	return (
+		<button onClick={()=> socket.emit('createLobby', {message:'hi'})}>
+			Hello
+		</button>
+	);
+}
+
 function App() {
 
 	return (
@@ -193,7 +212,9 @@ function App() {
 					<Route element={<Header />}>
 						<Route path="/" element={
 							<RequireAuth>
-								<div>Game</div>
+								<div>
+								<GamePage/>
+								</div>
 							</RequireAuth>
 						} />
 						<Route path='/public' element={<div>Public</div>} />
