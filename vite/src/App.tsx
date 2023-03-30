@@ -92,6 +92,7 @@ function App() {
 				<button onClick={() => { socket.emit('createLobby') }}>Create a game Lobby</button>
 				</div>
 				<Router.Link to="/login"> go login</Router.Link>
+				<Router.Link to="/register"> go register</Router.Link>
 			</AppContext.Provider>
 		</div>
 	)

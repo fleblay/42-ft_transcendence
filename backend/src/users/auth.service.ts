@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../model/user.entity'
+import { LoginUserDto } from './dtos/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,9 +30,13 @@ constructor(private usersService: UsersService, private jwtService: JwtService) 
 		}
 	}
 
-	async login(dataUser : CreateUserDto) {
+	async login(dataUser : LoginUserDto) {
 		const user = await this.usersService.findOneByEmail(dataUser.email);
-		const payload = { username: dataUser.username, sub: user.id};
+		if (!user)
+			throw new NotFoundException("User not existing");
+		if (user.password !== dataUser.password)
+			throw new ForbiddenException('Password not match');
+		const payload = { username: user.username, sub: user.id};
 		const options = {expiresIn: '1d'};
 		return {
 			access_token: this.jwtService.sign(payload),
@@ -40,8 +45,12 @@ constructor(private usersService: UsersService, private jwtService: JwtService) 
 
 	async signup(dataUser : CreateUserDto)
 	{
-		const user = await this.usersService.create(dataUser);
+		if (await this.usersService.findOneByEmail(dataUser.email))
+			throw new ForbiddenException('Email is not unique');
+		if (await this.usersService.findOneByUsername(dataUser.username))
+			throw new ForbiddenException('username is not unique');
 
+		const user = await this.usersService.create(dataUser);
 		const payload = { username: dataUser.username, sub: user.id}; // sub >
 		const options = {expiresIn: '1d'};
 		return {

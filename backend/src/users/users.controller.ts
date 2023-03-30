@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { AuthentificatedGuard } from './authenticated.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { LoginUserDto } from './dtos/login-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -19,17 +20,17 @@ export class UsersController {
 		return user;
 	}
 
-	@UseGuards(LocalAuthGuard)
 	@Post('/login')
-	async login(@Body() body: CreateUserDto, @Request() req){
-		console.log("login", req.user);
-		return this.authService.login(body);};
+	async login(@Body() body: LoginUserDto, @Request() req){
+		return await this.authService.login(body);
+	};
 
 	@UseGuards(JwtAuthGuard)
 	@Get('/all')
 	async findAll()
 	{
-		const allUser = await this.usersService.find("*");
+		const allUser = await this.usersService.getAll();
 		return allUser;
 	}
+
 }
