@@ -3,7 +3,7 @@ import { GetAll } from './pages/getall'
 import { GameCanvas } from './game/game'
 import React, { createContext, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
-import { getToken } from './token/token'
+import { delToken, getToken } from './token/token'
 import { LoginForm } from './pages/LoginPage'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fakeAuthProvider } from './auth'
@@ -240,8 +240,15 @@ function App() {
 				<MyForm />
 				<GetAll />
 				<GameCanvas />
-				<button onClick={() => { socket.emit('ping', 'Coucou') }}>Say hello to everyone</button>
+				<div>
+				<button onClick={() => { socket.emit('ping', {word: 'Coucou'}) }}>Say hello to everyone</button>
+				</div>
+				<div>
+				<button onClick={() => { socket.emit('createLobby') }}>Create a game Lobby</button>
+				</div>
 				<Link to="/login"> go login</Link>
+				<Link to="/register"> go register</Link>
+				<div onClick={() => { delToken() }}>Logout</div>
 			</AppContext.Provider>
 		</div>
 	)
