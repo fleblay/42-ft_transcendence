@@ -3,7 +3,7 @@ import { GetAll } from './pages/getall'
 import { GameCanvas } from './game/game'
 import React, { createContext, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
-import { getToken } from './token/token'
+import { delToken, getToken } from './token/token'
 import * as Router from 'react-router-dom'
 
 /*
@@ -93,6 +93,7 @@ function App() {
 				</div>
 				<Router.Link to="/login"> go login</Router.Link>
 				<Router.Link to="/register"> go register</Router.Link>
+				<div onClick={() => { delToken() }}>Logout</div>
 			</AppContext.Provider>
 		</div>
 	)
