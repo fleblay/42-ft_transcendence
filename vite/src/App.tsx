@@ -182,6 +182,22 @@ function Header() {
 	);
 }
 
+function Destinations() {
+	const destinations = [
+		{ name: "Game", path: "/game" },
+		{ name: "Public", path: "/public" },
+		{ name: "Chat", path: "/chat" },
+	]
+	const links = destinations.map((destination) => {
+			return (<span><Link to="{destination.path}">{destination.name}</Link></span>)
+	})
+	return (
+		<div>
+			{...links}
+		</div>
+	)
+}
+
 //export const AppContext = createContext<any>({});
 
 function GamePage() {
@@ -209,6 +225,7 @@ function App() {
 		<AuthService>
 			<SocketProvider>
 				<Routes>
+					<Route element={<Destinations />} />
 					<Route element={<Header />}>
 						<Route path="/" element={
 							<RequireAuth>
