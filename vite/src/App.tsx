@@ -3,10 +3,11 @@ import { GetAll } from './pages/getall'
 import { GameCanvas } from './game/game'
 import React, { createContext, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
-import { delToken, getToken } from './token/token'
+import { delToken, getToken, saveToken } from './token/token'
 import { LoginForm } from './pages/LoginPage'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fakeAuthProvider } from './auth'
+import axios from "axios";
 
 export interface Destinations {
 	name: string,
@@ -15,11 +16,13 @@ export interface Destinations {
 }
 
 const allRoutes : Destinations[] = [
-	{ name: "Game", path: "/game" , public: false},
+	{ name: "Register", path: "/register", public: true },
+	{ name: "Login", path: "/login", public: true },
 	{ name: "Public", path: "/public", public: true },
+	{ name: "About", path: "/about", public: true },
 	{ name: "Chat", path: "/chat", public: false },
+	{ name: "Game", path: "/game" , public: false},
 	{ name: "Leaderboard", path: "/top", public: false},
-	{ name: "About", path: "/about", public: true }
 ]
 
 //0.Definit l'interface pour le type de contexte passe au provider
@@ -162,6 +165,55 @@ function LoginPage() {
 	);
 }
 
+function RegisterPage() {
+	let auth = useAuthService();
+	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "No info yet...")
+
+	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+
+		let formData = new FormData(event.currentTarget);
+		let username = formData.get("username") as string;
+		let email = formData.get("email") as string;
+		let password = formData.get("password") as string;
+
+		console.log("Trying to register using :", username, email, password)
+		axios
+		  .post("/api/users/signup", {username, email, password})
+		  .then((response) => {
+			saveToken(response.data);
+			auth.login(username, ()=> {})
+			console.log("Successful register")
+			setInfo("Welcome aboard !")
+		  })
+		  .catch((error) => {
+			console.log("Error trying to register", error);
+			setInfo("Oups, something went wrong !")
+		  });
+	}
+
+	return (
+			<>
+			<form onSubmit={handleSubmit}>
+				<div>
+				<label>Username<input name="username" type="text" /></label>
+				</div>
+
+				<div> <label>Email <input name="email" type="email" /> </label>
+				</div>
+
+				<div>
+				<label>Password <input name="password" type="text" /> </label>
+				</div>
+				<button type="submit">Register</button>
+			</form>
+			<div>
+				<p>{info}</p>
+			</div>
+			</>
+	);
+}
+
 function RequireAuth({ children }: { children: JSX.Element }) {
 	let auth = useAuthService();
 	let location = useLocation();
@@ -262,6 +314,7 @@ function App() {
 							}
 						/>
 						<Route path="/login" element={<LoginPage />} />
+						<Route path="/register" element={<RegisterPage />} />
 					</Route>
 				</Routes>
 			</SocketProvider>
