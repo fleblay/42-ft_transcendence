@@ -130,6 +130,7 @@ function AuthStatus() {
 	);
 }
 
+/*
 function LoginPage() {
 	let navigate = useNavigate();
 	let location = useLocation();
@@ -165,6 +166,52 @@ function LoginPage() {
 				<button type="submit">Login</button>
 			</form>
 		</div>
+	);
+}
+*/
+
+function LoginPage() {
+	let auth = useAuthService();
+	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "No info yet...")
+
+	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+
+		let formData = new FormData(event.currentTarget);
+		let email = formData.get("email") as string;
+		let password = formData.get("password") as string;
+
+		console.log("Trying to loggin using :", email, password)
+		axios
+		  .post("/api/users/login", {email, password})
+		  .then((response) => {
+			saveToken(response.data);
+			auth.login(email, ()=> {})
+			console.log("Successful Loggin")
+			setInfo("Welcome back !")
+		  })
+		  .catch((error) => {
+			console.log("Error trying to Loggin", error);
+			setInfo("Oups, something went wrong !")
+		  });
+	}
+
+	return (
+			<>
+			<form onSubmit={handleSubmit}>
+				<div>
+				<label>email<input name="email" type="email" /></label>
+				</div>
+
+				<div>
+				<label>Password <input name="password" type="text" /> </label>
+				</div>
+				<button type="submit">Login</button>
+			</form>
+			<div>
+				<p>{info}</p>
+			</div>
+			</>
 	);
 }
 
