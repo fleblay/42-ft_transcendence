@@ -51,7 +51,7 @@ constructor(private usersService: UsersService, private jwtService: JwtService) 
 			throw new ForbiddenException('username is not unique');
 
 		const user = await this.usersService.create(dataUser);
-		const payload = { username: dataUser.username, sub: user.id}; // sub >
+		const payload = {username: dataUser.username, sub: user.id}; // sub >
 		const options = {expiresIn: '1d'};
 		return {
 			access_token: this.jwtService.sign(payload, options),

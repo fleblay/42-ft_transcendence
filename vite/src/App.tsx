@@ -9,6 +9,20 @@ import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 
 import { fakeAuthProvider } from './auth'
 import { RegisterForm} from './pages/RegisterPage'
 
+export interface Destinations {
+	name: string,
+	path: string,
+	public: boolean
+}
+
+const allRoutes : Destinations[] = [
+	{ name: "Game", path: "/game" , public: false},
+	{ name: "Public", path: "/public", public: true },
+	{ name: "Chat", path: "/chat", public: false },
+	{ name: "Leaderboard", path: "/top", public: false},
+	{ name: "About", path: "/about", public: true }
+]
+
 //0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
 	user: any;
@@ -184,13 +198,15 @@ function Header() {
 }
 
 function Destinations() {
-	const destinations = [
-		{ name: "Game", path: "/game" },
-		{ name: "Public", path: "/public" },
-		{ name: "Chat", path: "/chat" },
-	]
-	const links = destinations.map((destination) => {
-			return (<span><Link to="{destination.path}">{destination.name}</Link></span>)
+	const auth = useAuthService()
+	const links = allRoutes.map((destination) => {
+			if (!auth.user && !destination.public) return (<></>)
+			return (
+			<>
+			<span> </span>
+			<span><Link to={destination.path}>{destination.name}</Link></span>
+			<span> </span>
+			</>)
 	})
 	return (
 		<div>
@@ -226,8 +242,7 @@ function App() {
 		<AuthService>
 			<SocketProvider>
 				<Routes>
-					<Route element={<Destinations />} />
-					<Route element={<Header />}>
+					<Route element={<div> <Destinations /> <Header /> </div>}>
 						<Route path="/" element={
 							<RequireAuth>
 								<div>
