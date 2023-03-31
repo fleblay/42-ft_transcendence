@@ -4,7 +4,21 @@ ALL_VOLUMES			:= $(shell docker volume ls -q)
 ALL_NETWORK			:= $(shell docker network ls --filter type=custom -q)
 
 all: build
-	docker-compose up --no-build &
+	docker-compose up --no-build
+
+#MACOS specific
+
+kill:
+	pkill Docker
+
+docker:
+	open -g /Applications/Docker.app/
+
+detach: build
+	docker-compose up --no-build
+
+follow:
+	docker-compose logs -f
 
 build: .env.template backend/Dockerfile
 	bash envmaker.sh
@@ -31,7 +45,7 @@ endif
 
 rm-all :
 ifneq ($(strip $(ALL_CONTAINERS)), )
-	docker rm $(ALL_CONTAINERS)
+	docker rm -f $(ALL_CONTAINERS)
 else
 	@echo No container to be removed
 endif

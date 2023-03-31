@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent, useContext } from "react";
 import axios from "axios";
 import { saveToken } from "../token/token";
-import { AppContext } from "../App";
+import { SocketContext, SocketContextType } from "../App";
 import { Socket } from "socket.io-client";
 
 interface FormData {
@@ -12,7 +12,7 @@ interface FormData {
 
 export function MyForm() {
 
-	let { socket, reconnect } = useContext<{ socket: Socket, reconnect: () => void }>(AppContext);
+	let { socket} = useContext<SocketContextType>(SocketContext);
 
 	const [formData, setFormData] = useState<FormData>({
 		username: "",
@@ -27,7 +27,7 @@ export function MyForm() {
 			.then((response) => {
 				console.log(response);
 				const user = saveToken(response.data);
-				reconnect()
+				//reconnect()
 			})
 
 			.catch((error) => {

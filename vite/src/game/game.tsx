@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { AppContext } from "../App";
+import { SocketContext } from "../App";
 
 const paddleLength = 40
 const paddleWidth = 5
@@ -29,7 +29,7 @@ export function GameCanvas() {
 	const [posPlayerTwo, setPosPlayerTwo] = useState<number>(canvasHeight / 2); // pour rerender le div au changement slider
 	const [timer, setTimer] = useState<boolean>(false);
 
-	const { socket } = useContext(AppContext)
+	const { socket } = useContext(SocketContext)
 
 	setTimeout(() => {
 		let { x, y, dirX, dirY } = posBall

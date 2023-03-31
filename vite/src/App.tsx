@@ -41,11 +41,11 @@ function AuthService({ children }: { children: React.ReactNode }) {
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-interface SocketContextType {
+export interface SocketContextType {
 	socket: Socket
 }
 
-let SocketContext = React.createContext<SocketContextType>(null!)
+export let SocketContext = React.createContext<SocketContextType>(null!)
 // Appeler par AuthService quand auth.user change de valeur.
 // Creer le socket quand auth.user est defini (On est connecter)
 function SocketProvider({ children }: { children: React.ReactNode }) {
