@@ -17,6 +17,8 @@ export interface Destinations {
 }
 
 const allRoutes : Destinations[] = [
+	{ name: "RegisterOld", path: "/registerold", public: true },
+	{ name: "LoginOld", path: "/loginold", public: true },
 	{ name: "Register", path: "/register", public: true },
 	{ name: "Login", path: "/login", public: true },
 	{ name: "Public", path: "/public", public: true },
