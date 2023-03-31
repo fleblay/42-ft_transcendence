@@ -7,8 +7,11 @@ import { delToken, getToken, saveToken } from './token/token'
 import { LoginForm } from './pages/LoginPage'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fakeAuthProvider } from './auth'
+<<<<<<< HEAD
 import axios from "axios";
+=======
 import { RegisterForm} from './pages/RegisterPage'
+>>>>>>> 7993cd1d10e99c6ee32ffe919863c00f35ef6bd9
 
 export interface Destinations {
 	name: string,
@@ -314,10 +317,13 @@ function App() {
 								</RequireAuth>
 							}
 						/>
-						<Route path="/loginold" element={<LoginPage />} />
-						<Route path="/registerold" element={<RegisterPage />} />
+<<<<<<< HEAD
+						<Route path="/login" element={<LoginPage />} />
+						<Route path="/register" element={<RegisterPage />} />
+=======
 						<Route path="/login" element={<LoginForm />} />
 						<Route path="/register" element={<RegisterForm />} />
+>>>>>>> 7993cd1d10e99c6ee32ffe919863c00f35ef6bd9
 					</Route>
 				</Routes>
 			</SocketProvider>
