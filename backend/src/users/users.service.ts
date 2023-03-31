@@ -7,13 +7,12 @@ import { CreateUserDto } from './dtos/create-user.dto';
 @Injectable()
 export class UsersService {
 
-	
 	constructor(@InjectRepository(User) private repo: Repository<User>){}
 
 	create(dataUser: CreateUserDto){
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
 		const user = this.repo.create(dataUser);
-		console.log(`save user : ${user}`);
+		console.log("save user :", user);
 		return this.repo.save(user);
 	}
 
@@ -28,7 +27,13 @@ export class UsersService {
 
 	async findOneByUsername(username: string) {
 		if (!username) return null;
-		return await this.repo.findOneBy({ username });
+		try {
+			return await this.repo.findOneBy({username});
+		} catch (e)
+		{
+			console.log("Error while findOneByUsername : ", e)
+			return null
+		}
 	}
 
 	async findOneByEmail(email: string) {
