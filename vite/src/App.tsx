@@ -7,6 +7,7 @@ import { delToken, getToken } from './token/token'
 import { LoginForm } from './pages/LoginPage'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fakeAuthProvider } from './auth'
+import { RegisterForm} from './pages/RegisterPage'
 
 //0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
@@ -246,7 +247,8 @@ function App() {
 								</RequireAuth>
 							}
 						/>
-						<Route path="/login" element={<LoginPage />} />
+						<Route path="/login" element={<LoginForm />} />
+						<Route path="/register" element={<RegisterForm />} />
 					</Route>
 				</Routes>
 			</SocketProvider>
