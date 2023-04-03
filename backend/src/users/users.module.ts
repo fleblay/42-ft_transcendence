@@ -10,14 +10,17 @@ import { LocalStrategy } from './local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 
-
 @Module({
-	imports: [TypeOrmModule.forFeature([User]), PassportModule, JwtModule.register({
-		secret: 'secret', // not secure at all need to be changed in production  put in a .env file
-		signOptions: { expiresIn: '60s' },
-	})], 
-  controllers: [UsersController],
-  providers: [AuthService, UsersService, LocalStrategy, JwtStrategy],
-  exports: [AuthService, UsersService]
+	imports: [
+		TypeOrmModule.forFeature([User]),
+		PassportModule,
+		JwtModule.register({
+			secret: 'secret', // not secure at all need to be changed in production  put in a .env file
+			signOptions: { expiresIn: '60s' },
+		})
+	],
+	controllers: [UsersController],
+	providers: [AuthService, UsersService, LocalStrategy, JwtStrategy],
+	exports: [AuthService, UsersService],
 })
-export class UsersModule {}
+export class UsersModule { }

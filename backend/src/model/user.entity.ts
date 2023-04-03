@@ -1,5 +1,6 @@
 
-import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
+import { SavedGame } from './saved-game.entity';
 
 @Entity()
 export class User {
@@ -12,6 +13,10 @@ export class User {
 	email: string;
 	@Column()
 	password: string;
+
+	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
+	@JoinTable()
+	savedGames: SavedGame[];
 
 	@AfterInsert()
 	logInsert() {

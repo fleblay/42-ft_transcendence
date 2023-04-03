@@ -7,6 +7,8 @@ import { UsersModule } from './users/users.module';
 import { User } from './model/user.entity'
 import { EventsModule } from './events/events.module';
 import { LogMiddleware } from './app.middleware';
+import { GameModule } from './game/game.module';
+import { SavedGame } from './model/saved-game.entity';
 
 @Module({
 	imports: [
@@ -23,11 +25,12 @@ import { LogMiddleware } from './app.middleware';
 				username: config.get<string>("POSTGRES_USER"),
 				password: config.get<string>("POSTGRES_PASSWORD"),
 				synchronize: true,
-				entities:[User]
+				entities:[User, SavedGame]
 			})
 		}),
 		UsersModule,
 		EventsModule,
+		GameModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
