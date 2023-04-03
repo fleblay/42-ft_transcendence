@@ -8,7 +8,7 @@ import { LoginForm } from './pages/LoginPage'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fakeAuthProvider } from './auth'
 import axios from "axios";
-import { RegisterForm} from './pages/RegisterPage'
+import { RegisterForm } from './pages/RegisterPage'
 
 export interface Destinations {
 	name: string,
@@ -16,7 +16,7 @@ export interface Destinations {
 	public: boolean
 }
 
-const allRoutes : Destinations[] = [
+const allRoutes: Destinations[] = [
 	{ name: "RegisterOld", path: "/registerold", public: true },
 	{ name: "LoginOld", path: "/loginold", public: true },
 	{ name: "Register", path: "/register", public: true },
@@ -24,8 +24,8 @@ const allRoutes : Destinations[] = [
 	{ name: "Public", path: "/public", public: true },
 	{ name: "About", path: "/about", public: true },
 	{ name: "Chat", path: "/chat", public: false },
-	{ name: "Game", path: "/game" , public: false},
-	{ name: "Leaderboard", path: "/top", public: false},
+	{ name: "Game", path: "/game", public: false },
+	{ name: "Leaderboard", path: "/top", public: false },
 ]
 
 //0.Definit l'interface pour le type de contexte passe au provider
@@ -75,7 +75,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 		if (!auth.user) return
 		function onConnect() {
 			console.log('Connected to socket')
-			socket.emit('ping', {message: "This is my first ping"}, (response: any)  => {
+			socket.emit('ping', { message: "This is my first ping" }, (response: any) => {
 				console.log(response)
 			})
 		}
@@ -92,13 +92,13 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 			socket.off('message', onMessage);
 		}
 	}, [auth.user])
-	if(!auth.user) return <>{children}</>;
+	if (!auth.user) return <>{children}</>;
 
 	const socket = io({
-			auth: {
-				token: getToken()
-			}
-		})
+		auth: {
+			token: getToken()
+		}
+	})
 
 	const value = { socket }
 	console.log("Socket Creation")
@@ -183,35 +183,35 @@ function LoginPage() {
 
 		console.log("Trying to loggin using :", email, password)
 		axios
-		  .post("/api/users/login", {email, password})
-		  .then((response) => {
-			saveToken(response.data);
-			auth.login(email, ()=> {})
-			console.log("Successful Loggin")
-			setInfo("Welcome back !")
-		  })
-		  .catch((error) => {
-			console.log("Error trying to Loggin", error);
-			setInfo("Oups, something went wrong !")
-		  });
+			.post("/api/users/login", { email, password })
+			.then((response) => {
+				saveToken(response.data);
+				auth.login(email, () => { })
+				console.log("Successful Loggin")
+				setInfo("Welcome back !")
+			})
+			.catch((error) => {
+				console.log("Error trying to Loggin", error);
+				setInfo("Oups, something went wrong ! : " + error.response.data.message)
+			});
 	}
 
 	return (
-			<>
+		<>
 			<form onSubmit={handleSubmit}>
 				<div>
-				<label>email<input name="email" type="email" /></label>
+					<label>email<input name="email" type="email" /></label>
 				</div>
 
 				<div>
-				<label>Password <input name="password" type="text" /> </label>
+					<label>Password <input name="password" type="text" /> </label>
 				</div>
 				<button type="submit">Login</button>
 			</form>
 			<div>
 				<p>{info}</p>
 			</div>
-			</>
+		</>
 	);
 }
 
@@ -229,38 +229,37 @@ function RegisterPage() {
 
 		console.log("Trying to register using :", username, email, password)
 		axios
-		  .post("/api/users/signup", {username, email, password})
-		  .then((response) => {
-			saveToken(response.data);
-			auth.login(username, ()=> {})
-			console.log("Successful register")
-			setInfo("Welcome aboard !")
-		  })
-		  .catch((error) => {
-			console.log("Error trying to register", error);
-			setInfo("Oups, something went wrong !")
-		  });
+			.post("/api/users/signup", { username, email, password })
+			.then((response) => {
+				saveToken(response.data);
+				auth.login(username, () => { })
+				console.log("Successful register")
+			})
+			.catch((error) => {
+				console.log("Error trying to register : " + error);
+				setInfo("Oups, something went wrong ! : " + error.response.data.message)
+			});
 	}
 
 	return (
-			<>
+		<>
 			<form onSubmit={handleSubmit}>
 				<div>
-				<label>Username<input name="username" type="text" /></label>
+					<label>Username<input name="username" type="text" /></label>
 				</div>
 
 				<div> <label>Email <input name="email" type="email" /> </label>
 				</div>
 
 				<div>
-				<label>Password <input name="password" type="text" /> </label>
+					<label>Password <input name="password" type="text" /> </label>
 				</div>
 				<button type="submit">Register</button>
 			</form>
 			<div>
 				<p>{info}</p>
 			</div>
-			</>
+		</>
 	);
 }
 
@@ -301,12 +300,12 @@ function Header() {
 function Destinations() {
 	const auth = useAuthService()
 	const links = allRoutes.map((destination) => {
-			if (!auth.user && !destination.public) return (<></>)
-			return (
+		if (!auth.user && !destination.public) return (<></>)
+		return (
 			<>
-			<span> </span>
-			<span><Link to={destination.path}>{destination.name}</Link></span>
-			<span> </span>
+				<span> </span>
+				<span><Link to={destination.path}>{destination.name}</Link></span>
+				<span> </span>
 			</>)
 	})
 	return (
@@ -319,10 +318,10 @@ function Destinations() {
 //export const AppContext = createContext<any>({});
 
 function GamePage() {
-	const {socket} = React.useContext(SocketContext);
+	const { socket } = React.useContext(SocketContext);
 
-	React.useEffect(()=>{
-		function onNewLobby(data: any){
+	React.useEffect(() => {
+		function onNewLobby(data: any) {
 			console.log('new lobby', data)
 		}
 		socket.on('newLobby', onNewLobby)
@@ -331,7 +330,7 @@ function GamePage() {
 		}
 	}, [])
 	return (
-		<button onClick={()=> socket.emit('createLobby', {message:'hi'})}>
+		<button onClick={() => socket.emit('createLobby', { message: 'hi' })}>
 			Hello
 		</button>
 	);
@@ -347,7 +346,7 @@ function App() {
 						<Route path="/" element={
 							<RequireAuth>
 								<div>
-								<GamePage/>
+									<GamePage />
 								</div>
 							</RequireAuth>
 						} />
@@ -357,8 +356,8 @@ function App() {
 							element={
 								<RequireAuth>
 									<>
-									<label>w</label>
-									<LoginForm />
+										<label>w</label>
+										<LoginForm />
 									</>
 								</RequireAuth>
 							}
@@ -372,74 +371,74 @@ function App() {
 			</SocketProvider>
 		</AuthService>
 	);
-/*
-	function newSocket() {
-		return io({
-			auth: {
-				token: getToken()
+	/*
+		function newSocket() {
+			return io({
+				auth: {
+					token: getToken()
+				}
+			})
+		}
+	
+		function reconnect() {
+			socket.close()
+			setSocket(newSocket());
+		}
+	
+		const [socket, setSocket] = useState<Socket>(newSocket());
+		const navigate = useNavigate()
+		React.useEffect(() => {
+			console.log('Creating event listener');
+			function onConnect() {
+				console.log('Emiting a ping beging')
+				// socket.emit('ping', 'This is my first ping')e
+				console.log('Emiting a ping end')
+	
 			}
-		})
-	}
-
-	function reconnect() {
-		socket.close()
-		setSocket(newSocket());
-	}
-
-	const [socket, setSocket] = useState<Socket>(newSocket());
-	const navigate = useNavigate()
-	React.useEffect(() => {
-		console.log('Creating event listener');
-		function onConnect() {
-			console.log('Emiting a ping beging')
-			// socket.emit('ping', 'This is my first ping')e
-			console.log('Emiting a ping end')
-
-		}
-		function onMessage(data: any) {
-			console.log('Receiving a message')
-			console.log(data)
-		}
-
-		function onException(data: any) {
-			if (data.status === "error") {
-				console.log('Redirecting to login')
-				navigate('/login')
+			function onMessage(data: any) {
+				console.log('Receiving a message')
+				console.log(data)
 			}
-			console.log('Receiving an exception')
-			console.log(data)
-			socket.disconnect()
-		}
-
-		socket.on('connect', onConnect);
-		socket.on('message', onMessage)
-		socket.on('exception', onException)
-		return () => {
-			socket.off('connect', onConnect);
-			socket.off('message', onMessage)
-			socket.off('exception', onException)
-		}
-	}, [socket])
-
-	return (
-		<div className="App">
-			<AppContext.Provider value={{ socket, reconnect, navigate }}>
-				<MyForm />
-				<GetAll />
-				<GameCanvas />
-				<div>
-				<button onClick={() => { socket.emit('ping', {word: 'Coucou'}) }}>Say hello to everyone</button>
-				</div>
-				<div>
-				<button onClick={() => { socket.emit('createLobby') }}>Create a game Lobby</button>
-				</div>
-				<Link to="/login"> go login</Link>
-				<Link to="/register"> go register</Link>
-				<div onClick={() => { delToken() }}>Logout</div>
-			</AppContext.Provider>
-		</div>
-	)
-	*/
+	
+			function onException(data: any) {
+				if (data.status === "error") {
+					console.log('Redirecting to login')
+					navigate('/login')
+				}
+				console.log('Receiving an exception')
+				console.log(data)
+				socket.disconnect()
+			}
+	
+			socket.on('connect', onConnect);
+			socket.on('message', onMessage)
+			socket.on('exception', onException)
+			return () => {
+				socket.off('connect', onConnect);
+				socket.off('message', onMessage)
+				socket.off('exception', onException)
+			}
+		}, [socket])
+	
+		return (
+			<div className="App">
+				<AppContext.Provider value={{ socket, reconnect, navigate }}>
+					<MyForm />
+					<GetAll />
+					<GameCanvas />
+					<div>
+					<button onClick={() => { socket.emit('ping', {word: 'Coucou'}) }}>Say hello to everyone</button>
+					</div>
+					<div>
+					<button onClick={() => { socket.emit('createLobby') }}>Create a game Lobby</button>
+					</div>
+					<Link to="/login"> go login</Link>
+					<Link to="/register"> go register</Link>
+					<div onClick={() => { delToken() }}>Logout</div>
+				</AppContext.Provider>
+			</div>
+		)
+		*/
 }
 
 export default App
