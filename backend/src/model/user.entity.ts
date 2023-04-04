@@ -1,5 +1,5 @@
 
-import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
+import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { SavedGame } from './saved-game.entity';
 
 @Entity()
@@ -18,6 +18,10 @@ export class User {
 	@JoinTable()
 	savedGames: SavedGame[];
 
+	@OneToMany(() => SavedGame, (savedGame) => savedGame.winner)
+	//@JoinTable()
+	wonGames: SavedGame[];
+
 	@AfterInsert()
 	logInsert() {
 		console.log(`insert User with id ${this.id}`);
@@ -32,4 +36,5 @@ export class User {
 	logRemove() {
 		console.log(`remove User with id ${this.id}`);
 	}
+
 }

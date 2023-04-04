@@ -4,10 +4,10 @@ import { GameController } from './game.controller';
 import { UsersModule } from 'src/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SavedGame } from 'src/model/saved-game.entity';
-
+import { GameCluster } from './game-cluster';
 @Module({
 	exports: [GameService],
-	providers: [GameService],
+	providers: [GameService, GameCluster],
 	controllers: [GameController],
 	imports: [
 		UsersModule,

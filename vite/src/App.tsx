@@ -321,7 +321,7 @@ function GamePage() {
 	const { socket } = React.useContext(SocketContext);
 	const [gameId, setGameId] = React.useState<string>("")
 
-	React.useEffect(() => {
+/* 	React.useEffect(() => {
 		function onNewLobby(data: any) {
 			console.log('new lobby', data)
 		}
@@ -329,10 +329,10 @@ function GamePage() {
 		return () => {
 			socket.off('newLobby', onNewLobby)
 		}
-	}, [])
+	}, []) */
 	return (
 		<>
-		<button onClick={() => socket.emit('createLobby', { message: 'hi' }, (response:  any) => {setGameId(response.gameId)})}>
+		<button onClick={() => socket.emit('game.join', {} , (response:  any) => {setGameId(response)})}>
 			createGame
 		</button>
 		<div>{gameId}
