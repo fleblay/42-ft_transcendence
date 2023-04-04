@@ -1,10 +1,10 @@
-
+import { UUID } from '../type';
 
 export class Game {
 
-	constructor(private gameId: string, private privateGame : boolean = false) {}
+	constructor(private gameId: UUID, private privateGame : boolean = false) {}
 
-	get GameId() : string {
+	get GameId() : UUID {
 		return this.gameId;
 	}
 	

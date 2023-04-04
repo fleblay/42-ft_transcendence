@@ -38,7 +38,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	handleConnection(@EventUserDecorator() user : User) {
-		console.log('New connection from : ', user.username)
+		console.log('New connection from : ', user)
 	}
 
 	handleDisconnect(@EventUserDecorator() user : User) {
@@ -54,12 +54,12 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	@SubscribeMessage('game.join')
-	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:GameJoinDto): string
+	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:GameJoinDto): {}
 	{
 		console.log("New join event")
 		const gameId = this.gameService.join(client, user , data.gameId)
 		console.log("Game id is : ", gameId);
-		return gameId;
+		return {gameId, user};
 	}
 
 	@SubscribeMessage('createLobby')

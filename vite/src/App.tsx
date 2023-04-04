@@ -332,7 +332,7 @@ function GamePage() {
 	}, []) */
 	return (
 		<>
-		<button onClick={() => socket.emit('game.join', {} , (response:  any) => {setGameId(response)})}>
+		<button onClick={() => socket.emit('game.join', {} , (response:  any) => {console.log(response.user); setGameId(response.gameId)})}>
 			createGame
 		</button>
 		<div>{gameId}

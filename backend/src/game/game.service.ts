@@ -6,6 +6,8 @@ import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { GameCluster } from './game-cluster';
 import { User } from 'src/model/user.entity';
+import { UUID } from '../type';
+
 
 @Injectable()
 export class GameService {
@@ -19,7 +21,7 @@ export class GameService {
 		this.server = server;
 	}
 
-	join(client : Socket, user : User, gameId? : string ) : string {	
+	join(client : Socket, user : User, gameId? : UUID ) : UUID {	
 		const game = this.gameCluster.createGame();
 		return game.GameId;
 	}
