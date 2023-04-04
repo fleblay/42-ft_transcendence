@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Server, Socket } from 'socket.io'
 import { SavedGame } from 'src/model/saved-game.entity';
@@ -9,7 +9,6 @@ import { Repository } from 'typeorm';
 export class GameService {
 
 	private server: Server;
-	
 	constructor(private usersService: UsersService, @InjectRepository(SavedGame) private repo: Repository<SavedGame>){}
 
 	setWsServer(server: Server) {

@@ -1,4 +1,13 @@
-import {ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, OnGatewayInit } from '@nestjs/websockets';
+import {
+	ConnectedSocket,
+	SubscribeMessage,
+	WebSocketGateway,
+	WebSocketServer,
+	MessageBody,
+	OnGatewayInit,
+	OnGatewayConnection,
+	OnGatewayDisconnect
+} from '@nestjs/websockets';
 import {UseGuards, UseInterceptors} from '@nestjs/common';
 import {Server, Socket } from 'socket.io'
 import {EventGuard} from './guards/event.guard'
@@ -18,7 +27,7 @@ import {GameService} from '../game/game.service'
 //@UseGuards(EventGuard)
 // Adds client info into data of message -> Needed for EventUserDecorator
 @UseInterceptors(WebSocketUserInterceptor)
-export class EventsGateway implements OnGatewayInit {
+export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
 	@WebSocketServer() server: Server
 
@@ -26,6 +35,14 @@ export class EventsGateway implements OnGatewayInit {
 
 	afterInit(server: Server){
 		this.gameService.setWsServer(server)
+	}
+
+	handleConnection(@EventUserDecorator() user : User) {
+		console.log('New connection from : ', user.username)
+	}
+
+	handleDisconnect(@EventUserDecorator() user : User) {
+		console.log('End of connection from : ', user.username)
 	}
 
 	@SubscribeMessage('ping')

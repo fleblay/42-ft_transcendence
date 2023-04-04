@@ -319,6 +319,7 @@ function Destinations() {
 
 function GamePage() {
 	const { socket } = React.useContext(SocketContext);
+	const [gameId, setGameId] = React.useState<string>("")
 
 	React.useEffect(() => {
 		function onNewLobby(data: any) {
@@ -330,9 +331,14 @@ function GamePage() {
 		}
 	}, [])
 	return (
-		<button onClick={() => socket.emit('createLobby', { message: 'hi' })}>
-			Hello
+		<>
+		<button onClick={() => socket.emit('createLobby', { message: 'hi' }, (response:  any) => {setGameId(response.gameId)})}>
+			createGame
 		</button>
+		<div>{gameId}
+		</div>
+		</>
+
 	);
 }
 
@@ -343,7 +349,7 @@ function App() {
 			<SocketProvider>
 				<Routes>
 					<Route element={<div> <Destinations /> <Header /> </div>}>
-						<Route path="/" element={
+						<Route path="/game" element={
 							<RequireAuth>
 								<div>
 									<GamePage />
