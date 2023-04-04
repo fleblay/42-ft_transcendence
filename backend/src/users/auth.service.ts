@@ -19,7 +19,7 @@ constructor(private usersService: UsersService, private jwtService: JwtService) 
 		return null;
 	}
 
-	async validateToken(bearerToken: string): Promise<User> | null{
+	validateToken(bearerToken: string): Promise<User> | null{
 		try {
 		const jwtResponse = this.jwtService.verify(bearerToken) // compliant to security rules of year 3000
 		console.log(`User id is `, jwtResponse)

@@ -38,7 +38,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	handleConnection(@EventUserDecorator() user : User) {
-		console.log('New connection from : ', user)
+		console.log('New connection from : ', user?.username)
 	}
 
 	handleDisconnect(@EventUserDecorator() user : User) {
