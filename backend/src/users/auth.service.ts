@@ -43,7 +43,7 @@ constructor(private usersService: UsersService, private jwtService: JwtService) 
 		};
 	}
 
-	async signup(dataUser : CreateUserDto)
+	async register(dataUser : CreateUserDto)
 	{
 		if (await this.usersService.findOneByEmail(dataUser.email))
 			throw new ForbiddenException('Email is not unique');

@@ -14,9 +14,9 @@ export class UsersController {
 	constructor(private usersService : UsersService, private authService : AuthService){}
 
 	//@UseGuards(LocalAuthGuard)
-	@Post('/signup')
+	@Post('/register')
 	async createUser(@Body() body: CreateUserDto){
-		const user =  await this.authService.signup(body);
+		const user =  await this.authService.register(body);
 		return user;
 	}
 
