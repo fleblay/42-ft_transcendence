@@ -18,13 +18,14 @@ export interface Destinations {
 	public: boolean
 }
 
-const allRoutes: Destinations[] = [
+export const allRoutes: Destinations[] = [
 	{ name: "Register", path: "/register", public: true },
 	{ name: "Login", path: "/login", public: true },
 	{ name: "Public", path: "/public", public: true },
 	{ name: "About", path: "/about", public: true },
 	{ name: "Chat", path: "/chat", public: false },
 	{ name: "Game", path: "/game", public: false },
+	{ name: "ListAll", path: "/list", public: true },
 	{ name: "Leaderboard", path: "/top", public: false },
 ]
 
@@ -290,6 +291,16 @@ function Destinations() {
 
 //export const AppContext = createContext<any>({});
 
+function ListGames() {
+	const [list, setList] = React.useState("empty")
+
+	return (
+	<>
+	<button onClick={()=> {axios.get("/api/game/current").then((response)=> {console.log(response.data);setList(response.data.toString())})}}>GetList</button>
+	<div> {list} </div>
+	</>
+	)
+	}
 
 function App() {
 
@@ -320,6 +331,7 @@ function App() {
 						/>
 						<Route path="/login" element={<LoginForm />} />
 						<Route path="/register" element={<RegisterForm />} />
+						<Route path="/list" element={<ListGames />} />
 					</Route>
 				</Routes>
 			</SocketProvider>

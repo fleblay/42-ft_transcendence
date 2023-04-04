@@ -1,5 +1,5 @@
 import React from "react";
-import { IUser } from "../App";
+import { IUser, allRoutes } from "../App";
 import { AuthProvider } from "../auth";
 import { LoginData } from "../pages/LoginPage";
 import { delToken, getToken, saveToken } from "../token/token";
@@ -30,7 +30,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 		.then((response) => {
 			console.log(response.data)
 			setUser(response.data)
-		
+
 		}).catch((error) => {
 			console.log("Not connected");
 			navigate("/login", { replace: true });
@@ -38,7 +38,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 		})
 	}
 
-	if (!user && location.pathname !== "/login" && location.pathname !== "/register") {
+	if (!user && !allRoutes.find((el) => el.path === location.pathname)?.public) {
 		if (getToken())
 			getUser()
 		else

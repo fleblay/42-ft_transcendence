@@ -57,7 +57,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:GameJoinDto): {}
 	{
 		console.log("New join event")
-		const gameId = this.gameService.join(client, user , data.gameId)
+		const gameId = this.gameService.join(client, user, data.gameId)
 		console.log("Game id is : ", gameId);
 		return {gameId, user};
 	}
