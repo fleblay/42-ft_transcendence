@@ -4,11 +4,13 @@ import { GameCanvas } from './game/game'
 import React, { createContext, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
 import { delToken, getToken, saveToken } from './token/token'
-import { LoginForm } from './pages/LoginPage'
+import { LoginData, LoginForm } from './pages/LoginPage'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { fakeAuthProvider } from './auth'
+import { AuthProvider } from './auth'
 import axios from "axios";
 import { RegisterForm } from './pages/RegisterPage'
+import { CreateGame } from './component/CreateGame'
+import { AuthService, useAuthService } from './auth/AuthService'
 
 export interface Destinations {
 	name: string,
@@ -17,8 +19,6 @@ export interface Destinations {
 }
 
 const allRoutes: Destinations[] = [
-	{ name: "RegisterOld", path: "/registerold", public: true },
-	{ name: "LoginOld", path: "/loginold", public: true },
 	{ name: "Register", path: "/register", public: true },
 	{ name: "Login", path: "/login", public: true },
 	{ name: "Public", path: "/public", public: true },
@@ -28,37 +28,9 @@ const allRoutes: Destinations[] = [
 	{ name: "Leaderboard", path: "/top", public: false },
 ]
 
-//0.Definit l'interface pour le type de contexte passe au provider
-interface AuthContextType {
-	user: any;
-	login: (user: string, callback: VoidFunction) => void;
-	logout: (callback: VoidFunction) => void;
-}
-
-//1.Definit la value passe pour tous les enfants du AuthContext.Provider
-let AuthContext = React.createContext<AuthContextType>(null!);
-
-//2.Definit la value passe pour tous les enfants du AuthContext.Provider
-//3.Renvoie la balise AuthContext.Provider
-function AuthService({ children }: { children: React.ReactNode }) {
-	let [user, setUser] = React.useState<any>(null);
-
-	let login = (newUser: string, callback: VoidFunction) => {
-		return fakeAuthProvider.login(() => {
-			setUser(newUser);
-			callback();
-		});
-	};
-
-	let logout = (callback: VoidFunction) => {
-		return fakeAuthProvider.logout(() => {
-			setUser(null);
-			callback();
-		});
-	};
-
-	let value = { user, login, logout };
-	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+export interface IUser {
+	username: string,
+	email: string,
 }
 
 export interface SocketContextType {
@@ -105,9 +77,6 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
 }
 
-function useAuthService() {
-	return React.useContext(AuthContext);
-}
 function AuthStatus() {
 	let auth = useAuthService();
 	let navigate = useNavigate();
@@ -118,7 +87,7 @@ function AuthStatus() {
 
 	return (
 		<p>
-			Welcome {auth.user}!{" "}
+			Welcome {auth.user.username}!{" "}
 			<button
 				onClick={() => {
 					auth.logout(() => navigate("/"));
@@ -169,7 +138,7 @@ function LoginPage() {
 	);
 }
 */
-
+/*
 function LoginPage() {
 	let auth = useAuthService();
 	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "No info yet...")
@@ -186,7 +155,7 @@ function LoginPage() {
 			.post("/api/users/login", { email, password })
 			.then((response) => {
 				saveToken(response.data);
-				auth.login(email, () => { })
+				auth.login(email)
 				console.log("Successful Loggin")
 				setInfo("Welcome back !")
 			})
@@ -262,6 +231,7 @@ function RegisterPage() {
 		</>
 	);
 }
+*/
 
 function RequireAuth({ children }: { children: JSX.Element }) {
 	let auth = useAuthService();
@@ -272,7 +242,10 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 		// trying to go to when they were redirected. This allows us to send them
 		// along to that page after they login, which is a nicer user experience
 		// than dropping them off on the home page.
-		return <Navigate to="/login" state={{ from: location }} replace />;
+		return <>
+		<Link to="/login">Login Page</Link>;
+		<Link to="/register">Register Page</Link>;
+		</>
 	}
 
 	return children;
@@ -317,30 +290,6 @@ function Destinations() {
 
 //export const AppContext = createContext<any>({});
 
-function GamePage() {
-	const { socket } = React.useContext(SocketContext);
-	const [gameId, setGameId] = React.useState<string>("")
-
-/* 	React.useEffect(() => {
-		function onNewLobby(data: any) {
-			console.log('new lobby', data)
-		}
-		socket.on('newLobby', onNewLobby)
-		return () => {
-			socket.off('newLobby', onNewLobby)
-		}
-	}, []) */
-	return (
-		<>
-		<button onClick={() => socket.emit('game.join', {} , (response:  any) => {console.log(response.user); setGameId(response.gameId)})}>
-			createGame
-		</button>
-		<div>{gameId}
-		</div>
-		</>
-
-	);
-}
 
 function App() {
 
@@ -349,10 +298,11 @@ function App() {
 			<SocketProvider>
 				<Routes>
 					<Route element={<div> <Destinations /> <Header /> </div>}>
+						<Route path="/" element={<Navigate to='/game' replace />} />
 						<Route path="/game" element={
 							<RequireAuth>
 								<div>
-									<GamePage />
+									<CreateGame />
 								</div>
 							</RequireAuth>
 						} />
@@ -368,8 +318,6 @@ function App() {
 								</RequireAuth>
 							}
 						/>
-						<Route path="/loginold" element={<LoginPage />} />
-						<Route path="/registerold" element={<RegisterPage />} />
 						<Route path="/login" element={<LoginForm />} />
 						<Route path="/register" element={<RegisterForm />} />
 					</Route>

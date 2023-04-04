@@ -1,13 +1,17 @@
-const fakeAuthProvider = {
+import axios from "axios";
+import { saveToken } from "./token/token";
+import { LoginData } from "./pages/LoginPage";
+import { IUser } from "./App";
+
+const AuthProvider = {
 	isAuthenticated: false,
-	login(callback: VoidFunction) {
-		fakeAuthProvider.isAuthenticated = true;
-		setTimeout(callback, 100); // fake async
+	login(loginData: LoginData): void {
+
 	},
 	logout(callback: VoidFunction) {
-		fakeAuthProvider.isAuthenticated = false;
+		AuthProvider.isAuthenticated = false;
 		setTimeout(callback, 100);
 	},
 };
 
-export { fakeAuthProvider };
+export { AuthProvider };
