@@ -3,9 +3,11 @@ import { SocketContext } from '../App';
 import { Update } from 'vite/types/hmrPayload';
 import { IgameInfo, GameStatus } from '../types';
 import { GameScreen } from './GameScreen';
+import { getMenuItemUtilityClass } from '@mui/material';
 
 interface Iprops {
-	startGameInfo: IgameInfo
+	startGameInfo: IgameInfo,
+	gameId: string
 }
 
 export function CreateGame(): JSX.Element {
@@ -45,7 +47,7 @@ export function CreateGame(): JSX.Element {
 			<div>{gameId}
 			</div>
 			{
-				gameInfo && <GameScreen startGameInfo={gameInfo} ></GameScreen>
+				gameInfo && <GameScreen startGameInfo={gameInfo} gameId={gameId} ></GameScreen>
 			}
 
 		</>
