@@ -1,28 +1,55 @@
 import React from 'react';
 import { SocketContext } from '../App';
-
+import { Update } from 'vite/types/hmrPayload';
+import { IgameInfo, GameStatus } from '../types';
 
 
 export function CreateGame(): JSX.Element {
 	const { socket } = React.useContext(SocketContext);
 	const [gameId, setGameId] = React.useState<string>("")
+	const [gameInfo, setGameInfo] = React.useState<IgameInfo>();
 
-/* 	React.useEffect(() => {
-		function onNewLobby(data: any) {
-			console.log('new lobby', data)
-		}
-		socket.on('newLobby', onNewLobby)
-		return () => {
-			socket.off('newLobby', onNewLobby)
-		}
-	}, []) */
+	/* 	React.useEffect(() => {
+			function onNewLobby(data: any) {
+				console.log('new lobby', data)
+			}
+			socket.on('newLobby', onNewLobby)
+			return () => {
+				socket.off('newLobby', onNewLobby)
+			}
+		}, []) */
 	return (
 		<>
-			<button onClick={() => socket.emit('game.join', {} , (response:  any) => {console.log(response.user); setGameId(response.gameId)})}>
+			<button onClick={() => socket.emit('game.join', {}, (response: any) => {
+
+				if (response.error) {
+					console.log(response.error);
+					setGameId(response.error);
+				}
+				else {
+					console.log(response.user);
+					setGameId(response.gameId);
+					socket.on('game.update', (data: IgameInfo) => {
+						console.log('game.update', data);
+						setGameInfo(data);
+					});
+				}
+			}
+			)}>
 				createGame
 			</button>
 			<div>{gameId}
 			</div>
+			<div> <h1>Game Info :</h1></div>
+			<div> posBall x :{gameInfo?.posBall.x} </div>
+			<div> posBall y: {gameInfo?.posBall.y} </div>
+			<div> posP1: {gameInfo?.posP1} </div>
+			<div> posP2: {gameInfo?.posP2} </div>
+			<div> score: {gameInfo?.score} </div>
+			<div> status: {gameInfo?.status} </div>
+			<div> date: {gameInfo?.date.toString()} </div>
+
+
 		</>
 
 	);
