@@ -148,24 +148,26 @@ export class Game {
 		//Condition de win/loose
 		if (this.posBall.x <= 0)
 		{
-			this.score[0] += 1
+			this.score[1] += 1
 			this.posBall = {x: canvasHeight / 2, y: canvasWidth / 2 }
 		}
 		else if (this.posBall.x >= canvasWidth)
 		{
-			this.score[1] += 1
+			this.score[0] += 1
 			this.posBall = {x: canvasHeight / 2, y: canvasWidth / 2 }
 		}
 		if (this.score[0] + this.score[1] === 5)
+		{
 			this.status = GameStatus.end
+			clearInterval(this.intervalId)
+		}
 
 		this.updateInfo(this.generateGameInfo());
 	}
 
 	play() {
-		this.intervalId = setInterval(() => { this.gameLoop() }, 42)
+		this.intervalId = setInterval(() => { this.gameLoop() }, 40)
 		this.status = GameStatus.playing
-		setTimeout(() => clearInterval(this.intervalId), 1200000);
 	}
 
 	get GameId(): UUID {
