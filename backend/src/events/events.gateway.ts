@@ -54,12 +54,18 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	@SubscribeMessage('game.join')
-	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:GameJoinDto): {}
+	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:GameJoinDto): { gameId?: string, error?: string, user?: User}
 	{
 		console.log("New join event")
-		const gameId = this.gameService.join(client, user, data.gameId)
-		console.log("Game id is : ", gameId);
-		return {gameId, user};
+		try {
+			const gameId = this.gameService.join(client, user, data.gameId)
+			console.log("Game id is : ", gameId);
+			return {gameId, user};
+		}
+		catch (e) {
+			return {error: e.message as string}
+		}
+		
 	}
 
 	@SubscribeMessage('createLobby')
