@@ -2,8 +2,6 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "../App";
 import { IgameInfo, GameStatus } from "../types";
 import { useAuthService } from "../auth/AuthService";
-import { useScrollDirection } from "../useScrollDirection";
-
 
 interface Iprops {
 	startGameInfo: IgameInfo,
@@ -26,13 +24,44 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 
 	let auth = useAuthService();
 
-	const scrollDirection = useScrollDirection();
+	const [keyDown, setKeyDown] = useState({ up: false, down: false });
 
 	useEffect(() => {
-		console.log('scrollDirection', scrollDirection);
+		const interval = setInterval(() => {
+			if (keyDown.up) {
+				socket.emit('game.play.move', { gameId: gameId, move: 'Up' })
+			}
+			if (keyDown.down) {
+				socket.emit('game.play.move', { gameId: gameId, move: 'Down' })
+			}
+		}, 100);
+		return () => clearInterval(interval);
+	}, [keyDown])
 
-		socket.emit('game.play.move', {gameId: gameId , move: scrollDirection})
-	}, [scrollDirection])
+	useEffect(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			if (e.key === 'ArrowUp') {
+				setKeyDown({ up: true, down: false })
+			}
+			if (e.key === 'ArrowDown') {
+				setKeyDown({ up: false, down: true })
+			}
+		}
+		function handleKeyUp(e: KeyboardEvent) {
+			if (e.key === 'ArrowUp') {
+				setKeyDown({ up: false, down: false })
+			}
+			if (e.key === 'ArrowDown') {
+				setKeyDown({ up: false, down: false })
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown)
+		window.addEventListener('keyup', handleKeyUp)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+			window.removeEventListener('keyup', handleKeyUp)
+		}
+	}, [])
 
 	useEffect(() => {
 		const context2d = canvasRef.current?.getContext('2d');
@@ -87,22 +116,22 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		}
 	}, [])
 
-	useEffect(() => {
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === 'ArrowUp') {
-				console.log('game.play.move', {input :{move : 'Up'}});
-				socket.emit('game.play.move', {gameId : gameId, move : 'Up'})
-			}
-			if (e.key === 'ArrowDown') {
-				console.log('game.play.move', {input :{move : 'Up'}});
-				socket.emit('game.play.move', {gameId: gameId , move : 'Down'})
-			}
-		}
-		window.addEventListener('keydown', handleKeyDown)
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown)
-		}
-	}, [])
+	// useEffect(() => {
+	// 	function handleKeyDown(e: KeyboardEvent) {
+	// 		if (e.key === 'ArrowUp') {
+	// 			console.log('game.play.move', {input :{move : 'Up'}});
+	// 			socket.emit('game.play.move', {gameId : gameId, move : 'Up'})
+	// 		}
+	// 		if (e.key === 'ArrowDown') {
+	// 			console.log('game.play.move', {input :{move : 'Up'}});
+	// 			socket.emit('game.play.move', {gameId: gameId , move : 'Down'})
+	// 		}
+	// 	}
+	// 	window.addEventListener('keydown', handleKeyDown)
+	// 	return () => {
+	// 		window.removeEventListener('keydown', handleKeyDown)
+	// 	}
+	// }, [])
 
 	return <div>
 			<div> <h1>Game Info :</h1></div>
