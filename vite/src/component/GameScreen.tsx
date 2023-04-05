@@ -70,10 +70,10 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.key === 'ArrowUp') {
-				socket.emit('game.play.move.' + gameId, {userId : auth.user , input :{move : 'Up'}})
+				socket.emit('game.play.move.' + gameId, {userId : auth.user?.id , input :{move : 'Up'}})
 			}
 			if (e.key === 'ArrowDown') {
-				socket.emit('game.play.move.' + gameId, {userId : auth.user ,input : {move : 'Down'}})
+				socket.emit('game.play.move.' + gameId, {userId : auth.user?.id ,input : {move : 'Down'}})
 			}
 		}
 		window.addEventListener('keydown', handleKeyDown)
