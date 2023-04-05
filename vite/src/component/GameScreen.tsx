@@ -34,16 +34,16 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 			if (keyDown.down) {
 				socket.emit('game.play.move', { gameId: gameId, move: 'Down' })
 			}
-		}, 100);
+		}, 10);
 		return () => clearInterval(interval);
 	}, [keyDown])
 
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === 'ArrowUp') {
+			if (e.key === 'ArrowUp' && keyDown.up === false) {
 				setKeyDown({ up: true, down: false })
 			}
-			if (e.key === 'ArrowDown') {
+			if (e.key === 'ArrowDown' && keyDown.down === false ) {
 				setKeyDown({ up: false, down: true })
 			}
 		}
