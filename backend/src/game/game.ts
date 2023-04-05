@@ -67,6 +67,7 @@ export class Game {
 		if (foundPlayer === null)
 			return
 		if (input.move !== undefined) {
+			console.log(`Input is ${input.move}`)
 			switch (input.move) {
 				case ("Up"):
 					foundPlayer.pos -= playerSpeed
@@ -153,7 +154,7 @@ export class Game {
 	play() {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 42)
 		this.status = GameStatus.playing
-		setTimeout(() => clearInterval(this.intervalId), 60000);
+		setTimeout(() => clearInterval(this.intervalId), 1200000);
 	}
 
 	get GameId(): UUID {
