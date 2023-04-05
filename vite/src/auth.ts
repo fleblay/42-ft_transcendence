@@ -1,6 +1,6 @@
 import axios from "axios";
 import { saveToken } from "./token/token";
-import { LoginData } from "./pages/LoginPage";
+import { LoginData } from "./component/LoginForm";
 import { IUser } from "./App";
 
 const AuthProvider = {

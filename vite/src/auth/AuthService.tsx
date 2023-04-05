@@ -1,10 +1,10 @@
 import React from "react";
 import { IUser } from "../App";
 import { AuthProvider } from "../auth";
-import { LoginData } from "../pages/LoginPage";
+import { LoginData } from "../component/LoginForm";
 import { delToken, getToken, saveToken } from "../token/token";
 import axios from "axios";
-import { RegisterData } from "../pages/RegisterPage";
+import { RegisterData } from "../component/RegisterForm";
 import { userToken } from "../types";
 import { useLocation, useNavigate } from "react-router-dom";
 

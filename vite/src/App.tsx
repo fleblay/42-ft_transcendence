@@ -4,11 +4,11 @@ import { GameCanvas } from './game/game'
 import React, { createContext, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
 import { delToken, getToken, saveToken } from './token/token'
-import { LoginData, LoginForm } from './pages/LoginPage'
+import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { AuthProvider } from './auth'
 import axios from "axios";
-import { RegisterForm } from './pages/RegisterPage'
+import { RegisterForm } from './component/RegisterForm'
 import { CreateGame } from './component/CreateGame'
 import { AuthService, useAuthService } from './auth/AuthService'
 
