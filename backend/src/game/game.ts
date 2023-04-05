@@ -1,6 +1,6 @@
 import { UUID } from '../type';
 import { User } from '../model/user.entity'
-import {NotFoundException} from '@nestjs/common'
+import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 
 const paddleLength = 40
@@ -16,6 +16,17 @@ export type Pos2D = {
 	y: number
 }
 
+export type GameSetting = {
+	paddleLength: number,
+	paddleWidth: number,
+	ballSize: number,
+	ballSpeed: number,
+	playerSpeed: number,
+	canvasHeight: number,
+	canvasWidth: number,
+
+}
+
 enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 interface IgameInfo {
@@ -28,7 +39,7 @@ interface IgameInfo {
 	date: Date
 }
 
-enum Move { "Up" = 1, "Down" }
+enum Move { "Up" = 1, "Down", "Quit" }
 
 interface PlayerInput {
 	move: Move
@@ -52,23 +63,23 @@ export class Game {
 		this.viewerRoom = gameId + ":viewer"
 	}
 
-	applyPlayerInput(user: User, input: Partial<PlayerInput>) {
-		const foundPlayer = this.players.find(player => user.id === player.user.id)
+	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
+		const foundPlayer = this.players.find(player => userId === player.user.id)
 		if (foundPlayer === null)
 			return
 		if (input.move !== undefined) {
-			switch(input.move) {
-				case (Move.Up) :
+			switch (input.move) {
+				case (Move.Up):
 					foundPlayer.pos -= playerSpeed
 					break
-				case (Move.Down) :
+				case (Move.Down):
 					foundPlayer.pos += playerSpeed
 					break
 			}
 		}
 	}
 
-	get freeSlot(){
+	get freeSlot() {
 		return this.players.length < 2
 	}
 
@@ -79,14 +90,13 @@ export class Game {
 	}
 
 	generateGameInfo(): IgameInfo {
-		
 		return {
 			posP1: this.players[0]?.pos,
 			posP2: this.players[1]?.pos,
 			posBall: this.posBall,
 			score: this.score,
 			status: this.status,
-			date : new Date()
+			date: new Date()
 		}
 	}
 
@@ -94,12 +104,15 @@ export class Game {
 		if (this.players.find((player) => player.user.id === user.id))
 			throw new NotFoundException('Already in game')
 		if (this.players.length < 2) {
-			this.players.push({pos: canvasHeight / 2 - paddleLength / 2, user})
+			this.players.push({ pos: canvasHeight / 2 - paddleLength / 2, user })
 			client.join(this.playerRoom)
 			if (this.players.length === 2) {
 				this.status = GameStatus.start;
 				this.play()
-				//setTimeout(this.play, 3000)
+				this.server.on(`game.play.move.${this.gameId}`, ({ userId, input }: { userId: User["id"], input: Partial<PlayerInput> }) => {
+					console.log('Inside game.play.move', userId, input)
+					this.applyPlayerInput(userId, input)
+				})
 			}
 			else if (this.players.length === 1) {
 				this.status = GameStatus.waiting
@@ -114,11 +127,28 @@ export class Game {
 	}
 
 	gameLoop() {
+		//Colision mur
+		if (this.posBall.y > canvasHeight - ballSize && this.velocityBall.y == 1)
+			this.velocityBall.y = -1
+		if (this.posBall.y < ballSize && this.velocityBall.y == -1)
+			this.velocityBall.y = 1
+		//Colision paddle
+		if (this.posBall.x + this.velocityBall.x >= canvasWidth - ballSize - paddleWidth && (this.posBall.y > this.players[0].pos && this.posBall.y < this.players[1].pos + paddleLength))
+			this.velocityBall.x = -1
+		if (this.posBall.x <= ballSize + paddleWidth && (this.posBall.y > this.players[0].pos && this.posBall.y < this.players[0].pos + paddleLength))
+			this.velocityBall.x = 1
+		this.posBall.x += this.velocityBall.x
+		this.posBall.y += this.velocityBall.y
+
+		//Condition de win/loose
+		if (this.posBall.x <= 0 || this.posBall.x >= canvasWidth)
+			this.status = GameStatus.end
+
 		this.updateInfo(this.generateGameInfo());
 	}
 
 	play() {
-		this.intervalId = setInterval(() => {this.gameLoop()} , 42)
+		this.intervalId = setInterval(() => { this.gameLoop() }, 42)
 		this.status = GameStatus.playing
 		setTimeout(() => clearInterval(this.intervalId), 10000);
 	}
