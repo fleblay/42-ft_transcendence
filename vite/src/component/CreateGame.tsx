@@ -5,6 +5,7 @@ import { IgameInfo, GameStatus } from '../types';
 import { GameScreen } from './GameScreen';
 import { getMenuItemUtilityClass } from '@mui/material';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 interface Iprops {
 	startGameInfo: IgameInfo,
@@ -14,9 +15,10 @@ interface Iprops {
 interface JoinGamesProps {
 	setGameId: React.Dispatch<React.SetStateAction<string>>;
 	setGameInfo: React.Dispatch<React.SetStateAction<IgameInfo | undefined>>;
+	joinGames: (game?: string) => void;
 }
 
-const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ setGameId, setGameInfo }) => {
+const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames, setGameId, setGameInfo }) => {
 	const [listGames, setListGames] = React.useState<string[]>([]);
 	const { socket } = React.useContext(SocketContext);
 
@@ -30,20 +32,7 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ setGameId, setGame
 				{listGames.map((gameId) => {
 					return <div key={gameId}>
 						<button onClick={() => {
-							socket.emit('game.join', { gameId: gameId }, (response: any) => {
-								if (response.error) {
-									console.log(response.error);
-									setGameId(response.error);
-								}
-								else {
-									console.log(response.user);
-									setGameId(response.gameId);
-									socket.on('game.update', (data: IgameInfo) => {
-										console.log('game.update', data);
-										setGameInfo(data);
-									});
-								}
-							})
+							joinGames(gameId);
 						}}>Join game {gameId}
 						</button>
 					</div>
@@ -59,6 +48,31 @@ export function CreateGame(): JSX.Element {
 	const [gameId, setGameId] = React.useState<string>("")
 	const [gameInfo, setGameInfo] = React.useState<IgameInfo>();
 
+	let { id } = useParams();
+
+	function joinGames(game?: string) {
+		socket.emit('game.join', { gameId: id }, (response: any) => {
+			if (response.error) {
+				console.log(response.error);
+				setGameId(response.error);
+			}
+			else {
+				console.log(response.user);
+				setGameId(response.gameId);
+				socket.on('game.update', (data: IgameInfo) => {
+					console.log('game.update', data);
+					setGameInfo(data);
+				});
+			}
+		})
+	}
+
+	React.useEffect(() => {
+		if (id) {
+			joinGames(id);
+		}
+	}, [id])
+
 	/* 	React.useEffect(() => {
 			function onNewLobby(data: any) {
 				console.log('new lobby', data)
@@ -70,25 +84,10 @@ export function CreateGame(): JSX.Element {
 		}, []) */
 	return (
 		<>
-			<button onClick={() => socket.emit('game.join', {}, (response: any) => {
-
-				if (response.error) {
-					console.log(response.error);
-					setGameId(response.error);
-				}
-				else {
-					console.log(response.user);
-					setGameId(response.gameId);
-					socket.on('game.update', (data: IgameInfo) => {
-						//console.log('game.update', data);
-						setGameInfo(data);
-					});
-				}
-			}
-			)}>
+			<button onClick={() => joinGames() }>
 				createGame
 			</button>
-			<JoinGames setGameId={setGameId} setGameInfo={setGameInfo} />
+			<JoinGames joinGames={joinGames} setGameId={setGameId} setGameInfo={setGameInfo} />
 			<div>{gameId}
 			</div>
 			{
