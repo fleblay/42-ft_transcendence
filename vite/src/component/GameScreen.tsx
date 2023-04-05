@@ -70,12 +70,12 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.key === 'ArrowUp') {
-				console.log('game.play.move.' + gameId, {userId : auth.user?.id , input :{move : 'Up'}});
-				socket.emit('game.play.move.' + gameId, {userId : auth.user?.id , input :{move : 'Up'}})
+				console.log('game.play.move', {input :{move : 'Up'}});
+				socket.emit('game.play.move', {gameId : gameId, input :{move : 'Up'}})
 			}
 			if (e.key === 'ArrowDown') {
-				console.log('game.play.move.' + gameId, {userId : auth.user?.id , input :{move : 'Down'}});
-				socket.emit('game.play.move.' + gameId, {userId : auth.user?.id ,input : {move : 'Down'}})
+				console.log('game.play.move', {input :{move : 'Up'}});
+				socket.emit('game.play.move', {gameId: gameId , input : {move : 'Down'}})
 			}
 		}
 		window.addEventListener('keydown', handleKeyDown)
@@ -84,8 +84,6 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		}
 	}, [])
 	
-
-
 	return <div>
 			<div> <h1>Game Info :</h1></div>
 			<div> posBall x :{gameInfo?.posBall.x} </div>
