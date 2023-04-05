@@ -69,6 +69,7 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 
 		// center line
 		context.current.beginPath();
+		context.current.strokeStyle = "white";
 		context.current.moveTo(canvasWidth / 2, 0);
 		context.current.lineTo(canvasWidth / 2, canvasHeight);
 		context.current.stroke();
