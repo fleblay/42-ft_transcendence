@@ -38,9 +38,11 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 
 		// Clear canvas
 		context.current.clearRect(0, 0, canvasWidth, canvasHeight);
+		context.current.fillStyle = "black";
+		context.current.fillRect(0, 0, canvasWidth, canvasHeight);
 
 		// Set color of players
-		context.current.fillStyle = "rgb(200, 0, 0, 1)";
+		context.current.fillStyle = "white";
 
 		// Player One
 		context.current.fillRect(0, gameInfo.posP1, paddleWidth, paddleLength);
@@ -48,7 +50,7 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		context.current.fillRect(canvasWidth - paddleWidth, gameInfo.posP2, paddleWidth, paddleLength);
 
 		// Ball
-		context.current.fillStyle = "rgb(0, 200, 0, 1)";
+		context.current.fillStyle = "white";
 		// context.current.fillRect(posBall.x, posBall.y, ballSize, ballSize);
 
 		context.current.beginPath();
