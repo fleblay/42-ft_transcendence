@@ -71,9 +71,11 @@ export class Game {
 			switch (input.move) {
 				case ("Up"):
 					foundPlayer.pos -= playerSpeed
+					foundPlayer.momentum = (foundPlayer.momentum < 0) ? foundPlayer.momentum - 1 : 0
 					break
 				case ("Down"):
 					foundPlayer.pos += playerSpeed
+					foundPlayer.momentum = (foundPlayer.momentum > 0) ? foundPlayer.momentum + 1 : 0
 					break
 				default:
 					console.log(`Input is ${input.move}`)
@@ -138,10 +140,18 @@ export class Game {
 		if (this.posBall.y < ballSize && this.velocityBall.y == -1)
 			this.velocityBall.y = 1
 		//Colision paddle
-		if (this.posBall.x + this.velocityBall.x >= canvasWidth - ballSize - paddleWidth && (this.posBall.y > this.players[0].pos && this.posBall.y < this.players[1].pos + paddleLength))
-			this.velocityBall.x = -1
+		if (this.posBall.x + this.velocityBall.x >= canvasWidth - ballSize - paddleWidth && (this.posBall.y > this.players[1].pos && this.posBall.y < this.players[1].pos + paddleLength))
+			{
+				this.velocityBall.x = -1
+				if (this.players[1].momentum !== 0)
+					this.velocityBall.y -= this.players[1].momentum / 10
+			}
 		if (this.posBall.x <= ballSize + paddleWidth && (this.posBall.y > this.players[0].pos && this.posBall.y < this.players[0].pos + paddleLength))
-			this.velocityBall.x = 1
+			{
+				if (this.players[0].momentum !== 0)
+					this.velocityBall.y -= this.players[0].momentum / 10
+				this.velocityBall.x = 1
+			}
 		this.posBall.x += this.velocityBall.x * ballSpeed
 		this.posBall.y += this.velocityBall.y * ballSpeed
 
