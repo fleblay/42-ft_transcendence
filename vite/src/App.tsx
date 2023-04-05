@@ -296,12 +296,12 @@ function ListGames() {
 	const [list, setList] = React.useState("empty")
 
 	return (
-	<>
-	<button onClick={()=> {axios.get("/api/game/current").then((response)=> {console.log(response.data);setList(response.data.toString())})}}>GetList</button>
-	<div> {list} </div>
-	</>
+		<>
+			<button onClick={() => { axios.get("/api/game/current").then((response) => { console.log(response.data); setList(response.data.toString()) }) }}>GetList</button>
+			<div> {list} </div>
+		</>
 	)
-	}
+}
 
 function App() {
 
@@ -346,12 +346,12 @@ function App() {
 				}
 			})
 		}
-	
+
 		function reconnect() {
 			socket.close()
 			setSocket(newSocket());
 		}
-	
+
 		const [socket, setSocket] = useState<Socket>(newSocket());
 		const navigate = useNavigate()
 		React.useEffect(() => {
@@ -360,13 +360,13 @@ function App() {
 				console.log('Emiting a ping beging')
 				// socket.emit('ping', 'This is my first ping')e
 				console.log('Emiting a ping end')
-	
+
 			}
 			function onMessage(data: any) {
 				console.log('Receiving a message')
 				console.log(data)
 			}
-	
+
 			function onException(data: any) {
 				if (data.status === "error") {
 					console.log('Redirecting to login')
@@ -376,7 +376,7 @@ function App() {
 				console.log(data)
 				socket.disconnect()
 			}
-	
+
 			socket.on('connect', onConnect);
 			socket.on('message', onMessage)
 			socket.on('exception', onException)
@@ -386,7 +386,7 @@ function App() {
 				socket.off('exception', onException)
 			}
 		}, [socket])
-	
+
 		return (
 			<div className="App">
 				<AppContext.Provider value={{ socket, reconnect, navigate }}>
