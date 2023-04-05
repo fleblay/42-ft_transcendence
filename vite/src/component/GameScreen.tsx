@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "../App";
 import { IgameInfo, GameStatus } from "../types";
 import { useAuthService } from "../auth/AuthService";
+import { useScrollDirection } from "../useScrollDirection";
 
 
 interface Iprops {
@@ -22,7 +23,16 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const [gameInfo, setGameInfo] = useState<IgameInfo>(startGameInfo);
 	const { socket } = useContext(SocketContext);
+
 	let auth = useAuthService();
+
+	const scrollDirection = useScrollDirection();
+
+	useEffect(() => {
+		console.log('scrollDirection', scrollDirection);
+
+		socket.emit('game.play.move', {gameId: gameId , move: scrollDirection})
+	}, [scrollDirection])
 
 	useEffect(() => {
 		const context2d = canvasRef.current?.getContext('2d');
@@ -56,6 +66,13 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		context.current.beginPath();
 		context.current.arc(gameInfo.posBall.x, gameInfo.posBall.y, ballSize, 0, 2 * Math.PI)
 		context.current.fill();
+
+		// center line
+		context.current.beginPath();
+		context.current.moveTo(canvasWidth / 2, 0);
+		context.current.lineTo(canvasWidth / 2, canvasHeight);
+		context.current.stroke();
+		
 	}, [gameInfo.posP1, gameInfo.posP2, gameInfo.posBall]);
 
 	React.useEffect(() => {
@@ -85,7 +102,7 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
 	}, [])
-	
+
 	return <div>
 			<div> <h1>Game Info :</h1></div>
 			<div> posBall x :{gameInfo?.posBall.x} </div>
