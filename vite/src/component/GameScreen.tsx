@@ -72,7 +72,7 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		context.current.moveTo(canvasWidth / 2, 0);
 		context.current.lineTo(canvasWidth / 2, canvasHeight);
 		context.current.stroke();
-		
+
 	}, [gameInfo.posP1, gameInfo.posP2, gameInfo.posBall]);
 
 	React.useEffect(() => {
@@ -109,7 +109,7 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 			<div> posBall y: {gameInfo?.posBall.y} </div>
 			<div> posP1: {gameInfo?.posP1} </div>
 			<div> posP2: {gameInfo?.posP2} </div>
-			<div> score: {gameInfo?.score} </div>
+			<div> score: {`${gameInfo?.score[0]}:${gameInfo?.score[1]}`} </div>
 			<div> status: {gameInfo?.status} </div>
 			<div> date: {gameInfo?.date.toString()} </div>
 			<div>
