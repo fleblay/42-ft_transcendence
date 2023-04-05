@@ -56,6 +56,13 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		context.current.beginPath();
 		context.current.arc(gameInfo.posBall.x, gameInfo.posBall.y, ballSize, 0, 2 * Math.PI)
 		context.current.fill();
+
+		// center line
+		context.current.beginPath();
+		context.current.moveTo(canvasWidth / 2, 0);
+		context.current.lineTo(canvasWidth / 2, canvasHeight);
+		context.current.stroke();
+		
 	}, [gameInfo.posP1, gameInfo.posP2, gameInfo.posBall]);
 
 	React.useEffect(() => {
