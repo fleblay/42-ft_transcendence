@@ -67,6 +67,7 @@ export class Game {
 		if (foundPlayer === null)
 			return
 		if (input.move !== undefined) {
+			console.log(`Input is ${input.move}`)
 			switch (input.move) {
 				case ("Up"):
 					foundPlayer.pos -= playerSpeed
@@ -108,6 +109,7 @@ export class Game {
 			if (this.players.length === 2) {
 				this.status = GameStatus.start;
 				this.play()
+				console.log(`listening event : game.play.move.${this.gameId}`)
 				this.server.on(`game.play.move.${this.gameId}`, ({ userId, input }: { userId: User["id"], input: Partial<PlayerInput> }) => {
 					console.log('Inside game.play.move', userId, input)
 					this.applyPlayerInput(userId, input)
@@ -153,7 +155,7 @@ export class Game {
 	play() {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 42)
 		this.status = GameStatus.playing
-		setTimeout(() => clearInterval(this.intervalId), 60000);
+		setTimeout(() => clearInterval(this.intervalId), 1200000);
 	}
 
 	get GameId(): UUID {
