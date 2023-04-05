@@ -71,11 +71,11 @@ export class Game {
 			switch (input.move) {
 				case ("Up"):
 					foundPlayer.pos -= playerSpeed
-					foundPlayer.momentum = (foundPlayer.momentum < 0) ? foundPlayer.momentum - 1 : 0
+					foundPlayer.momentum = (foundPlayer.momentum <= 0) ? foundPlayer.momentum - 1 : 0
 					break
 				case ("Down"):
 					foundPlayer.pos += playerSpeed
-					foundPlayer.momentum = (foundPlayer.momentum > 0) ? foundPlayer.momentum + 1 : 0
+					foundPlayer.momentum = (foundPlayer.momentum >= 0) ? foundPlayer.momentum + 1 : 0
 					break
 				default:
 					console.log(`Input is ${input.move}`)
@@ -110,9 +110,10 @@ export class Game {
 		if (this.players.length < 2) {
 			this.players.push({ pos: canvasHeight / 2 - paddleLength / 2, momentum: 0,  user })
 			client.join(this.playerRoom)
-			if (this.players.length === 2) {
-				this.status = GameStatus.start;
+			if (this.players.length === 1)
 				this.play()
+			if (this.players.length === 2) {
+				this.status = GameStatus.playing;
 				//console.log(`listening event : game.play.move.${this.gameId}`)
 				/*
 				this.server.on(`game.play.move.${this.gameId}`, ({ userId, input }: { userId: User["id"], input: Partial<PlayerInput> }) => {
@@ -148,12 +149,17 @@ export class Game {
 			}
 		if (this.posBall.x <= ballSize + paddleWidth && (this.posBall.y > this.players[0].pos && this.posBall.y < this.players[0].pos + paddleLength))
 			{
+				this.velocityBall.x = 1
 				if (this.players[0].momentum !== 0)
 					this.velocityBall.y -= this.players[0].momentum / 10
-				this.velocityBall.x = 1
 			}
+
+		//Move de la balle
+		if (this.status === GameStatus.playing)
+		{
 		this.posBall.x += this.velocityBall.x * ballSpeed
 		this.posBall.y += this.velocityBall.y * ballSpeed
+		}
 
 		//Condition de win/loose
 		if (this.posBall.x <= 0)
