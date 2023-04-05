@@ -36,7 +36,7 @@ export function CreateGame(): JSX.Element {
 					console.log(response.user);
 					setGameId(response.gameId);
 					socket.on('game.update', (data: IgameInfo) => {
-						console.log('game.update', data);
+						//console.log('game.update', data);
 						setGameInfo(data);
 					});
 				}

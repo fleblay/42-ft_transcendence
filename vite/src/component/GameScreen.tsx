@@ -58,7 +58,7 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 
 	React.useEffect(() => {
 		function onGameUpdate(data: IgameInfo) {
-			console.log('game.update', data);
+			//console.log('game.update', data);
 			setGameInfo(data);
 		}
 		socket.on('game.update', onGameUpdate)
@@ -70,9 +70,11 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.key === 'ArrowUp') {
+				console.log('game.play.move.' + gameId);
 				socket.emit('game.play.move.' + gameId, {userId : auth.user?.id , input :{move : 'Up'}})
 			}
 			if (e.key === 'ArrowDown') {
+				console.log('game.play.move.' + gameId);
 				socket.emit('game.play.move.' + gameId, {userId : auth.user?.id ,input : {move : 'Down'}})
 			}
 		}
