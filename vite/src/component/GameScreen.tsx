@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "../App";
 import { IgameInfo, GameStatus } from "../types";
+import { useAuthService } from "../auth/AuthService";
 
 
 interface Iprops {
-	startGameInfo: IgameInfo
+	startGameInfo: IgameInfo,
+	gameId: string
 }
 
 const canvasHeight = 250
@@ -14,13 +16,13 @@ const paddleWidth = 5
 const ballSize = 5
 
 
-export function GameScreen({ startGameInfo }: Iprops): JSX.Element {
+export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const [gameInfo, setGameInfo] = useState<IgameInfo>(startGameInfo);
 	const { socket } = useContext(SocketContext);
-
+	let auth = useAuthService();
 
 	useEffect(() => {
 		const context2d = canvasRef.current?.getContext('2d');
@@ -54,8 +56,33 @@ export function GameScreen({ startGameInfo }: Iprops): JSX.Element {
 		context.current.fill();
 	}, [gameInfo.posP1, gameInfo.posP2, gameInfo.posBall]);
 
+	React.useEffect(() => {
+		function onGameUpdate(data: IgameInfo) {
+			console.log('game.update', data);
+			setGameInfo(data);
+		}
+		socket.on('game.update', onGameUpdate)
+		return () => {
+			socket.off('game.update', onGameUpdate)
+		}
+	}, [])
+
 	useEffect(() => {
-		
+		function handleKeyDown(e: KeyboardEvent) {
+			if (e.key === 'ArrowUp') {
+				socket.emit('game.play.move.' + gameId, {userId : auth.user , input :{move : 'Up'}})
+			}
+			if (e.key === 'ArrowDown') {
+				socket.emit('game.play.move.' + gameId, {userId : auth.user ,input : {move : 'Down'}})
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [])
+	
+
 
 	return <div>
 			<div> <h1>Game Info :</h1></div>
