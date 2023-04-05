@@ -75,6 +75,8 @@ export class Game {
 				case ("Down"):
 					foundPlayer.pos += playerSpeed
 					break
+				default:
+					console.log(`Input is ${input.move}`)
 			}
 		}
 	}
@@ -84,8 +86,8 @@ export class Game {
 	}
 
 	updateInfo(payload: IgameInfo) {
-		console.log(this.playerRoom);
-		console.log(this.viewerRoom);
+		//console.log(this.playerRoom);
+		//console.log(this.viewerRoom);
 		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.update', payload)
 	}
 
