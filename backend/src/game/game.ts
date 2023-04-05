@@ -39,10 +39,9 @@ interface IgameInfo {
 	date: Date
 }
 
-enum Move { "Up" = 1, "Down", "Quit" }
 
 interface PlayerInput {
-	move: Move
+	move: "Up" | "Down" | "Quit"
 	powerUp?: string
 }
 
@@ -69,10 +68,10 @@ export class Game {
 			return
 		if (input.move !== undefined) {
 			switch (input.move) {
-				case (Move.Up):
+				case ("Up"):
 					foundPlayer.pos -= playerSpeed
 					break
-				case (Move.Down):
+				case ("Down"):
 					foundPlayer.pos += playerSpeed
 					break
 			}
