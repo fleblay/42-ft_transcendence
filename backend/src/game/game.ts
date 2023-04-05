@@ -48,9 +48,9 @@ interface PlayerInput {
 export class Game {
 	private posBall: Pos2D = { x: canvasHeight / 2, y: canvasWidth / 2 }
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1) }
-	private startTime: number
+	private startTime: string = (new Date()).toString()
 	private intervalId: NodeJS.Timer
-	private players: { pos: number, user: User }[] = []
+	private players: { pos: number, momentum: number, user: User }[] = []
 	private viewers: User[] = []
 	private score: number[] = [0, 0]
 	private status: GameStatus = GameStatus.waiting
@@ -106,7 +106,7 @@ export class Game {
 		if (this.players.find((player) => player.user.id === user.id))
 			throw new NotFoundException('Already in game')
 		if (this.players.length < 2) {
-			this.players.push({ pos: canvasHeight / 2 - paddleLength / 2, user })
+			this.players.push({ pos: canvasHeight / 2 - paddleLength / 2, momentum: 0,  user })
 			client.join(this.playerRoom)
 			if (this.players.length === 2) {
 				this.status = GameStatus.start;
@@ -161,7 +161,6 @@ export class Game {
 			this.status = GameStatus.end
 			clearInterval(this.intervalId)
 		}
-
 		this.updateInfo(this.generateGameInfo());
 	}
 
