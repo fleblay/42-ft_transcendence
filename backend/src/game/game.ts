@@ -142,8 +142,8 @@ export class Game {
 			this.velocityBall.x = -1
 		if (this.posBall.x <= ballSize + paddleWidth && (this.posBall.y > this.players[0].pos && this.posBall.y < this.players[0].pos + paddleLength))
 			this.velocityBall.x = 1
-		this.posBall.x += this.velocityBall.x
-		this.posBall.y += this.velocityBall.y
+		this.posBall.x += this.velocityBall.x * ballSpeed
+		this.posBall.y += this.velocityBall.y * ballSpeed
 
 		//Condition de win/loose
 		if (this.posBall.x <= 0)
