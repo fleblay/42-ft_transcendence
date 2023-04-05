@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { GameCluster } from './game-cluster';
 import { User } from 'src/model/user.entity';
 import { UUID } from '../type';
+import {PlayerInputDto} from '../events/dtos/player-input.dto'
 
 
 @Injectable()
@@ -42,5 +43,7 @@ export class GameService {
 		return this.gameCluster.listAll()
 	}
 
-
+	handlePlayerInput(client: Socket, user: User, data: PlayerInputDto){
+		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, {move: data.move, powerup: data.powerup})
+	}
 }

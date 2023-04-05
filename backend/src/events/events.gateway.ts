@@ -15,6 +15,7 @@ import {WebSocketUserInterceptor} from './interceptors/WebSocketUser.interceptor
 import {EventUserDecorator} from './decorators/EventUser.decorator'
 import {User} from '../model/user.entity'
 import {GameJoinDto} from './dtos/game-join.dto'
+import {PlayerInputDto} from './dtos/player-input.dto'
 import {GameService} from '../game/game.service'
 
 @WebSocketGateway({
@@ -65,7 +66,12 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		catch (e) {
 			return {error: e.message as string}
 		}
-		
+	}
+
+	@SubscribeMessage('game.play.move')
+	handlePlayerInput(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:PlayerInputDto): void
+	{
+		this.gameService.handlePlayerInput(client, user, data)
 	}
 
 	@SubscribeMessage('createLobby')

@@ -41,8 +41,8 @@ interface IgameInfo {
 
 
 interface PlayerInput {
-	move: "Up" | "Down" | "Quit"
-	powerUp?: string
+	move: string
+	powerup?: string
 }
 
 export class Game {
