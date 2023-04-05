@@ -111,11 +111,13 @@ export class Game {
 			if (this.players.length === 2) {
 				this.status = GameStatus.start;
 				this.play()
-				console.log(`listening event : game.play.move.${this.gameId}`)
+				//console.log(`listening event : game.play.move.${this.gameId}`)
+				/*
 				this.server.on(`game.play.move.${this.gameId}`, ({ userId, input }: { userId: User["id"], input: Partial<PlayerInput> }) => {
 					console.log('Inside game.play.move', userId, input)
 					this.applyPlayerInput(userId, input)
 				})
+				*/
 			}
 			else if (this.players.length === 1) {
 				this.status = GameStatus.waiting
