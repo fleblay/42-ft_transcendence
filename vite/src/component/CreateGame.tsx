@@ -48,10 +48,8 @@ export function CreateGame(): JSX.Element {
 	const [gameId, setGameId] = React.useState<string>("")
 	const [gameInfo, setGameInfo] = React.useState<IgameInfo>();
 
-	let { id } = useParams();
-
 	function joinGames(game?: string) {
-		socket.emit('game.join', { gameId: id }, (response: any) => {
+		socket.emit('game.join', { gameId: game }, (response: any) => {
 			if (response.error) {
 				console.log(response.error);
 				setGameId(response.error);
@@ -66,6 +64,8 @@ export function CreateGame(): JSX.Element {
 			}
 		})
 	}
+
+	let { id } = useParams();
 
 	React.useEffect(() => {
 		if (id) {
