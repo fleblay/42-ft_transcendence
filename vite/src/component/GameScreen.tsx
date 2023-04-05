@@ -71,11 +71,11 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.key === 'ArrowUp') {
 				console.log('game.play.move', {input :{move : 'Up'}});
-				socket.emit('game.play.move', {gameId : gameId, input :{move : 'Up'}})
+				socket.emit('game.play.move', {gameId : gameId, move : 'Up'})
 			}
 			if (e.key === 'ArrowDown') {
 				console.log('game.play.move', {input :{move : 'Up'}});
-				socket.emit('game.play.move', {gameId: gameId , input : {move : 'Down'}})
+				socket.emit('game.play.move', {gameId: gameId , move : 'Down'})
 			}
 		}
 		window.addEventListener('keydown', handleKeyDown)
