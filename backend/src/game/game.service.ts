@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Server, Socket } from 'socket.io'
 import { SavedGame } from 'src/model/saved-game.entity';
@@ -15,15 +15,14 @@ export class GameService {
 	private server: Server;
 	constructor(private usersService: UsersService,
 		@InjectRepository(SavedGame) private repo: Repository<SavedGame>,
-		private gameCluster : GameCluster)
-		{ }
+		private gameCluster: GameCluster) { }
 
 	setWsServer(server: Server) {
 		this.server = server;
 		this.gameCluster.setServer(server)
 	}
 
-	join(client : Socket, user : User, gameId? : UUID ) : UUID {
+	join(client: Socket, user: User, gameId?: UUID): UUID {
 		let game;
 		if (gameId) {
 			game = this.gameCluster.findOne(gameId);
@@ -34,11 +33,12 @@ export class GameService {
 			game = this.gameCluster.findAvailable()
 		if (game === null)
 			game = this.gameCluster.createGame();
+
 		game.addUser(user, client);
 		return game.GameId;
 	}
 
-	listAll(){
+	listAll() {
 		return this.gameCluster.listAll()
 	}
 

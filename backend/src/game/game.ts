@@ -16,7 +16,7 @@ export type Pos2D = {
 	y: number
 }
 
-enum GameStatus { "waiting", "start", "playing", "end", "error" }
+enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 interface IgameInfo {
 
@@ -25,7 +25,7 @@ interface IgameInfo {
 	posBall: Pos2D
 	score: number[]
 	status: GameStatus
-	updateReason: string
+	date: Date
 }
 
 enum Move { "Up" = 1, "Down" }
@@ -73,7 +73,21 @@ export class Game {
 	}
 
 	updateInfo(payload: IgameInfo) {
-		this.server.to(this.playerRoom).to(this.playerRoom).emit('game.update', payload)
+		console.log(this.playerRoom);
+		console.log(this.viewerRoom);
+		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.update', payload)
+	}
+
+	generateGameInfo(): IgameInfo {
+		
+		return {
+			posP1: this.players[0]?.pos,
+			posP2: this.players[1]?.pos,
+			posBall: this.posBall,
+			score: this.score,
+			status: this.status,
+			date : new Date()
+		}
 	}
 
 	addUser(user: User, client: Socket) {
@@ -83,23 +97,30 @@ export class Game {
 			this.players.push({pos: canvasHeight / 2 - paddleLength / 2, user})
 			client.join(this.playerRoom)
 			if (this.players.length === 2) {
-				this.status = GameStatus.start
+				this.status = GameStatus.start;
+				this.play()
 				//setTimeout(this.play, 3000)
+			}
+			else if (this.players.length === 1) {
+				this.status = GameStatus.waiting
 			}
 		}
 		else {
 			this.viewers.push(user)
 			client.join(this.viewerRoom)
 		}
+		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
+
 	}
 
 	gameLoop() {
-		console.log('Hi');
+		this.updateInfo(this.generateGameInfo());
 	}
 
 	play() {
-		this.intervalId = setInterval(()=> console.log("coucou"), 42)
+		this.intervalId = setInterval(() => {this.gameLoop()} , 42)
 		this.status = GameStatus.playing
+		setTimeout(() => clearInterval(this.intervalId), 10000);
 	}
 
 	get GameId(): UUID {
