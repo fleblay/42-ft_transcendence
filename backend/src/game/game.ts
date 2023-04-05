@@ -52,7 +52,7 @@ export class Game {
 	private intervalId: NodeJS.Timer
 	private players: { pos: number, user: User }[] = []
 	private viewers: User[] = []
-	private score: number[]
+	private score: number[] = [0, 0]
 	private status: GameStatus = GameStatus.waiting
 	private readonly playerRoom: string
 	private readonly viewerRoom: string
@@ -140,7 +140,11 @@ export class Game {
 		this.posBall.y += this.velocityBall.y
 
 		//Condition de win/loose
-		if (this.posBall.x <= 0 || this.posBall.x >= canvasWidth)
+		if (this.posBall.x <= 0)
+				this.score[0] += 1
+		else if (this.posBall.x >= canvasWidth)
+				this.score[1] += 1
+		if (this.score[0] + this.score[1] === 5)
 			this.status = GameStatus.end
 
 		this.updateInfo(this.generateGameInfo());
@@ -149,7 +153,7 @@ export class Game {
 	play() {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 42)
 		this.status = GameStatus.playing
-		setTimeout(() => clearInterval(this.intervalId), 10000);
+		setTimeout(() => clearInterval(this.intervalId), 60000);
 	}
 
 	get GameId(): UUID {
