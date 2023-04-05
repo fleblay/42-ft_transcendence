@@ -2,7 +2,11 @@ import React from 'react';
 import { SocketContext } from '../App';
 import { Update } from 'vite/types/hmrPayload';
 import { IgameInfo, GameStatus } from '../types';
+import { GameScreen } from './GameScreen';
 
+interface Iprops {
+	startGameInfo: IgameInfo
+}
 
 export function CreateGame(): JSX.Element {
 	const { socket } = React.useContext(SocketContext);
@@ -40,15 +44,9 @@ export function CreateGame(): JSX.Element {
 			</button>
 			<div>{gameId}
 			</div>
-			<div> <h1>Game Info :</h1></div>
-			<div> posBall x :{gameInfo?.posBall.x} </div>
-			<div> posBall y: {gameInfo?.posBall.y} </div>
-			<div> posP1: {gameInfo?.posP1} </div>
-			<div> posP2: {gameInfo?.posP2} </div>
-			<div> score: {gameInfo?.score} </div>
-			<div> status: {gameInfo?.status} </div>
-			<div> date: {gameInfo?.date.toString()} </div>
-
+			{
+				gameInfo && <GameScreen startGameInfo={gameInfo} ></GameScreen>
+			}
 
 		</>
 
