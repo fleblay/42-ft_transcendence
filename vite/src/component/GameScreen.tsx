@@ -22,7 +22,7 @@ enum LoadingStatus {
 
 export function GamePage() {
 	const [loading, setLoading] = useState<LoadingStatus>(LoadingStatus.Loading);
-	const [gameInfo, setGameInfo] = useState<IgameInfo>();
+	const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
 	const [joined, setJoined] = useState<boolean>(false);
 	const { socket } = useContext(SocketContext);
 
@@ -47,7 +47,7 @@ export function GamePage() {
 		});
 	}, [joined]);
 
-	if (loading === LoadingStatus.Loading || !gameInfo || gameInfo.status === GameStatus.waiting) {
+	if (loading === LoadingStatus.Loading) {
 		return (
 			<div>
 				Loading...
@@ -55,7 +55,7 @@ export function GamePage() {
 		);
 	}
 
-	if (loading === LoadingStatus.Loaded && idGame && gameInfo) {
+	if (loading === LoadingStatus.Loaded && idGame) {
 		if (gameInfo.status === GameStatus.playing) {
 			return <GameScreen startGameInfo={gameInfo} gameId={idGame} />
 		}
