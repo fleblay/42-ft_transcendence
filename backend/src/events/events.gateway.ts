@@ -18,6 +18,7 @@ import {GameJoinDto} from './dtos/game-join.dto'
 import {PlayerInputDto} from './dtos/player-input.dto'
 import {GameService} from '../game/game.service'
 import { AuthService } from 'src/users/auth.service';
+import { GameCreateDto } from './dtos/game-create.dto';
 
 @WebSocketGateway({
 	path: '/socket.io/',
@@ -61,14 +62,43 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		//client.emit('message', user)
 	}
 
+
+	@SubscribeMessage('game.create')
+	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string} | {error: string}
+	{
+		console.log("New create event")
+		try {
+			const gameId = this.gameService.findOrCreate(data.map)
+			console.log("Game id is : ", gameId);
+			return {gameId};
+		}
+		catch (e) {
+			return {error: e.message as string}
+		}
+	}
+
+	@SubscribeMessage('game.findOrCreate')
+	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string} | {error: string}
+	{
+		console.log("New create event")
+		try {
+			const gameId = this.gameService.findOrCreate(data.map)
+			console.log("Game id is : ", gameId);
+			return {gameId};
+		}
+		catch (e) {
+			return {error: e.message as string}
+		}
+	}
+
 	@SubscribeMessage('game.join')
-	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:GameJoinDto): { gameId?: string, error?: string, user?: User}
+	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): { gameId: string} | {error: string}
 	{
 		console.log("New join event")
 		try {
 			const gameId = this.gameService.join(client, user, data.gameId)
 			console.log("Game id is : ", gameId);
-			return {gameId, user};
+			return {gameId};
 		}
 		catch (e) {
 			return {error: e.message as string}

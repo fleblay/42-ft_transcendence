@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SocketContext } from '../App';
 import { Update } from 'vite/types/hmrPayload';
 import { IgameInfo, GameStatus } from '../types';
@@ -43,22 +43,32 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 
 export function CreateGame() {
 	const navigate = useNavigate();
+	const { socket } = React.useContext(SocketContext);
+
+	const [privateGame, setPrivateGame] = useState<boolean>(false);
 
 	function joinGames(game?: string) {
 		if (game) {
 			navigate(`/game/${game}`);
 		}
 		else {
-
+			socket.emit(privateGame ? 'game.create' : 'game.find', {}, ({ gameId }: { gameId: number }) => {
+				console.log("game created", gameId);
+				navigate(`/game/${gameId}`);
+			});
 		}
 	}
 	return (
 		<>
-			<button onClick={() => joinGames() }>
-				createGame
+			<div>
+				<input type="checkbox" id="scales" name="scales" onChange={(e) => {setPrivateGame(e.target.checked)}} />
+				<label>Privee</label>
+			</div>
+
+			<button onClick={() => joinGames()}>
+				Trouver une game public
 			</button>
 			<JoinGames joinGames={joinGames} />
 		</>
-
 	);
 }
