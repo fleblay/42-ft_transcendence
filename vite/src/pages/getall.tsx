@@ -1,6 +1,7 @@
 import React, { useState} from "react";
 import axios from "axios";
-import { getToken } from "../token/token";
+import { getAccessToken } from "../token/token";
+import apiClient from "../auth/interceptor.axios";
 
 interface FormData {
   username: string;
@@ -17,11 +18,11 @@ export function GetAll() {
 	const config = {
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': 'Bearer ' + getToken()
+			'Authorization': 'Bearer ' + getAccessToken()
 		}
 	}
-	console.log(getToken())
-    axios
+	console.log(getAccessToken())
+    apiClient
       .get("/api/users/all", config)
       .then((response) => {
 		return (JSON.stringify(response.data))

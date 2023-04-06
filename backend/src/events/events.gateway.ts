@@ -17,7 +17,7 @@ import {User} from '../model/user.entity'
 import {GameJoinDto} from './dtos/game-join.dto'
 import {PlayerInputDto} from './dtos/player-input.dto'
 import {GameService} from '../game/game.service'
-import { AuthService } from 'src/users/auth.service';
+import { AuthService } from 'src/users/auth/auth.service';
 
 @WebSocketGateway({
 	path: '/socket.io/',
@@ -42,15 +42,16 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	async handleConnection(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
 		const foundUser =  await this.authService.validateToken(bearerToken)
+
 		if (foundUser)
-			console.log("New Connection User:", foundUser.username)
+			//console.log("New Connection User:", foundUser.username)
 	}
 
 	async handleDisconnect(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
 		const foundUser =  await this.authService.validateToken(bearerToken)
 		if (foundUser)
-			console.log("Disconnect User:", foundUser.username)
+			//console.log("Disconnect User:", foundUser.username)
 	}
 
 	@SubscribeMessage('ping')
