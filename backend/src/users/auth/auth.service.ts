@@ -6,6 +6,7 @@ import { User } from '../../model/user.entity'
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from 'src/model/refresh-token';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
