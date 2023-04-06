@@ -1,6 +1,6 @@
 import {Injectable, NestInterceptor, ExecutionContext, CallHandler} from '@nestjs/common'
 import {Observable, map} from 'rxjs'
-import {AuthService} from '../../users/auth.service'
+import {AuthService} from '../../users/auth/auth.service'
 
 @Injectable()
 export class WebSocketUserInterceptor implements NestInterceptor {

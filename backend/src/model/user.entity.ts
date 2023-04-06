@@ -14,6 +14,9 @@ export class User {
 	@Column()
 	password: string;
 
+	@Column()
+	refreshtoken: string;
+	
 	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
 	@JoinTable()
 	savedGames: SavedGame[];

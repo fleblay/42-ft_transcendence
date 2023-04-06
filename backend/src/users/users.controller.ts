@@ -2,10 +2,8 @@ import { Get, Body, Controller, UseGuards, Request, ForbiddenException} from '@n
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
-import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './local-auth.guard';
-import { AuthentificatedGuard } from './authenticated.guard';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { AuthService } from './auth/auth.service';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { LoginUserDto } from './dtos/login-user.dto';
 
 @Controller('users')

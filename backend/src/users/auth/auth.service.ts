@@ -1,14 +1,16 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dtos/create-user.dto';
-import { UsersService } from './users.service';
+import { CreateUserDto } from '../dtos/create-user.dto';
+import { UsersService } from '../users.service';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../model/user.entity'
-import { LoginUserDto } from './dtos/login-user.dto';
+import { User } from '../../model/user.entity'
+import { LoginUserDto } from '../dtos/login-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { RefreshToken } from 'src/model/refresh-token';
 
 @Injectable()
 export class AuthService {
 
-constructor(private usersService: UsersService, private jwtService: JwtService) {}
+	constructor(@InjectRepository(RefreshToken) private repo: Repository<RefreshToken>, private usersService: UsersService, private jwtService: JwtService) {}
 
 	async validateUser(email: string, pass: string): Promise<any> {
 		const user = await this.usersService.findOneByEmail(email);
@@ -39,7 +41,7 @@ constructor(private usersService: UsersService, private jwtService: JwtService) 
 		const payload = { username: user.username, sub: user.id};
 		const options = {expiresIn: '1d'};
 		return {
-			access_token: this.jwtService.sign(payload),
+			access_token: this.jwtService.sign(payload, options),
 		};
 	}
 
@@ -58,5 +60,19 @@ constructor(private usersService: UsersService, private jwtService: JwtService) 
 		};
 	}
 
+	async getToken(user: User) {
+		const access_token_payload = { username: user.username, sub: user.id};
+		const access_token_options = {expiresIn: '5m', secret: 'access'};
+		const access_token = this.jwtService.signAsync(access_token_payload, access_token_options);
 
+		const refresh_token_payload = { username: user.username, sub: user.id};
+		const refresh_token_options = {expiresIn: '7d', secret: 'refresh'};
+		const refresh_token = this.jwtService.signAsync(refresh_token_payload, refresh_token_options);
+
+		return { access_token, refresh_token };
+	}
+
+	async updateRefreshToken(userId: number, refreshToken: string) {
+
+	}
 }
