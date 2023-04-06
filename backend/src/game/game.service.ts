@@ -24,7 +24,7 @@ export class GameService {
 	}
 
 	create(map: number): UUID {
-		let game = this.gameCluster.createGame();
+		let game = this.gameCluster.createGame(true);
 		return game.GameId
 	}
 

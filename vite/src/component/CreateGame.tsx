@@ -52,7 +52,7 @@ export function CreateGame() {
 			navigate(`/game/${game}`);
 		}
 		else {
-			socket.emit(privateGame ? 'game.create' : 'game.find', {}, ({ gameId }: { gameId: number }) => {
+			socket.emit(privateGame ? 'game.create' : 'game.findOrCreate', {}, ({ gameId }: { gameId: number }) => {
 				console.log("game created", gameId);
 				navigate(`/game/${gameId}`);
 			});
@@ -66,7 +66,7 @@ export function CreateGame() {
 			</div>
 
 			<button onClick={() => joinGames()}>
-				Trouver une game public
+				{privateGame ? "Creer une game privee": "Trouver une game public"}
 			</button>
 			<JoinGames joinGames={joinGames} />
 		</>
