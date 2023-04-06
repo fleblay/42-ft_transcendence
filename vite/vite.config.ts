@@ -15,5 +15,8 @@ export default defineConfig({
 		*/
 		host: true,
 		port: 4243,
+	},
+	build: {
+		sourcemap: true,
 	}
 })
