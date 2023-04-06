@@ -54,6 +54,7 @@ export function GamePage() {
 		);
 	}
 
+	// TODO: Crash, gameInfo is undefined. game.update est seulement dans gamescreen. game.join envoie un gameInfo pour init ?
 	if (loading === LoadingStatus.Loaded && idGame) {
 		if (gameInfo.status === GameStatus.playing) {
 			return <GameScreen startGameInfo={gameInfo} gameId={idGame} />
@@ -86,6 +87,17 @@ export function GameScreen({ startGameInfo, gameId }: Iprops): JSX.Element {
 	const { socket } = useContext(SocketContext);
 
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
+
+	useEffect(() => {
+		function onGameUpdate(data: IgameInfo) {
+			//console.log('game.update', data);
+			setGameInfo(data);
+		}
+		socket.on('game.update', onGameUpdate)
+		return () => {
+			socket.off('game.update', onGameUpdate)
+		}
+	}, [])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -167,17 +179,6 @@ export function GameScreen({ startGameInfo, gameId }: Iprops): JSX.Element {
 		context.current.stroke();
 
 	}, [gameInfo.players[0].pos, gameInfo.players[1]?.pos, gameInfo.posBall]);
-
-	React.useEffect(() => {
-		function onGameUpdate(data: IgameInfo) {
-			//console.log('game.update', data);
-			setGameInfo(data);
-		}
-		socket.on('game.update', onGameUpdate)
-		return () => {
-			socket.off('game.update', onGameUpdate)
-		}
-	}, [])
 
 	// useEffect(() => {
 	// 	function handleKeyDown(e: KeyboardEvent) {
