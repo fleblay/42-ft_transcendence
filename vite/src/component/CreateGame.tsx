@@ -5,7 +5,7 @@ import { IgameInfo, GameStatus } from '../types';
 import { GameScreen } from './GameScreen';
 import { getMenuItemUtilityClass } from '@mui/material';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface Iprops {
 	startGameInfo: IgameInfo,
@@ -13,12 +13,10 @@ interface Iprops {
 }
 
 interface JoinGamesProps {
-	setGameId: React.Dispatch<React.SetStateAction<string>>;
-	setGameInfo: React.Dispatch<React.SetStateAction<IgameInfo | undefined>>;
 	joinGames: (game?: string) => void;
 }
 
-const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames, setGameId, setGameInfo }) => {
+const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 	const [listGames, setListGames] = React.useState<string[]>([]);
 	const { socket } = React.useContext(SocketContext);
 
@@ -43,64 +41,21 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames, setGame
 	);
 }
 
-export function CreateGame(): JSX.Element {
-	const { socket } = React.useContext(SocketContext);
-	const [gameId, setGameId] = React.useState<string>("")
-	const [gameInfo, setGameInfo] = React.useState<IgameInfo>();
-	const [joined, setJoined] = React.useState<boolean>(false);
+export function CreateGame() {
+	const navigate = useNavigate();
+
 
 	function joinGames(game?: string) {
-		if (!joined)
-		{
-			setJoined(true)
-			return
+		if (game) {
+			navigate(`/game/${game}`);
 		}
-		console.log('game is now:', game)
-		socket.emit('game.join', { gameId: game }, (response: any) => {
-			if (response.error) {
-				console.log(response.error);
-				setGameId(response.error);
-			}
-			else {
-				console.log(response.user);
-				setGameId(response.gameId);
-				socket.on('game.update', (data: IgameInfo) => {
-					//console.log('game.update', data);
-					setGameInfo(data);
-				});
-			}
-		})
 	}
-
-	let { id } = useParams();
-
-	React.useEffect(() => {
-		if (id) {
-			joinGames(id);
-		}
-	}, [joined])
-
-	/* 	React.useEffect(() => {
-			function onNewLobby(data: any) {
-				console.log('new lobby', data)
-			}
-			socket.on('newLobby', onNewLobby)
-			return () => {
-				socket.off('newLobby', onNewLobby)
-			}
-		}, []) */
 	return (
 		<>
 			<button onClick={() => joinGames() }>
 				createGame
 			</button>
-			<JoinGames joinGames={joinGames} setGameId={setGameId} setGameInfo={setGameInfo} />
-			<div>{gameId}
-			</div>
-			{
-				gameInfo && <GameScreen startGameInfo={gameInfo} gameId={gameId} ></GameScreen>
-			}
-
+			<JoinGames joinGames={joinGames} />
 		</>
 
 	);

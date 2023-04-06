@@ -11,6 +11,7 @@ import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
 import { CreateGame } from './component/CreateGame'
 import { AuthService, useAuthService } from './auth/AuthService'
+import { GamePage } from './component/GameScreen'
 
 export interface Destinations {
 	name: string,
@@ -314,7 +315,7 @@ function App() {
 						<Route path="game/">
 							<Route path=":idGame" element={
 								<RequireAuth>
-									<CreateGame />
+									<GamePage />
 								</RequireAuth>
 							} />
 							<Route path="" element={

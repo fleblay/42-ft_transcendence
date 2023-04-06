@@ -54,18 +54,31 @@ export function GamePage() {
 			</div>
 		);
 	}
-	if (loading === LoadingStatus.Failed || !idGame) {
-		return (
-			<div>
-				Failed to load game (game not found)
-			</div>
-		);
+
+	if (loading === LoadingStatus.Loaded && idGame && gameInfo) {
+		if (gameInfo.status === GameStatus.playing) {
+			return <GameScreen startGameInfo={gameInfo} gameId={idGame} />
+		}
+		if (gameInfo.status === GameStatus.end) {
+			return <GameFinishedScreen gameInfo={gameInfo} />
+		}
 	}
 
-	if (loading === LoadingStatus.Loaded) {
-		return <GameScreen startGameInfo={gameInfo} gameId={idGame} />
-	}
+	return (
+		<div>
+			Failed to load game (game not found)
+		</div>
+	);
 };
+
+function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
+	return (
+		<div>
+			<div>Game finished</div>
+			<div>Winner: {gameInfo.players.map((player, index) => <div key={index}> {player.score}</div>)}</div>
+		</div>
+	)
+}
 
 export function GameScreen({ startGameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
