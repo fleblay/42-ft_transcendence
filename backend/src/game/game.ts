@@ -157,7 +157,6 @@ export class Game {
 		if (this.status === GameStatus.playing) {
 			this.posBall.x += this.velocityBall.x * ballSpeed
 			this.posBall.y += this.velocityBall.y * ballSpeed
-		}
 		//Colision mur
 		if (this.posBall.y > canvasHeight - ballSize && this.velocityBall.y > 0)
 			this.velocityBall.y *= -1
@@ -204,6 +203,7 @@ export class Game {
 			if (Date.now() - player.timeLastMove > 100)
 				player.momentum = 0
 		})
+		}
 		//Envoi des infos
 		this.updateInfo(this.generateGameInfo());
 	}
