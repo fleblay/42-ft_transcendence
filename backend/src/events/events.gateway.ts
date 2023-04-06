@@ -17,7 +17,7 @@ import {User} from '../model/user.entity'
 import {GameJoinDto} from './dtos/game-join.dto'
 import {PlayerInputDto} from './dtos/player-input.dto'
 import {GameService} from '../game/game.service'
-import { AuthService } from 'src/users/auth.service';
+import { AuthService } from 'src/users/auth/auth.service';
 
 @WebSocketGateway({
 	path: '/socket.io/',
