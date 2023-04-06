@@ -44,6 +44,6 @@ export class GameService {
 	}
 
 	handlePlayerInput(client: Socket, user: User, data: PlayerInputDto){
-		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, {move: data.move, powerup: data.powerup})
+		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, {move: data.move, powerUp: data.powerup})
 	}
 }

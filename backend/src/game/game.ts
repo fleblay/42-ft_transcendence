@@ -25,35 +25,43 @@ export type GameSetting = {
 	playerSpeed: number,
 	canvasHeight: number,
 	canvasWidth: number,
+}
 
+export type Players = {
+	pos: number,
+	momentum: number,
+	timeLastMove: number,
+	paddleLength: number,
+	score: number,
+	user: User,
 }
 
 enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 interface IgameInfo {
 
-	posP1: number
-	posP2: number
+	//posP1: number
+	//posP2: number
+	players: Players[],
 	posBall: Pos2D
-	score: number[]
+	//score: number[]
 	status: GameStatus
 	date: Date
 }
 
-
 interface PlayerInput {
 	move: string
-	powerup?: string
+	powerUp?: string
 }
 
 export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1) }
-	private startTime: number = Date.now()
+	//private startTime: number = Date.now()
 	private intervalId: NodeJS.Timer
-	private players: { pos: number, momentum: number, lastmove: number, user: User }[] = []
+	private players: Players[] = []
 	private viewers: User[] = []
-	private score: number[] = [0, 0]
+	//private score: number[] = [0, 0]
 	private status: GameStatus = GameStatus.waiting
 	private readonly playerRoom: string
 	private readonly viewerRoom: string
@@ -77,7 +85,7 @@ export class Game {
 					foundPlayer.pos -= playerSpeed - (foundPlayer.momentum / 10)
 					foundPlayer.pos = Math.floor(foundPlayer.pos)
 					foundPlayer.pos = (foundPlayer.pos <= 0) ? 0 : foundPlayer.pos
-					foundPlayer.lastmove = Date.now()
+					foundPlayer.timeLastMove = Date.now()
 					break
 				case ("Down"):
 					foundPlayer.momentum = (foundPlayer.momentum >= 0) ? foundPlayer.momentum + 1 : 0
@@ -85,8 +93,8 @@ export class Game {
 						foundPlayer.momentum = 20
 					foundPlayer.pos += playerSpeed + (foundPlayer.momentum / 10)
 					foundPlayer.pos = Math.floor(foundPlayer.pos)
-					foundPlayer.pos = (foundPlayer.pos >= canvasHeight - paddleLength) ? canvasHeight - paddleLength : foundPlayer.pos
-					foundPlayer.lastmove = Date.now()
+					foundPlayer.pos = (foundPlayer.pos >= canvasHeight - foundPlayer.paddleLength) ? canvasHeight - foundPlayer.paddleLength : foundPlayer.pos
+					foundPlayer.timeLastMove = Date.now()
 					break
 				default:
 					console.log(`Input is ${input.move}`)
@@ -106,10 +114,13 @@ export class Game {
 
 	generateGameInfo(): IgameInfo {
 		return {
-			posP1: this.players[0]?.pos,
-			posP2: this.players[1]?.pos,
+			//posP1: this.players[0]?.pos,
+			//posP2: this.players[1]?.pos,
+			players: this.players,
+
 			posBall: this.posBall,
-			score: this.score,
+			//score: [this.players[0].score, this.players[1].score],
+			//score: [0,0],
 			status: this.status,
 			date: new Date()
 		}
@@ -119,7 +130,7 @@ export class Game {
 		if (this.players.find((player) => player.user.id === user.id))
 			throw new NotFoundException('Already in game')
 		if (this.players.length < 2) {
-			this.players.push({ pos: canvasHeight / 2 - paddleLength / 2, momentum: 0, lastmove: Date.now(), user })
+			this.players.push({ pos: canvasHeight / 2 - paddleLength / 2, momentum: 0, timeLastMove: Date.now(), paddleLength: paddleLength, score: 0, user })
 			client.join(this.playerRoom)
 			if (this.players.length === 1)
 				this.play()
@@ -151,7 +162,7 @@ export class Game {
 		if (this.posBall.y < ballSize && this.velocityBall.y < 0)
 			this.velocityBall.y *= -1
 		//Colision paddle droite
-		if (this.posBall.x + this.velocityBall.x >= canvasWidth - ballSize - paddleWidth && (this.posBall.y > this.players[1].pos && this.posBall.y < this.players[1].pos + paddleLength)) {
+		if (this.posBall.x + this.velocityBall.x >= canvasWidth - ballSize - paddleWidth && (this.posBall.y > this.players[1].pos && this.posBall.y < this.players[1].pos + this.players[1].paddleLength)) {
 			this.velocityBall.x = -1
 			if (this.players[1].momentum !== 0) {
 				this.velocityBall.y += this.players[1].momentum / 40
@@ -159,7 +170,7 @@ export class Game {
 			}
 		}
 		//Colision paddle gauche
-		if (this.posBall.x <= ballSize + paddleWidth && (this.posBall.y > this.players[0].pos && this.posBall.y < this.players[0].pos + paddleLength)) {
+		if (this.posBall.x <= ballSize + paddleWidth && (this.posBall.y > this.players[0].pos && this.posBall.y < this.players[0].pos + this.players[0].paddleLength)) {
 			this.velocityBall.x = 1
 			if (this.players[0].momentum !== 0) {
 				this.velocityBall.y += this.players[0].momentum / 40
@@ -173,24 +184,26 @@ export class Game {
 			this.posBall.y += this.velocityBall.y * ballSpeed
 		}
 
-		//Condition de win/loose
+		//Condition de marquage de point
 		if (this.posBall.x <= 0) {
-			this.score[1] += 1
+			this.players[1].score += 1
 			this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
 			this.velocityBall = { x: (Math.random() > 0, 5) ? 1 : -1, y: (Math.random() > 0, 5) ? 1 : -1}
 		}
 		else if (this.posBall.x >= canvasWidth) {
-			this.score[0] += 1
+			this.players[0].score += 1
 			this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
 			this.velocityBall = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1)}
 		}
-		if (this.score[0] + this.score[1] === gameRounds) {
+
+		//Condition fin de jeu
+		if (this.players[0].score + this.players[1]?.score === gameRounds) {
 			this.status = GameStatus.end
 			clearInterval(this.intervalId)
 		}
 		//Reset des momentum
 		this.players.forEach((player) => {
-			if (Date.now() - player.lastmove > 500)
+			if (Date.now() - player.timeLastMove > 500)
 				player.momentum = 0
 		})
 		//Envoi des infos

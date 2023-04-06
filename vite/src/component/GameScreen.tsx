@@ -84,9 +84,9 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		context.current.fillStyle = "white";
 
 		// Player One
-		context.current.fillRect(0, gameInfo.posP1, paddleWidth, paddleLength);
+		context.current.fillRect(0, gameInfo.players[0].pos, paddleWidth, paddleLength);
 		// Player Two
-		context.current.fillRect(canvasWidth - paddleWidth, gameInfo.posP2, paddleWidth, paddleLength);
+		context.current.fillRect(canvasWidth - paddleWidth, gameInfo.players[1]?.pos, paddleWidth, paddleLength);
 
 		// Ball
 		context.current.fillStyle = "white";
@@ -103,7 +103,7 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		context.current.lineTo(canvasWidth / 2, canvasHeight);
 		context.current.stroke();
 
-	}, [gameInfo.posP1, gameInfo.posP2, gameInfo.posBall]);
+	}, [gameInfo.players[0].pos, gameInfo.players[1]?.pos, gameInfo.posBall]);
 
 	React.useEffect(() => {
 		function onGameUpdate(data: IgameInfo) {
@@ -137,9 +137,9 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 			<div> <h1>Game Info :</h1></div>
 			<div> posBall x :{gameInfo?.posBall.x} </div>
 			<div> posBall y: {gameInfo?.posBall.y} </div>
-			<div> posP1: {gameInfo?.posP1} </div>
-			<div> posP2: {gameInfo?.posP2} </div>
-			<div> score: {`${gameInfo?.score[0]}:${gameInfo?.score[1]}`} </div>
+			<div> posP1: {gameInfo?.players[0].pos} </div>
+			<div> posP2: {gameInfo?.players[1]?.pos} </div>
+			<div> score: {`${gameInfo?.players[0].score}:${gameInfo?.players[1]?.score}`} </div>
 			<div> status: {gameInfo?.status} </div>
 			<div> date: {gameInfo?.date.toString()} </div>
 			<div>
