@@ -3,16 +3,18 @@ import { User } from '../model/user.entity'
 import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 
-const paddleLength = 40
+const paddleLength = 60
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 5
 const playerSpeed = 3
-const canvasHeight = 250
-const canvasWidth = 500
+const canvasHeight = 600
+const canvasWidth = 800
 const gameRounds = 50
 
+
 export type Pos2D = {
+
 	x: number,
 	y: number
 }
@@ -80,8 +82,8 @@ export class Game {
 			switch (input.move) {
 				case ("Up"):
 					foundPlayer.momentum = (foundPlayer.momentum <= 0) ? foundPlayer.momentum - 1 : 0
-					if (foundPlayer.momentum <= -20)
-						foundPlayer.momentum = -20
+					if (foundPlayer.momentum <= -40)
+						foundPlayer.momentum = -40
 					foundPlayer.pos -= playerSpeed - (foundPlayer.momentum / 10)
 					foundPlayer.pos = Math.floor(foundPlayer.pos)
 					foundPlayer.pos = (foundPlayer.pos <= 0) ? 0 : foundPlayer.pos
@@ -89,8 +91,8 @@ export class Game {
 					break
 				case ("Down"):
 					foundPlayer.momentum = (foundPlayer.momentum >= 0) ? foundPlayer.momentum + 1 : 0
-					if (foundPlayer.momentum >= 20)
-						foundPlayer.momentum = 20
+					if (foundPlayer.momentum >= 40)
+						foundPlayer.momentum = 40
 					foundPlayer.pos += playerSpeed + (foundPlayer.momentum / 10)
 					foundPlayer.pos = Math.floor(foundPlayer.pos)
 					foundPlayer.pos = (foundPlayer.pos >= canvasHeight - foundPlayer.paddleLength) ? canvasHeight - foundPlayer.paddleLength : foundPlayer.pos
@@ -130,7 +132,14 @@ export class Game {
 		if (this.players.find((player) => player.user.id === user.id))
 			throw new NotFoundException('Already in game')
 		if (this.players.length < 2) {
-			this.players.push({ pos: canvasHeight / 2 - paddleLength / 2, momentum: 0, timeLastMove: Date.now(), paddleLength: paddleLength, score: 0, user })
+			this.players.push({
+				pos: canvasHeight / 2 - paddleLength / 2,
+				momentum: 0,
+				timeLastMove: Date.now(),
+				paddleLength: paddleLength + ((Math.random() > 0.5) ? -1 : 1) * (Math.random() * paddleLength),
+				score: 0,
+				user
+			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1)
 				this.play()
@@ -166,7 +175,7 @@ export class Game {
 			this.velocityBall.x = -1
 			if (this.players[1].momentum !== 0) {
 				this.velocityBall.y += this.players[1].momentum / 40
-				this.players[1].momentum = 0
+				//this.players[1].momentum = 0
 			}
 		}
 		//Colision paddle gauche
@@ -174,7 +183,7 @@ export class Game {
 			this.velocityBall.x = 1
 			if (this.players[0].momentum !== 0) {
 				this.velocityBall.y += this.players[0].momentum / 40
-				this.players[0].momentum = 0
+				//this.players[0].momentum = 0
 			}
 		}
 
@@ -188,12 +197,12 @@ export class Game {
 		if (this.posBall.x <= 0) {
 			this.players[1].score += 1
 			this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-			this.velocityBall = { x: (Math.random() > 0, 5) ? 1 : -1, y: (Math.random() > 0, 5) ? 1 : -1}
+			this.velocityBall = { x: (Math.random() > 0, 5) ? 1 : -1, y: (Math.random() > 0, 5) ? 1 : -1 }
 		}
 		else if (this.posBall.x >= canvasWidth) {
 			this.players[0].score += 1
 			this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-			this.velocityBall = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1)}
+			this.velocityBall = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1) }
 		}
 
 		//Condition fin de jeu
@@ -203,7 +212,7 @@ export class Game {
 		}
 		//Reset des momentum
 		this.players.forEach((player) => {
-			if (Date.now() - player.timeLastMove > 500)
+			if (Date.now() - player.timeLastMove > 300)
 				player.momentum = 0
 		})
 		//Envoi des infos

@@ -8,9 +8,8 @@ interface Iprops {
 	gameId: string
 }
 
-const canvasHeight = 250
-const canvasWidth = 500
-const paddleLength = 40
+const canvasHeight = 600
+const canvasWidth = 800
 const paddleWidth = 5
 const ballSize = 5
 
@@ -84,9 +83,9 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		context.current.fillStyle = "white";
 
 		// Player One
-		context.current.fillRect(0, gameInfo.players[0].pos, paddleWidth, paddleLength);
+		context.current.fillRect(0, gameInfo.players[0].pos, paddleWidth, gameInfo.players[0].paddleLength);
 		// Player Two
-		context.current.fillRect(canvasWidth - paddleWidth, gameInfo.players[1]?.pos, paddleWidth, paddleLength);
+		context.current.fillRect(canvasWidth - paddleWidth, gameInfo.players[1]?.pos, paddleWidth, gameInfo.players[1]?.paddleLength);
 
 		// Ball
 		context.current.fillStyle = "white";
@@ -138,7 +137,11 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 			<div> posBall x :{gameInfo?.posBall.x} </div>
 			<div> posBall y: {gameInfo?.posBall.y} </div>
 			<div> posP1: {gameInfo?.players[0].pos} </div>
+			<div> momentumP1: {gameInfo?.players[0].momentum} </div>
+			<div> paddleLengthP1: {gameInfo?.players[0].paddleLength} </div>
 			<div> posP2: {gameInfo?.players[1]?.pos} </div>
+			<div> momentumP2: {gameInfo?.players[1]?.momentum} </div>
+			<div> paddleLengthP2: {gameInfo?.players[1]?.paddleLength} </div>
 			<div> score: {`${gameInfo?.players[0].score}:${gameInfo?.players[1]?.score}`} </div>
 			<div> status: {gameInfo?.status} </div>
 			<div> date: {gameInfo?.date.toString()} </div>

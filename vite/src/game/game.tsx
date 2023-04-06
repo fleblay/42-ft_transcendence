@@ -6,8 +6,8 @@ const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 5
 const playerSpeed = 5
-const canvasHeight = 250
-const canvasWidth = 500
+const canvasHeight = 600
+const canvasWidth = 800
 
 interface IBallPos {
 	x: number;
