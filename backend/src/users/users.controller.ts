@@ -36,7 +36,6 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	@Get('/me')
 	getMe(@Request() req) {
-		console.log(req.headers)
 		const token = req.headers.authorization.replace('Bearer ', '');
 		return this.authService.validateToken(token);
 	}
