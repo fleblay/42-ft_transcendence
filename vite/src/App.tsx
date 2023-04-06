@@ -1,9 +1,7 @@
-import { MyForm } from './pages/NameSelector'
-import { GetAll } from './pages/getall'
-import { GameCanvas } from './game/game'
+
 import React, { createContext, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
-import { delToken, getToken, saveToken } from './token/token'
+import { delAccessToken, getAccessToken, saveToken } from './token/token'
 import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { AuthProvider } from './auth'
@@ -12,6 +10,7 @@ import { RegisterForm } from './component/RegisterForm'
 import { CreateGame } from './component/CreateGame'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { GamePage } from './component/GameScreen'
+import apiClient from './auth/interceptor.axios'
 
 export interface Destinations {
 	name: string,
@@ -71,7 +70,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 
 	const socket = io({
 		auth: {
-			token: getToken()
+			token: getAccessToken()
 		}
 	})
 
@@ -298,7 +297,7 @@ function ListGames() {
 
 	return (
 		<>
-			<button onClick={() => { axios.get("/api/game/current").then((response) => { console.log(response.data); setList(response.data.toString()) }) }}>GetList</button>
+			<button onClick={() => { apiClient.get("/api/game/current").then((response) => { console.log(response.data); setList(response.data.toString()) }) }}>GetList</button>
 			<div> {list} </div>
 		</>
 	)

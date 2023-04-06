@@ -2,11 +2,12 @@ import React from "react";
 import { IUser, allRoutes } from "../App";
 import { AuthProvider } from "../auth";
 import { LoginData } from "../component/LoginForm";
-import { delToken, getToken, saveToken } from "../token/token";
+import { delAccessToken, delRefreshToken, getAccessToken, saveToken } from "../token/token";
 import axios from "axios";
 import { RegisterData } from "../component/RegisterForm";
 import { userToken } from "../types";
 import { useLocation, useNavigate } from "react-router-dom";
+import apiClient from "./interceptor.axios";
 
 //0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
@@ -26,7 +27,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	const navigate = useNavigate()
 
 	const getUser = async () => {
-		axios.get('/api/users/me', { headers: { Authorization: `Bearer ${getToken()}` } })
+		apiClient.get('/api/users/me')
 		.then((response) => {
 			console.log(response.data)
 			setUser(response.data)
@@ -39,7 +40,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	}
 
 	if (!user && !allRoutes.find((el) => el.path === location.pathname)?.public) {
-		if (getToken())
+		if (getAccessToken())
 			getUser()
 		else
 			navigate("/login", { replace: true });
@@ -49,7 +50,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 
 	let register = async (registerData: RegisterData): Promise<void> => {
 		return new Promise((resolve, reject) => {
-			axios
+			apiClient
 			.post("/api/users/register", registerData)
 			.then((response) => {
 				const userData = response.data as userToken;
@@ -66,10 +67,11 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 
 	let login = async (loginData: LoginData): Promise<void> => {
 		return new Promise((resolve, reject) => {
-			axios
+			apiClient
 			.post("/api/users/login", loginData)
 			.then((response) => {
 				const userData = response.data as userToken;
+				console.log(userData);
 				saveToken(userData);
 				getUser()
 				resolve();
@@ -83,7 +85,8 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 
 	let logout = (callback: VoidFunction) => {
 		setUser(null);
-		delToken();
+		delAccessToken();
+		delRefreshToken();
 	};
 
 	let value = { user, register, login, logout };

@@ -6,6 +6,7 @@ import { GameScreen } from './GameScreen';
 import { getMenuItemUtilityClass } from '@mui/material';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import apiClient from '../auth/interceptor.axios';
 
 interface Iprops {
 	startGameInfo: IgameInfo,
@@ -22,7 +23,7 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 
 	return (
 		<>
-			<button onClick={() => { axios.get("/api/game/current").then((response) => {
+			<button onClick={() => { apiClient.get("/api/game/current").then((response) => {
 				console.log(response.data);
 				setListGames(response.data.map((gameId: string) => gameId.replace(/"/g, '')))
 			}) }}>Refresh list</button>

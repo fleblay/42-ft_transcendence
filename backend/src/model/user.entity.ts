@@ -13,7 +13,7 @@ export class User {
 	email: string;
 	@Column()
 	password: string;
-
+	
 	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
 	@JoinTable()
 	savedGames: SavedGame[];
