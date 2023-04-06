@@ -31,9 +31,10 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames, setGame
 			<div>
 				{listGames.map((gameId) => {
 					return <div key={gameId}>
+						<label>{gameId}</label>
 						<button onClick={() => {
 							joinGames(gameId);
-						}}>Join game {gameId}
+						}}>Join game
 						</button>
 					</div>
 				})
@@ -69,6 +70,7 @@ export function CreateGame(): JSX.Element {
 
 	React.useEffect(() => {
 		if (id) {
+			console.log('joining game: ', id);
 			joinGames(id);
 		}
 	}, [id])
