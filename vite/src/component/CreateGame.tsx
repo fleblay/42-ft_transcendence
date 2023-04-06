@@ -44,10 +44,12 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 export function CreateGame() {
 	const navigate = useNavigate();
 
-
 	function joinGames(game?: string) {
 		if (game) {
 			navigate(`/game/${game}`);
+		}
+		else {
+
 		}
 	}
 	return (
