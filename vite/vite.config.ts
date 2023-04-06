@@ -4,7 +4,7 @@ import {readFileSync} from 'fs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	base: './',
+	base: '/',
 	plugins: [react()],
 	server: {
 		/*
@@ -15,5 +15,8 @@ export default defineConfig({
 		*/
 		host: true,
 		port: 4243,
+	},
+	build: {
+		sourcemap: true,
 	}
 })

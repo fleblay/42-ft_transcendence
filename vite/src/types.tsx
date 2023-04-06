@@ -15,6 +15,7 @@ export interface IPlayers {
 	momentum: number,
 	timeLastMove: number,
 	paddleLength: number,
+	paddleWidth: number,
 	score: number,
 }
 

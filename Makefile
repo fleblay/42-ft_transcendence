@@ -15,7 +15,7 @@ docker:
 	open -g /Applications/Docker.app/
 
 detach: build
-	docker-compose up --no-build
+	docker-compose up --no-build -d
 
 follow:
 	docker-compose logs -f

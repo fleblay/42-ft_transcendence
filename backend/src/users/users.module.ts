@@ -19,7 +19,7 @@ import { AccessTokenStrategy } from './strategy/accessToken.strategy';
 		PassportModule,
 		JwtModule.register({
 			secret: 'secret', // not secure at all need to be changed in production  put in a .env file
-			signOptions: { expiresIn: '60s' },
+			signOptions: { expiresIn: '600s' },
 		})
 	],
 	controllers: [UsersController],

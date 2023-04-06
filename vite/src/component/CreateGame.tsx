@@ -35,7 +35,7 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames, setGame
 						<button onClick={() => {
 							joinGames(gameId);
 						}}>Join game {gameId}
-						</button>
+						</button>{gameId}
 					</div>
 				})
 				}
@@ -48,8 +48,15 @@ export function CreateGame(): JSX.Element {
 	const { socket } = React.useContext(SocketContext);
 	const [gameId, setGameId] = React.useState<string>("")
 	const [gameInfo, setGameInfo] = React.useState<IgameInfo>();
+	const [joined, setJoined] = React.useState<boolean>(false);
 
 	function joinGames(game?: string) {
+		if (!joined)
+		{
+			setJoined(true)
+			return
+		}
+		console.log('game is now:', game)
 		socket.emit('game.join', { gameId: game }, (response: any) => {
 			if (response.error) {
 				console.log(response.error);
@@ -59,7 +66,7 @@ export function CreateGame(): JSX.Element {
 				console.log(response.user);
 				setGameId(response.gameId);
 				socket.on('game.update', (data: IgameInfo) => {
-					console.log('game.update', data);
+					//console.log('game.update', data);
 					setGameInfo(data);
 				});
 			}
@@ -72,7 +79,7 @@ export function CreateGame(): JSX.Element {
 		if (id) {
 			joinGames(id);
 		}
-	}, [id])
+	}, [joined])
 
 	/* 	React.useEffect(() => {
 			function onNewLobby(data: any) {
