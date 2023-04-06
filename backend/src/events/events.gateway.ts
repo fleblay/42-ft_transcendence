@@ -68,7 +68,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	{
 		console.log("New create event")
 		try {
-			const gameId = this.gameService.findOrCreate(data.map)
+			const gameId = this.gameService.create(data.map)
 			console.log("Game id is : ", gameId);
 			return {gameId};
 		}
@@ -80,7 +80,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@SubscribeMessage('game.findOrCreate')
 	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string} | {error: string}
 	{
-		console.log("New create event")
+		console.log("New findOrCreate event")
 		try {
 			const gameId = this.gameService.findOrCreate(data.map)
 			console.log("Game id is : ", gameId);

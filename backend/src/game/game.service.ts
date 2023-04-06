@@ -23,6 +23,11 @@ export class GameService {
 		this.gameCluster.setServer(server)
 	}
 
+	create(map: number): UUID {
+		let game = this.gameCluster.createGame();
+		return game.GameId
+	}
+
 	findOrCreate(map: number): UUID {
 		let game = this.gameCluster.findAvailable()
 		if (game === null)
