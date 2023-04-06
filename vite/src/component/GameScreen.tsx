@@ -10,7 +10,6 @@ interface Iprops {
 
 const canvasHeight = 600
 const canvasWidth = 800
-const paddleWidth = 5
 const ballSize = 5
 
 
@@ -83,9 +82,9 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 		context.current.fillStyle = "white";
 
 		// Player One
-		context.current.fillRect(0, gameInfo.players[0].pos, paddleWidth, gameInfo.players[0].paddleLength);
+		context.current.fillRect(0, gameInfo.players[0].pos, gameInfo.players[0].paddleWidth, gameInfo.players[0].paddleLength);
 		// Player Two
-		context.current.fillRect(canvasWidth - paddleWidth, gameInfo.players[1]?.pos, paddleWidth, gameInfo.players[1]?.paddleLength);
+		context.current.fillRect(canvasWidth - gameInfo.players[1].paddleWidth, gameInfo.players[1]?.pos, gameInfo.players[1].paddleWidth, gameInfo.players[1]?.paddleLength);
 
 		// Ball
 		context.current.fillStyle = "white";
