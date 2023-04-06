@@ -311,13 +311,18 @@ function App() {
 				<Routes>
 					<Route element={<div> <Destinations /> <Header /> </div>}>
 						<Route path="/" element={<Navigate to='/game' replace />} />
-						<Route path="/game/:id?" element={
-							<RequireAuth>
-								<div>
+						<Route path="game/">
+							<Route path=":id" element={
+								<RequireAuth>
 									<CreateGame />
-								</div>
-							</RequireAuth>
-						} />
+								</RequireAuth>
+							} />
+							<Route path="" element={
+								<RequireAuth>
+									<CreateGame />
+								</RequireAuth>
+							} />
+						</Route>
 						<Route path='/public' element={<div>Public</div>} />
 						<Route
 							path="/chat"
