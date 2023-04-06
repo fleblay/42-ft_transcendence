@@ -10,6 +10,7 @@ import { LogMiddleware } from './app.middleware';
 import { GameModule } from './game/game.module';
 import { SavedGame } from './model/saved-game.entity';
 import { RefreshToken } from './model/refresh-token';
+import { AuthModule } from './users/auth/auth.module';
 
 @Module({
 	imports: [
@@ -32,6 +33,7 @@ import { RefreshToken } from './model/refresh-token';
 		UsersModule,
 		EventsModule,
 		GameModule,
+		AuthModule
 	],
 	controllers: [AppController],
 	providers: [AppService],

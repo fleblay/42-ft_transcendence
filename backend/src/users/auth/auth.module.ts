@@ -7,19 +7,20 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { RefreshToken } from 'src/model/refresh-token';
 import { UsersModule } from '../users.module';
+import { JwtStrategy } from '../strategy/jwt.strategy';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([RefreshToken]),
 		PassportModule,
 		JwtModule.register({
-			secret: 'secret', // not secure at all need to be changed in production  put in a .env file
+			secret: 'access', // not secure at all need to be changed in production  put in a .env file
 			signOptions: { expiresIn: '60s' },
 		}),
 		UsersModule
 	],
 	controllers: [AuthController],
-	providers: [AuthService],
+	providers: [AuthService, UsersModule, JwtStrategy],
 	exports: [AuthService],
 })
 export class AuthModule { }

@@ -7,6 +7,12 @@ import { LoginUserDto } from '../dtos/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from 'src/model/refresh-token';
 import { Repository } from 'typeorm';
+import { access } from 'fs';
+
+type Tokens = {
+	access_token: string;
+	refresh_token: string;
+};
 
 @Injectable()
 export class AuthService {
@@ -24,7 +30,8 @@ export class AuthService {
 
 	validateToken(bearerToken: string): Promise<User> | null{
 		try {
-		const jwtResponse = this.jwtService.verify(bearerToken) // compliant to security rules of year 3000
+		const access_token_options = {expiresIn: '20s', secret: 'access'};
+		const jwtResponse = this.jwtService.verify(bearerToken, access_token_options) // compliant to security rules of year 3000
 		console.log(`User id is `, jwtResponse)
 			return this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
@@ -33,17 +40,40 @@ export class AuthService {
 		}
 	}
 
+	decodeToken(bearerToken: string) : Promise<User> | null{
+		try {
+			const jwtResponse = this.jwtService.decode(bearerToken);
+			console.log(`Decode :  `, jwtResponse);
+			return this.usersService.findOne(jwtResponse.sub);
+		} catch (e) {
+			console.log(`Error in validate Token is ${e}`)
+			return null
+		}
+	}
+//
+
+
 	async login(dataUser : LoginUserDto) {
 		const user = await this.usersService.findOneByEmail(dataUser.email);
 		if (!user)
 			throw new NotFoundException("User not existing");
 		if (user.password !== dataUser.password)
 			throw new ForbiddenException('Password not match');
-		const payload = { username: user.username, sub: user.id};
-		const options = {expiresIn: '1d'};
-		return {
-			access_token: this.jwtService.sign(payload, options),
-		};
+		const tokens = this.getToken(user);
+		await this.saveRefreshToken(user.id, tokens.refresh_token);
+		console.log(`tokens are ${tokens.access_token}`);
+		return tokens;
+	}
+
+	getToken(user: User) {
+		const access_token_payload = { username: user.username, sub: user.id};
+		const access_token_options = {expiresIn: '20s', secret: 'access'};
+		const access_token = this.jwtService.sign(access_token_payload, access_token_options);
+
+		const refresh_token_payload = { username: user.username, sub: user.id};
+		const refresh_token_options = {expiresIn: '7d', secret: 'refresh'};
+		const refresh_token = this.jwtService.sign(refresh_token_payload, refresh_token_options);
+		return { access_token, refresh_token };
 	}
 
 	async register(dataUser : CreateUserDto)
@@ -54,27 +84,51 @@ export class AuthService {
 			throw new ForbiddenException('username is not unique');
 
 		const user = await this.usersService.create(dataUser);
-		const payload = {username: dataUser.username, sub: user.id}; // sub >
-		const options = {expiresIn: '1d'};
-		return {
-			access_token: this.jwtService.sign(payload, options),
-		};
+		const tokens = this.getToken(user);
+		await this.saveRefreshToken(user.id, tokens.refresh_token);
+		console.log(`tokens are ${tokens}`);
+		return tokens;
 	}
 
-	async getToken(user: User) {
-		const access_token_payload = { username: user.username, sub: user.id};
-		const access_token_options = {expiresIn: '5m', secret: 'access'};
-		const access_token = this.jwtService.signAsync(access_token_payload, access_token_options);
-
-		const refresh_token_payload = { username: user.username, sub: user.id};
-		const refresh_token_options = {expiresIn: '7d', secret: 'refresh'};
-		const refresh_token = this.jwtService.signAsync(refresh_token_payload, refresh_token_options);
-
-		return { access_token, refresh_token };
+	async saveRefreshToken(userId: number, refreshToken: string) {
+		await this.repo.save({ userId, refreshToken });
 	}
 
 	async updateRefreshToken(userId: number, refreshToken: string) {
-		
+		const report = await this.repo.findOne({ where: { userId: userId } });
+		if (!report) {
+			throw new NotFoundException('User not found');
+		}
+		report.refreshToken = refreshToken;
+		await this.repo.save(report);
+	}
 
+	async refreshToken(refreshToken: string) {
+		const user = await this.decodeToken(refreshToken);
+		if (!user) {
+			throw new ForbiddenException('Invalid refresh token');
+		}
+		const tokens = this.getToken(user);
+		await this.updateRefreshToken(user.id, tokens.refresh_token);
+		return tokens;
+	}
+
+	async validateRefreshToken(refreshToken: string) {
+		const user = await this.decodeToken(refreshToken);
+		if (!user) {
+			throw new ForbiddenException('Invalid refresh token');
+		}
+		const report = await this.repo.findOne({ where: { refreshToken: refreshToken } });
+		if (!report) {
+			throw new NotFoundException('User not found');
+		}
+		if (report.id !== user.id) {
+			throw new ForbiddenException('Invalid refresh token');
+		}
+		return user;
+	}
+
+	async findAllTokens() {
+		return await this.repo.find();
 	}
 }

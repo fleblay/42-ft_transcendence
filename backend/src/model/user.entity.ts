@@ -13,9 +13,6 @@ export class User {
 	email: string;
 	@Column()
 	password: string;
-
-	@Column()
-	refreshtoken: string;
 	
 	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
 	@JoinTable()
