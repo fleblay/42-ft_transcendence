@@ -3,7 +3,7 @@ import { User } from '../model/user.entity'
 import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 
-const paddleLength = 60
+const paddleLength = 80
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 5
@@ -42,11 +42,8 @@ enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 interface IgameInfo {
 
-	//posP1: number
-	//posP2: number
 	players: Players[],
 	posBall: Pos2D
-	//score: number[]
 	status: GameStatus
 	date: Date
 }
@@ -63,7 +60,6 @@ export class Game {
 	private intervalId: NodeJS.Timer
 	private players: Players[] = []
 	private viewers: User[] = []
-	//private score: number[] = [0, 0]
 	private status: GameStatus = GameStatus.waiting
 	private readonly playerRoom: string
 	private readonly viewerRoom: string
@@ -109,20 +105,13 @@ export class Game {
 	}
 
 	updateInfo(payload: IgameInfo) {
-		//console.log(this.playerRoom);
-		//console.log(this.viewerRoom);
 		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.update', payload)
 	}
 
 	generateGameInfo(): IgameInfo {
 		return {
-			//posP1: this.players[0]?.pos,
-			//posP2: this.players[1]?.pos,
 			players: this.players,
-
 			posBall: this.posBall,
-			//score: [this.players[0].score, this.players[1].score],
-			//score: [0,0],
 			status: this.status,
 			date: new Date()
 		}
@@ -131,12 +120,13 @@ export class Game {
 	addUser(user: User, client: Socket) {
 		if (this.players.find((player) => player.user.id === user.id))
 			throw new NotFoundException('Already in game')
+
 		if (this.players.length < 2) {
 			this.players.push({
 				pos: canvasHeight / 2 - paddleLength / 2,
 				momentum: 0,
 				timeLastMove: Date.now(),
-				paddleLength: paddleLength + ((Math.random() > 0.5) ? -1 : 1) * (Math.random() * paddleLength),
+				paddleLength: Math.floor(paddleLength + ((Math.random() > 0.5) ? -1 : 1) * (Math.random() * paddleLength / 3)),
 				score: 0,
 				user
 			})
@@ -145,13 +135,6 @@ export class Game {
 				this.play()
 			if (this.players.length === 2) {
 				this.status = GameStatus.playing;
-				//console.log(`listening event : game.play.move.${this.gameId}`)
-				/*
-				this.server.on(`game.play.move.${this.gameId}`, ({ userId, input }: { userId: User["id"], input: Partial<PlayerInput> }) => {
-					console.log('Inside game.play.move', userId, input)
-					this.applyPlayerInput(userId, input)
-				})
-				*/
 			}
 			else if (this.players.length === 1) {
 				this.status = GameStatus.waiting
@@ -175,7 +158,6 @@ export class Game {
 			this.velocityBall.x = -1
 			if (this.players[1].momentum !== 0) {
 				this.velocityBall.y += this.players[1].momentum / 40
-				//this.players[1].momentum = 0
 			}
 		}
 		//Colision paddle gauche
@@ -183,7 +165,6 @@ export class Game {
 			this.velocityBall.x = 1
 			if (this.players[0].momentum !== 0) {
 				this.velocityBall.y += this.players[0].momentum / 40
-				//this.players[0].momentum = 0
 			}
 		}
 
