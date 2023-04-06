@@ -50,6 +50,7 @@ export function CreateGame(): JSX.Element {
 	const [gameInfo, setGameInfo] = React.useState<IgameInfo>();
 
 	function joinGames(game?: string) {
+		console.log('game is now:', game)
 		socket.emit('game.join', { gameId: game }, (response: any) => {
 			if (response.error) {
 				console.log(response.error);
