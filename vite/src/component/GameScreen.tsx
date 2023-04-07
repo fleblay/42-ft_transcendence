@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "../App";
 import { IgameInfo, GameStatus } from "../types";
 import { useAuthService } from "../auth/AuthService";
+import { useParams } from "react-router-dom";
 
 interface Iprops {
 	startGameInfo: IgameInfo,
@@ -12,17 +13,91 @@ const canvasHeight = 600
 const canvasWidth = 800
 const ballSize = 5
 
+enum LoadingStatus {
+	Loading,
+	Loaded,
+	Failed
+}
 
-export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
+export function GamePage() {
+	const [loading, setLoading] = useState<LoadingStatus>(LoadingStatus.Loading);
+	const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
+	const [joined, setJoined] = useState<boolean>(false);
+	const { socket } = useContext(SocketContext);
 
+	let auth = useAuthService();
+
+	const { idGame } = useParams();
+
+	useEffect(() => {
+		if (!joined) {
+			setJoined(true)
+			return
+		}
+		socket.emit('game.join', { gameId: idGame }, (response: any) => {
+			if (response.error) {
+				console.log(response.error);
+				setLoading(LoadingStatus.Failed);
+			}
+			else {
+				setGameInfo(response.gameInfo);
+				setLoading(LoadingStatus.Loaded);
+			}
+		});
+	}, [joined]);
+
+	if (loading === LoadingStatus.Loading) {
+		return (
+			<div>
+				Loading...
+			</div>
+		);
+	}
+
+	// TODO: Crash, gameInfo is undefined. game.update est seulement dans gamescreen. game.join envoie un gameInfo pour init ?
+	if (loading === LoadingStatus.Loaded && idGame) {
+		if (gameInfo.status === GameStatus.playing) {
+			return <GameScreen startGameInfo={gameInfo} gameId={idGame} />
+		}
+		if (gameInfo.status === GameStatus.end) {
+			return <GameFinishedScreen gameInfo={gameInfo} />
+		}
+	}
+
+	return (
+		<div>
+			Failed to load game (game not found)
+		</div>
+	);
+};
+
+function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
+	return (
+		<div>
+			<div>Game finished</div>
+			<div>Winner: {gameInfo.players.map((player, index) => <div key={index}> {player.score}</div>)}</div>
+		</div>
+	)
+}
+
+export function GameScreen({ startGameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const [gameInfo, setGameInfo] = useState<IgameInfo>(startGameInfo);
 	const { socket } = useContext(SocketContext);
 
-	let auth = useAuthService();
-
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
+
+	useEffect(() => {
+		function onGameUpdate(data: IgameInfo) {
+			//console.log('game.update', data);
+			setGameInfo(data);
+		}
+		socket.on('game.update', onGameUpdate)
+		return () => {
+			socket.off('game.update', onGameUpdate)
+		}
+	}, [])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -41,7 +116,7 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 			if (e.key === 'ArrowUp' && keyDown.up === false) {
 				setKeyDown({ up: true, down: false })
 			}
-			if (e.key === 'ArrowDown' && keyDown.down === false ) {
+			if (e.key === 'ArrowDown' && keyDown.down === false) {
 				setKeyDown({ up: false, down: true })
 			}
 		}
@@ -105,17 +180,6 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 
 	}, [gameInfo.players[0].pos, gameInfo.players[1]?.pos, gameInfo.posBall]);
 
-	React.useEffect(() => {
-		function onGameUpdate(data: IgameInfo) {
-			//console.log('game.update', data);
-			setGameInfo(data);
-		}
-		socket.on('game.update', onGameUpdate)
-		return () => {
-			socket.off('game.update', onGameUpdate)
-		}
-	}, [])
-
 	// useEffect(() => {
 	// 	function handleKeyDown(e: KeyboardEvent) {
 	// 		if (e.key === 'ArrowUp') {
@@ -134,19 +198,19 @@ export function GameScreen({ startGameInfo, gameId}: Iprops): JSX.Element {
 	// }, [])
 
 	return <div>
-			<div> <h1>Game Info :</h1></div>
-			<div> posBall x :{gameInfo?.posBall.x} </div>
-			<div> posBall y: {gameInfo?.posBall.y} </div>
-			<div> posP1: {gameInfo?.players[0].pos} </div>
-			<div> momentumP1: {gameInfo?.players[0].momentum} </div>
-			<div> paddleLengthP1: {gameInfo?.players[0].paddleLength} </div>
-			<div> posP2: {gameInfo?.players[1]?.pos} </div>
-			<div> momentumP2: {gameInfo?.players[1]?.momentum} </div>
-			<div> paddleLengthP2: {gameInfo?.players[1]?.paddleLength} </div>
-			<div> score: {`${gameInfo?.players[0].score}:${gameInfo?.players[1]?.score}`} </div>
-			<div> status: {gameInfo?.status} </div>
-			<div> date: {gameInfo?.date.toString()} </div>
-			<div>
+		<div> <h1>Game Info :</h1></div>
+		<div> posBall x :{gameInfo?.posBall.x} </div>
+		<div> posBall y: {gameInfo?.posBall.y} </div>
+		<div> posP1: {gameInfo?.players[0].pos} </div>
+		<div> momentumP1: {gameInfo?.players[0].momentum} </div>
+		<div> paddleLengthP1: {gameInfo?.players[0].paddleLength} </div>
+		<div> posP2: {gameInfo?.players[1]?.pos} </div>
+		<div> momentumP2: {gameInfo?.players[1]?.momentum} </div>
+		<div> paddleLengthP2: {gameInfo?.players[1]?.paddleLength} </div>
+		<div> score: {`${gameInfo?.players[0].score}:${gameInfo?.players[1]?.score}`} </div>
+		<div> status: {gameInfo?.status} </div>
+		<div> date: {gameInfo?.date.toString()} </div>
+		<div>
 			<canvas width={canvasWidth} height={canvasHeight} ref={canvasRef} />
 		</div>
 	</div>
