@@ -8,6 +8,7 @@ type User = {
 	password?: string
 	state?: string,
 	gameId?: string
+	isConnected?: boolean
 }
 
 type UserStatus = {
@@ -36,8 +37,9 @@ export function ListUsers() {
 			.then(async (partialUserList: User[]) => {
 				let partialUserList2 : User[] = await Promise.all(partialUserList.map(async (e: User) => {
 					const userStatus = (await apiClient .get(`/api/game/userinfo/${e.id}`)).data as UserStatus
-					console.log("This is user status", userStatus)
-					return {...e, ...userStatus}
+					const isConnected = (await apiClient .get(`/api/users/connected/${e.id}`)).data as boolean
+					console.log("This is connected status", isConnected)
+					return {...e, ...userStatus, isConnected}
 					}))
 				return(partialUserList2)
 				})
@@ -50,6 +52,7 @@ export function ListUsers() {
 							<li>{elem.email}</li>
 							<li>{elem.state}</li>
 							<li>{elem.gameId}</li>
+							<li>{(elem.isConnected) ? "En ligne": "Offline"}</li>
 							</ul>
 						</li>
 					)

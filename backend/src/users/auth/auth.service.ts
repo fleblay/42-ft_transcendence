@@ -17,6 +17,8 @@ type Tokens = {
 @Injectable()
 export class AuthService {
 
+	private connectedUsers : {id: number, access_token: string}[] = []
+
 	constructor(@InjectRepository(RefreshToken) private repo: Repository<RefreshToken>, private usersService: UsersService, private jwtService: JwtService) {}
 
 	async validateUser(email: string, pass: string): Promise<any> {
@@ -73,7 +75,22 @@ export class AuthService {
 		const refresh_token_payload = { username: user.username, sub: user.id};
 		const refresh_token_options = {expiresIn: '7d', secret: 'refresh'};
 		const refresh_token = this.jwtService.sign(refresh_token_payload, refresh_token_options);
+
+		//Gestion d'un array de connected users
+		const newConnectedUser = {id: user.id, access_token}
+		this.connectedUsers.push(newConnectedUser)
+		setTimeout(()=> {
+			this.connectedUsers.splice(this.connectedUsers.indexOf(newConnectedUser) , 1)
+		}, 20.0 * 1000)
+		//Gestion d'un array de connected users
+
 		return { access_token, refresh_token };
+	}
+
+	isConnected(id: number): boolean{
+
+		//WTF ne marche pas avec elem.id === id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		return (this.connectedUsers.findIndex(elem => elem.id == id) != -1)
 	}
 
 	async register(dataUser : CreateUserDto)
