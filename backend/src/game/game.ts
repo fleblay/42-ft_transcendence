@@ -58,8 +58,8 @@ export class Game {
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1) }
 	//private startTime: number = Date.now()
 	private intervalId: NodeJS.Timer
-	private players: Players[] = []
-	private viewers: User[] = []
+	public players: Players[] = []
+	public viewers: User[] = []
 	private status: GameStatus = GameStatus.waiting
 	private readonly playerRoom: string
 	private readonly viewerRoom: string

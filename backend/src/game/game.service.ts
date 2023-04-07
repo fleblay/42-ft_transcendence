@@ -46,4 +46,8 @@ export class GameService {
 	handlePlayerInput(client: Socket, user: User, data: PlayerInputDto){
 		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, {move: data.move, powerUp: data.powerup})
 	}
+
+	userState(id: number) : {state: string, gameId?: UUID} {
+		return this.gameCluster.findUserStateById(id)
+	}
 }

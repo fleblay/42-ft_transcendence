@@ -1,4 +1,3 @@
-
 import React, { createContext, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
 import { delAccessToken, getAccessToken, saveToken } from './token/token'
@@ -8,6 +7,7 @@ import { AuthProvider } from './auth'
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
 import { CreateGame } from './component/CreateGame'
+import { ListUsers } from './component/ListUsers'
 import { AuthService, useAuthService } from './auth/AuthService'
 import apiClient from './auth/interceptor.axios'
 
@@ -26,6 +26,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "Game", path: "/game", public: false },
 	{ name: "ListAll", path: "/list", public: true },
 	{ name: "Leaderboard", path: "/top", public: false },
+	{ name: "UserDataBase", path: "/allusers", public: false },
 ]
 
 export interface IUser {
@@ -337,6 +338,7 @@ function App() {
 						<Route path="/login" element={<LoginForm />} />
 						<Route path="/register" element={<RegisterForm />} />
 						<Route path="/list" element={<ListGames />} />
+						<Route path="/allusers" element={<ListUsers />} />
 					</Route>
 				</Routes>
 			</SocketProvider>
