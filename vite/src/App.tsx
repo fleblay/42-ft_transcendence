@@ -9,6 +9,7 @@ import { RegisterForm } from './component/RegisterForm'
 import { CreateGame } from './component/CreateGame'
 import { ListUsers } from './component/ListUsers'
 import { AuthService, useAuthService } from './auth/AuthService'
+import { GamePage } from './component/GameScreen'
 import apiClient from './auth/interceptor.axios'
 
 export interface Destinations {
@@ -312,9 +313,9 @@ function App() {
 					<Route element={<div> <Destinations /> <Header /> </div>}>
 						<Route path="/" element={<Navigate to='/game' replace />} />
 						<Route path="game/">
-							<Route path=":id" element={
+							<Route path=":idGame" element={
 								<RequireAuth>
-									<CreateGame />
+									<GamePage />
 								</RequireAuth>
 							} />
 							<Route path="" element={

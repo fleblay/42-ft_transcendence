@@ -41,7 +41,7 @@ export type Players = {
 
 enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
-interface IgameInfo {
+export interface IgameInfo {
 
 	players: Players[],
 	posBall: Pos2D
@@ -211,7 +211,7 @@ export class Game {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 5)
 	}
 
-	get GameId(): UUID {
+	get id(): UUID {
 		return this.gameId;
 	}
 }

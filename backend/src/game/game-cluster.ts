@@ -26,7 +26,7 @@ export class GameCluster
 
 	createGame(privateGame: boolean = false) : Game {
 		const game = new Game(this.generateGameId(), this.server, privateGame);
-		this.gamesMap.set(game.GameId, game);
+		this.gamesMap.set(game.id, game);
 		return game;
 	};
 

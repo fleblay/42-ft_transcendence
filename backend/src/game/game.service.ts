@@ -8,6 +8,7 @@ import { GameCluster } from './game-cluster';
 import { User } from 'src/model/user.entity';
 import { UUID } from '../type';
 import {PlayerInputDto} from '../events/dtos/player-input.dto'
+import { IgameInfo } from './game';
 
 
 @Injectable()
@@ -23,20 +24,24 @@ export class GameService {
 		this.gameCluster.setServer(server)
 	}
 
-	join(client: Socket, user: User, gameId?: UUID): UUID {
-		let game;
-		if (gameId) {
-			game = this.gameCluster.findOne(gameId);
-			if (!game)
-				throw new NotFoundException('Game not found');
-		}
-		else
-			game = this.gameCluster.findAvailable()
+	create(map: number): UUID {
+		let game = this.gameCluster.createGame(true);
+		return game.id
+	}
+
+	findOrCreate(map: number): UUID {
+		let game = this.gameCluster.findAvailable()
 		if (game === null)
 			game = this.gameCluster.createGame();
+		return game.id
+	}
 
+	join(client: Socket, user: User, gameId: UUID): { gameId: UUID, gameInfo: IgameInfo } {
+		let game = this.gameCluster.findOne(gameId);
+		if (!game)
+			throw new NotFoundException('Game not found');
 		game.addUser(user, client);
-		return game.GameId;
+		return { gameId: game.id, gameInfo: game.generateGameInfo() };
 	}
 
 	listAll() {
