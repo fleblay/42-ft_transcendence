@@ -65,12 +65,12 @@ export class GameCluster
 			if (game.players.find(player => player.user.id === id))
 				{
 					stateArray.push("Ingame")
-					gameIdArray.push(game.GameId)
+					gameIdArray.push(game.gameId)
 				}
 			if (game.viewers.find(viewer => viewer.id === id))
 				{
 					stateArray.push("Watching")
-					gameIdArray.push(game.GameId)
+					gameIdArray.push(game.gameId)
 				}
 		}
 		if (stateArray.length === 0)

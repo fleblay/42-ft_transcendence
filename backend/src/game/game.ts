@@ -64,7 +64,7 @@ export class Game {
 	private readonly playerRoom: string
 	private readonly viewerRoom: string
 
-	constructor(private gameId: UUID, private server: Server, private privateGame: boolean = false) {
+	constructor(public gameId: UUID, private server: Server, private privateGame: boolean = false) {
 		this.playerRoom = gameId + ":player"
 		this.viewerRoom = gameId + ":viewer"
 	}
