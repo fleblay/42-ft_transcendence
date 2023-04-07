@@ -173,7 +173,7 @@ export class Game {
 
 		const leftPlayer = this.players[0]
 		// Colision paddle gauche
-		if (newBall.x - ballSize <= leftPlayer.paddleWidth && this.posBall.x >= leftPlayer.paddleWidth) {
+		if (newBall.x <= leftPlayer.paddleWidth && this.posBall.x >= leftPlayer.paddleWidth) {
 			intersect.x = leftPlayer.paddleWidth;
 			intersect.y = this.posBall.y - ((this.posBall.x - leftPlayer.paddleWidth) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
 			if (intersect.y >= leftPlayer.pos && intersect.y <= leftPlayer.pos + leftPlayer.paddleLength) {
