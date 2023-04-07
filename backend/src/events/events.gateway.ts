@@ -26,6 +26,7 @@ import { AuthService } from 'src/users/auth/auth.service';
 	},
 })
 
+
 //@UseGuards(EventGuard)
 // Adds client info into data of message -> Needed for EventUserDecorator
 @UseInterceptors(WebSocketUserInterceptor)

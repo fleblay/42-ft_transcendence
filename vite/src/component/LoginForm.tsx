@@ -35,7 +35,13 @@ export function LoginForm() {
 			console.log('/game')
 			navigate("/game", { replace: true });
 		}).catch((error) => {
-			setInfo("Login failed");
+			let errorInfo = {
+				status: error?.response?.status,
+				statusText:  error?.response?.statusText,
+				message: error?.response?.data?.message
+				}
+			setInfo(`Login failed : ${errorInfo.status} - ${errorInfo.statusText}${" : " + (errorInfo.message || "No additional info")}`)
+			console.log(error)
 		});
 	};
 
