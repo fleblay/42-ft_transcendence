@@ -44,14 +44,14 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		const foundUser =  await this.authService.validateToken(bearerToken)
 
 		if (foundUser)
-			//console.log("New Connection User:", foundUser.username)
+			console.log("New Connection User:", foundUser.username)
 	}
 
 	async handleDisconnect(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
 		const foundUser =  await this.authService.validateToken(bearerToken)
 		if (foundUser)
-			//console.log("Disconnect User:", foundUser.username)
+			console.log("Disconnect User:", foundUser.username)
 	}
 
 	@SubscribeMessage('ping')
