@@ -8,7 +8,7 @@ export type Pos2D = {
 		y: number
 	}
 
-export enum GameStatus { "waiting", "start", "playing", "end", "error" }
+export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 export interface IPlayers {
 	pos: number,

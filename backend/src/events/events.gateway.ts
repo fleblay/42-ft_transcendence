@@ -19,6 +19,7 @@ import {PlayerInputDto} from './dtos/player-input.dto'
 import {GameService} from '../game/game.service'
 import { GameCreateDto } from './dtos/game-create.dto';
 import { AuthService } from 'src/users/auth/auth.service';
+import { IgameInfo } from 'src/game/game';
 
 @WebSocketGateway({
 	path: '/socket.io/',
@@ -67,7 +68,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 
 	@SubscribeMessage('game.create')
-	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string} | {error: string}
+	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string }
 	{
 		console.log("New create event")
 		try {
@@ -81,7 +82,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	@SubscribeMessage('game.findOrCreate')
-	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string} | {error: string}
+	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string }
 	{
 		console.log("New findOrCreate event")
 		try {
@@ -95,13 +96,13 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	@SubscribeMessage('game.join')
-	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): { gameId: string} | {error: string}
+	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): { gameId: string, gameInfo: IgameInfo } | { error: string }
 	{
 		console.log("New join event")
 		try {
-			const gameId = this.gameService.join(client, user, data.gameId)
+			const {gameId, gameInfo} = this.gameService.join(client, user, data.gameId)
 			console.log("Game id is : ", gameId);
-			return {gameId};
+			return {gameId, gameInfo};
 		}
 		catch (e) {
 			return {error: e.message as string}

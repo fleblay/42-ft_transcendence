@@ -5,7 +5,7 @@ import { useAuthService } from "../auth/AuthService";
 import { useParams } from "react-router-dom";
 
 interface Iprops {
-	startGameInfo: IgameInfo,
+	gameInfo: IgameInfo,
 	gameId: string
 }
 
@@ -40,11 +40,25 @@ export function GamePage() {
 				setLoading(LoadingStatus.Failed);
 			}
 			else {
-				setGameInfo(response.gameInfo);
+				console.log('game.join', response.gameId, response.gameInfo);
+				setGameInfo(response.gameInfo as IgameInfo);
 				setLoading(LoadingStatus.Loaded);
 			}
 		});
 	}, [joined]);
+
+	useEffect(() => {
+		if (!idGame) {
+			return;
+		}
+		function onGameUpdate(data: IgameInfo) {
+			setGameInfo(data);
+		}
+		socket.on('game.update', onGameUpdate)
+		return () => {
+			socket.off('game.update', onGameUpdate)
+		}
+	}, [])
 
 	if (loading === LoadingStatus.Loading) {
 		return (
@@ -56,8 +70,15 @@ export function GamePage() {
 
 	// TODO: Crash, gameInfo is undefined. game.update est seulement dans gamescreen. game.join envoie un gameInfo pour init ?
 	if (loading === LoadingStatus.Loaded && idGame) {
+		if (gameInfo.status === GameStatus.waiting) {
+			return (
+				<div>
+					Waiting for players...
+				</div>
+			);
+		}
 		if (gameInfo.status === GameStatus.playing) {
-			return <GameScreen startGameInfo={gameInfo} gameId={idGame} />
+			return <GameScreen gameInfo={gameInfo} gameId={idGame} />
 		}
 		if (gameInfo.status === GameStatus.end) {
 			return <GameFinishedScreen gameInfo={gameInfo} />
@@ -80,24 +101,12 @@ function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
 	)
 }
 
-export function GameScreen({ startGameInfo, gameId }: Iprops): JSX.Element {
+export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
-	const [gameInfo, setGameInfo] = useState<IgameInfo>(startGameInfo);
 	const { socket } = useContext(SocketContext);
 
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
-
-	useEffect(() => {
-		function onGameUpdate(data: IgameInfo) {
-			//console.log('game.update', data);
-			setGameInfo(data);
-		}
-		socket.on('game.update', onGameUpdate)
-		return () => {
-			socket.off('game.update', onGameUpdate)
-		}
-	}, [])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
