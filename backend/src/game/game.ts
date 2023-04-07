@@ -211,7 +211,7 @@ export class Game {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 5)
 	}
 
-	get GameId(): UUID {
+	get id(): UUID {
 		return this.gameId;
 	}
 }

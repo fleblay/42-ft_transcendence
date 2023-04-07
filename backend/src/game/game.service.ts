@@ -26,14 +26,14 @@ export class GameService {
 
 	create(map: number): UUID {
 		let game = this.gameCluster.createGame(true);
-		return game.GameId
+		return game.id
 	}
 
 	findOrCreate(map: number): UUID {
 		let game = this.gameCluster.findAvailable()
 		if (game === null)
 			game = this.gameCluster.createGame();
-		return game.GameId
+		return game.id
 	}
 
 	join(client: Socket, user: User, gameId: UUID): { gameId: UUID, gameInfo: IgameInfo } {
@@ -41,7 +41,7 @@ export class GameService {
 		if (!game)
 			throw new NotFoundException('Game not found');
 		game.addUser(user, client);
-		return { gameId: game.GameId, gameInfo: game.generateGameInfo() };
+		return { gameId: game.id, gameInfo: game.generateGameInfo() };
 	}
 
 	listAll() {
