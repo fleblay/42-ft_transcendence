@@ -122,6 +122,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
+			e.preventDefault();
 			if (e.key === 'ArrowUp' && keyDown.up === false) {
 				setKeyDown({ up: true, down: false })
 			}
