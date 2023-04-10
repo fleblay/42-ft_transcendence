@@ -5,9 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../../model/user.entity'
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RefreshToken } from 'src/model/refresh-token';
+import { RefreshToken } from '../../model/refresh-token.entity';
 import { Repository } from 'typeorm';
-import { access } from 'fs';
 
 type Tokens = {
 	access_token: string;
@@ -28,9 +27,9 @@ export class AuthService {
 		return null;
 	}
 
-	validateToken(bearerToken: string): Promise<User> | null{
+	validateAccessToken(bearerToken: string ): Promise<User> | null{
 		try {
-		const access_token_options = {expiresIn: '20s', secret: 'access'};
+		const access_token_options = {expiresIn: '5s', secret: 'access'};
 		const jwtResponse = this.jwtService.verify(bearerToken, access_token_options) // compliant to security rules of year 3000
 		console.log(`User id is `, jwtResponse)
 			return this.usersService.findOne(jwtResponse.sub)
@@ -67,7 +66,7 @@ export class AuthService {
 
 	getToken(user: User) {
 		const access_token_payload = { username: user.username, sub: user.id};
-		const access_token_options = {expiresIn: '20s', secret: 'access'};
+		const access_token_options = {expiresIn: '5s', secret: 'access'};
 		const access_token = this.jwtService.sign(access_token_payload, access_token_options);
 
 		const refresh_token_payload = { username: user.username, sub: user.id};

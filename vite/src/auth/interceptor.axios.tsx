@@ -17,17 +17,21 @@ apiClient.interceptors.request.use(
 		const token = localStorage.getItem('access_token') as string;
 		if (token) {
 			const decode = jwt_decode(token) as DecodeToken;
-			console.log("decode token");
-			console.log(decode);
+			console.log("decode token :");
+			//console.log(decode);
+			console.log(decode.exp);
+			console.log(Date.now() / 1000);
 
-			if (decode.exp < Date.now() / 1000) {
+			if (decode.exp > (Date.now() / 1000 - 60)) {
 				console.log("token expired");
-				const token = localStorage.getItem('refresh_token') as string;
-				axios.get('/api/auth/refresh', { headers: { Authorization: `Bearer ${getRefreshToken()}` }}).then((res) => {
+				axios.get('/api/auth/refresh', { headers: { Authorization: `Bearer ${getAccessToken()}`, 'X-Refresh-Token': getRefreshToken() }}).then((res) => {
 					console.log(res);
 					localStorage.removeItem('access_token');
+					localStorage.removeItem('refresh_token');
 					saveToken(res.data);
 				}).catch((err) => {
+					localStorage.removeItem('access_token');
+					localStorage.removeItem('refresh_token');
 					console.log(err);
 				}
 				);

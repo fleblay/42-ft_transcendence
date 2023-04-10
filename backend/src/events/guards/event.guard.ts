@@ -11,7 +11,7 @@ export class EventGuard implements CanActivate {
 		if (!bearerToken)
 			return false
 		console.log(`Bearer token received in EventGuard is ${bearerToken}`)
-		const foundUser =  await this.authService.validateToken(bearerToken)
+		const foundUser =  await this.authService.validateAccessToken(bearerToken)
 		console.log(`User is ${foundUser}`)
 		return !!foundUser
 	}

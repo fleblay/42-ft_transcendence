@@ -41,7 +41,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	async handleConnection(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
-		const foundUser =  await this.authService.validateToken(bearerToken)
+		const foundUser =  await this.authService.validateAccessToken(bearerToken)
 
 		if (foundUser)
 			console.log("New Connection User:", foundUser.username)
@@ -49,7 +49,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	async handleDisconnect(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
-		const foundUser =  await this.authService.validateToken(bearerToken)
+		const foundUser =  await this.authService.validateAccessToken(bearerToken)
 		if (foundUser)
 			console.log("Disconnect User:", foundUser.username)
 	}
