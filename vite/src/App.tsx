@@ -47,11 +47,16 @@ export let SocketContext = React.createContext<SocketContextType>(null!)
 function SocketProvider({ children }: { children: React.ReactNode }) {
 	const auth = useAuthService()
 
+	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket {
+		data._access_token = getAccessToken()
+		return socket.emit(eventname, data, callback)
+	}
+
 	React.useEffect(() => {
 		if (!auth.user) return
 		function onConnect() {
 			console.log('Connected to socket')
-			socket.emit('ping', { message: "This is my first ping" }, (response: any) => {
+			customEmit('ping', { message: "This is my first ping" }, (response: any) => {
 				console.log(response)
 			})
 		}
@@ -70,16 +75,14 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 	}, [auth.user])
 	if (!auth.user) return <>{children}</>;
 
-	const socket = io({
+	const socket = io()
+	/*
+	io({
 		auth: {
 			token: getAccessToken()
 		}
 	})
-
-	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket {
-		data._access_token = getAccessToken()
-		return socket.emit(eventname, data, callback)
-	}
+	*/
 
 	const value = { socket, customEmit }
 	console.log("Socket Creation")

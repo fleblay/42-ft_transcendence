@@ -32,7 +32,7 @@ import { IgameInfo } from 'src/game/game';
 //@UseGuards(EventGuard)
 // Adds client info into data of message -> Needed for EventUserDecorator
 @UseInterceptors(WebSocketUserInterceptor)
-export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class EventsGateway implements OnGatewayInit /*OnGatewayConnection, OnGatewayDisconnect*/ {
 
 	@WebSocketServer() server: Server
 
@@ -42,6 +42,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.gameService.setWsServer(server)
 	}
 
+	/*
 	async handleConnection(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
 		const foundUser =  await this.authService.validateToken(bearerToken)
@@ -56,6 +57,13 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 		if (foundUser)
 			console.log("Disconnect User:", foundUser.username)
+	}
+	*/
+
+	@SubscribeMessage('disconnect')
+	handledisconnect(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data:any): void
+	{
+		client.broadcast.emit('message', `Server : a challenger left`)
 	}
 
 	@SubscribeMessage('ping')
