@@ -1,4 +1,4 @@
-import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param} from '@nestjs/common';
+import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers} from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -39,8 +39,11 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/me')
-	getMe(@Request() req) {
-		const token = req.headers.authorization.replace('Bearer ', '');
+	getMe(@Headers('authorization') auth: string) {
+		if (!auth) {
+			throw new ForbiddenException('No token provided');
+		}
+		const token = auth.replace('Bearer ', '');
 		return this.authService.validateAccessToken(token);
 	}
 }

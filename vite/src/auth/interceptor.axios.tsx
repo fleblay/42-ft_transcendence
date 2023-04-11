@@ -12,39 +12,29 @@ type DecodeToken = {
 const apiClient = axios.create({});
 
 apiClient.interceptors.request.use(
-	(config) => {
-
-		const token = localStorage.getItem('access_token') as string;
+	async (config) => {
+		const token = getAccessToken()
 		console.log("token :", token);
 		if (token) {
 			const decode = jwt_decode(token) as DecodeToken;
-			console.log("decode token :");
-			//console.log(decode);
-			console.log('exp     ', decode.exp);
-			console.log('date.now', Math.floor((Date.now() / 1000)));
 
 			if (decode.exp - (Date.now() / 1000) < 10) {
 				console.log("token expired");
-				axios.get('/api/auth/refresh', { headers: { 'X-Refresh-Token': getRefreshToken() }}).then((res) => {
-					console.log(res);
-					console.log("delete and save token");
+				const response = await axios.get('/api/auth/refresh', { headers: { 'X-Refresh-Token': getRefreshToken() } });
+				if (response.status === 200) {
+					console.log("Access token refreshed");
 					localStorage.removeItem('access_token');
 					localStorage.removeItem('refresh_token');
-					saveToken(res.data);
-				}).catch((err) => {
-					console.log("delete token");
-					localStorage.removeItem('access_token');
-					localStorage.removeItem('refresh_token');
-					console.log(err);
+					saveToken(response.data);
 				}
-				);
-				const access_token = getAccessToken()
-				config.headers.Authorization = `Bearer ${access_token}`;
+				else {
+					console.log("Error refreshing access token", response.status, response.statusText);
+					localStorage.removeItem('access_token');
+					localStorage.removeItem('refresh_token');
+				}
 			}
-			else {
-				const access_token = getAccessToken()
-				config.headers.Authorization = `Bearer ${access_token}`;
-			}
+			const access_token = getAccessToken()
+			config.headers.Authorization = `Bearer ${access_token}`;
 		}
 		else {
 			console.log("no token");
