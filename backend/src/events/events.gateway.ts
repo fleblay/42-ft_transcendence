@@ -36,8 +36,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	@WebSocketServer() server: Server
 
-	constructor(private gameService: GameService, private au	@UseGuards(JwtAuthGuard)
-	thService: AuthService) {}
+	constructor(private gameService: GameService, private authService: AuthService) {}
 
 	afterInit(server: Server){
 		this.gameService.setWsServer(server)

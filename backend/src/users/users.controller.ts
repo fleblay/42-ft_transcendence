@@ -34,7 +34,7 @@ export class UsersController {
 	@Get('/connected/:id')
 	isConnected(@Param("id") id: number): boolean
 	{
-		return this.authService.isConnected(id);
+		return this.usersService.isConnected(id);
 	}
 
 	@UseGuards(ATGuard)
