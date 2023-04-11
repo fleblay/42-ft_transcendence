@@ -24,7 +24,7 @@ apiClient.interceptors.request.use(
 
 			if (decode.exp > (Date.now() / 1000 - 60)) {
 				console.log("token expired");
-				axios.get('/api/auth/refresh', { headers: { Authorization: `Bearer ${getAccessToken()}`, 'X-Refresh-Token': getRefreshToken() }}).then((res) => {
+				axios.get('/api/auth/refresh', { headers: { 'X-Refresh-Token': getRefreshToken() }}).then((res) => {
 					console.log(res);
 					localStorage.removeItem('access_token');
 					localStorage.removeItem('refresh_token');
