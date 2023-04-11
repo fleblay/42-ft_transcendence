@@ -63,7 +63,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 
 		function onDisconnect() {
 			console.log('Disconnected to socket')
-			customEmit('disconnect', {});
+			customEmit('disconnect', { message: "Bye" });
 		}
 
 		function onMessage(data: any) {
@@ -82,14 +82,11 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 	}, [auth.user])
 	if (!auth.user) return <>{children}</>;
 
-	const socket = io()
-	/*
-	io({
+	const socket = io({
 		auth: {
 			token: getAccessToken()
-		}
+		},
 	})
-	*/
 
 	const value = { socket, customEmit }
 	console.log("Socket Creation")

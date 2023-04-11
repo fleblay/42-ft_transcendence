@@ -17,8 +17,6 @@ type Tokens = {
 @Injectable()
 export class AuthService {
 
-	private connectedUsers : {id: number, access_token: string, timestamp: number}[] = []
-
 	constructor(@InjectRepository(RefreshToken) private repo: Repository<RefreshToken>, private usersService: UsersService, private jwtService: JwtService) {}
 
 	async validateUser(email: string, pass: string): Promise<any> {
@@ -76,20 +74,6 @@ export class AuthService {
 		const refresh_token_options = {expiresIn: '7d', secret: 'refresh'};
 		const refresh_token = this.jwtService.sign(refresh_token_payload, refresh_token_options);
 
-		//Gestion d'un array de connected users
-		const newConnectedUser = {id: user.id, access_token, timestamp: Date.now()}
-		this.connectedUsers.push(newConnectedUser)
-		console.log(`Inserting an acess token for id : ${newConnectedUser.id} : timestamp is ${newConnectedUser.timestamp}`)
-
-		console.log("Array des users connected is now")
-		console.log(this.connectedUsers)
-		setTimeout(()=> {
-			console.log(`Removing an acess token for id : ${newConnectedUser.id} : timestamp is ${newConnectedUser.timestamp}`)
-			const removedUser = this.connectedUsers.splice(this.connectedUsers.indexOf(newConnectedUser) , 1)
-			console.log("Removed : ", removedUser)
-		}, 20.0 * 1000)
-		//Gestion d'un array de connected users
-
 		return { access_token, refresh_token };
 	}
 
@@ -97,8 +81,7 @@ export class AuthService {
 
 		//WTF ne marche pas avec elem.id === id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		console.log("Array des users connected")
-		console.log(this.connectedUsers)
-		return (this.connectedUsers.findIndex(elem => elem.id == id) != -1)
+		return false
 	}
 
 	async register(dataUser : CreateUserDto)
