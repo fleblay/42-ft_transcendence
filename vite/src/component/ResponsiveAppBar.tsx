@@ -16,6 +16,8 @@ import AdbIcon from '@mui/icons-material/Adb';
 const pages = ['Game', 'Leaderboard', 'Chat'];
 const settings = ['My profil', 'friends', 'Logout'];
 
+
+
 export function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -35,11 +37,13 @@ export function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+
+  
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+        <Toolbar disableGutters >
+          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1}} />
           <Typography
             variant="h6"
             noWrap
@@ -53,6 +57,7 @@ export function ResponsiveAppBar() {
               letterSpacing: '.3rem',
               color: 'inherit',
               textDecoration: 'none',
+			  backgroundColor: 'blue',
             }}
           >
             CYBER PONG
@@ -113,12 +118,12 @@ export function ResponsiveAppBar() {
           >
             LOGO
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, backgroundColor: 'black' }}>
             {pages.map((page) => (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+                sx={{ my: 2, color: 'white', display: 'block', fontWeight: 700 }}
               >
                 {page}
               </Button>
