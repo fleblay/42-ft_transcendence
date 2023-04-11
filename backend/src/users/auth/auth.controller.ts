@@ -12,7 +12,6 @@ export class AuthController {
 
 	@Get('/refresh')
 	@UseGuards(RTGuard)
-	@UseGuards(ATGuard)
 	async refresh(@Request() req){
 		console.log('refresh');
 		// token dans X-Refresh-Token

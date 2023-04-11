@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth/auth.service';
+import { Request } from 'express';
 
 @Injectable()
 export class ATGuard implements CanActivate {
@@ -12,13 +13,19 @@ export class ATGuard implements CanActivate {
     constructor(private authService: AuthService, private jwtService : JwtService) {}
 
 	canActivate(context: ExecutionContext){
-		const request = context.switchToHttp().getRequest();
-        const bearerToken = request.headers.authorization.split(' ')[1];
+		const request = context.switchToHttp().getRequest() as Request;
+		console.log("ATGuard", request.headers);
+        const bearerToken = request.headers.authorization?.replace('Bearer ', '');
+
+		if (!bearerToken) {
+			console.log("ATGuard: no bearer token");
+			return false;
+		}
         const user = this.authService.validateAccessToken(bearerToken);
 		if (!user) {
+			console.log("ATGuard: no user");
 			return false;
 		}
 		return true;
 	}
-	
 }

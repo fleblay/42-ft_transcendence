@@ -15,21 +15,24 @@ apiClient.interceptors.request.use(
 	(config) => {
 
 		const token = localStorage.getItem('access_token') as string;
+		console.log("token :", token);
 		if (token) {
 			const decode = jwt_decode(token) as DecodeToken;
 			console.log("decode token :");
 			//console.log(decode);
-			console.log(decode.exp);
-			console.log(Date.now() / 1000);
+			console.log('exp     ', decode.exp);
+			console.log('date.now', Math.floor((Date.now() / 1000)));
 
-			if (decode.exp > (Date.now() / 1000 - 60)) {
+			if (decode.exp - (Date.now() / 1000) < 10) {
 				console.log("token expired");
 				axios.get('/api/auth/refresh', { headers: { 'X-Refresh-Token': getRefreshToken() }}).then((res) => {
 					console.log(res);
+					console.log("delete and save token");
 					localStorage.removeItem('access_token');
 					localStorage.removeItem('refresh_token');
 					saveToken(res.data);
 				}).catch((err) => {
+					console.log("delete token");
 					localStorage.removeItem('access_token');
 					localStorage.removeItem('refresh_token');
 					console.log(err);
