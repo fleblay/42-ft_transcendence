@@ -14,7 +14,6 @@ export class ATGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext){
 		const request = context.switchToHttp().getRequest() as Request;
-		console.log("ATGuard", request.headers);
         const bearerToken = request.headers.authorization?.replace('Bearer ', '');
 
 		if (!bearerToken) {

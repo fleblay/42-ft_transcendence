@@ -48,8 +48,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 	const auth = useAuthService()
 
 	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket {
-		data._access_token = getAccessToken()
-		return socket.emit(eventname, data, callback)
+		return socket.emit(eventname, {...data, _access_token: getAccessToken()}, callback)
 	}
 
 	React.useEffect(() => {
