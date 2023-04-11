@@ -23,10 +23,12 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 
 	return (
 		<>
-			<button onClick={() => { apiClient.get("/api/game/current").then((response) => {
-				console.log(response.data);
-				setListGames(response.data.map((gameId: string) => gameId.replace(/"/g, '')))
-			}) }}>Refresh list</button>
+			<button onClick={() => {
+				apiClient.get("/api/game/current").then((response) => {
+					console.log(response.data);
+					setListGames(response.data.map((gameId: string) => gameId.replace(/"/g, '')))
+				})
+			}}>Refresh list</button>
 			<div>
 				{listGames.map((gameId) => {
 					return <div key={gameId}>
@@ -44,7 +46,7 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 
 export function CreateGame() {
 	const navigate = useNavigate();
-	const { socket } = React.useContext(SocketContext);
+	const { customEmit } = React.useContext(SocketContext);
 
 	const [privateGame, setPrivateGame] = useState<boolean>(false);
 
@@ -53,7 +55,7 @@ export function CreateGame() {
 			navigate(`/game/${game}`);
 		}
 		else {
-			socket.emit(privateGame ? 'game.create' : 'game.findOrCreate', {}, ({ gameId }: { gameId: number }) => {
+			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {}, ({ gameId }: { gameId: number }) => {
 				console.log("game created", gameId);
 				navigate(`/game/${gameId}`);
 			});
@@ -62,12 +64,12 @@ export function CreateGame() {
 	return (
 		<>
 			<div>
-				<input type="checkbox" id="scales" name="scales" onChange={(e) => {setPrivateGame(e.target.checked)}} />
+				<input type="checkbox" id="scales" name="scales" onChange={(e) => { setPrivateGame(e.target.checked) }} />
 				<label>Privee</label>
 			</div>
 
 			<button onClick={() => joinGames()}>
-				{privateGame ? "Creer une game privee": "Trouver une game public"}
+				{privateGame ? "Creer une game privee" : "Trouver une game public"}
 			</button>
 			<JoinGames joinGames={joinGames} />
 		</>
