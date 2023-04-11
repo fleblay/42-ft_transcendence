@@ -11,6 +11,7 @@ const playerSpeed = 3
 const canvasHeight = 600
 const canvasWidth = 800
 const gameRounds = 50
+const MaxBounceAngle = Math.PI / 12;
 
 
 export type Pos2D = {
@@ -152,34 +153,65 @@ export class Game {
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
 	}
 
+	private updateBall() {
+		let newBall: Pos2D = { ...this.posBall };
+
+		newBall.x += this.velocityBall.x * ballSpeed
+		newBall.y += this.velocityBall.y * ballSpeed
+		// Colision mur
+		if (newBall.y > canvasHeight - ballSize && this.velocityBall.y > 0) {
+			this.velocityBall.y *= -1
+		}
+		else if (newBall.y < ballSize && this.velocityBall.y < 0) {
+			this.velocityBall.y *= -1
+		}
+
+		let intersect: Pos2D = {x: 0, y: 0}
+		let relativeIntersectY: number = 0
+		let bounceAngle: number = 0
+		let newballSpeed: number = 0
+		let ballTravelLeft: number = 0
+
+		const leftPlayer = this.players[0]
+		// Colision paddle gauche
+		if (newBall.x <= leftPlayer.paddleWidth && this.posBall.x >= leftPlayer.paddleWidth) {
+			intersect.x = leftPlayer.paddleWidth;
+			intersect.y = this.posBall.y - ((this.posBall.x - leftPlayer.paddleWidth) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
+			if (intersect.y >= leftPlayer.pos && intersect.y <= leftPlayer.pos + leftPlayer.paddleLength) {
+				relativeIntersectY = (leftPlayer.pos + (leftPlayer.paddleLength / 2)) - intersect.y;
+				bounceAngle = (relativeIntersectY / (leftPlayer.paddleLength / 2)) * (Math.PI / 2 - MaxBounceAngle);
+				newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y);
+				ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
+				this.velocityBall.x = newballSpeed * Math.cos(bounceAngle);
+				this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
+				newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
+				newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
+			}
+		}
+
+		const rightPlayer = this.players[1];
+		if (newBall.x > canvasWidth - rightPlayer.paddleWidth && this.posBall.x <= canvasWidth - rightPlayer.paddleWidth) {
+			intersect.x = canvasWidth - rightPlayer.paddleWidth;
+			intersect.y = this.posBall.y - ((this.posBall.x - (canvasWidth - rightPlayer.paddleWidth)) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
+			if (intersect.y >= rightPlayer.pos && intersect.y <= rightPlayer.pos + rightPlayer.paddleLength) {
+				relativeIntersectY = (rightPlayer.pos + (rightPlayer.paddleLength / 2)) - intersect.y;
+				bounceAngle = (relativeIntersectY / (rightPlayer.paddleLength / 2)) * (Math.PI / 2 - MaxBounceAngle);
+				newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y);
+				ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
+				this.velocityBall.x = newballSpeed * -Math.cos(bounceAngle);
+				this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
+				newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
+				newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
+			}
+		}
+
+		this.posBall = newBall;
+	}
+
 	gameLoop() {
 		//Move de la balle
 		if (this.status === GameStatus.playing) {
-			this.posBall.x += this.velocityBall.x * ballSpeed
-			this.posBall.y += this.velocityBall.y * ballSpeed
-			//Colision mur
-			if (this.posBall.y > canvasHeight - ballSize && this.velocityBall.y > 0)
-				this.velocityBall.y *= -1
-			else if (this.posBall.y < ballSize && this.velocityBall.y < 0)
-				this.velocityBall.y *= -1
-			//Colision paddle droite
-			else if (this.posBall.x + this.velocityBall.x >= canvasWidth - ballSize - this.players[1].paddleLength && (this.posBall.y >= this.players[1].pos && this.posBall.y <= this.players[1].pos + this.players[1].paddleLength)) {
-				this.velocityBall.x *= -1
-				if (this.players[1].momentum !== 0) {
-					this.velocityBall.y += this.players[1].momentum / 180
-					this.velocityBall.x -= this.players[1].momentum / 180
-					this.players[1].momentum = 0
-				}
-			}
-			//Colision paddle gauche
-			else if (this.posBall.x <= ballSize + this.players[0].paddleLength && (this.posBall.y >= this.players[0].pos && this.posBall.y <= this.players[0].pos + this.players[0].paddleLength)) {
-				this.velocityBall.x *= -1
-				if (this.players[0].momentum !== 0) {
-					this.velocityBall.y += this.players[0].momentum / 180
-					this.velocityBall.x -= this.players[0].momentum / 180
-					this.players[0].momentum = 0
-				}
-			}
+			this.updateBall()
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {

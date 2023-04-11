@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { GameCluster } from './game-cluster';
 import { User } from 'src/model/user.entity';
 import { UUID } from '../type';
-import {PlayerInputDto} from '../events/dtos/player-input.dto'
+import { PlayerInputDto } from '../events/dtos/player-input.dto'
 import { IgameInfo } from './game';
 
 
@@ -54,7 +54,7 @@ export class GameService {
 		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, {move: data.move, powerUp: data.powerup})
 	}
 
-	userState(id: number) : {state: string, gameId?: UUID} {
+	userState(id: number): { state: string, gameId?: UUID } {
 		return this.gameCluster.findUserStateById(id)
 	}
 }
