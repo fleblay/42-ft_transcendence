@@ -38,6 +38,7 @@ export interface IUser {
 
 export interface SocketContextType {
 	socket: Socket
+	customEmit: (eventname: string, data: any, callback?: (response: any) => void) => Socket
 }
 
 export let SocketContext = React.createContext<SocketContextType>(null!)
@@ -55,15 +56,22 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 			})
 		}
 
+		function onDisconnect() {
+			console.log('Disconnected to socket')
+			customEmit('disconnect', {});
+		}
+
 		function onMessage(data: any) {
 			console.log('Receiving a message')
 			console.log(data)
 		}
 
 		socket.on('connect', onConnect);
+		socket.on('disconnect', onDisconnect);
 		socket.on('message', onMessage)
 		return () => {
 			socket.off('connect', onConnect);
+			socket.off('disconnect', onDisconnect);
 			socket.off('message', onMessage);
 		}
 	}, [auth.user])
@@ -75,7 +83,12 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 		}
 	})
 
-	const value = { socket }
+	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket {
+		data._access_token = getAccessToken()
+		return socket.emit(eventname, data, callback)
+	}
+
+	const value = { socket, customEmit }
 	console.log("Socket Creation")
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
 }
@@ -246,8 +259,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 		// along to that page after they login, which is a nicer user experience
 		// than dropping them off on the home page.
 		return <>
-		<Link to="/login">Login Page</Link>;
-		<Link to="/register">Register Page</Link>;
+			<Link to="/login">Login Page</Link>;
+			<Link to="/register">Register Page</Link>;
 		</>
 	}
 

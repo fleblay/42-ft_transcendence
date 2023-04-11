@@ -23,7 +23,7 @@ export function GamePage() {
 	const [loading, setLoading] = useState<LoadingStatus>(LoadingStatus.Loading);
 	const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
 	const [joined, setJoined] = useState<boolean>(false);
-	const { socket } = useContext(SocketContext);
+	const { socket, customEmit } = useContext(SocketContext);
 
 	let auth = useAuthService();
 
@@ -34,7 +34,7 @@ export function GamePage() {
 			setJoined(true)
 			return
 		}
-		socket.emit('game.join', { gameId: idGame }, (response: any) => {
+		customEmit('game.join', { gameId: idGame }, (response: any) => {
 			if (response.error) {
 				console.log(response.error);
 				setLoading(LoadingStatus.Failed);
@@ -104,17 +104,17 @@ function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
 export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
-	const { socket } = useContext(SocketContext);
+	const { customEmit } = useContext(SocketContext);
 
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
 
 	useEffect(() => {
 		const interval = setInterval(() => {
 			if (keyDown.up) {
-				socket.emit('game.play.move', { gameId: gameId, move: 'Up' })
+				customEmit('game.play.move', { gameId: gameId, move: 'Up' })
 			}
 			if (keyDown.down) {
-				socket.emit('game.play.move', { gameId: gameId, move: 'Down' })
+				customEmit('game.play.move', { gameId: gameId, move: 'Down' })
 			}
 		}, 10);
 		return () => clearInterval(interval);
@@ -194,11 +194,11 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	// 	function handleKeyDown(e: KeyboardEvent) {
 	// 		if (e.key === 'ArrowUp') {
 	// 			console.log('game.play.move', {input :{move : 'Up'}});
-	// 			socket.emit('game.play.move', {gameId : gameId, move : 'Up'})
+	// 			customEmit('game.play.move', {gameId : gameId, move : 'Up'})
 	// 		}
 	// 		if (e.key === 'ArrowDown') {
 	// 			console.log('game.play.move', {input :{move : 'Up'}});
-	// 			socket.emit('game.play.move', {gameId: gameId , move : 'Down'})
+	// 			customEmit('game.play.move', {gameId: gameId , move : 'Down'})
 	// 		}
 	// 	}
 	// 	window.addEventListener('keydown', handleKeyDown)
