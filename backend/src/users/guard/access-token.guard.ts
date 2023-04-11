@@ -12,7 +12,7 @@ export class ATGuard implements CanActivate {
 
     constructor(private authService: AuthService, private jwtService : JwtService) {}
 
-	canActivate(context: ExecutionContext){
+	async canActivate(context: ExecutionContext){
 		const request = context.switchToHttp().getRequest() as Request;
 		console.log("ATGuard", request.headers);
         const bearerToken = request.headers.authorization?.replace('Bearer ', '');
@@ -21,8 +21,9 @@ export class ATGuard implements CanActivate {
 			console.log("ATGuard: no bearer token");
 			return false;
 		}
-        const user = this.authService.validateAccessToken(bearerToken);
-		if (!user) {
+        const user = await this.authService.validateAccessToken(bearerToken);
+		console.log("ATGuard: user", user);
+		if (!user || user === undefined) {
 			console.log("ATGuard: no user");
 			return false;
 		}
