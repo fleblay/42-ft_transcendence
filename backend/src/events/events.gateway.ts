@@ -41,6 +41,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		setInterval(() => { console.log("Sockets info are : ", this.socketInfo) }, 10000)
 	}
 
+
 	afterInit(server: Server) {
 		this.gameService.setWsServer(server)
 	}
@@ -83,7 +84,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string } {
 		console.log("New create event")
 		try {
-			const gameId = this.gameService.create(data.map)
+			const gameId = this.gameService.create(data[0].map)
 			console.log("Game id is : ", gameId);
 			return { gameId };
 		}
@@ -96,7 +97,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string } {
 		console.log("New findOrCreate event")
 		try {
-			const gameId = this.gameService.findOrCreate(data.map)
+			const gameId = this.gameService.findOrCreate(data[0].map)
 			console.log("Game id is : ", gameId);
 			return { gameId };
 		}
@@ -109,7 +110,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): { gameId: string, gameInfo: IgameInfo } | { error: string } {
 		console.log("New join event")
 		try {
-			const { gameId, gameInfo } = this.gameService.join(client, user, data.gameId)
+			const { gameId, gameInfo } = this.gameService.join(client, user, data[0].gameId)
 			console.log("Game id is : ", gameId);
 			return { gameId, gameInfo };
 		}
@@ -120,7 +121,8 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	@SubscribeMessage('game.play.move')
 	handlePlayerInput(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: PlayerInputDto): void {
-		this.gameService.handlePlayerInput(client, user, data)
+		console.log("gateway input handle")
+		this.gameService.handlePlayerInput(client, user, data[0])
 	}
 
 	@SubscribeMessage('createLobby')
