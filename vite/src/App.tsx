@@ -11,6 +11,8 @@ import { ListUsers } from './component/ListUsers'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { GamePage } from './component/GameScreen'
 import apiClient from './auth/interceptor.axios'
+import { ResponsiveAppBar } from './component/ResponsiveAppBar'
+
 
 export interface Destinations {
 	name: string,
@@ -28,6 +30,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "ListAll", path: "/list", public: true },
 	{ name: "Leaderboard", path: "/top", public: false },
 	{ name: "UserDataBase", path: "/allusers", public: false },
+	{ name: "testMenu", path: "/testMenu", public: false },
 ]
 
 export interface IUser {
@@ -89,6 +92,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 
 	const value = { socket, customEmit }
 	console.log("Socket Creation")
+	console.log(Date.now()/1000);
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
 }
 
@@ -352,6 +356,8 @@ function App() {
 						<Route path="/register" element={<RegisterForm />} />
 						<Route path="/list" element={<ListGames />} />
 						<Route path="/allusers" element={<ListUsers />} />
+						<Route path="/testMenu" element={<ResponsiveAppBar />} />
+
 					</Route>
 				</Routes>
 			</SocketProvider>
