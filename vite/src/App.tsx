@@ -38,6 +38,7 @@ export interface IUser {
 
 export interface SocketContextType {
 	socket: Socket
+	customEmit: (eventname: string, data: any) => Socket
 }
 
 export let SocketContext = React.createContext<SocketContextType>(null!)
@@ -75,7 +76,12 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 		}
 	})
 
-	const value = { socket }
+	function customEmit(eventname: string, data: any): Socket {
+		data._access_token = getAccessToken()
+		return socket.emit(eventname, data)
+		}
+
+	const value = { socket, customEmit }
 	console.log("Socket Creation")
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
 }
