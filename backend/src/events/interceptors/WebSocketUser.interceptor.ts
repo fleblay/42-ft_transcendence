@@ -10,6 +10,9 @@ export class WebSocketUserInterceptor implements NestInterceptor {
 		const request = context.switchToWs()
 		if (!request.getData()[0])
 			request.getData()[0] = request.getData()
+		else
+			console.warn("Watch out, request.getData() is a array of object !")
+
 		const data = request.getData()[0]
 		const bearerToken = data["_access_token"]
 		const foundUser =  await this.authService.decodeToken(bearerToken)
