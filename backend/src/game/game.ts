@@ -41,7 +41,7 @@ export type Players = {
 
 enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
-interface IgameInfo {
+export interface IgameInfo {
 
 	players: Players[],
 	posBall: Pos2D
@@ -58,13 +58,13 @@ export class Game {
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1) }
 	//private startTime: number = Date.now()
 	private intervalId: NodeJS.Timer
-	private players: Players[] = []
-	private viewers: User[] = []
+	public players: Players[] = []
+	public viewers: User[] = []
 	private status: GameStatus = GameStatus.waiting
 	private readonly playerRoom: string
 	private readonly viewerRoom: string
 
-	constructor(private gameId: UUID, private server: Server, private privateGame: boolean = false) {
+	constructor(public gameId: UUID, private server: Server, private privateGame: boolean = false) {
 		this.playerRoom = gameId + ":player"
 		this.viewerRoom = gameId + ":viewer"
 	}
@@ -211,7 +211,7 @@ export class Game {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 5)
 	}
 
-	get GameId(): UUID {
+	get id(): UUID {
 		return this.gameId;
 	}
 }

@@ -26,7 +26,7 @@ export class GameCluster
 
 	createGame(privateGame: boolean = false) : Game {
 		const game = new Game(this.generateGameId(), this.server, privateGame);
-		this.gamesMap.set(game.GameId, game);
+		this.gamesMap.set(game.id, game);
 		return game;
 	};
 
@@ -57,5 +57,24 @@ export class GameCluster
 		return uuidv4();
 	}
 
-
+	findUserStateById(id: number){
+		let stateArray : string[] = []
+		let gameIdArray : string[] = []
+		for (const game of this.gamesMap.values())
+		{
+			if (game.players.find(player => player.user.id === id))
+				{
+					stateArray.push("Ingame")
+					gameIdArray.push(game.gameId)
+				}
+			if (game.viewers.find(viewer => viewer.id === id))
+				{
+					stateArray.push("Watching")
+					gameIdArray.push(game.gameId)
+				}
+		}
+		if (stateArray.length === 0)
+				stateArray.push("Unavailable")
+		return {state: stateArray.join("-"), gameId: gameIdArray.join("-")}
+	}
 }

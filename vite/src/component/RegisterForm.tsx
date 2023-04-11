@@ -34,7 +34,13 @@ export function RegisterForm() {
 		auth.register(registerData).then(() => {
 			navigate("/game", { replace: true });
 		}).catch((error) => {
-			setInfo("Register failed");
+			let errorInfo = {
+				status: error?.response?.status,
+				statusText:  error?.response?.statusText,
+				message: error?.response?.data?.message
+				}
+			setInfo(`Login failed : ${errorInfo.status} - ${errorInfo.statusText}${" : " + (errorInfo.message || "No additional info")}`)
+			console.log(error)
 		});
 	};
 

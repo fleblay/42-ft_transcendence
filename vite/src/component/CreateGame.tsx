@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SocketContext } from '../App';
 import { Update } from 'vite/types/hmrPayload';
 import { IgameInfo, GameStatus } from '../types';
 import { GameScreen } from './GameScreen';
 import { getMenuItemUtilityClass } from '@mui/material';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../auth/interceptor.axios';
 
 interface Iprops {
@@ -14,12 +14,10 @@ interface Iprops {
 }
 
 interface JoinGamesProps {
-	setGameId: React.Dispatch<React.SetStateAction<string>>;
-	setGameInfo: React.Dispatch<React.SetStateAction<IgameInfo | undefined>>;
 	joinGames: (game?: string) => void;
 }
 
-const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames, setGameId, setGameInfo }) => {
+const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 	const [listGames, setListGames] = React.useState<string[]>([]);
 	const { socket } = React.useContext(SocketContext);
 
@@ -44,65 +42,34 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames, setGame
 	);
 }
 
-export function CreateGame(): JSX.Element {
+export function CreateGame() {
+	const navigate = useNavigate();
 	const { socket } = React.useContext(SocketContext);
-	const [gameId, setGameId] = React.useState<string>("")
-	const [gameInfo, setGameInfo] = React.useState<IgameInfo>();
-	const [joined, setJoined] = React.useState<boolean>(false);
+
+	const [privateGame, setPrivateGame] = useState<boolean>(false);
 
 	function joinGames(game?: string) {
-		if (!joined)
-		{
-			setJoined(true)
-			return
+		if (game) {
+			navigate(`/game/${game}`);
 		}
-		console.log('game is now:', game)
-		socket.emit('game.join', { gameId: game }, (response: any) => {
-			if (response.error) {
-				console.log(response.error);
-				setGameId(response.error);
-			}
-			else {
-				console.log(response.user);
-				setGameId(response.gameId);
-				socket.on('game.update', (data: IgameInfo) => {
-					//console.log('game.update', data);
-					setGameInfo(data);
-				});
-			}
-		})
+		else {
+			socket.emit(privateGame ? 'game.create' : 'game.findOrCreate', {}, ({ gameId }: { gameId: number }) => {
+				console.log("game created", gameId);
+				navigate(`/game/${gameId}`);
+			});
+		}
 	}
-
-	let { id } = useParams();
-
-	React.useEffect(() => {
-		if (id) {
-			joinGames(id);
-		}
-	}, [joined])
-
-	/* 	React.useEffect(() => {
-			function onNewLobby(data: any) {
-				console.log('new lobby', data)
-			}
-			socket.on('newLobby', onNewLobby)
-			return () => {
-				socket.off('newLobby', onNewLobby)
-			}
-		}, []) */
 	return (
 		<>
-			<button onClick={() => joinGames() }>
-				createGame
-			</button>
-			<JoinGames joinGames={joinGames} setGameId={setGameId} setGameInfo={setGameInfo} />
-			<div>{gameId}
+			<div>
+				<input type="checkbox" id="scales" name="scales" onChange={(e) => {setPrivateGame(e.target.checked)}} />
+				<label>Privee</label>
 			</div>
-			{
-				gameInfo && <GameScreen startGameInfo={gameInfo} gameId={gameId} ></GameScreen>
-			}
 
+			<button onClick={() => joinGames()}>
+				{privateGame ? "Creer une game privee": "Trouver une game public"}
+			</button>
+			<JoinGames joinGames={joinGames} />
 		</>
-
 	);
 }
