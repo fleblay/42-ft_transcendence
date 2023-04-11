@@ -56,15 +56,22 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 			})
 		}
 
+		function onDisconnect() {
+			console.log('Disconnected to socket')
+			customEmit('disconnect', {});
+		}
+
 		function onMessage(data: any) {
 			console.log('Receiving a message')
 			console.log(data)
 		}
 
 		socket.on('connect', onConnect);
+		socket.on('disconnect', onDisconnect);
 		socket.on('message', onMessage)
 		return () => {
 			socket.off('connect', onConnect);
+			socket.off('disconnect', onDisconnect);
 			socket.off('message', onMessage);
 		}
 	}, [auth.user])
