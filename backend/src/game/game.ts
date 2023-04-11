@@ -70,6 +70,7 @@ export class Game {
 	}
 
 	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
+		console.log("game input handle")
 		const foundPlayer = this.players.find(player => userId === player.user.id)
 		if (foundPlayer === null)
 			return

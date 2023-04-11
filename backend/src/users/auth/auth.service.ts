@@ -34,7 +34,7 @@ export class AuthService {
 	async validateAccessToken(bearerToken: string): Promise<User> | null {
 		try {
 			const jwtResponse = this.jwtService.verify(bearerToken, access_token_options) // compliant to security rules of year 3000
-			console.log(`User id is `, jwtResponse)
+			//console.log(`User id is `, jwtResponse)
 			return this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
 			console.log(`Error in validate Token is ${e}`)
@@ -45,7 +45,7 @@ export class AuthService {
 	decodeToken(bearerToken: string): Promise<User> | null {
 		try {
 			const jwtResponse = this.jwtService.decode(bearerToken);
-			console.log(`Decode :  `, jwtResponse);
+			//console.log(`Decode :  `, jwtResponse);
 			return this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
 			console.log(`Error in validate Token is ${e}`)
