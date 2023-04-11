@@ -47,10 +47,11 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	async handleConnection(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
-		const foundUser =  await this.authService.validateAccessToken(bearerToken)
+		const foundUser = await this.authService.validateAccessToken(bearerToken)
 
-		if (foundUser)
-			console.log("New Connection User:", foundUser.username)
+		if (!foundUser)
+			return
+		console.log("New Connection User:", foundUser.username)
 		console.log("handleConnection headers is : ", socket.request.headers)
 		this.socketInfo.push({ socketId: socket.id, username: foundUser.username })
 	}
@@ -71,10 +72,12 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@SubscribeMessage('ping')
 	handleMessage(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: any): void {
 		client.broadcast.emit('message', `Server : new challenger`)
-		//client.emit('message', {log: 'data is', data}) //
-		//client.emit('message', user)
 	}
 
+	@SubscribeMessage('goodbye')
+	goodbyMessage(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: any): void {
+		client.broadcast.emit('message', `Server : a challenger has left`)
+	}
 
 	@SubscribeMessage('game.create')
 	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string } {

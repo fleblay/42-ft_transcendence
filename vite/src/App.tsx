@@ -63,7 +63,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 
 		function onDisconnect() {
 			console.log('Disconnected to socket')
-			customEmit('disconnect', { message: "Bye" });
+			customEmit('goodbye', { message: "Bye" });
 		}
 
 		function onMessage(data: any) {
