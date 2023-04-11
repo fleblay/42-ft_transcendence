@@ -13,6 +13,9 @@ type Tokens = {
 	refresh_token: string;
 };
 
+const access_token_options = { expiresIn: '1m', secret: 'access' };
+const refresh_token_options = { expiresIn: '7d', secret: 'refresh' };
+
 @Injectable()
 export class AuthService {
 
@@ -30,7 +33,6 @@ export class AuthService {
 
 	async validateAccessToken(bearerToken: string): Promise<User> | null {
 		try {
-			const access_token_options = { expiresIn: '1m', secret: 'access' };
 			const jwtResponse = this.jwtService.verify(bearerToken, access_token_options) // compliant to security rules of year 3000
 			console.log(`User id is `, jwtResponse)
 			return this.usersService.findOne(jwtResponse.sub)
@@ -67,11 +69,9 @@ export class AuthService {
 
 	getTokens(user: User) {
 		const access_token_payload = { username: user.username, sub: user.id };
-		const access_token_options = { expiresIn: '1m', secret: 'access' };
 		const access_token = this.jwtService.sign(access_token_payload, access_token_options);
 
 		const refresh_token_payload = { username: user.username, sub: user.id };
-		const refresh_token_options = { expiresIn: '7d', secret: 'refresh' };
 		const refresh_token = this.jwtService.sign(refresh_token_payload, refresh_token_options);
 
 		return { access_token, refresh_token };
