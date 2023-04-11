@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { User } from 'src/model/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
-import { RefreshToken } from 'src/model/refresh-token';
+import { RefreshToken } from '../../model/refresh-token.entity';
 import { UsersModule } from '../users.module';
-import { JwtStrategy } from '../strategy/jwt.strategy';
 
 @Module({
 	imports: [
@@ -20,7 +18,7 @@ import { JwtStrategy } from '../strategy/jwt.strategy';
 		UsersModule
 	],
 	controllers: [AuthController],
-	providers: [AuthService, UsersModule, JwtStrategy],
+	providers: [AuthService, UsersModule],
 	exports: [AuthService],
 })
 export class AuthModule { }

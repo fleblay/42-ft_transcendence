@@ -8,10 +8,9 @@ export class WebSocketUserInterceptor implements NestInterceptor {
 
 	async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
 		const request = context.switchToWs()
-		//bearerToken doit exister car l'interceptor est fait apres le guard
-		const bearerToken = context.switchToWs().getClient().handshake.auth?.token
+		const data = request.getData()[0] || request.getData()
+		const bearerToken = data["_access_token"]
 		const foundUser =  await this.authService.decodeToken(bearerToken)
-		//console.log("Added User ", foundUser, "to Websocket incomming message data")
 		request.getData()["_user"] = foundUser
 		return next.handle().pipe()
 	}

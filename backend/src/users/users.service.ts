@@ -3,13 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../model/user.entity'
 import { CreateUserDto } from './dtos/create-user.dto';
+import { UserStatus } from '../type';
 
 @Injectable()
 export class UsersService {
 
-	constructor(@InjectRepository(User) private repo: Repository<User>){}
+	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
 
-	create(dataUser: CreateUserDto){
+	constructor(@InjectRepository(User) private repo: Repository<User>) { }
+
+	create(dataUser: CreateUserDto) {
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
 		const user = this.repo.create(dataUser);
 		console.log("save user :", user);
@@ -28,9 +31,8 @@ export class UsersService {
 	async findOneByUsername(username: string) {
 		if (!username) return null;
 		try {
-			return await this.repo.findOneBy({username});
-		} catch (e)
-		{
+			return await this.repo.findOneBy({ username });
+		} catch (e) {
 			console.log("Error while findOneByUsername : ", e)
 			return null
 		}
@@ -50,4 +52,42 @@ export class UsersService {
 		await this.repo.delete(id);
 		return true;
 	}
+
+	isConnected(id: number): boolean {
+
+		//WTF ne marche pas avec elem.id === id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		console.log("Array des users connected")
+		console.log(this.connectedUsers)
+		return (this.connectedUsers.get(id) != undefined)
+	}
+
+	addConnectedUser(id: number) {
+		if (this.isConnected(id))
+			this.connectedUsers.get(id).push(UserStatus.online)
+		else
+			this.connectedUsers.set(id, [UserStatus.online])
+	}
+
+	changeStatus(id: number, { newStatus, oldStatus }: { newStatus?: UserStatus, oldStatus?: UserStatus }) {
+
+		if (!this.isConnected(id))
+			this.addConnectedUser(id);
+
+		if (oldStatus) {
+			const index = this.connectedUsers.get(id).indexOf(oldStatus);
+			if (index > -1) {
+				this.connectedUsers.get(id).splice(index, 1);
+			}
+		}
+		if (newStatus)
+			this.connectedUsers.get(id).push(newStatus)
+		if (this.connectedUsers.get(id).length == 0)
+			this.connectedUsers.delete(id)
+	}
+
+	disconnect(id: number) {
+		this.changeStatus(id, { oldStatus: UserStatus.online })
+	}
+
+
 }

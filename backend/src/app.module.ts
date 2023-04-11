@@ -9,7 +9,7 @@ import { EventsModule } from './events/events.module';
 import { LogMiddleware } from './app.middleware';
 import { GameModule } from './game/game.module';
 import { SavedGame } from './model/saved-game.entity';
-import { RefreshToken } from './model/refresh-token';
+import { RefreshToken } from './model/refresh-token.entity';
 import { AuthModule } from './users/auth/auth.module';
 
 @Module({

@@ -38,6 +38,7 @@ export interface IUser {
 
 export interface SocketContextType {
 	socket: Socket
+	customEmit: (eventname: string, data: any, callback?: (response: any) => void) => Socket
 }
 
 export let SocketContext = React.createContext<SocketContextType>(null!)
@@ -46,13 +47,23 @@ export let SocketContext = React.createContext<SocketContextType>(null!)
 function SocketProvider({ children }: { children: React.ReactNode }) {
 	const auth = useAuthService()
 
+	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket {
+		data._access_token = getAccessToken()
+		return socket.emit(eventname, data, callback)
+	}
+
 	React.useEffect(() => {
 		if (!auth.user) return
 		function onConnect() {
 			console.log('Connected to socket')
-			socket.emit('ping', { message: "This is my first ping" }, (response: any) => {
+			customEmit('ping', { message: "This is my first ping" }, (response: any) => {
 				console.log(response)
 			})
+		}
+
+		function onDisconnect() {
+			console.log('Disconnected to socket')
+			customEmit('goodbye', { message: "Bye" });
 		}
 
 		function onMessage(data: any) {
@@ -61,9 +72,11 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 		}
 
 		socket.on('connect', onConnect);
+		socket.on('disconnect', onDisconnect);
 		socket.on('message', onMessage)
 		return () => {
 			socket.off('connect', onConnect);
+			socket.off('disconnect', onDisconnect);
 			socket.off('message', onMessage);
 		}
 	}, [auth.user])
@@ -72,10 +85,10 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
 	const socket = io({
 		auth: {
 			token: getAccessToken()
-		}
+		},
 	})
 
-	const value = { socket }
+	const value = { socket, customEmit }
 	console.log("Socket Creation")
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
 }
@@ -246,8 +259,8 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 		// along to that page after they login, which is a nicer user experience
 		// than dropping them off on the home page.
 		return <>
-		<Link to="/login">Login Page</Link>;
-		<Link to="/register">Register Page</Link>;
+			<Link to="/login">Login Page</Link>;
+			<Link to="/register">Register Page</Link>;
 		</>
 	}
 

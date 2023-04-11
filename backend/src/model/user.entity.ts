@@ -22,7 +22,7 @@ export class User {
 	//@JoinTable()
 	wonGames: SavedGame[];
 
-	@AfterInsert()
+/* 	@AfterInsert()
 	logInsert() {
 		console.log(`insert User with id ${this.id}`);
 	}
@@ -35,6 +35,6 @@ export class User {
 	@AfterRemove()
 	logRemove() {
 		console.log(`remove User with id ${this.id}`);
-	}
+	} */
 
 }
