@@ -29,8 +29,9 @@ export class RTGuard implements CanActivate {
 			return true;
 		} catch (e) {
 			console.error('RTGuard trycatch:', e)
-			return false;
+			return 	false;
 		}
-
+		
+   
 	}
 }

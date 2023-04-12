@@ -131,7 +131,36 @@ function ListGames() {
 	)
 }
 
+function Loader() {
+	return (
+		<div>
+			Loading...
+		</div>
+	)
+}
+
+
 function App() {
+
+	const [backIsReady, setBackIsReady] = useState(false)
+	const cooldown = React.useRef<number>(10);
+
+	React.useEffect(() => {
+		const intevalId = setInterval(() => {
+			axios.get("/api/areyouready").then((response) => {
+				if (response.status === 200) {
+					setBackIsReady(true);
+					clearInterval(intevalId);
+				}
+			}).catch((error) => {
+				console.log(error);
+			})
+			if (cooldown.current < 1000)
+				cooldown.current *= cooldown.current;
+		}, cooldown.current)
+		return () => clearInterval(intevalId);
+	}, [])
+	if (!backIsReady) return <Loader />
 
 	return (
 		<AuthService>

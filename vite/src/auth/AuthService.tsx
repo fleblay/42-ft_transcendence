@@ -25,7 +25,6 @@ let AuthContext = React.createContext<AuthContextType>(null!);
 //3.Renvoie la balise AuthContext.Provider
 export function AuthService({ children }: { children: React.ReactNode }) {
 	let [user, setUser] = React.useState<any | null>(null);
-	const navigate = useNavigate();
 
 	const getUser = async () => {
 		try {
