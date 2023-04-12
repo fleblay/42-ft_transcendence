@@ -20,8 +20,7 @@ interface JoinGamesProps {
 
 const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 	const [listGames, setListGames] = React.useState<string[]>([]);
-	// const { socket } = React.useContext(SocketContext);
-	const { socket } = useAuthService();
+	const { socket } = React.useContext(SocketContext);
 
 	return (
 		<>
@@ -48,8 +47,7 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 
 export function CreateGame() {
 	const navigate = useNavigate();
-	// const { customEmit } = React.useContext(SocketContext);
-	const { customEmit } = useAuthService();
+	const { customEmit } = React.useContext(SocketContext);
 
 	const [privateGame, setPrivateGame] = useState<boolean>(false);
 

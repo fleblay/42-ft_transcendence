@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from '../socket/SocketProvider';
 import { IgameInfo, GameStatus } from "../types";
-import { useAuthService } from "../auth/AuthService";
 import { useParams } from "react-router-dom";
 
 interface Iprops {
@@ -23,10 +22,7 @@ export function GamePage() {
 	const [loading, setLoading] = useState<LoadingStatus>(LoadingStatus.Loading);
 	const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
 	const [joined, setJoined] = useState<boolean>(false);
-	// const { socket, customEmit } = useContext(SocketContext);
-
-
-	let {customEmit, socket, ...auth} = useAuthService();
+	const { socket, customEmit } = useContext(SocketContext);
 
 	const { idGame } = useParams();
 
@@ -106,8 +102,7 @@ function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
 export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
-	// const { customEmit } = useContext(SocketContext);
-	const { customEmit } = useAuthService();
+	const { customEmit } = useContext(SocketContext);
 
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
 
