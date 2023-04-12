@@ -52,7 +52,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 
 	let register = async (registerData: RegisterData): Promise<void> => {
 		return new Promise((resolve, reject) => {
-			apiClient
+			axios
 				.post("/api/users/register", registerData)
 				.then(async (response) => {
 					const userData = response.data as userToken;
@@ -69,11 +69,13 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 
 	let login = async (loginData: LoginData): Promise<void> => {
 		return new Promise((resolve, reject) => {
-			apiClient
+			axios
 				.post("/api/users/login", loginData)
 				.then(async (response) => {
 					const userData = response.data as userToken;
 					console.log(userData);
+					delAccessToken();
+					delRefreshToken();
 					saveToken(userData);
 					await getUser()
 					resolve();

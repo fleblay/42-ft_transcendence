@@ -37,7 +37,7 @@ export class AuthService {
 			//console.log(`User id is `, jwtResponse)
 			return this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
-			console.log(`Error in validate Token is ${e}`)
+			console.log(`Error in validate Token access is ${e}`)
 			return null
 		}
 	}
@@ -48,7 +48,7 @@ export class AuthService {
 			//console.log(`Decode :  `, jwtResponse);
 			return this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
-			console.log(`Error in validate Token is ${e}`)
+			console.log(`Error in decode Token is ${e}`)
 			return null
 		}
 	}
