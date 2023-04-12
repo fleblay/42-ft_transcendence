@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { SocketContext } from "../App";
+import { SocketContext } from '../socket/SocketProvider';
 import { IgameInfo, GameStatus } from "../types";
 import { useAuthService } from "../auth/AuthService";
 import { useParams } from "react-router-dom";

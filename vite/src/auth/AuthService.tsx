@@ -26,17 +26,21 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	let [user, setUser] = React.useState<IUser | null>(null);
 	const navigate = useNavigate()
 
-	const getUser = async () => {
+	const getUser = async() => {
+		console.log("Start getting user")
 		apiClient.get('/api/users/me')
-		.then((response) => {
-			console.log(response.data)
-			setUser(response.data)
+			.then((response) => {
+				console.log(response.data)
+				if (!user)
+				{
+					console.log('user is :', user)
+					setUser(response.data)
+				}
+			}).catch((error) => {
+				console.log("Not connected");
+				navigate("/login", { replace: true });
 
-		}).catch((error) => {
-			console.log("Not connected");
-			navigate("/login", { replace: true });
-
-		})
+			})
 	}
 
 	if (!user && !allRoutes.find((el) => el.path === location.pathname)?.public) {
@@ -51,35 +55,35 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	let register = async (registerData: RegisterData): Promise<void> => {
 		return new Promise((resolve, reject) => {
 			apiClient
-			.post("/api/users/register", registerData)
-			.then((response) => {
-				const userData = response.data as userToken;
-				saveToken(userData);
-				getUser()
-				resolve();
-			})
-			.catch((error) => {
-				console.log(error);
-				reject(error);
-			});
+				.post("/api/users/register", registerData)
+				.then((response) => {
+					const userData = response.data as userToken;
+					saveToken(userData);
+					getUser()
+					resolve();
+				})
+				.catch((error) => {
+					console.log(error);
+					reject(error);
+				});
 		})
 	};
 
 	let login = async (loginData: LoginData): Promise<void> => {
 		return new Promise((resolve, reject) => {
 			apiClient
-			.post("/api/users/login", loginData)
-			.then((response) => {
-				const userData = response.data as userToken;
-				console.log(userData);
-				saveToken(userData);
-				getUser()
-				resolve();
-			})
-			.catch((error) => {
-				console.log(error);
-				reject(error);
-			});
+				.post("/api/users/login", loginData)
+				.then((response) => {
+					const userData = response.data as userToken;
+					console.log(userData);
+					saveToken(userData);
+					getUser()
+					resolve();
+				})
+				.catch((error) => {
+					console.log('login catch', error);
+					reject(error);
+				});
 		})
 	};
 

@@ -8,7 +8,6 @@ import { Paper, Box, Typography, Grid } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthService } from "../auth/AuthService";
 
-
 export interface LoginData {
 	email: string;
 	password: string;
@@ -31,6 +30,7 @@ export function LoginForm() {
 			email: loginForm.get("email") as string,
 			password: loginForm.get("password") as string
 		};
+		console.log("About to start logging process")
 		auth.login(loginData).then(() => {
 			console.log('/game')
 			navigate("/game", { replace: true });

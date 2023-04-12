@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SocketContext } from '../App';
+import { SocketContext } from '../socket/SocketProvider';
 import { Update } from 'vite/types/hmrPayload';
 import { IgameInfo, GameStatus } from '../types';
 import { GameScreen } from './GameScreen';
