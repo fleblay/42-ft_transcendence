@@ -66,7 +66,6 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		if (!foundUser)
 			return
 		console.log("New Connection User:", foundUser.username)
-		console.log("handleConnection headers is : ", socket.request.headers)
 		this.connectedSockets.push({ id: socket.id, username: foundUser.username, userId: foundUser.id, actions: ["connection"] })
 	}
 
