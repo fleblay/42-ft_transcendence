@@ -23,9 +23,10 @@ export function GamePage() {
 	const [loading, setLoading] = useState<LoadingStatus>(LoadingStatus.Loading);
 	const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
 	const [joined, setJoined] = useState<boolean>(false);
-	const { socket, customEmit } = useContext(SocketContext);
+	// const { socket, customEmit } = useContext(SocketContext);
 
-	let auth = useAuthService();
+
+	let {customEmit, socket, ...auth} = useAuthService();
 
 	const { idGame } = useParams();
 
@@ -48,7 +49,7 @@ export function GamePage() {
 	}, [joined]);
 
 	useEffect(() => {
-		if (!idGame) {
+		if (!idGame || !socket) {
 			return;
 		}
 		function onGameUpdate(data: IgameInfo) {
@@ -56,6 +57,7 @@ export function GamePage() {
 		}
 		socket.on('game.update', onGameUpdate)
 		return () => {
+			if (!socket) return;
 			socket.off('game.update', onGameUpdate)
 		}
 	}, [])
@@ -104,7 +106,8 @@ function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
 export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
-	const { customEmit } = useContext(SocketContext);
+	// const { customEmit } = useContext(SocketContext);
+	const { customEmit } = useAuthService();
 
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
 

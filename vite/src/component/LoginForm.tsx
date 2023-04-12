@@ -32,7 +32,7 @@ export function LoginForm() {
 		};
 		console.log("About to start logging process")
 
-		await auth.login(loginData).then(() => {
+		auth.login(loginData).then(() => {
 			console.log('/game')
 			navigate("/game", { replace: true });
 		}).catch((error) => {

@@ -7,6 +7,7 @@ import { getMenuItemUtilityClass } from '@mui/material';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../auth/interceptor.axios';
+import { useAuthService } from '../auth/AuthService';
 
 interface Iprops {
 	startGameInfo: IgameInfo,
@@ -19,13 +20,14 @@ interface JoinGamesProps {
 
 const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 	const [listGames, setListGames] = React.useState<string[]>([]);
-	const { socket } = React.useContext(SocketContext);
+	// const { socket } = React.useContext(SocketContext);
+	const { socket } = useAuthService();
 
 	return (
 		<>
 			<button onClick={() => {
 				apiClient.get("/api/game/current").then((response) => {
-					console.log(response.data);
+				console.log(response.data);
 					setListGames(response.data.map((gameId: string) => gameId.replace(/"/g, '')))
 				})
 			}}>Refresh list</button>
@@ -46,7 +48,8 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 
 export function CreateGame() {
 	const navigate = useNavigate();
-	const { customEmit } = React.useContext(SocketContext);
+	// const { customEmit } = React.useContext(SocketContext);
+	const { customEmit } = useAuthService();
 
 	const [privateGame, setPrivateGame] = useState<boolean>(false);
 

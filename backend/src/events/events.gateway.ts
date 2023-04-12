@@ -54,7 +54,6 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		}
 	}
 
-
 	afterInit(server: Server) {
 		this.gameService.setWsServer(server)
 	}
@@ -87,12 +86,6 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	handleMessage(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: any): void {
 		client.broadcast.emit('message', `Server : new challenger`)
 		this.updateSocket(client, "ping")
-	}
-
-	@SubscribeMessage('goodbye')
-	goodbyMessage(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: any): void {
-		client.broadcast.emit('message', `Server : a challenger has left`)
-		this.updateSocket(client, "goodbye")
 	}
 
 	@SubscribeMessage('game.create')

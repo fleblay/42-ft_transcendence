@@ -20,18 +20,21 @@ apiClient.interceptors.request.use(
 
 			if (decode.exp - (Date.now() / 1000) < 10) {
 				console.log("token expired");
-				const response = await axios.get('/api/auth/refresh', { headers: { 'X-Refresh-Token': getRefreshToken() } });
-				if (response.status === 200) {
-					console.log("Access token refreshed");
+				try {
+					const response = await axios.get('/api/auth/refresh', { headers: { 'X-Refresh-Token': getRefreshToken() } });
+					if (response.status === 200) {
+						console.log("Access token refreshed");
+						localStorage.removeItem('access_token');
+						localStorage.removeItem('refresh_token');
+						saveToken(response.data);
+					}
+				}
+				catch (error) {
+					console.log("Error refreshing access token", error);
 					localStorage.removeItem('access_token');
 					localStorage.removeItem('refresh_token');
-					saveToken(response.data);
 				}
-				else {
-					console.log("Error refreshing access token", response.status, response.statusText);
-					localStorage.removeItem('access_token');
-					localStorage.removeItem('refresh_token');
-				}
+				
 			}
 			const access_token = getAccessToken()
 			config.headers.Authorization = `Bearer ${access_token}`;
@@ -39,8 +42,7 @@ apiClient.interceptors.request.use(
 		else {
 			console.log("no token");
 		}
-
-		return config
+		return config;
 	}
 );
 
