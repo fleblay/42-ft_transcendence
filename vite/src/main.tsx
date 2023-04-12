@@ -5,12 +5,35 @@ import App from './App'
 import {
 	BrowserRouter,
 	Routes,
+	useLocation,
 } from "react-router-dom";
+
+
+export const RouterContext = React.createContext<{to: string, from: string}>(null!!);
+
+const RouterProvider = ({ children }: { children: JSX.Element }) => {
+	const location = useLocation()
+	const route = React.useRef({
+		to: location.pathname,
+		from: location.pathname
+	});
+
+	React.useEffect(() => {
+		route.current = { to: location.pathname, from: route.current.to }
+		console.log('route', route.current)
+	}, [location]);
+
+	return <RouterContext.Provider value={route.current}>
+		{children}
+	</RouterContext.Provider>
+}
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
 		<BrowserRouter>
-			<App />
+			<RouterProvider>
+				<App />
+			</RouterProvider>
 		</BrowserRouter>
 	</React.StrictMode>,
 )
