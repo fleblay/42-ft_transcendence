@@ -88,7 +88,7 @@ function Header() {
 
 			<ul>
 				<li>
-					<Link to="/">Game Page</Link>
+					<Link to="/game">Game Page</Link>
 				</li>
 				<li>
 					<Link to="/chat">Chat Page</Link>
@@ -158,7 +158,6 @@ function App() {
 								<RequireAuth>
 									<>
 										<label>w</label>
-										<LoginForm />
 									</>
 								</RequireAuth>
 							}
@@ -168,6 +167,8 @@ function App() {
 						<Route path="/list" element={<ListGames />} />
 						<Route path="/allusers" element={<ListUsers />} />
 						<Route path="/testMenu" element={<ResponsiveAppBar />} />
+						<Route path="/top" element={<div>Hoppy best players</div>} />
+						<Route path='*' element={<div>404</div>} />
 
 					</Route>
 				</Routes>
