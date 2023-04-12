@@ -11,7 +11,7 @@ export let SocketContext = React.createContext<SocketContextType>(null!)
 
 // Appeler par AuthService quand auth.user change de valeur.
 // Creer le socket quand auth.user est defini (On est connecter)
-function SocketProvider({ children }: { children: React.ReactNode }) {
+export function SocketProvider({ children }: { children: React.ReactNode }) {
 	const auth = useAuthService()
 
 	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket {

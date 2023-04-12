@@ -23,20 +23,25 @@ let AuthContext = React.createContext<AuthContextType>(null!);
 //2.Definit la value passe pour tous les enfants du AuthContext.Provider
 //3.Renvoie la balise AuthContext.Provider
 export function AuthService({ children }: { children: React.ReactNode }) {
-	let [user, setUser] = React.useState<IUser | null>(null);
-	const navigate = useNavigate()
+	let [user, setUser] = React.useState< any | null>(null);
+	const navigate = useNavigate();
 
-	const getUser = async() => {
-		console.log("Start getting user")
+	const getUser = async (name :string ) => {
+		console.log("call by ", name);
+		console.log(name," : Start getting user")
 		apiClient.get('/api/users/me')
-			.then((response) => {
-				console.log(response.data)
+			.then( (response) => {
 				if (!user)
 				{
-					console.log('user is :', user)
-					setUser(response.data)
-				}
-			}).catch((error) => {
+					console.log(name, ': user is :', user)
+					console.log(name, ": response data ", response.data)
+					return (await setUser(response.data));
+				
+			}}).then(() => {
+				console.log(name, "finish seting user")
+				console.log(name, ": user is ", user)
+			})
+			.catch((error) => {
 				console.log("Not connected");
 				navigate("/login", { replace: true });
 
@@ -45,7 +50,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 
 	if (!user && !allRoutes.find((el) => el.path === location.pathname)?.public) {
 		if (getAccessToken())
-			getUser()
+			getUser("AuthService")
 		else
 			navigate("/login", { replace: true });
 	}
@@ -56,10 +61,10 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 		return new Promise((resolve, reject) => {
 			apiClient
 				.post("/api/users/register", registerData)
-				.then((response) => {
+				.then(async (response) => {
 					const userData = response.data as userToken;
 					saveToken(userData);
-					getUser()
+					await getUser("register")
 					resolve();
 				})
 				.catch((error) => {
@@ -73,11 +78,11 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 		return new Promise((resolve, reject) => {
 			apiClient
 				.post("/api/users/login", loginData)
-				.then((response) => {
+				.then(async (response) => {
 					const userData = response.data as userToken;
 					console.log(userData);
 					saveToken(userData);
-					getUser()
+					await getUser("login")
 					resolve();
 				})
 				.catch((error) => {

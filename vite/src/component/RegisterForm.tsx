@@ -23,7 +23,7 @@ export function RegisterForm() {
 
 	let from = location.state?.from?.pathname || "/";
 
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const registerForm = new FormData(event.currentTarget);
 		const registerData = {
@@ -31,7 +31,7 @@ export function RegisterForm() {
 			email: registerForm.get("email") as string,
 			password: registerForm.get("password") as string
 		};
-		auth.register(registerData).then(() => {
+		await auth.register(registerData).then(() => {
 			navigate("/game", { replace: true });
 		}).catch((error) => {
 			let errorInfo = {

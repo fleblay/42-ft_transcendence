@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { SocketContext } from "../App";
+import { SocketContext } from "../socket/SocketProvider";
 
 const paddleLength = 40
 const paddleWidth = 5

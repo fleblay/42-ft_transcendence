@@ -12,6 +12,7 @@ import { AuthService, useAuthService } from './auth/AuthService'
 import { GamePage } from './component/GameScreen'
 import apiClient from './auth/interceptor.axios'
 import { ResponsiveAppBar } from './component/ResponsiveAppBar'
+import { SocketProvider } from './socket/SocketProvider'
 
 export interface Destinations {
 	name: string,

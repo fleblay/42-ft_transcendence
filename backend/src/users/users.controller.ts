@@ -5,6 +5,8 @@ import { UsersService } from './users.service';
 import { AuthService } from './auth/auth.service';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { ATGuard } from './guard/access-token.guard';
+//import { Serialize } from 'src/interceptors/serialize.interceptor';
+//import { UserDto } from './dtos/user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -39,6 +41,7 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/me')
+	//@Serialize(UserDto)
 	getMe(@Headers('authorization') auth: string) {
 		if (!auth) {
 			throw new ForbiddenException('No token provided');

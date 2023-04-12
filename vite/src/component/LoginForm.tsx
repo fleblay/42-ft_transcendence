@@ -23,7 +23,7 @@ export function LoginForm() {
 
 	let from = location.state?.from?.pathname || "/";
 
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const loginForm = new FormData(event.currentTarget);
 		const loginData = {
@@ -31,7 +31,8 @@ export function LoginForm() {
 			password: loginForm.get("password") as string
 		};
 		console.log("About to start logging process")
-		auth.login(loginData).then(() => {
+
+		await auth.login(loginData).then(() => {
 			console.log('/game')
 			navigate("/game", { replace: true });
 		}).catch((error) => {
