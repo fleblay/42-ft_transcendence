@@ -21,6 +21,13 @@ import { GameCreateDto } from './dtos/game-create.dto';
 import { AuthService } from 'src/users/auth/auth.service';
 import { IgameInfo } from 'src/game/game';
 
+type SocketInfo = {
+	id: string,
+	username: string,
+	userId: number,
+	actions: string[]
+}
+
 @WebSocketGateway({
 	path: '/socket.io/',
 	cors: {
@@ -35,10 +42,17 @@ import { IgameInfo } from 'src/game/game';
 export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
 	@WebSocketServer() server: Server
-	private socketInfo: { socketId: string, username: string }[] = []
+	private connectedSockets: SocketInfo[] = []
 
 	constructor(private gameService: GameService, private authService: AuthService) {
-		setInterval(() => { console.log("Sockets info are : ", this.socketInfo) }, 10000)
+		setInterval(() => { console.log("\x1b[33mSockets info are : \x1b[0m", this.connectedSockets) }, 10000)
+	}
+
+	updateSocket(socket: Socket, action: string): void {
+		const toUpdate = this.connectedSockets.find((e: SocketInfo) => e.id == socket.id)
+		if (toUpdate) {
+			toUpdate.actions.push(action)
+		}
 	}
 
 
@@ -54,7 +68,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			return
 		console.log("New Connection User:", foundUser.username)
 		console.log("handleConnection headers is : ", socket.request.headers)
-		this.socketInfo.push({ socketId: socket.id, username: foundUser.username })
+		this.connectedSockets.push({ id: socket.id, username: foundUser.username, userId: foundUser.id, actions: ["connection"] })
 	}
 
 	async handleDisconnect(socket: Socket) {
@@ -63,26 +77,29 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 		if (foundUser)
 			console.log("Disconnect User:", foundUser.username)
-		const toRemove = this.socketInfo.findIndex((e) => e.socketId == socket.id)
+		const toRemove = this.connectedSockets.findIndex((e) => e.id == socket.id)
 		if (toRemove != -1) {
 			console.log("Removing Disconnected socket:", socket.id)
-			this.socketInfo.splice(toRemove, 1)
+			this.connectedSockets.splice(toRemove, 1)
 		}
 	}
 
 	@SubscribeMessage('ping')
 	handleMessage(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: any): void {
 		client.broadcast.emit('message', `Server : new challenger`)
+		this.updateSocket(client, "ping")
 	}
 
 	@SubscribeMessage('goodbye')
 	goodbyMessage(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: any): void {
 		client.broadcast.emit('message', `Server : a challenger has left`)
+		this.updateSocket(client, "goodbye")
 	}
 
 	@SubscribeMessage('game.create')
 	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string } {
 		console.log("New create event")
+		this.updateSocket(client, "gamecreate")
 		try {
 			const gameId = this.gameService.create(data[0].map)
 			console.log("Game id is : ", gameId);
@@ -96,6 +113,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@SubscribeMessage('game.findOrCreate')
 	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string } {
 		console.log("New findOrCreate event")
+		this.updateSocket(client, "findOrCreate")
 		try {
 			const gameId = this.gameService.findOrCreate(data[0].map)
 			console.log("Game id is : ", gameId);
@@ -109,6 +127,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@SubscribeMessage('game.join')
 	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): { gameId: string, gameInfo: IgameInfo } | { error: string } {
 		console.log("New join event")
+		this.updateSocket(client, "join")
 		try {
 			const { gameId, gameInfo } = this.gameService.join(client, user, data[0].gameId)
 			console.log("Game id is : ", gameId);
@@ -122,11 +141,13 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@SubscribeMessage('game.play.move')
 	handlePlayerInput(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: PlayerInputDto): void {
 		console.log("gateway input handle")
+		this.updateSocket(client, "playerInput")
 		this.gameService.handlePlayerInput(client, user, data[0])
 	}
 
 	@SubscribeMessage('createLobby')
 	createLobby(client: Socket): void {
+		this.updateSocket(client, "Lobby")
 		client.broadcast.emit('newLobby', 'Lobby id 1');
 	}
 }
