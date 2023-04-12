@@ -49,4 +49,5 @@ export class UsersController {
 		const token = auth.replace('Bearer ', '');
 		return this.authService.validateAccessToken(token);
 	}
+
 }
