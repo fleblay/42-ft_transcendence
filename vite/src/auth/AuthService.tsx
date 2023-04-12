@@ -35,7 +35,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 				{
 					console.log(name, ': user is :', user)
 					console.log(name, ": response data ", response.data)
-					return (await setUser(response.data));
+					return (setUser(response.data));
 				
 			}}).then(() => {
 				console.log(name, "finish seting user")
