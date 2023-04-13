@@ -3,6 +3,7 @@ import { User } from '../model/user.entity'
 import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 import { GameCluster } from './game-cluster';
+import { SavedGame } from 'src/model/saved-game.entity';
 
 const paddleLength = 100
 const paddleWidth = 5
@@ -39,6 +40,7 @@ export type Players = {
 	paddleWidth: number,
 	score: number,
 	user: User,
+	leaving: boolean;
 }
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
@@ -124,6 +126,17 @@ export class Game {
 		}
 	}
 
+	generateSavedGameInfo(): SavedGame {
+
+		const savedGame = new SavedGame();
+		savedGame.id = this.gameId;
+		savedGame.players = this.players.map((player) => player.user);
+		savedGame.score = this.players.map((player) => player.score);
+		savedGame.winner = (this.players[0].score > this.players[1].score) ? this.players[0].user : this.players[1].user;
+		return savedGame;
+	}
+
+
 	addUser(user: User, client: Socket) {
 		if (this.players.find((player) => player.user.id === user.id))
 			throw new NotFoundException('Already in game')
@@ -136,7 +149,8 @@ export class Game {
 				paddleLength: Math.floor(paddleLength + ((Math.random() > 0.5) ? -1 : 1) * (Math.random() * paddleLength / 2)),
 				paddleWidth: paddleWidth,
 				score: 0,
-				user
+				user,
+				leaving: false
 			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1) {
@@ -230,7 +244,6 @@ export class Game {
 			if (this.players[0].score + this.players[1]?.score === gameRounds) {
 				this.status = GameStatus.end
 				clearInterval(this.intervalId)
-				this.gameCluster.destroyGame(this.gameId);
 			}
 			//Reset des momentum
 			this.players.forEach((player) => {

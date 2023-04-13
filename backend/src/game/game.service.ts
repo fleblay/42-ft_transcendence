@@ -41,7 +41,7 @@ export class GameService {
 		if (!game)
 			throw new NotFoundException('Game not found');
 		game.addUser(user, client);
-		this.usersService.addConnectedUser(user.id)
+		//this.usersService.addConnectedUser(user.id)
 		return { gameId: game.id, gameInfo: game.generateGameInfo() };
 	}
 
@@ -59,26 +59,19 @@ export class GameService {
 		return this.gameCluster.findUserStateById(id)
 	}
 
-	saveGame(game: Game, gameId: UUID) {
-		if (!game)
-			throw new NotFoundException('Game not found');
-		const savedGame = new SavedGame();
-		savedGame.id = gameId;
-		savedGame.players = game.players.map(player => player.user);
-		savedGame.score = game.players.map(player => player.score);
-		console.log("savedGame", savedGame);
-		this.repo.save(savedGame);
-	}
+
 
 	quitGame(Userid: number, gameId: UUID) {
-		console.log("game", this.gameCluster.findOne(gameId));
-		this.usersService.disconnect(Userid)
-		const game = this.gameCluster.destroyGame(gameId, Userid);
-		console.log("game", game)
-		if (game)
-			return this.saveGame(game, gameId);
+		const gameInfo = this.gameCluster.playerQuit(gameId, Userid);
+		//console.log("game", this.gameCluster.findOne(gameId));
+		console.log("game", gameInfo)
+		if (gameInfo)
+		{
+			let saveObject = this.repo.create(gameInfo);
+			return this.repo.save(saveObject);
+		}
 		else
-			return "null"
+			return null;
 	}
 
 	getListGames(page: number) {
