@@ -13,6 +13,9 @@ export class SavedGame {
 	@Column("int", { array: true })
 	score : number[];
 
+	@Column()
+	date : Date;
+	
 	@ManyToOne(() => User, (user) => user.wonGames)
 	winner : User;
 }

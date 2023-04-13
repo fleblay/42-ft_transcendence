@@ -9,6 +9,7 @@ import { UUID } from '../type';
 import { PlayerInputDto } from '../events/dtos/player-input.dto'
 import { IgameInfo } from './game';
 import { SavedGame } from '../model/saved-game.entity';
+import { Game } from './game';
 
 @Injectable()
 export class GameService {
@@ -55,6 +56,19 @@ export class GameService {
 
 	userState(id: number): { state: string, gameId?: UUID } {
 		return this.gameCluster.findUserStateById(id)
+	}
+
+	saveGame(igameId: UUID) {
+		const game : Game = this.gameCluster.findOne(igameId);
+		if (!game)
+			throw new NotFoundException('Game not found');
+		const savedGame = new SavedGame();
+		savedGame.id = igameId;
+		savedGame.players = game.players.map(player => player.user);
+		savedGame.score = game.players.map(player => player.score);
+		savedGame.date = new Date();
+		this.repo.save(savedGame);
+
 	}
 
 	quitGame(id: number, gameId: UUID) {
