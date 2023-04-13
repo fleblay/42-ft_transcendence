@@ -59,7 +59,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 	}, [auth.user])
 
 	React.useEffect(() => {
-		if (socket.current && nav.to != '/game' && nav.from == '/game') {
+		if (socket.current && !nav.to.startsWith('/game') && nav.from == '/game') {
 			console.log("Leaving game page")
 			customEmit('leave', {})
 		}
