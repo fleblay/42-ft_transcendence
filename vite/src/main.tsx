@@ -13,17 +13,13 @@ export const RouterContext = React.createContext<{to: string, from: string}>(nul
 
 const RouterProvider = ({ children }: { children: JSX.Element }) => {
 	const location = useLocation()
-	const route = React.useRef({
-		to: location.pathname,
-		from: location.pathname
-	});
+	const [route, setRoute] = React.useState({to: "init", from: "init"})
 
 	React.useEffect(() => {
-		route.current = { to: location.pathname, from: route.current.to }
-		console.log('route', route.current)
+		setRoute({to: location.pathname, from : route.to})
 	}, [location]);
 
-	return <RouterContext.Provider value={route.current}>
+	return <RouterContext.Provider value={route}>
 		{children}
 	</RouterContext.Provider>
 }

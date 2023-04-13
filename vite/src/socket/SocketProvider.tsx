@@ -1,7 +1,8 @@
 import React, { createContext, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
 import { delAccessToken, getAccessToken, saveToken } from '../token/token'
-import {useAuthService} from '../auth/AuthService'
+import { useAuthService } from '../auth/AuthService'
+import { RouterContext } from '../main'
 
 export interface SocketContextType {
 	socket: Socket | null
@@ -13,12 +14,12 @@ export let SocketContext = React.createContext<SocketContextType>(null!)
 // Creer le socket quand auth.user est defini (On est connecter)
 export function SocketProvider({ children }: { children: React.ReactNode }) {
 	const auth = useAuthService()
-	
 	const socket = React.useRef<Socket | null>(null);
+	const nav = React.useContext(RouterContext)
 
 	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket | null {
 		if (!socket.current) return null;
-		return socket.current.emit(eventname, {...data, _access_token: getAccessToken()}, callback)
+		return socket.current.emit(eventname, { ...data, _access_token: getAccessToken() }, callback)
 	}
 
 	const onConnect = React.useCallback(() => {
@@ -56,6 +57,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 			}
 		}
 	}, [auth.user])
+
+	React.useEffect(() => {
+		if (socket.current && nav.to != '/game' && nav.from == '/game') {
+			console.log("Leaving game page")
+			customEmit('leave', {})
+		}
+	}, [nav])
 
 	const value = { customEmit, socket: socket.current }
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
