@@ -20,6 +20,7 @@ import { GameService } from '../game/game.service'
 import { GameCreateDto } from './dtos/game-create.dto';
 import { AuthService } from 'src/users/auth/auth.service';
 import { IgameInfo } from 'src/game/game';
+import { UsersService } from '../users/users.service'
 
 type SocketInfo = {
 	id: string,
@@ -43,7 +44,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@WebSocketServer() server: Server
 	private connectedSockets: SocketInfo[] = []
 
-	constructor(private gameService: GameService, private authService: AuthService) {
+	constructor(private gameService: GameService, private authService: AuthService, private userServices: UsersService) {
 		setInterval(() => { console.log("\x1b[33mSockets info are : \x1b[0m", this.connectedSockets) }, 5000)
 	}
 
@@ -66,6 +67,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			return
 		console.log("New Connection User:", foundUser.username)
 		this.connectedSockets.push({ id: socket.id, username: foundUser.username, userId: foundUser.id, actions: ["connection"] })
+		this.userServices.addConnectedUser(foundUser.id)
 	}
 
 	async handleDisconnect(socket: Socket) {
@@ -78,6 +80,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		if (toRemove != -1) {
 			console.log("Removing Disconnected socket:", socket.id)
 			this.connectedSockets.splice(toRemove, 1)
+			this.userServices.disconnect(foundUser.id)
 		}
 	}
 

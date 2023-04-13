@@ -68,28 +68,49 @@ export class GameCluster {
 			}
 		}
 		if (stateArray.length === 0)
-			stateArray.push("Waiting")
+			stateArray.push("None")
 		return { state: stateArray.join("-"), gameId: gameIdArray.join("-") }
 	}
 
-	setGameStatus(gameId: UUID, status: GameStatus) {
-		const game = this.gamesMap.get(gameId)
-		game.status = status;
-	}
-	
-	endGame(gameId: UUID, userId?: number) {
-		this.setGameStatus(gameId, GameStatus.end)
-		const game = this.gamesMap.get(gameId)
-		if (userId) {
-			if (game.status === GameStatus.playing) {
-				if (game.players.find(player => player.user.id === userId)) {
-					game.players.forEach(player => {
-						if (player.user.id !== userId) player.score = 0;
-						else player.score = 5;
-					});
+
+	rageQuit(game: Game, quitterId: number) {
+		if (game.players.find(player => player.user.id === quitterId)) {
+			game.players.forEach(player => {
+				if (player.user.id === quitterId) {
+					player.leaving = true;
+					player.score = 0;
 				}
+				else {
+					player.score = 5;
+				}
+			});
+			game.status = GameStatus.end;
+		}
+	}
+
+	playerQuit(gameId: UUID, userId: number) {
+		const game = this.gamesMap.get(gameId);
+		let gameInfo = null;
+
+		if (!game) return;
+
+		if (game.status === GameStatus.waiting && game.players.length < 2) {
+			this.gamesMap.delete(gameId);
+		}
+		else if (game.status === GameStatus.playing) {
+			this.rageQuit(game, userId);
+		}
+		if (game.status === GameStatus.end) {
+			const player = game.players.find(player => player.user.id === userId);
+			if (player)
+				player.leaving = true;
+
+			if (game.players.every(player => player.leaving)) {
+				gameInfo = game.generateSavedGameInfo();
+				this.gamesMap.delete(gameId);
 			}
 		}
-		return game;
+		return gameInfo;
 	}
+
 }

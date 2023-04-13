@@ -54,7 +54,7 @@ function AuthStatus() {
 			Welcome {auth.user.username}!{" "}
 			<button
 				onClick={() => {
-					auth.logout(() => navigate("/"));
+					auth.logout();
 				}}
 			>
 				Sign out
