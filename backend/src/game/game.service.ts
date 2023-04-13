@@ -66,6 +66,7 @@ export class GameService {
 		savedGame.id = gameId;
 		savedGame.players = game.players.map(player => player.user);
 		savedGame.score = game.players.map(player => player.score);
+		console.log("savedGame", savedGame);
 		this.repo.save(savedGame);
 	}
 
@@ -74,9 +75,9 @@ export class GameService {
 		//console.log("game", this.gameCluster.findOne(gameId));
 		const userState = this.userState(Userid)
 		const game = this.gameCluster.destroyGame(gameId, Userid);
-		if (game) {
+		console.log("game", game)
+		if (game)
 			return this.saveGame(game, gameId);
-		}
 		else
 			return "null"
 	}
