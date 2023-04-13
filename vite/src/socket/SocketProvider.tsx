@@ -60,13 +60,14 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 	}, [auth.user])
 
 	React.useEffect(() => {
-		if (socket.current && !nav.to.startsWith('/game') && nav.from == '/game') {
+		if (socket.current && !nav.to.startsWith('/game') && nav.from.startsWith('/game')) {
 			console.log("Leaving game page")
 			const gameId = nav.from.split('/')[2]
 			if (gameId)
-				apiClient.post(`/api/game/quit/${gameId}`, {
-					socketId: socket.current.id
-				})
+			{
+				console.log(`quit Game : ${gameId}`)
+				apiClient.get(`/api/game/quit/${gameId}`)
+			}
 		}
 	}, [nav])
 
