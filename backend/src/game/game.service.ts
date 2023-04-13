@@ -58,21 +58,23 @@ export class GameService {
 		return this.gameCluster.findUserStateById(id)
 	}
 
-	saveGame(igameId: UUID) {
-		const game : Game = this.gameCluster.findOne(igameId);
+	saveGame(game : Game, gameId: UUID) {
 		if (!game)
 			throw new NotFoundException('Game not found');
 		const savedGame = new SavedGame();
-		savedGame.id = igameId;
+		savedGame.id = gameId;
 		savedGame.players = game.players.map(player => player.user);
 		savedGame.score = game.players.map(player => player.score);
 		this.repo.save(savedGame);
-
 	}
 
-	quitGame(id: number, gameId: UUID) {
+	quitGame(Userid: number, gameId: UUID) {
 		console.log("game", this.gameCluster.findOne(gameId));
-		return "quite game, not implemented yet"
+		const game = this.gameCluster.destroyGame(gameId, Userid);
+		if (game)
+			return this.saveGame(game, gameId);
+		else
+			return "null"
 	}
 
 }

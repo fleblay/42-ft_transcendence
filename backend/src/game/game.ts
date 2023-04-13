@@ -10,7 +10,7 @@ const ballSpeed = 2
 const playerSpeed = 3
 const canvasHeight = 600
 const canvasWidth = 800
-const gameRounds = 50
+const gameRounds = 5
 const MaxBounceAngle = Math.PI / 12;
 
 
@@ -40,7 +40,7 @@ export type Players = {
 	user: User,
 }
 
-enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
+export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 export interface IgameInfo {
 
@@ -61,7 +61,7 @@ export class Game {
 	private intervalId: NodeJS.Timer
 	public players: Players[] = []
 	public viewers: User[] = []
-	private status: GameStatus = GameStatus.waiting
+	public status: GameStatus = GameStatus.waiting
 	private readonly playerRoom: string
 	private readonly viewerRoom: string
 
@@ -242,6 +242,7 @@ export class Game {
 
 	play() {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 5)
+
 	}
 
 	get id(): UUID {
