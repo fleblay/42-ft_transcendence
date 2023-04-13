@@ -71,9 +71,8 @@ export class GameService {
 	}
 
 	quitGame(Userid: number, gameId: UUID) {
-		console.log("game", this.gameCluster.findOne(gameId));
 		this.usersService.disconnect(Userid)
-		const game = this.gameCluster.destroyGame(gameId, Userid);
+		const game = this.gameCluster.endGame(gameId, Userid);
 		console.log("game", game)
 		if (game)
 			return this.saveGame(game, gameId);

@@ -230,7 +230,6 @@ export class Game {
 			if (this.players[0].score + this.players[1]?.score === gameRounds) {
 				this.status = GameStatus.end
 				clearInterval(this.intervalId)
-				this.gameCluster.destroyGame(this.gameId);
 			}
 			//Reset des momentum
 			this.players.forEach((player) => {

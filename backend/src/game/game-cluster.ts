@@ -72,7 +72,13 @@ export class GameCluster {
 		return { state: stateArray.join("-"), gameId: gameIdArray.join("-") }
 	}
 
-	destroyGame(gameId: UUID, userId?: number) {
+	setGameStatus(gameId: UUID, status: GameStatus) {
+		const game = this.gamesMap.get(gameId)
+		game.status = status;
+	}
+	
+	endGame(gameId: UUID, userId?: number) {
+		this.setGameStatus(gameId, GameStatus.end)
 		const game = this.gamesMap.get(gameId)
 		if (userId) {
 			if (game.status === GameStatus.playing) {
@@ -84,8 +90,6 @@ export class GameCluster {
 				}
 			}
 		}
-		console.log("destroying game: ", gameId); 
-		this.gamesMap.delete(gameId)
 		return game;
 	}
 }
