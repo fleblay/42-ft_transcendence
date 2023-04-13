@@ -12,7 +12,7 @@ interface FormData {
 export function FinishGames() {
 
 	const [listGames, setListGames] = useState<any>(null);
-	const [gamePage, setGamePage] = useState(1);
+	const [gamePage, setGamePage] = useState(0);
 
 	useEffect(() => {
 		apiClient.get(`/api/game/list/${gamePage}`).then((response) => {
@@ -38,7 +38,7 @@ export function FinishGames() {
 				<tbody>
 					{listGames?.map((game: any) => {
 						return (
-							<tr>
+							<tr key={game.id}>
 								<td>{game.id}</td>
 								<td>{game.players}</td>
 								<td>{game.score}</td>
@@ -49,9 +49,17 @@ export function FinishGames() {
 					})}
 				</tbody>
 			</table>
-			<button onClick={() => setGamePage(gamePage - 1)}>Previous</button>
+			<button onClick={() => {
+				if (gamePage > 0) {
+					setGamePage(gamePage - 1)
+				}
+			}}>Previous</button>
 			<label>{gamePage}</label>
-			<button onClick={() => setGamePage(gamePage + 1)}>Next</button>
+			<button onClick={() => {
+				if (listGames.length === 10) {
+					setGamePage(gamePage + 1)
+				}
+			}}>Next</button>
 		</div>
 	);
 }
