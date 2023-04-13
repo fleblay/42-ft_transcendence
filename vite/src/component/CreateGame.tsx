@@ -8,6 +8,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../auth/interceptor.axios';
 import { useAuthService } from '../auth/AuthService';
+import { FinishGames } from './FinishGames';
 
 interface Iprops {
 	startGameInfo: IgameInfo,
@@ -73,6 +74,7 @@ export function CreateGame() {
 				{privateGame ? "Creer une game privee" : "Trouver une game public"}
 			</button>
 			<JoinGames joinGames={joinGames} />
+			<FinishGames />
 		</>
 	);
 }

@@ -13,6 +13,7 @@ import { GamePage } from './component/GameScreen'
 import apiClient from './auth/interceptor.axios'
 import { ResponsiveAppBar } from './component/ResponsiveAppBar'
 import { SocketProvider } from './socket/SocketProvider'
+import Leaderboard from './pages/Leaderboards'
 
 export interface Destinations {
 	name: string,
@@ -120,17 +121,6 @@ function Destinations() {
 
 //export const AppContext = createContext<any>({});
 
-function ListGames() {
-	const [list, setList] = React.useState("empty")
-
-	return (
-		<>
-			<button onClick={() => { apiClient.get("/api/game/current").then((response) => { console.log(response.data); setList(response.data.toString()) }) }}>GetList</button>
-			<div> {list} </div>
-		</>
-	)
-}
-
 function Loader() {
 	return (
 		<div>
@@ -193,10 +183,9 @@ function App() {
 						/>
 						<Route path="/login" element={<LoginForm />} />
 						<Route path="/register" element={<RegisterForm />} />
-						<Route path="/list" element={<ListGames />} />
 						<Route path="/allusers" element={<ListUsers />} />
 						<Route path="/testMenu" element={<ResponsiveAppBar />} />
-						<Route path="/top" element={<div>Hoppy best players</div>} />
+						<Route path="/top" element={<Leaderboard />} />
 						<Route path='*' element={<div>404</div>} />
 
 					</Route>

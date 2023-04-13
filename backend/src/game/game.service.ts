@@ -80,4 +80,14 @@ export class GameService {
 			return "null"
 	}
 
+	getListGames(page: number) {
+		return this.repo.find({
+			order: {
+				date: 'DESC'
+			},
+			take: 10,
+			skip: page * 10
+		})
+	}
+
 }

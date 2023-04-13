@@ -30,4 +30,16 @@ export class GameController {
 		return this.gameService.quitGame(user.id, gameId)
 	}
 
+	@UseGuards(ATGuard)
+	@Get('/list/:page')
+	async getLeaderboard(@Param('page') page: string) {
+		const pageNumber = +page;
+		if (isNaN(pageNumber) || pageNumber < 0) {
+			throw new Error("Invalid page number");
+		}
+		const games = await this.gameService.getListGames(+page);
+		console.log('games: ', games);
+		return games;
+	}
+
 }
