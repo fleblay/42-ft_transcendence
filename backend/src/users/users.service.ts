@@ -58,8 +58,10 @@ export class UsersService {
 	isConnected(id: number): boolean {
 
 		//WTF ne marche pas avec elem.id === id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		return (this.connectedUsers.get(id) != undefined)
+		console.log(`id is ${id}user found connected status is`, this.connectedUsers.get(id))
+		return (this.connectedUsers.get(+id) != undefined)
 	}
+
 
 	addConnectedUser(id: number) {
 		if (this.isConnected(id))

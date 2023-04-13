@@ -16,8 +16,8 @@ export class GameController {
 	}
 
 	@Get("/userinfo/:id")
-	getUserState(@Param('id') id: number) : {state: string, gameId?: UUID}{
-		return this.gameService.userState(id)
+	getUserState(@Param('id') id: string) : {state: string, gameId?: UUID}{
+		return this.gameService.userState(parseInt(id))
 	}
 
 
