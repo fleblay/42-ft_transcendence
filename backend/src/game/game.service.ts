@@ -66,7 +66,6 @@ export class GameService {
 		savedGame.id = igameId;
 		savedGame.players = game.players.map(player => player.user);
 		savedGame.score = game.players.map(player => player.score);
-		savedGame.date = new Date();
 		this.repo.save(savedGame);
 
 	}

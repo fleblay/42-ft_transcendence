@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 
 
@@ -13,9 +13,9 @@ export class SavedGame {
 	@Column("int", { array: true })
 	score : number[];
 
-	@Column()
+	@CreateDateColumn()
 	date : Date;
-	
+
 	@ManyToOne(() => User, (user) => user.wonGames)
 	winner : User;
 }
