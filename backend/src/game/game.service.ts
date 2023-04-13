@@ -41,7 +41,7 @@ export class GameService {
 		if (!game)
 			throw new NotFoundException('Game not found');
 		game.addUser(user, client);
-		this.usersService.addConnectedUser(user.id)
+		//this.usersService.addConnectedUser(user.id)
 		return { gameId: game.id, gameInfo: game.generateGameInfo() };
 	}
 
@@ -69,9 +69,10 @@ export class GameService {
 		this.repo.save(savedGame);
 	}
 
+
 	quitGame(Userid: number, gameId: UUID) {
-		console.log("game", this.gameCluster.findOne(gameId));
-		this.usersService.disconnect(Userid)
+		//console.log("game", this.gameCluster.findOne(gameId));
+		const userState = this.userState(Userid)
 		const game = this.gameCluster.destroyGame(gameId, Userid);
 		if (game) {
 			return this.saveGame(game, gameId);

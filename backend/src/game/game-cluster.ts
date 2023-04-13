@@ -68,7 +68,7 @@ export class GameCluster {
 			}
 		}
 		if (stateArray.length === 0)
-			stateArray.push("Waiting")
+			stateArray.push("None")
 		return { state: stateArray.join("-"), gameId: gameIdArray.join("-") }
 	}
 

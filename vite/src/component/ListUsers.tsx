@@ -49,8 +49,7 @@ export function ListUsers() {
 							<ul style={{listStyleType: "none"}}>
 							<li>{elem.username}</li>
 							<li>{elem.email}</li>
-							<li>{elem.state}</li>
-							<li>{elem.gameId}</li>
+							<li>{elem.state} {elem.gameId}</li>
 							<li>{(elem.isConnected) ? "En ligne": "Offline"}</li>
 							</ul>
 						</li>
