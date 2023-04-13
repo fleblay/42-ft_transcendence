@@ -7,6 +7,7 @@ import { LoginUserDto } from '../dtos/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from '../../model/refresh-token.entity';
 import { Repository } from 'typeorm';
+import { UserStatus } from '../../type';
 
 type Tokens = {
 	access_token: string;
@@ -66,6 +67,7 @@ export class AuthService {
 		console.log(`tokens are ${tokens.access_token}`);
 		return tokens;
 	}
+
 
 	getTokens(user: User) {
 		const access_token_payload = { username: user.username, sub: user.id };

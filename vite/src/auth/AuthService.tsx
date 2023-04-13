@@ -15,7 +15,7 @@ interface AuthContextType {
 	user: IUser | null;
 	register: (user: RegisterData) => Promise<void>;
 	login: (user: LoginData) => Promise<void>;
-	logout: (callback: VoidFunction) => void;
+	logout: () => void;
 }
 
 //1.Definit la value passe pour tous les enfants du AuthContext.Provider
@@ -86,15 +86,27 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 		})
 	};
 
-	let logout = (callback: VoidFunction) => {
-		setUser(null);
-		delAccessToken();
-		delRefreshToken();
-	};
 
+	let logout = async (): Promise<void> => {
+		return new Promise((resolve, reject) => {
+			apiClient
+				.get("/api/users/logout")
+				.then(async (response) => {
+					setUser(null);
+					delAccessToken();
+					delRefreshToken();
+					resolve()
+				})
+				.catch((error) => {
+					console.log('logout catch', error);
+					reject(error);
+				});
+		})
+	};
 	let value = { user, register, login, logout };
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
 
 export function useAuthService() {
 	return React.useContext(AuthContext);

@@ -20,6 +20,7 @@ export class GameController {
 		return this.gameService.userState(id)
 	}
 
+
 	@UseGuards(ATGuard)
 	@Get("/quit/:gameId")
 	quitGame(@Param('gameId') gameId: UUID, @CurrentUser() user: User) {
