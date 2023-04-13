@@ -3,6 +3,7 @@ import { Socket, io } from 'socket.io-client'
 import { delAccessToken, getAccessToken, saveToken } from '../token/token'
 import { useAuthService } from '../auth/AuthService'
 import { RouterContext } from '../main'
+import apiClient from '../auth/interceptor.axios'
 
 export interface SocketContextType {
 	socket: Socket | null
@@ -61,7 +62,11 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 	React.useEffect(() => {
 		if (socket.current && !nav.to.startsWith('/game') && nav.from == '/game') {
 			console.log("Leaving game page")
-			customEmit('leave', {})
+			const gameId = nav.from.split('/')[2]
+			if (gameId)
+				apiClient.post(`/api/game/quit/${gameId}`, {
+					socketId: socket.current.id
+				})
 		}
 	}, [nav])
 

@@ -1,6 +1,9 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import {GameService} from './game.service'
 import { UUID } from '../type';
+import { ATGuard } from 'src/users/guard/access-token.guard';
+import { CurrentUser } from 'src/users/decorators/current-user.decorator';
+import { User } from 'src/model/user.entity';
 
 @Controller('game')
 export class GameController {
@@ -17,9 +20,13 @@ export class GameController {
 		return this.gameService.userState(id)
 	}
 
-	@Get("/quit/:id/:gameId")
-	quitGame(@Param('id') id: number, @Param('gameId') gameId: UUID){
-		return this.gameService.quitGame(id, gameId)
+	@UseGuards(ATGuard)
+	@Get("/quit/:gameId")
+	quitGame(@Param('gameId') gameId: UUID, @CurrentUser() user: User) {
+		if (!user) {
+			throw new Error("No user");
+		}
+		return this.gameService.quitGame(user.id, gameId)
 	}
 
 }

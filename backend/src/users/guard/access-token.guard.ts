@@ -26,6 +26,7 @@ export class ATGuard implements CanActivate {
 			console.log("ATGuard: no user");
 			return false;
 		}
+		(request as any).currentUser  = user;
 		return true;
 	}
 }
