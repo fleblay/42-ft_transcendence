@@ -16,9 +16,10 @@ export class GameController {
 	}
 
 	@Get("/userinfo/:id")
-	getUserState(@Param('id') id: number) : {state: string, gameId?: UUID}{
-		return this.gameService.userState(id)
+	getUserState(@Param('id') id: string) : {state: string, gameId?: UUID}{
+		return this.gameService.userState(parseInt(id))
 	}
+
 
 	@UseGuards(ATGuard)
 	@Get("/quit/:gameId")
@@ -27,6 +28,18 @@ export class GameController {
 			throw new Error("No user");
 		}
 		return this.gameService.quitGame(user.id, gameId)
+	}
+
+	@UseGuards(ATGuard)
+	@Get('/list/:page')
+	async getLeaderboard(@Param('page') page: string) {
+		const pageNumber = +page;
+		if (isNaN(pageNumber) || pageNumber < 0) {
+			throw new Error("Invalid page number");
+		}
+		const games = await this.gameService.getListGames(+page);
+		console.log('games: ', games);
+		return games;
 	}
 
 }

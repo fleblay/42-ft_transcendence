@@ -21,7 +21,6 @@ export function ListUsers() {
 	const [info, setInfo] = useState<string>("No info yet...")
 	const [userList, setUserList] = useState<JSX.Element[]>([])
 
-
 	function handleClick(): void {
 			apiClient
 			.get("/api/users/all")

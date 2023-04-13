@@ -68,7 +68,7 @@ export class GameCluster {
 			}
 		}
 		if (stateArray.length === 0)
-			stateArray.push("Unavailable")
+			stateArray.push("Waiting")
 		return { state: stateArray.join("-"), gameId: gameIdArray.join("-") }
 	}
 

@@ -5,6 +5,8 @@ import { UsersService } from './users.service';
 import { AuthService } from './auth/auth.service';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { ATGuard } from './guard/access-token.guard';
+import {CurrentUser} from './decorators/current-user.decorator'
+import { User } from "src/model/user.entity";
 //import { Serialize } from 'src/interceptors/serialize.interceptor';
 //import { UserDto } from './dtos/user.dto';
 
@@ -33,10 +35,19 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
-	@Get('/connected/:id')
-	isConnected(@Param("id") id: number): boolean
+	@Get('/logout')
+	logout(@CurrentUser() user: User)
 	{
-		return this.usersService.isConnected(id);
+		//Todo : supprimer le refresh de la BDD
+		console.log("user.controller.logout")
+		return ("OK")
+	}
+
+	@UseGuards(ATGuard)
+	@Get('/connected/:id')
+	isConnected(@Param("id") id: string): boolean
+	{
+		return this.usersService.isConnected(parseInt(id));
 	}
 
 	@UseGuards(ATGuard)

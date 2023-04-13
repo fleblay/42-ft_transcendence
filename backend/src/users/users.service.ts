@@ -10,7 +10,9 @@ export class UsersService {
 
 	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
 
-	constructor(@InjectRepository(User) private repo: Repository<User>) { }
+	constructor(@InjectRepository(User) private repo: Repository<User>) {
+		setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
+}
 
 	create(dataUser: CreateUserDto) {
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
@@ -56,10 +58,10 @@ export class UsersService {
 	isConnected(id: number): boolean {
 
 		//WTF ne marche pas avec elem.id === id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		console.log("Array des users connected")
-		console.log(this.connectedUsers)
-		return (this.connectedUsers.get(id) != undefined)
+		console.log(`id is ${id}user found connected status is`, this.connectedUsers.get(id))
+		return (this.connectedUsers.get(+id) != undefined)
 	}
+
 
 	addConnectedUser(id: number) {
 		if (this.isConnected(id))
@@ -69,7 +71,7 @@ export class UsersService {
 	}
 
 	changeStatus(id: number, { newStatus, oldStatus }: { newStatus?: UserStatus, oldStatus?: UserStatus }) {
-
+		console.log('changing status : new ', newStatus,'old :', oldStatus)
 		if (!this.isConnected(id))
 			this.addConnectedUser(id);
 
@@ -86,6 +88,7 @@ export class UsersService {
 	}
 
 	disconnect(id: number) {
+		console.log("user.service.disconnect")
 		this.changeStatus(id, { oldStatus: UserStatus.online })
 	}
 

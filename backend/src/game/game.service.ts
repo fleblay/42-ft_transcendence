@@ -41,6 +41,7 @@ export class GameService {
 		if (!game)
 			throw new NotFoundException('Game not found');
 		game.addUser(user, client);
+		this.usersService.addConnectedUser(user.id)
 		return { gameId: game.id, gameInfo: game.generateGameInfo() };
 	}
 
@@ -48,17 +49,17 @@ export class GameService {
 		return this.gameCluster.listAll()
 	}
 
-	handlePlayerInput(client: Socket, user: User, data: PlayerInputDto){
+	handlePlayerInput(client: Socket, user: User, data: PlayerInputDto) {
 		console.log("service input handle")
 		console.log("data is : ", data)
-		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, {move: data.move, powerUp: data.powerup})
+		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, { move: data.move, powerUp: data.powerup })
 	}
 
 	userState(id: number): { state: string, gameId?: UUID } {
 		return this.gameCluster.findUserStateById(id)
 	}
 
-	saveGame(game : Game, gameId: UUID) {
+	saveGame(game: Game, gameId: UUID) {
 		if (!game)
 			throw new NotFoundException('Game not found');
 		const savedGame = new SavedGame();
@@ -71,12 +72,23 @@ export class GameService {
 
 	quitGame(Userid: number, gameId: UUID) {
 		console.log("game", this.gameCluster.findOne(gameId));
+		this.usersService.disconnect(Userid)
 		const game = this.gameCluster.destroyGame(gameId, Userid);
 		console.log("game", game)
 		if (game)
 			return this.saveGame(game, gameId);
 		else
 			return "null"
+	}
+
+	getListGames(page: number) {
+		return this.repo.find({
+			order: {
+				date: 'DESC'
+			},
+			take: 10,
+			skip: page * 10
+		})
 	}
 
 }
