@@ -2,6 +2,7 @@ import { UUID } from '../type';
 import { User } from '../model/user.entity'
 import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
+import { GameCluster } from './game-cluster';
 
 const paddleLength = 100
 const paddleWidth = 5
@@ -65,7 +66,7 @@ export class Game {
 	private readonly playerRoom: string
 	private readonly viewerRoom: string
 
-	constructor(public gameId: UUID, private server: Server, private privateGame: boolean = false) {
+	constructor(public gameId: UUID, private server: Server, private privateGame: boolean = false, private gameCluster: GameCluster) {
 		this.playerRoom = gameId + ":player"
 		this.viewerRoom = gameId + ":viewer"
 	}
@@ -229,6 +230,7 @@ export class Game {
 			if (this.players[0].score + this.players[1]?.score === gameRounds) {
 				this.status = GameStatus.end
 				clearInterval(this.intervalId)
+				this.gameCluster.destroyGame(this.gameId);
 			}
 			//Reset des momentum
 			this.players.forEach((player) => {

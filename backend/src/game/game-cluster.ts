@@ -25,7 +25,7 @@ export class GameCluster {
 	}
 
 	createGame(privateGame: boolean = false): Game {
-		const game = new Game(this.generateGameId(), this.server, privateGame);
+		const game = new Game(this.generateGameId(), this.server, privateGame, this);
 		this.gamesMap.set(game.id, game);
 		return game;
 	};
@@ -84,6 +84,7 @@ export class GameCluster {
 				}
 			}
 		}
+		console.log("destroying game: ", gameId); 
 		this.gamesMap.delete(gameId)
 		return game;
 	}

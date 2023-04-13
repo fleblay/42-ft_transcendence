@@ -65,12 +65,14 @@ export class GameService {
 		savedGame.id = gameId;
 		savedGame.players = game.players.map(player => player.user);
 		savedGame.score = game.players.map(player => player.score);
+		console.log("savedGame", savedGame);
 		this.repo.save(savedGame);
 	}
 
 	quitGame(Userid: number, gameId: UUID) {
 		console.log("game", this.gameCluster.findOne(gameId));
 		const game = this.gameCluster.destroyGame(gameId, Userid);
+		console.log("game", game)
 		if (game)
 			return this.saveGame(game, gameId);
 		else
