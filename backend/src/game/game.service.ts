@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Server, Socket } from 'socket.io'
-import { SavedGame } from 'src/model/saved-game.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { GameCluster } from './game-cluster';
@@ -9,7 +8,7 @@ import { User } from 'src/model/user.entity';
 import { UUID } from '../type';
 import { PlayerInputDto } from '../events/dtos/player-input.dto'
 import { IgameInfo } from './game';
-
+import { SavedGame } from '../model/saved-game.entity';
 
 @Injectable()
 export class GameService {
@@ -57,4 +56,10 @@ export class GameService {
 	userState(id: number): { state: string, gameId?: UUID } {
 		return this.gameCluster.findUserStateById(id)
 	}
+
+	quitGame(id: number, gameId: UUID) {
+		console.log("game", this.gameCluster.findOne(gameId));
+		return "quite game, not implemented yet"
+	}
+
 }
