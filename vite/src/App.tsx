@@ -14,6 +14,7 @@ import apiClient from './auth/interceptor.axios'
 import { ResponsiveAppBar } from './component/ResponsiveAppBar'
 import { SocketProvider } from './socket/SocketProvider'
 import Leaderboard from './pages/Leaderboards'
+import { MuiAppBar } from './component/menu'
 
 export interface Destinations {
 	name: string,
@@ -184,7 +185,7 @@ function App() {
 						<Route path="/login" element={<LoginForm />} />
 						<Route path="/register" element={<RegisterForm />} />
 						<Route path="/allusers" element={<ListUsers />} />
-						<Route path="/testMenu" element={<ResponsiveAppBar />} />
+						<Route path="/testMenu" element={<MuiAppBar />} />
 						<Route path="/top" element={<Leaderboard />} />
 						<Route path='*' element={<div>404</div>} />
 
