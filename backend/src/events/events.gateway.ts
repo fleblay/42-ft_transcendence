@@ -72,15 +72,17 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	async handleDisconnect(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
+		console.log("event gateway handleDisconnect")
 		const foundUser = await this.authService.decodeToken(bearerToken)
 
-		if (foundUser)
+		if (foundUser) {
 			console.log("Disconnect User:", foundUser.username)
+			this.userServices.disconnect(foundUser.id)
+		}
 		const toRemove = this.connectedSockets.findIndex((e) => e.id == socket.id)
 		if (toRemove != -1) {
 			console.log("Removing Disconnected socket:", socket.id)
 			this.connectedSockets.splice(toRemove, 1)
-			this.userServices.disconnect(foundUser.id)
 		}
 	}
 

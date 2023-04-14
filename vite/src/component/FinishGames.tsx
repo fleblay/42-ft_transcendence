@@ -40,10 +40,10 @@ export function FinishGames() {
 						return (
 							<tr key={game.id}>
 								<td>{game.id}</td>
-								<td>{game.players}</td>
+								<td>{game.players[0].username} {game.players[1].username}</td>
 								<td>{game.score}</td>
 								<td>{game.date}</td>
-								<td>{game.winner}</td>
+								<td>{game.winner.username}</td>
 							</tr>
 						)
 					})}

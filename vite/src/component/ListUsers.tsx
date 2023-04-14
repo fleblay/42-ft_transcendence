@@ -35,7 +35,7 @@ export function ListUsers() {
 				})
 			.then(async (partialUserList: User[]) => {
 				let partialUserList2 : User[] = await Promise.all(partialUserList.map(async (e: User) => {
-					const userStatus = (await apiClient .get(`/api/game/userinfo/${e.id}`)).data as UserStatus
+					const userStatus = (await apiClient .get(`/api/game/userstate/${e.id}`)).data as UserStatus
 					const isConnected = (await apiClient .get(`/api/users/connected/${e.id}`)).data as boolean
 					console.log("This is connected status", isConnected)
 					return {...e, ...userStatus, isConnected}

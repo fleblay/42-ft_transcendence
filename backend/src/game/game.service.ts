@@ -59,8 +59,6 @@ export class GameService {
 		return this.gameCluster.findUserStateById(id)
 	}
 
-
-
 	quitGame(Userid: number, gameId: UUID) {
 		const gameInfo = this.gameCluster.playerQuit(gameId, Userid);
 		//console.log("game", this.gameCluster.findOne(gameId));
@@ -83,5 +81,4 @@ export class GameService {
 			skip: page * 10
 		})
 	}
-
 }
