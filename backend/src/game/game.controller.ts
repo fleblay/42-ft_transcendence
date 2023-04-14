@@ -20,6 +20,11 @@ export class GameController {
 		return this.gameService.userState(parseInt(id))
 	}
 
+	@Get("/usergames/:id")
+	getUserGames(@Param('id') id: string){
+		return this.gameService.getListGamesByUser(parseInt(id))
+	}
+
 
 	@UseGuards(ATGuard)
 	@Get("/quit/:gameId")

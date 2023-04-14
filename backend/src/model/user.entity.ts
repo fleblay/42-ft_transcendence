@@ -15,7 +15,7 @@ export class User {
 	password: string;
 	
 	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
-	@JoinTable()
+	@JoinTable({})
 	savedGames: SavedGame[];
 
 	@OneToMany(() => SavedGame, (savedGame) => savedGame.winner)
