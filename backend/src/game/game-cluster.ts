@@ -58,6 +58,8 @@ export class GameCluster {
 		let stateArray: string[] = []
 		let gameIdArray: string[] = []
 		for (const game of this.gamesMap.values()) {
+			if (!game.players)
+				continue
 			if (game.players.find(player => player.user.id === id)) {
 				stateArray.push("Ingame")
 				gameIdArray.push(game.gameId)
