@@ -6,14 +6,10 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip'; 0
 import * as React from 'react';
-import { MenuBook } from '@mui/icons-material';
-import ResponsiveAppBar from './ResponsiveAppBar';
-import { Grid } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const pages = ['Game', 'Leaderboard', 'Chat', 'About'];
 const menu = ['My profil', 'friends', 'Logout'];
@@ -22,6 +18,8 @@ export function MuiAppBar() {
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const navigate = useNavigate();
+
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -38,12 +36,17 @@ export function MuiAppBar() {
         setAnchorElUser(null);
     };
 
+    const handleNavigate = (page: string) => {
+        console.log("handleNavigate", page)
+        navigate("/" + page);
+    };
+
 
     return (
         <AppBar position="static">
             <Toolbar>
                 <IconButton size="large" edge="start" color="inherit" aria-label="logo" href="/">
-                    <SportsTennisIcon />
+                    <SportsTennisIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
                 </IconButton>
                 <Typography
                     variant="h6"
@@ -63,6 +66,63 @@ export function MuiAppBar() {
                     CYBER PONG
                 </Typography>
 
+                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                    <IconButton
+                        size="large"
+                        aria-label="account of current user"
+                        aria-controls="menu-appbar"
+                        aria-haspopup="true"
+                        onClick={handleOpenNavMenu}
+                        color="inherit"
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                    <Menu
+                        id="menu-appbar"
+                        anchorEl={anchorElNav}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                        open={Boolean(anchorElNav)}
+                        onClose={handleCloseNavMenu}
+                        sx={{
+                            display: { xs: 'block', md: 'none' },
+                        }}
+                    >
+                        {pages.map((page) => (
+                            <MenuItem key={page} onClick={() => handleNavigate(page)}>
+                                <Typography textAlign="center">{page}</Typography>
+                            </MenuItem>
+                        ))}
+                    </Menu>
+                </Box>
+
+                <SportsTennisIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+                <Typography
+                    variant="h5"
+                    noWrap
+                    component="a"
+                    href=""
+                    sx={{
+                        mr: 2,
+                        display: { xs: 'flex', md: 'none' },
+                        flexGrow: 1,
+                        fontFamily: 'monospace',
+                        fontWeight: 700,
+                        letterSpacing: '.3rem',
+                        color: 'inherit',
+                        textDecoration: 'none',
+                    }}
+                >
+                    CYBER PONG
+                </Typography>
+
                 <Box
                     display="flex"
                     justifyContent="center"
@@ -71,7 +131,7 @@ export function MuiAppBar() {
                     {pages.map((page) => (
                         <Button
                             key={page}
-                            onClick={handleCloseNavMenu}
+                            onClick={() => handleNavigate(page)}
                             sx={{ my: 4, color: 'white', display: 'block', fontWeight: 700 }}
                         >
                             {page}
@@ -80,40 +140,39 @@ export function MuiAppBar() {
 
                 </Box>
 
-                <Box  display="flex" sx={{ flexGrow: 0, flexDirection: 'row', marginLeft: 'auto'}}>
+                <Box display="flex" sx={{ flexGrow: 0, marginLeft: 'auto' }}>
 
-                        <IconButton sx={{ p: 0 }}>
-                            <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                        </IconButton>
-                <Button onClick={handleOpenUserMenu} sx={{ my: 4, color: 'white', display: 'block', fontWeight: 700 }}>
-                    my profil
-                </Button>
-                <Menu
-                    sx={{ mt: '45px' }}
-                    id="menu-appbar"
-                    anchorEl={anchorElUser}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    open={Boolean(anchorElUser)}
-                    onClose={handleCloseUserMenu}
-                >
-                    {menu.map((menu) => (
-                        <MenuItem key={menu} onClick={handleCloseUserMenu}>
-                            <Typography textAlign="center">{menu}</Typography>
-                        </MenuItem>
-                    ))}
-                </Menu>
-            </Box>
+                    <IconButton sx={{ p: 0 }}>
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                    </IconButton>
+                    <Button onClick={handleOpenUserMenu} sx={{ color: 'white', display: 'block', fontWeight: 700 }}>
+                        my profil
+                    </Button>
+                    <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar"
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                    >
+                        {menu.map((menu) => (
+                            <MenuItem key={menu} onClick={()=> handleNavigate(menu)}>
+                                <Typography textAlign="center">{menu}</Typography>
+                            </MenuItem>
+                        ))}
+                    </Menu>
+                </Box>
 
-
-        </Toolbar>
+            </Toolbar>
         </AppBar >
     );
 }

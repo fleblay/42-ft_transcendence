@@ -23,16 +23,16 @@ export interface Destinations {
 }
 
 export const allRoutes: Destinations[] = [
-	{ name: "Register", path: "/register", public: true },
-	{ name: "Login", path: "/login", public: true },
-	{ name: "Public", path: "/public", public: true },
-	{ name: "About", path: "/about", public: true },
-	{ name: "Chat", path: "/chat", public: false },
-	{ name: "Game", path: "/game", public: false },
-	{ name: "ListAll", path: "/list", public: true },
-	{ name: "Leaderboard", path: "/top", public: false },
-	{ name: "UserDataBase", path: "/allusers", public: false },
-	{ name: "testMenu", path: "/testMenu", public: false },
+	{ name: "Register", path: "/Register", public: true },
+	{ name: "Login", path: "/Login", public: true },
+	{ name: "Public", path: "/Public", public: true },
+	{ name: "About", path: "/About", public: true },
+	{ name: "Chat", path: "/Chat", public: false },
+	{ name: "Game", path: "/Game", public: false },
+	{ name: "ListAll", path: "/List", public: true },
+	{ name: "Leaderboard", path: "/Leaderboard", public: false },
+	{ name: "UserDataBase", path: "/Allusers", public: false },
+	{ name: "testMenu", path: "/TestMenu", public: false },
 ]
 
 export interface IUser {
@@ -90,10 +90,10 @@ function Header() {
 
 			<ul>
 				<li>
-					<Link to="/game">Game Page</Link>
+					<Link to="/Game">Game Page</Link>
 				</li>
 				<li>
-					<Link to="/chat">Chat Page</Link>
+					<Link to="/Chat">Chat Page</Link>
 				</li>
 			</ul>
 
@@ -156,6 +156,8 @@ function App() {
 	return (
 		<AuthService>
 			<SocketProvider>
+			<MuiAppBar />
+
 				<Routes>
 					<Route element={<div> <Destinations /> <Header /> </div>}>
 						<Route path="/" element={<Navigate to='/game' replace />} />
@@ -182,13 +184,12 @@ function App() {
 								</RequireAuth>
 							}
 						/>
-						<Route path="/login" element={<LoginForm />} />
-						<Route path="/register" element={<RegisterForm />} />
-						<Route path="/allusers" element={<ListUsers />} />
-						<Route path="/testMenu" element={<MuiAppBar />} />
-						<Route path="/top" element={<Leaderboard />} />
+						<Route path="/Login" element={<LoginForm />} />
+						<Route path="/Register" element={<RegisterForm />} />
+						<Route path="/Allusers" element={<ListUsers />} />
+						<Route path="/TestMenu" element={<MuiAppBar />} />
+						<Route path="/Leaderboard" element={<Leaderboard />} />
 						<Route path='*' element={<div>404</div>} />
-
 					</Route>
 				</Routes>
 			</SocketProvider>
