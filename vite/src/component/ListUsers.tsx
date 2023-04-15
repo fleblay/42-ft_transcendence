@@ -25,7 +25,7 @@ export function ListUsers() {
 			apiClient
 			.get("/api/users/all")
 			.then((response) => {
-				console.log(response)
+				console.log("ressponse from all: ", response)
 				setInfo("Successfully retrieve infos :")
 				let partialUserList = response.data.map((elem : User) => {
 					let {password, ...userInfo} = elem

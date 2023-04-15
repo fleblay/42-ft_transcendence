@@ -63,8 +63,7 @@ export class GameService {
 		const gameInfo = this.gameCluster.playerQuit(gameId, Userid);
 		//console.log("game", this.gameCluster.findOne(gameId));
 		console.log("game", gameInfo)
-		if (gameInfo)
-		{
+		if (gameInfo) {
 			let saveObject = this.repo.create(gameInfo);
 			return this.repo.save(saveObject);
 		}
@@ -81,4 +80,14 @@ export class GameService {
 			skip: page * 10
 		})
 	}
+
+	async getListGamesByUser(id: number) {
+		const fullDB = await this.repo.createQueryBuilder("game")
+			.leftJoin("game.players", "player")
+			.addSelect(['player.id', 'player.username'])
+			.getMany()
+		return fullDB.filter((element) => element.players[0].id == id || element.players[1] .id== id)
+	}
 }
+//.leftJoinAndSelect("game.players", "players")
+//.where("game.id = :gameId", {gameId: "d38c3c7f-8f2f-4808-9645-fce150dcac3d"})
