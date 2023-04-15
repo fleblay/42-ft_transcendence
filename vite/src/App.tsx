@@ -156,7 +156,9 @@ function App() {
 	return (
 		<AuthService>
 			<SocketProvider>
-			<MuiAppBar />
+				<RequireAuth>
+					<MuiAppBar />
+				</RequireAuth>
 
 				<Routes>
 					<Route element={<div> <Destinations /> <Header /> </div>}>
