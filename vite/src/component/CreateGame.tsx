@@ -77,6 +77,7 @@ export function CreateGame() {
 					border: '1px solid #D3C6C6',
 					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
 					borderRadius: '16px',
+					p: '2rem',
 				}}>
 					<Stepper activeStep={activeStep} alternativeLabel>
 						{steps.map((step) => (
