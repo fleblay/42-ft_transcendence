@@ -67,10 +67,6 @@ export function CreateGame() {
 	const [activeStep, setActiveStep] = React.useState(0);
 	return (
 		<>
-			<div>
-				<input type="checkbox" id="scales" name="scales" />
-				<label>Privee</label>
-			</div>
 			<Container maxWidth="md">
 				<Box sx={{
 					width: '100%',
@@ -87,14 +83,14 @@ export function CreateGame() {
 						))}
 					</Stepper>
 
-					<span>Privee</span>
+					<span>Private</span>
 					<Checkbox onChange={(e) => { setPrivateGame(e.target.checked) }} />
 
 					<Button variant='contained' onClick={() => {
 						setActiveStep(1);
 						joinGames()
 					}}>
-						{privateGame ? "Creer une game privee" : "Trouver une game public"}
+						{privateGame ? "Create a private game" : "Join a game"}
 					</Button>
 				</Box>
 			</Container>
