@@ -98,7 +98,9 @@ export function CreateGame() {
 				</Box>
 			</Container>
 			<JoinGames joinGames={joinGames} />
-			<FinishGames />
+			<Container maxWidth="md">
+				<FinishGames />
+			</Container>
 		</>
 	);
 }

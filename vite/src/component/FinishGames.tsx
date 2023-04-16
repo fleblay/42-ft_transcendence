@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getAccessToken } from "../token/token";
 import apiClient from "../auth/interceptor.axios";
+import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid } from "@mui/material";
 
 interface FormData {
 	username: string;
 	email: string;
 	password: string;
 }
+
 
 export function FinishGames() {
 
@@ -25,41 +27,50 @@ export function FinishGames() {
 
 	return (
 		<div>
-			<table>
-				<thead>
-					<tr>
-						<th>id</th>
-						<th>players</th>
-						<th>score</th>
-						<th>date</th>
-						<th>winner</th>
-					</tr>
-				</thead>
-				<tbody>
-					{listGames?.map((game: any) => {
-						return (
-							<tr key={game.id}>
-								<td>{game.id}</td>
-								<td>{game.players[0].username} {game.players[1].username}</td>
-								<td>{game.score}</td>
-								<td>{game.date}</td>
-								<td>{game.winner.username}</td>
-							</tr>
-						)
-					})}
-				</tbody>
-			</table>
-			<button onClick={() => {
-				if (gamePage > 0) {
-					setGamePage(gamePage - 1)
-				}
-			}}>Previous</button>
-			<label>{gamePage}</label>
-			<button onClick={() => {
-				if (listGames.length === 10) {
-					setGamePage(gamePage + 1)
-				}
-			}}>Next</button>
+
+			<TableContainer component={Paper}>
+				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+					<TableHead>
+						<TableRow>
+							<TableCell>Game id</TableCell>
+							<TableCell align="right">Players</TableCell>
+							<TableCell align="right">Score</TableCell>
+							<TableCell align="right">Date</TableCell>
+							<TableCell align="right">Winner</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{listGames.map((game: any) => (
+							<TableRow
+								key={game.id}
+								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+							>
+								<TableCell component="th" scope="row">
+									{game.id}
+								</TableCell>
+								<TableCell align="right">{game.players[0].username} {game.players[1].username}</TableCell>
+								<TableCell align="right">{game.score}</TableCell>
+								<TableCell align="right">{game.date}</TableCell>
+								<TableCell align="right">{game.winner.username}</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</TableContainer>
+
+			<Grid container justifyContent="flex-end">
+				<Button variant="outlined" onClick={() => {
+					if (gamePage > 0) {
+						setGamePage(gamePage - 1)
+					}
+				}}>Previous</Button>
+				<label style={{ padding: '5px 15px' }}>{gamePage}</label>
+				<Button variant="outlined" onClick={() => {
+					if (listGames.length === 10) {
+						setGamePage(gamePage + 1)
+					}
+				}}>Next</Button>
+			</Grid>
 		</div>
 	);
 }
