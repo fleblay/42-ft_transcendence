@@ -1,6 +1,7 @@
 
 import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { SavedGame } from './saved-game.entity';
+import { Url } from 'url';
 
 @Entity()
 export class User {
@@ -13,6 +14,9 @@ export class User {
 	email: string;
 	@Column()
 	password: string;
+
+	@Column({default: "/default-avatar.png"})
+	avatar: string;
 	
 	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
 	@JoinTable({})

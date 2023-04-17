@@ -15,6 +15,7 @@ import { ResponsiveAppBar } from './component/ResponsiveAppBar'
 import { SocketProvider } from './socket/SocketProvider'
 import Leaderboard from './pages/Leaderboards'
 import { MuiAppBar } from './component/menu'
+import { MyProfil } from './component/MyProfil'
 
 export interface Destinations {
 	name: string,
@@ -33,6 +34,8 @@ export const allRoutes: Destinations[] = [
 	{ name: "Leaderboard", path: "/Leaderboard", public: false },
 	{ name: "UserDataBase", path: "/Allusers", public: false },
 	{ name: "testMenu", path: "/TestMenu", public: false },
+	{ name: "MyProfil", path: "/MyProfil", public: false },
+
 ]
 
 export interface IUser {
@@ -191,6 +194,8 @@ function App() {
 						<Route path="/Allusers" element={<ListUsers />} />
 						<Route path="/TestMenu" element={<MuiAppBar />} />
 						<Route path="/Leaderboard" element={<Leaderboard />} />
+						<Route path="/MyProfil" element={<MyProfil />} />
+
 						<Route path='*' element={<div>404</div>} />
 					</Route>
 				</Routes>

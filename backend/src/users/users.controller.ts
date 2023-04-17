@@ -1,4 +1,4 @@
-import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers} from '@nestjs/common';
+import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors} from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -7,6 +7,8 @@ import { LoginUserDto } from './dtos/login-user.dto';
 import { ATGuard } from './guard/access-token.guard';
 import {CurrentUser} from './decorators/current-user.decorator'
 import { User } from "src/model/user.entity";
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadedFile } from '@nestjs/common';
 //import { Serialize } from 'src/interceptors/serialize.interceptor';
 //import { UserDto } from './dtos/user.dto';
 
@@ -59,6 +61,16 @@ export class UsersController {
 		}
 		const token = auth.replace('Bearer ', '');
 		return this.authService.validateAccessToken(token);
+	}
+
+	@UseGuards(ATGuard)
+	@Post('/uploadAvatar')
+	@UseInterceptors(FileInterceptor('image'))
+	async uploadAvatar(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File)
+	{
+		console.log("coucou");
+		return await this.usersService.uploadAvatar(user, file);
+		//return await this.usersService.uploadAvatar(user.id, body);
 	}
 
 }

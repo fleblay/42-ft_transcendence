@@ -38,7 +38,8 @@ export function MuiAppBar() {
 
     const handleNavigate = (page: string) => {
         console.log("handleNavigate", page)
-        navigate("/" + page);
+		const path = page.replace(/\s/g, '');
+        navigate("/" + path);
     };
 
 

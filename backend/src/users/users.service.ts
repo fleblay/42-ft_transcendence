@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { User } from '../model/user.entity'
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UserStatus } from '../type';
+import { createWriteStream } from 'fs';
+
 
 @Injectable()
 export class UsersService {
@@ -11,7 +13,7 @@ export class UsersService {
 	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
 
 	constructor(@InjectRepository(User) private repo: Repository<User>) {
-		setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
+		//setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
 }
 
 	create(dataUser: CreateUserDto) {
@@ -91,6 +93,21 @@ export class UsersService {
 		console.log("user.service.disconnect")
 		this.changeStatus(id, { oldStatus: UserStatus.online })
 	}
+
+	async uploadAvatar(user: User , file: Express.Multer.File) {
+		const path = '/usr/src/app/Avatars/' + user.id + '.png';
+		console.log("user.controller.uploadAvatar", file.buffer);
+		const writeStream = createWriteStream(path);
+		writeStream.write(file.buffer);
+		writeStream.end();
+		console.log("user.controller.uploadAvatar");
+		//save image
+		user.avatar = path;
+		console.log("path", path);
+		console.log ("user", user);
+		return this.repo.save(user);
+	}
+
 
 
 }
