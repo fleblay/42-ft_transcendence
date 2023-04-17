@@ -7,7 +7,7 @@ import { AuthProvider } from './auth'
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
 import { CreateGame } from './component/CreateGame'
-import { ListUsers } from './component/ListUsers'
+import { ListUsers, FakeGames } from './component/ListUsers'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { GamePage } from './component/GameScreen'
 import apiClient from './auth/interceptor.axios'
@@ -188,7 +188,7 @@ function App() {
 						/>
 						<Route path="/Login" element={<LoginForm />} />
 						<Route path="/Register" element={<RegisterForm />} />
-						<Route path="/Allusers" element={<ListUsers />} />
+						<Route path="/Allusers" element={<><ListUsers /> <FakeGames/></>} />
 						<Route path="/TestMenu" element={<MuiAppBar />} />
 						<Route path="/Leaderboard" element={<Leaderboard />} />
 						<Route path='*' element={<div>404</div>} />
