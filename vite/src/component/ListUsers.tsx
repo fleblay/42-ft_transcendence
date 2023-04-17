@@ -1,6 +1,14 @@
 import { useState} from "react";
 import apiClient from '../auth/interceptor.axios'
 
+type Games = {
+	date: string,
+	id: string,
+	score: number[]
+	players: Partial<User>[]
+	winner: Partial<User>
+}
+
 type User = {
 	email: string,
 	id: number,
@@ -9,6 +17,9 @@ type User = {
 	state?: string,
 	gameId?: string
 	isConnected?: boolean
+	savedGames: Games[]
+	wonGames: Games[]
+	totalScore: number
 }
 
 type UserStatus = {
@@ -37,8 +48,11 @@ export function ListUsers() {
 				let partialUserList2 : User[] = await Promise.all(partialUserList.map(async (e: User) => {
 					const userStatus = (await apiClient .get(`/api/game/userstate/${e.id}`)).data as UserStatus
 					const isConnected = (await apiClient .get(`/api/users/connected/${e.id}`)).data as boolean
+					const totalScore = e.wonGames.reduce((acc, curr) => {
+						return acc + Math.max(...curr.score)
+						}, 0)
 					console.log("This is connected status", isConnected)
-					return {...e, ...userStatus, isConnected}
+					return {...e, ...userStatus, isConnected, totalScore}
 					}))
 				return(partialUserList2)
 				})
@@ -49,6 +63,7 @@ export function ListUsers() {
 							<ul style={{listStyleType: "none"}}>
 							<li>{elem.username}</li>
 							<li>{elem.email}</li>
+							<li>Total score : {elem.totalScore}</li>
 							<li>{elem.state} {elem.gameId}</li>
 							<li>{(elem.isConnected) ? "En ligne": "Offline"}</li>
 							</ul>
