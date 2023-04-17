@@ -1,5 +1,4 @@
 import axios, { AxiosHeaders } from 'axios';
-import jwt_decode from "jwt-decode";
 import { getAccessToken, saveToken, getRefreshToken } from '../token/token';
 
 
@@ -63,6 +62,7 @@ apiClient.interceptors.response.use(
 								localStorage.removeItem('refresh_token');
 								saveToken(response.data);
 								originalRequest.headers.Authorization = `Bearer ${getAccessToken()}`;
+								resolve(axios(originalRequest));
 								onRefreshed(getAccessToken());
 							}
 						})

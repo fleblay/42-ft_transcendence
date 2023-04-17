@@ -27,12 +27,11 @@ export class AuthController {
 		return allUser;
 	}
 
-	@Post('/logout')
+	@Get('/logout')
 	@UseGuards(ATGuard)
 	async logout(@Request() req){
 		console.log('logout');
 		const refreshToken = req.get('X-Refresh-Token');
-		
 		return this.authService.deleteRefreshToken(refreshToken);
 	}
 		

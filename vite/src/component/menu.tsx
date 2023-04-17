@@ -10,15 +10,17 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthService } from '../auth/AuthService';
 
 const pages = ['Game', 'Leaderboard', 'Chat', 'About'];
-const menu = ['My profil', 'friends', 'Logout'];
+const menu = ['My profil', 'friends', 'Logout', 'all refresh token'];
 
 export function MuiAppBar() {
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
+	const auth = useAuthService();
 
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -37,6 +39,10 @@ export function MuiAppBar() {
     };
 
     const handleNavigate = (page: string) => {
+		if (page === 'Logout') {
+			auth.logout();
+			return;
+		}
         console.log("handleNavigate", page)
 		const path = page.replace(/\s/g, '');
         navigate("/" + path);

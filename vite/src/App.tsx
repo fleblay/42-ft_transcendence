@@ -16,6 +16,7 @@ import { SocketProvider } from './socket/SocketProvider'
 import Leaderboard from './pages/Leaderboards'
 import { MuiAppBar } from './component/menu'
 import { MyProfil } from './component/MyProfil'
+import { AllRefreshToken } from './component/TokenView'
 
 export interface Destinations {
 	name: string,
@@ -35,6 +36,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "UserDataBase", path: "/Allusers", public: false },
 	{ name: "testMenu", path: "/TestMenu", public: false },
 	{ name: "MyProfil", path: "/MyProfil", public: false },
+	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
 
 ]
 
@@ -195,6 +197,7 @@ function App() {
 						<Route path="/TestMenu" element={<MuiAppBar />} />
 						<Route path="/Leaderboard" element={<Leaderboard />} />
 						<Route path="/MyProfil" element={<MyProfil />} />
+						<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
 
 						<Route path='*' element={<div>404</div>} />
 					</Route>

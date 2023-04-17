@@ -29,15 +29,6 @@ export class UsersController {
 	};
 
 	@UseGuards(ATGuard)
-	@Get('/logout')
-	logout(@CurrentUser() user: User)
-	{
-		//Todo : supprimer le refresh de la BDD
-		console.log("user.controller.logout")
-		return ("OK")
-	}
-
-	@UseGuards(ATGuard)
 	@Get('/all')
 	async findAll()
 	{
