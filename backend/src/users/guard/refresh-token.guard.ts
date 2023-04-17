@@ -22,7 +22,7 @@ export class RTGuard implements CanActivate {
 		}
 		try {
 			const user =  await this.authService.validateRefreshToken(refreshToken);
-			console.log("user:" , user);
+			//console.log("user:" , user);
 			if (!user) {
 				return false;
 			}
@@ -30,9 +30,7 @@ export class RTGuard implements CanActivate {
 			return true;
 		} catch (e) {
 			console.error('RTGuard trycatch:', e)
-			return 	false;
+			return	false;
 		}
-		
-   
 	}
 }

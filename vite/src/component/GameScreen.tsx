@@ -72,6 +72,7 @@ export function GamePage() {
 			return (
 				<div>
 					Waiting for players...
+					<GameScreen gameInfo={gameInfo} gameId={idGame} />
 				</div>
 			);
 		}
