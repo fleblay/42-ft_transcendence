@@ -33,9 +33,6 @@ export function MyProfil() {
 		}
 		const formData = new FormData();
 		formData.append('image', fileToBlob(file as File));
-		const size =  new getCroppingRect();
-		formData.append('size', JSON.stringify(size));
-
 		apiClient.post('/api/users/uploadAvatar', formData, {
 			headers: {
 				'Content-Type': 'multipart/form-data'
@@ -53,16 +50,8 @@ export function MyProfil() {
 			<div>	Choose profil pic</div>
 			<input  type="file" onChange={handleChange} />
 			<Button type="submit">Submit</Button>
-			<div>{error}</div>
-			{file !== null  ? (<AvatarEditor
-      image={file}
-      width={250}
-      height={250}
-      border={50}
-      color={[255, 255, 255, 0.6]} // RGBA
-      scale={1.2}
-      rotate={0}
-    />): null}
+			<div> {error} </div>
+		
 		</form>
 
 	)
