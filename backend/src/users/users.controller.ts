@@ -27,20 +27,28 @@ export class UsersController {
 	};
 
 	@UseGuards(ATGuard)
-	@Get('/all')
-	async findAll()
-	{
-		const allUser = await this.usersService.getAll();
-		return allUser;
-	}
-
-	@UseGuards(ATGuard)
 	@Get('/logout')
 	logout(@CurrentUser() user: User)
 	{
 		//Todo : supprimer le refresh de la BDD
 		console.log("user.controller.logout")
 		return ("OK")
+	}
+
+	@UseGuards(ATGuard)
+	@Get('/:id')
+	async findOne(@Param("id") id: string)
+	{
+		const user = await this.usersService.findOne(parseInt(id));
+		return user;
+	}
+
+	@UseGuards(ATGuard)
+	@Get('/all')
+	async findAll()
+	{
+		const allUser = await this.usersService.getAll();
+		return allUser;
 	}
 
 	@UseGuards(ATGuard)
