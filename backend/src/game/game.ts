@@ -40,7 +40,8 @@ export type Players = {
 	paddleWidth: number,
 	score: number,
 	user: User,
-	leaving: boolean;
+	leaving: boolean,
+	client: Socket
 }
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
@@ -150,7 +151,8 @@ export class Game {
 				paddleWidth: paddleWidth,
 				score: 0,
 				user,
-				leaving: false
+				leaving: false,
+				client
 			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1) {
@@ -180,6 +182,7 @@ export class Game {
 		else if (newBall.y < ballSize && this.velocityBall.y < 0) {
 			this.velocityBall.y *= -1
 		}
+
 
 		let intersect: Pos2D = {x: 0, y: 0}
 		let relativeIntersectY: number = 0
@@ -230,7 +233,7 @@ export class Game {
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
-				this.status = GameStatus.waiting
+				this.status = GameStatus.start
 				setTimeout(() => this.status = GameStatus.playing, 3000)
 				this.players[1].score += 1
 				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
@@ -241,7 +244,7 @@ export class Game {
 				})
 			}
 			else if (this.posBall.x >= canvasWidth) {
-				this.status = GameStatus.waiting
+				this.status = GameStatus.start
 				setTimeout(() => this.status = GameStatus.playing, 3000)
 				this.players[0].score += 1
 				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
@@ -255,7 +258,6 @@ export class Game {
 			//Condition fin de jeu
 			if (this.players[0].score + this.players[1]?.score === gameRounds) {
 				this.status = GameStatus.end
-				clearInterval(this.intervalId)
 			}
 			//Reset des momentum
 			this.players.forEach((player) => {
@@ -263,6 +265,8 @@ export class Game {
 					player.momentum = 0
 			})
 		}
+		if (this.status == GameStatus.end)
+			clearInterval(this.intervalId)
 		//Envoi des infos
 		this.updateInfo(this.generateGameInfo());
 	}

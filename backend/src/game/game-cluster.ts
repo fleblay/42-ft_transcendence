@@ -9,7 +9,6 @@ import { GameStatus } from './game';
 //server.to(gameId).emit('message')
 
 
-
 //import { Map } from 'immutable';
 
 @Injectable()
@@ -18,6 +17,13 @@ export class GameCluster {
 	private server: Server
 
 	constructor() {
+		setInterval(() => {
+			const info = []
+			this.gamesMap.forEach((e) => {
+				info.push(e.players.map((e) => e.user.id).join('-'))
+			})
+			console.log("This is the game cluster", info)
+		}, 5000)
 	}
 
 	setServer(newserver: Server) {
@@ -37,6 +43,14 @@ export class GameCluster {
 	findAvailable() {
 		for (const game of this.gamesMap.values()) {
 			if (game.freeSlot)
+				return game;
+		}
+		return null;
+	}
+
+	findByClient(client: Socket) : Game | null {
+		for (const game of this.gamesMap.values()) {
+			if (game.players.find((player)=>{player.client == client}))
 				return game;
 		}
 		return null;
@@ -63,11 +77,11 @@ export class GameCluster {
 				continue
 			if (game.players.find(player => player.user.id === id)) {
 				stateArray.push("Ingame")
-				gameIdArray.push(game.gameId)
+				gameIdArray.push(game.id)
 			}
 			if (game.viewers.find(viewer => viewer.id === id)) {
 				stateArray.push("Watching")
-				gameIdArray.push(game.gameId)
+				gameIdArray.push(game.id)
 			}
 		}
 		if (stateArray.length === 0)
@@ -91,16 +105,19 @@ export class GameCluster {
 		}
 	}
 
+
 	playerQuit(gameId: UUID, userId: number) {
 		const game = this.gamesMap.get(gameId);
 		let gameInfo = null;
 
 		if (!game) return;
 
-		if (game.status === GameStatus.waiting && game.players.length < 2) {
+		if (game.status === GameStatus.waiting
+			&& game.players.length < 2) {
 			this.gamesMap.delete(gameId);
 		}
-		else if (game.status === GameStatus.playing) {
+		else if (game.status === GameStatus.playing
+			|| game.status === GameStatus.start) {
 			this.rageQuit(game, userId);
 		}
 		if (game.status === GameStatus.end) {

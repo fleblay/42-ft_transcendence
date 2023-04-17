@@ -84,6 +84,10 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			console.log("Disconnect User:", foundUser.username)
 			this.userServices.disconnect(foundUser.id)
 		}
+		const currentGame = this.gameService.findByClient(socket)
+		if (currentGame && foundUser)
+			this.gameService.quitGame(foundUser.id, currentGame.id)
+
 		const toRemove = this.connectedSockets.findIndex((e) => e.id == socket.id)
 		if (toRemove != -1) {
 			console.log("Removing Disconnected socket:", socket.id)

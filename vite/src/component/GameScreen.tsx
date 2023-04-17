@@ -76,7 +76,7 @@ export function GamePage() {
 				</div>
 			);
 		}
-		if (gameInfo.status === GameStatus.playing) {
+		if (gameInfo.status === GameStatus.playing || gameInfo.status === GameStatus.start) {
 			return <GameScreen gameInfo={gameInfo} gameId={idGame} />
 		}
 		if (gameInfo.status === GameStatus.end) {
@@ -95,7 +95,7 @@ function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
 	return (
 		<div>
 			<div>Game finished</div>
-			<div>Winner: {gameInfo.players.map((player, index) => <div key={index}> {player.score}</div>)}</div>
+			<div>Winner: {gameInfo.players.map((player, index) => <div key={index}>{player.score}</div>)}</div>
 		</div>
 	)
 }

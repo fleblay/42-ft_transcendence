@@ -50,6 +50,10 @@ export class GameService {
 		return this.gameCluster.listAll()
 	}
 
+	findByClient(client: Socket) {
+		return this.gameCluster.findByClient(client)
+	}
+
 	handlePlayerInput(client: Socket, user: User, data: PlayerInputDto) {
 		//console.log("service input handle")
 		//console.log("data is : ", data)

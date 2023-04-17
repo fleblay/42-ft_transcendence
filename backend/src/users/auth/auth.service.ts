@@ -45,9 +45,9 @@ export class AuthService {
 
 	decodeToken(bearerToken: string): Promise<User> | null {
 		try {
-			console.log(`Bearer token is ${bearerToken}`)
+			//console.log(`Bearer token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.decode(bearerToken);
-			console.log(`Decode :  `, jwtResponse);
+			//console.log(`Decode :  `, jwtResponse);
 			return this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
 			console.log("Error in decode Token is :", e)
