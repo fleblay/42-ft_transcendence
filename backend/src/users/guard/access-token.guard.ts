@@ -27,7 +27,7 @@ export class ATGuard implements CanActivate {
 		if (decoded.exp < Date.now() / 1000)
 			throw new HttpException('Token invalide', 498);
         const user = await this.authService.validateAccessToken(bearerToken);
-		console.log("ATGuard: user", user);
+		//console.log("ATGuard: user", user);
 		if (!user || user === undefined) {
 			console.log("ATGuard: no user");
 			return false;

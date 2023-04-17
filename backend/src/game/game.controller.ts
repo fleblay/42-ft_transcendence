@@ -49,7 +49,7 @@ export class GameController {
 			throw new Error("Invalid page number");
 		}
 		const games = await this.gameService.getListGames(+page);
-		console.log('games: ', games);
+		//console.log('games: ', games);
 		return games;
 	}
 

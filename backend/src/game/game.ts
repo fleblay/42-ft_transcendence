@@ -59,7 +59,7 @@ interface PlayerInput {
 
 export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
-	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1) }
+	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
 	//private startTime: number = Date.now()
 	private intervalId: NodeJS.Timer
 	public players: Players[] = []
@@ -74,12 +74,12 @@ export class Game {
 	}
 
 	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
-		console.log("game input handle")
+		//console.log("game input handle")
 		const foundPlayer = this.players.find(player => userId === player.user.id)
 		if (foundPlayer === null)
 			return
 		if (input.move !== undefined) {
-			console.log(`Input is ${input.move}`)
+			//console.log(`Input is ${input.move}`)
 			switch (input.move) {
 				case ("Up"):
 					foundPlayer.momentum = (foundPlayer.momentum <= 0) ? foundPlayer.momentum - 1 : 0
@@ -104,7 +104,7 @@ export class Game {
 					foundPlayer.timeLastMove = Date.now()
 					break
 				default:
-					console.log(`Input is ${input.move}`)
+					//console.log(`Input is ${input.move}`)
 			}
 		}
 	}
@@ -158,7 +158,7 @@ export class Game {
 				this.play()
 			}
 			if (this.players.length === 2) {
-				this.status = GameStatus.playing;
+				setTimeout(() => this.status = GameStatus.playing, 3000)
 			}
 		}
 		else {
@@ -230,14 +230,26 @@ export class Game {
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
+				this.status = GameStatus.waiting
+				setTimeout(() => this.status = GameStatus.playing, 3000)
 				this.players[1].score += 1
 				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-				this.velocityBall = { x: (Math.random() > 0, 5) ? 1 : -1, y: (Math.random() > 0, 5) ? 1 : -1 }
+				this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
+				this.players.forEach((player) => {
+					player.pos = canvasHeight / 2 - player.paddleLength / 2
+					player.momentum = 0
+				})
 			}
 			else if (this.posBall.x >= canvasWidth) {
+				this.status = GameStatus.waiting
+				setTimeout(() => this.status = GameStatus.playing, 3000)
 				this.players[0].score += 1
 				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-				this.velocityBall = { x: (Math.random() > 0, 5) ? 1 : -1, y: (Math.random() > 0, 5) ? 1 : -1 }
+				this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
+				this.players.forEach((player) => {
+					player.pos = canvasHeight / 2 - player.paddleLength / 2
+					player.momentum = 0
+				})
 			}
 
 			//Condition fin de jeu

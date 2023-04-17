@@ -56,7 +56,7 @@ export function GamePage() {
 			if (!socket) return;
 			socket.off('game.update', onGameUpdate)
 		}
-	}, [])
+	}, [window.location.pathname])
 
 	if (loading === LoadingStatus.Loading) {
 		return (
@@ -72,6 +72,7 @@ export function GamePage() {
 			return (
 				<div>
 					Waiting for players...
+					<GameScreen gameInfo={gameInfo} gameId={idGame} />
 				</div>
 			);
 		}

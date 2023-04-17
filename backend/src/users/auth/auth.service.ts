@@ -50,12 +50,10 @@ export class AuthService {
 			console.log(`Decode :  `, jwtResponse);
 			return this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
-			console.log(`Error in decode Token is ${e}`)
+			console.log("Error in decode Token is :", e)
 			return null
 		}
 	}
-
-	//
 
 	async login(dataUser: LoginUserDto) {
 		const user = await this.usersService.findOneByEmail(dataUser.email);
@@ -105,6 +103,7 @@ export class AuthService {
 		}
 		report.refreshToken = refreshToken;
 		await this.repo.save(report);
+		//await this.repo.save({userId, refreshToken})
 	}
 
 	async refreshToken(refreshToken: string) {
