@@ -45,13 +45,17 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 			console.log('Receiving a message')
 			console.log(data)
 		}
-
+		function onDisconnect() {
+			console.log('Disconnected from socket')
+		}
 		socket.current.on('connect', onConnect);
+		socket.current.on('disconnect', onDisconnect);
 		socket.current.on('message', onMessage)
 		return () => {
 			if (!socket.current) return;
 			socket.current.off('connect', onConnect);
 			socket.current.off('message', onMessage);
+			socket.current.off('disconnect', onDisconnect);
 			if (socket.current.connected) {
 				socket.current.disconnect();
 				socket.current = null;
