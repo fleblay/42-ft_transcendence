@@ -26,6 +26,7 @@ export class RTGuard implements CanActivate {
 			if (!user) {
 				return false;
 			}
+			console.log("RTGuard return true");
 			return true;
 		} catch (e) {
 			console.error('RTGuard trycatch:', e)
