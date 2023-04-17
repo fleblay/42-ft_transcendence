@@ -4,6 +4,7 @@ import { Column, Entity, ManyToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedC
 export class RefreshToken {
     @PrimaryGeneratedColumn()
     id: number;
+
 	@Column()
 	refreshToken: string;
 

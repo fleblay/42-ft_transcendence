@@ -66,10 +66,11 @@ export class GameService {
 		console.log("game", gameInfo)
 		if (gameInfo) {
 			let saveObject = this.repo.create(gameInfo);
-			return this.repo.save(saveObject);
+			this.repo.save(saveObject);
+			return "Succes in leaving and saving game as last user"
 		}
 		else
-			return null;
+			return "Success in leaving game, a user is still inside";
 	}
 
 	getListGames(page: number) {
