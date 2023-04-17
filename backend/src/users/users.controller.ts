@@ -36,14 +36,6 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
-	@Get('/:id')
-	async findOne(@Param("id") id: string)
-	{
-		const user = await this.usersService.findOne(parseInt(id));
-		return user;
-	}
-
-	@UseGuards(ATGuard)
 	@Get('/all')
 	async findAll()
 	{
@@ -69,4 +61,11 @@ export class UsersController {
 		return this.authService.validateAccessToken(token);
 	}
 
+	@UseGuards(ATGuard)
+	@Get('/:id')
+	async findOne(@Param("id") id: string)
+	{
+		const user = await this.usersService.findOne(parseInt(id));
+		return user;
+	}
 }
