@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getAccessToken } from "../token/token";
 import apiClient from "../auth/interceptor.axios";
-import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid } from "@mui/material";
+import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link } from "@mui/material";
+import { Link as LinkRouter } from "react-router-dom";
 
 interface FormData {
 	username: string;
@@ -48,7 +49,11 @@ export function FinishGames() {
 								<TableCell component="th" scope="row">
 									{game.id}
 								</TableCell>
-								<TableCell align="right">{game.players[0].username} {game.players[1].username}</TableCell>
+								<TableCell align="right">
+									<Link component={LinkRouter} to={`/profile/${game.players[0].id}`}>{game.players[0].username}</Link>
+									{' | '}
+									<Link component={LinkRouter} to={`/profile/${game.players[1].id}`}>{game.players[1].username}</Link>
+								</TableCell>
 								<TableCell align="right">{game.score}</TableCell>
 								<TableCell align="right">{game.date}</TableCell>
 								<TableCell align="right">{game.winner.username}</TableCell>
