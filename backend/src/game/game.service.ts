@@ -93,6 +93,8 @@ export class GameService {
 	async saveFakeGame() {
 		const game = new SavedGame()
 		const playersList : User[] = await this.usersService.getAll()
+		if (playersList.length < 2)
+			throw new NotFoundException('Only one useer in DB');
 		let randUser1: User = playersList[Math.floor(Math.random() * playersList.length)]
 		let randUser2: User = playersList[Math.floor(Math.random() * playersList.length)]
 
