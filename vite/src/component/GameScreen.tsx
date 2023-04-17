@@ -56,7 +56,7 @@ export function GamePage() {
 			if (!socket) return;
 			socket.off('game.update', onGameUpdate)
 		}
-	}, [])
+	}, [window.location.pathname])
 
 	if (loading === LoadingStatus.Loading) {
 		return (

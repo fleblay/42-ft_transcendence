@@ -45,7 +45,12 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	private connectedSockets: SocketInfo[] = []
 
 	constructor(private gameService: GameService, private authService: AuthService, private userServices: UsersService) {
-		setInterval(() => { console.log("\x1b[33mSockets info are : \x1b[0m", this.connectedSockets) }, 5000)
+		setInterval(() => {
+			const info = this.connectedSockets.map((e) => {
+				return e.username
+			})
+			console.log("\x1b[33mSockets info are : \x1b[0m", info.join('-'))
+		}, 5000)
 	}
 
 	updateSocket(socket: Socket, action: string): void {
@@ -98,7 +103,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.updateSocket(client, "gamecreate")
 		try {
 			const gameId = this.gameService.create(data[0].map)
-			console.log("Game id is : ", gameId);
+			//console.log("Game id is : ", gameId);
 			return { gameId };
 		}
 		catch (e) {
@@ -112,7 +117,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.updateSocket(client, "findOrCreate")
 		try {
 			const gameId = this.gameService.findOrCreate(data[0].map)
-			console.log("Game id is : ", gameId);
+			//console.log("Game id is : ", gameId);
 			return { gameId };
 		}
 		catch (e) {
@@ -122,11 +127,11 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	@SubscribeMessage('game.join')
 	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): { gameId: string, gameInfo: IgameInfo } | { error: string } {
-		console.log("New join event")
+		//console.log("New join event")
 		this.updateSocket(client, "join")
 		try {
 			const { gameId, gameInfo } = this.gameService.join(client, user, data[0].gameId)
-			console.log("Game id is : ", gameId);
+			//console.log("Game id is : ", gameId);
 			return { gameId, gameInfo };
 		}
 		catch (e) {
@@ -136,7 +141,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	@SubscribeMessage('game.play.move')
 	handlePlayerInput(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: PlayerInputDto): void {
-		console.log("gateway input handle")
+		//console.log("gateway input handle")
 		this.updateSocket(client, "playerInput")
 		this.gameService.handlePlayerInput(client, user, data[0])
 	}

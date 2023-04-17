@@ -35,7 +35,6 @@ apiClient.interceptors.request.use(
 					localStorage.removeItem('access_token');
 					localStorage.removeItem('refresh_token');
 				}
-				
 			}
 			const access_token = getAccessToken()
 			config.headers.Authorization = `Bearer ${access_token}`;

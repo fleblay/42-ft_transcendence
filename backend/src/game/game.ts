@@ -74,12 +74,12 @@ export class Game {
 	}
 
 	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
-		console.log("game input handle")
+		//console.log("game input handle")
 		const foundPlayer = this.players.find(player => userId === player.user.id)
 		if (foundPlayer === null)
 			return
 		if (input.move !== undefined) {
-			console.log(`Input is ${input.move}`)
+			//console.log(`Input is ${input.move}`)
 			switch (input.move) {
 				case ("Up"):
 					foundPlayer.momentum = (foundPlayer.momentum <= 0) ? foundPlayer.momentum - 1 : 0
@@ -104,7 +104,7 @@ export class Game {
 					foundPlayer.timeLastMove = Date.now()
 					break
 				default:
-					console.log(`Input is ${input.move}`)
+					//console.log(`Input is ${input.move}`)
 			}
 		}
 	}
