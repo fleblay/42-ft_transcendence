@@ -4,6 +4,7 @@ import { UseGuards } from '@nestjs/common';
 import { ATGuard } from '../guard/access-token.guard';
 import { RTGuard } from '../guard/refresh-token.guard';
 import { AuthService } from './auth.service';
+import { Post } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
@@ -20,13 +21,20 @@ export class AuthController {
 	}
 
 	@Get('/allTokens')
-	@UseGuards(RTGuard)
-	@UseGuards(ATGuard)
 	async findAll()
 	{
 		const allUser = await this.authService.findAllTokens();
 		return allUser;
 	}
 
+	@Post('/logout')
+	@UseGuards(ATGuard)
+	async logout(@Request() req){
+		console.log('logout');
+		const refreshToken = req.get('X-Refresh-Token');
+		
+		return this.authService.deleteRefreshToken(refreshToken);
+	}
+		
 
 }

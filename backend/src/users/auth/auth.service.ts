@@ -45,8 +45,9 @@ export class AuthService {
 
 	decodeToken(bearerToken: string): Promise<User> | null {
 		try {
+			console.log(`Bearer token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.decode(bearerToken);
-			//console.log(`Decode :  `, jwtResponse);
+			console.log(`Decode :  `, jwtResponse);
 			return this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
 			console.log(`Error in decode Token is ${e}`)
@@ -113,6 +114,7 @@ export class AuthService {
 		}
 		const tokens = this.getTokens(user);
 		await this.updateRefreshToken(user.id, tokens.refresh_token);
+		console.log("tokens are ", tokens);
 		return tokens;
 	}
 
@@ -133,5 +135,10 @@ export class AuthService {
 
 	async findAllTokens() {
 		return await this.repo.find();
+	}
+
+	async deleteRefreshToken(refreshToken: string) {
+		const report = await this.repo.findOne({ where: { refreshToken } });
+		await this.repo.delete(report.id);
 	}
 }
