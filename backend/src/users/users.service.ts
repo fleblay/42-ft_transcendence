@@ -22,7 +22,9 @@ export class UsersService {
 	}
 
 	getAll() {
-		return this.repo.find();
+		return this.repo.createQueryBuilder("user")
+			.leftJoinAndSelect("user.savedGames", "games")
+			.getMany()
 	}
 
 	async findOne(id: number) {
