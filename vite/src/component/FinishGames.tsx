@@ -54,7 +54,7 @@ export function FinishGames() {
 									{' | '}
 									<Link component={LinkRouter} to={`/profile/${game.players[1].id}`}>{game.players[1].username}</Link>
 								</TableCell>
-								<TableCell align="right">{game.score}</TableCell>
+								<TableCell align="right">{game.score.join(' ')}</TableCell>
 								<TableCell align="right">{game.date}</TableCell>
 								<TableCell align="right">{game.winner.username}</TableCell>
 							</TableRow>
