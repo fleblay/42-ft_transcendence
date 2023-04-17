@@ -15,6 +15,12 @@ export class GameController {
 		return this.gameService.listAll()
 	}
 
+	@Get("/fake")
+	saveFakeGame(){
+		return this.gameService.saveFakeGame()
+	}
+
+
 	@Get("/userstate/:id")
 	getUserState(@Param('id') id: string) : {state: string, gameId?: UUID}{
 		return this.gameService.userState(parseInt(id))

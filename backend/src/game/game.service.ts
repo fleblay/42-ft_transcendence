@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { GameCluster } from './game-cluster';
 import { User } from 'src/model/user.entity';
 import { UUID } from '../type';
+import { v4 as uuidv4 } from 'uuid';
 import { PlayerInputDto } from '../events/dtos/player-input.dto'
 import { IgameInfo } from './game';
 import { SavedGame } from '../model/saved-game.entity';
@@ -86,8 +87,30 @@ export class GameService {
 			.leftJoin("game.players", "player")
 			.addSelect(['player.id', 'player.username'])
 			.getMany()
-		return fullDB.filter((element) => element.players[0].id == id || element.players[1] .id== id)
+		return fullDB.filter((element) => element.players[0].id == id || element.players[1] .id == id)
 	}
+
+	async saveFakeGame() {
+		const game = new SavedGame()
+		const playersList : User[] = await this.usersService.getAll()
+		if (playersList.length < 2)
+			throw new NotFoundException('Only one useer in DB');
+		let randUser1: User = playersList[Math.floor(Math.random() * playersList.length)]
+		let randUser2: User = playersList[Math.floor(Math.random() * playersList.length)]
+
+		while (randUser2 == randUser1)
+			randUser2 = playersList[Math.floor(Math.random() * playersList.length)]
+		const score1 = Math.floor(Math.random() * 6)
+		const score2 = 5 - score1
+		game.id = uuidv4();
+		game.players = [randUser1, randUser2]
+		game.score = [score1, score2]
+		game.winner = (score1 > score2) ? randUser1 : randUser2
+		console.log('game info is now', game)
+		let saveObject = this.repo.create(game);
+			return this.repo.save(saveObject);
+	}
+
 }
 //.leftJoinAndSelect("game.players", "players")
 //.where("game.id = :gameId", {gameId: "d38c3c7f-8f2f-4808-9645-fce150dcac3d"})

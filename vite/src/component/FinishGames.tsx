@@ -2,18 +2,25 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getAccessToken } from "../token/token";
 import apiClient from "../auth/interceptor.axios";
-import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid } from "@mui/material";
+import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link } from "@mui/material";
+import { Link as LinkRouter } from "react-router-dom";
 
-interface FormData {
+type User = {
+	id: number;
 	username: string;
-	email: string;
-	password: string;
+}
+interface SaveGame {
+	date: string;
+	id: string;
+	players: User[];
+	score: number[];
+	winner: User;
 }
 
 
 export function FinishGames() {
 
-	const [listGames, setListGames] = useState<any>(null);
+	const [listGames, setListGames] = useState<SaveGame[] | null>(null);
 	const [gamePage, setGamePage] = useState(0);
 
 	useEffect(() => {
@@ -40,7 +47,7 @@ export function FinishGames() {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{listGames.map((game: any) => (
+						{listGames.map((game) => (
 							<TableRow
 								key={game.id}
 								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -48,8 +55,18 @@ export function FinishGames() {
 								<TableCell component="th" scope="row">
 									{game.id}
 								</TableCell>
-								<TableCell align="right">{game.players[0].username} {game.players[1].username}</TableCell>
-								<TableCell align="right">{game.score}</TableCell>
+								<TableCell align="right">
+									{
+										game.players.sort((a: User, b: User) => {
+											if (a.id === game.winner.id) return -1;
+											if (b.id === game.winner.id) return 1;
+											return 1;
+										}).map((player: User) => {
+											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
+										})
+									}
+								</TableCell>
+								<TableCell align="right">{game.score.sort((a: number, b: number) => b - a).map((score: number) => score.toString()).join(' ')}</TableCell>
 								<TableCell align="right">{game.date}</TableCell>
 								<TableCell align="right">{game.winner.username}</TableCell>
 							</TableRow>
