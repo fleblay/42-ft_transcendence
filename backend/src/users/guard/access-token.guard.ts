@@ -21,7 +21,7 @@ export class ATGuard implements CanActivate {
 			return false;
 		}
         const user = await this.authService.validateAccessToken(bearerToken);
-		console.log("ATGuard: user", user);
+		//console.log("ATGuard: user", user);
 		if (!user || user === undefined) {
 			console.log("ATGuard: no user");
 			return false;

@@ -45,7 +45,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	private connectedSockets: SocketInfo[] = []
 
 	constructor(private gameService: GameService, private authService: AuthService, private userServices: UsersService) {
-		//setInterval(() => { console.log("\x1b[33mSockets info are : \x1b[0m", this.connectedSockets) }, 5000)
+		setInterval(() => { console.log("\x1b[33mSockets info are : \x1b[0m", this.connectedSockets) }, 5000)
 	}
 
 	updateSocket(socket: Socket, action: string): void {

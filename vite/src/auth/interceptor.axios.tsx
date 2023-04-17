@@ -19,8 +19,9 @@ apiClient.interceptors.request.use(
 			const decode = jwt_decode(token) as DecodeToken;
 
 			if (decode.exp - (Date.now() / 1000) < 10) {
-				console.log("token expired");
+				console.log("token about to expire");
 				try {
+					console.log('refreshing with token :', getRefreshToken())
 					const response = await axios.get('/api/auth/refresh', { headers: { 'X-Refresh-Token': getRefreshToken() } });
 					if (response.status === 200) {
 						console.log("Access token refreshed");

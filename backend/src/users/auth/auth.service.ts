@@ -45,16 +45,14 @@ export class AuthService {
 
 	decodeToken(bearerToken: string): Promise<User> | null {
 		try {
+			console.log("About to decode :  ", bearerToken);
 			const jwtResponse = this.jwtService.decode(bearerToken);
-			//console.log(`Decode :  `, jwtResponse);
 			return this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
-			console.log(`Error in decode Token is ${e}`)
+			console.log("Error in decode Token is :", e)
 			return null
 		}
 	}
-
-	//
 
 	async login(dataUser: LoginUserDto) {
 		const user = await this.usersService.findOneByEmail(dataUser.email);
