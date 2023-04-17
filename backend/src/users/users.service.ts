@@ -23,13 +23,25 @@ export class UsersService {
 
 	getAll() {
 		return this.repo.createQueryBuilder("user")
-			.leftJoinAndSelect("user.savedGames", "games")
+			.leftJoinAndSelect("user.savedGames", "savedgames")
+			.leftJoinAndSelect("user.wonGames", "wongames")
+			/*
+			.leftJoin("savedgames.players", "players")
+			.addSelect(["players.id", "players.username"])
+			.leftJoin("games.winner", "winner")
+			.addSelect(["winner.id", "winner.username"])
+			*/
 			.getMany()
 	}
 
-	async findOne(id: number) {
+
+	findOne(id: number) {
 		if (!id) return null;
-		return await this.repo.findOneBy({ id });
+		//return this.repo.findOneBy({ id });
+		return this.repo.createQueryBuilder("user")
+			.leftJoinAndSelect("user.savedGames", "savedgames")
+			.where("user.id = :userId", {userId: id})
+			.getOne()
 	}
 
 	async findOneByUsername(username: string) {

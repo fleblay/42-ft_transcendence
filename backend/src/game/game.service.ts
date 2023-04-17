@@ -106,6 +106,7 @@ export class GameService {
 		game.players = [randUser1, randUser2]
 		game.score = [score1, score2]
 		game.winner = (score1 > score2) ? randUser1 : randUser2
+		console.log('game info is now', game)
 		let saveObject = this.repo.create(game);
 			return this.repo.save(saveObject);
 	}
