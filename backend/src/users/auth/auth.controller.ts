@@ -20,8 +20,6 @@ export class AuthController {
 	}
 
 	@Get('/allTokens')
-	@UseGuards(RTGuard)
-	@UseGuards(ATGuard)
 	async findAll()
 	{
 		const allUser = await this.authService.findAllTokens();

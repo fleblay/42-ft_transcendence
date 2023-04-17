@@ -100,8 +100,9 @@ export class AuthService {
 		if (!report) {
 			throw new NotFoundException('User not found');
 		}
-		report.refreshToken = refreshToken;
-		await this.repo.save(report);
+		//report.refreshToken = refreshToken;
+		//await this.repo.save(report);
+		await this.repo.save({userId, refreshToken})
 	}
 
 	async refreshToken(refreshToken: string) {
