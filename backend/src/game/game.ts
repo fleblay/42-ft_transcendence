@@ -59,7 +59,7 @@ interface PlayerInput {
 
 export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
-	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0, 5 ? 1 : -1), y: (Math.random() > 0, 5 ? 1 : -1) }
+	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
 	//private startTime: number = Date.now()
 	private intervalId: NodeJS.Timer
 	public players: Players[] = []
@@ -232,12 +232,16 @@ export class Game {
 			if (this.posBall.x <= 0) {
 				this.players[1].score += 1
 				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-				this.velocityBall = { x: (Math.random() > 0, 5) ? 1 : -1, y: (Math.random() > 0, 5) ? 1 : -1 }
+				this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
 			}
 			else if (this.posBall.x >= canvasWidth) {
 				this.players[0].score += 1
 				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-				this.velocityBall = { x: (Math.random() > 0, 5) ? 1 : -1, y: (Math.random() > 0, 5) ? 1 : -1 }
+				this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
+				this.players.forEach((player) => {
+					player.pos = canvasHeight / 2 - player.paddleLength / 2
+					player.momentum = 0
+				})
 			}
 
 			//Condition fin de jeu
