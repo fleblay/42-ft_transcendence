@@ -120,6 +120,11 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		console.log("New findOrCreate event")
 		this.updateSocket(client, "findOrCreate")
 		try {
+			// TODO: data[0] is a circular object, need to find a way to fix it
+			/*
+			<ref *1> { '0': [Circular *1] }
+			*/
+			console.log('trying to find or create game', data)
 			const gameId = this.gameService.findOrCreate(data[0].map)
 			//console.log("Game id is : ", gameId);
 			return { gameId };

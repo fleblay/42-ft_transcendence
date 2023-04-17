@@ -57,7 +57,7 @@ export function CreateGame() {
 			navigate(`/game/${game}`);
 		}
 		else {
-			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {}, ({ gameId }: { gameId: number }) => {
+			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {map:'bob'}, ({ gameId }: { gameId: number }) => {
 				console.log("game created", gameId);
 				navigate(`/game/${gameId}`);
 			});
