@@ -9,6 +9,7 @@ import { userToken } from "../types";
 import { useLocation, useNavigate } from "react-router-dom";
 import apiClient from "./interceptor.axios";
 import { Socket, io } from "socket.io-client";
+import { getRefreshToken } from "../token/token";
 
 //0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
@@ -90,7 +91,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	let logout = async (): Promise<void> => {
 		return new Promise((resolve, reject) => {
 			apiClient
-				.get("/api/users/logout")
+				.get("/api/auth/logout", { headers: { 'X-Refresh-Token': getRefreshToken() } } )
 				.then(async (response) => {
 					setUser(null);
 					delAccessToken();
