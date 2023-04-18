@@ -1,16 +1,15 @@
 import { Injectable, NotFoundException, forwardRef, Inject} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Server, Socket } from 'socket.io'
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { GameCluster } from './game-cluster';
-import { User } from 'src/model/user.entity';
+import { User } from '../model/user.entity';
 import { UUID, UserState } from '../type';
 import { v4 as uuidv4 } from 'uuid';
 import { PlayerInputDto } from '../events/dtos/player-input.dto'
 import { IgameInfo } from './game';
 import { SavedGame } from '../model/saved-game.entity';
-import { Game } from './game';
 
 @Injectable()
 export class GameService {

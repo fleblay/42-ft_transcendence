@@ -7,10 +7,12 @@ import { GameService } from '../game/game.service';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { ATGuard } from './guard/access-token.guard';
 import { CurrentUser } from './decorators/current-user.decorator'
-import { User } from "src/model/user.entity";
+import { UserInfo, UserScore } from '../type'
+import { User } from "../model/user.entity";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
-import { UserInfo, UserScore } from '../type'
+//import { Serialize } from '../interceptors/serialize.interceptor';
+//import { UserDto } from './dtos/user.dto';
 
 @Controller('users')
 export class UsersController {

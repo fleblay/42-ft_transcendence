@@ -46,6 +46,10 @@ export class AuthService {
 		try {
 			//console.log(`Bearer token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.decode(bearerToken);
+			if (jwtResponse == null) {
+				console.log(`error in decode token`)
+				return null
+			}
 			//console.log(`Decode :  `, jwtResponse);
 			return this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {

@@ -18,8 +18,8 @@ import { GameJoinDto } from './dtos/game-join.dto'
 import { PlayerInputDto } from './dtos/player-input.dto'
 import { GameService } from '../game/game.service'
 import { GameCreateDto } from './dtos/game-create.dto';
-import { AuthService } from 'src/users/auth/auth.service';
-import { IgameInfo } from 'src/game/game';
+import { AuthService } from '../users/auth/auth.service';
+import { IgameInfo } from '../game/game';
 import { UsersService } from '../users/users.service'
 
 type SocketInfo = {

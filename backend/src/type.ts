@@ -1,5 +1,5 @@
 import {User} from './model/user.entity'
-
+export type SocketId = string;
 export type UUID = string;
 
 export type UserStatus = 'online' | 'ingame' | 'watching'
