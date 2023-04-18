@@ -139,7 +139,7 @@ function Loader() {
 function App() {
 
 	const [backIsReady, setBackIsReady] = useState(false)
-	const cooldown = React.useRef<number>(10);
+	const [cooldown, setCooldown] = React.useState<number>(10);
 
 	React.useEffect(() => {
 		const intevalId = setInterval(() => {
@@ -151,11 +151,11 @@ function App() {
 			}).catch((error) => {
 				console.log(error);
 			})
-			if (cooldown.current < 1000)
-				cooldown.current *= cooldown.current;
-		}, cooldown.current)
+			if (cooldown < 1000)
+				setCooldown(cooldown => cooldown *= 10);
+		}, cooldown)
 		return () => clearInterval(intevalId);
-	}, [])
+	}, [cooldown])
 	if (!backIsReady) return <Loader />
 
 	return (

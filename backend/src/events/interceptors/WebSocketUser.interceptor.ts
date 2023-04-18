@@ -8,13 +8,15 @@ export class WebSocketUserInterceptor implements NestInterceptor {
 
 	async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
 		const request = context.switchToWs()
+		/*
 		if (!request.getData()[0])
 			request.getData()[0] = request.getData()
 		else {
-			//console.warn("Watch out, request.getData() is a array of object !")
+			console.log("\x1b[32mWatch out, request.getData() is a array of object !\x1b[0m")
 		}
-
 		const data = request.getData()[0]
+		*/
+		const data = request.getData()
 		const bearerToken = data["_access_token"]
 		const foundUser = await this.authService.decodeToken(bearerToken)
 		request.getData()["_user"] = foundUser

@@ -47,9 +47,9 @@ export class GameCluster {
 		return null;
 	}
 
-	findByClient(client: Socket) : Game | null {
+	findByClient(client: Socket): Game | null {
 		for (const game of this.gamesMap.values()) {
-			if (game.players.find((player)=>{player.client == client}))
+			if (game.players.find((player) => player.clientId === client.id))
 				return game;
 		}
 		return null;
@@ -88,6 +88,10 @@ export class GameCluster {
 		return { state: stateArray.join("-"), gameId: gameIdArray.join("-") }
 	}
 
+	private getClientFromSocketId(socketId: string): Socket {
+		const sockets = this.server.sockets.sockets;
+		return sockets.get(socketId);
+	}
 
 	rageQuit(game: Game, quitterId: number) {
 		if (game.players.find(player => player.user.id === quitterId)) {
@@ -95,6 +99,8 @@ export class GameCluster {
 				if (player.user.id === quitterId) {
 					player.leaving = true;
 					player.score = 0;
+					const client = this.getClientFromSocketId(player.clientId);
+					client.leave(game.playerRoom);
 				}
 				else {
 					player.score = 5;
@@ -104,7 +110,6 @@ export class GameCluster {
 		}
 	}
 
-
 	playerQuit(gameId: UUID, userId: number) {
 		const game = this.gamesMap.get(gameId);
 		let gameInfo = null;
@@ -113,6 +118,10 @@ export class GameCluster {
 
 		if (game.status === GameStatus.waiting
 			&& game.players.length < 2) {
+			for (const player of game.players) {
+				const client = this.getClientFromSocketId(player.clientId);
+				client.leave(game.playerRoom);
+			}
 			this.gamesMap.delete(gameId);
 		}
 		else if (game.status === GameStatus.playing
@@ -121,8 +130,14 @@ export class GameCluster {
 		}
 		if (game.status === GameStatus.end) {
 			const player = game.players.find(player => player.user.id === userId);
+			const client = this.getClientFromSocketId(player.clientId);
 			if (player)
+			{
 				player.leaving = true;
+				client.leave(game.playerRoom);
+			}
+			else if (game.viewers.find(viewer => viewer.id === userId))
+				client.leave(game.viewerRoom);
 
 			if (game.players.every(player => player.leaving)) {
 				gameInfo = game.generateSavedGameInfo();
