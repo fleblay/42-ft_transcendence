@@ -1,3 +1,4 @@
+export type SocketId = string;
 export type UUID = string;
 
 export enum UserStatus {

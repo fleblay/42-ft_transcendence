@@ -1,4 +1,4 @@
-import { UUID } from '../type';
+import { UUID, SocketId } from '../type';
 import { User } from '../model/user.entity'
 import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
@@ -32,7 +32,7 @@ export type GameSetting = {
 	canvasWidth: number,
 }
 
-export type Players = {
+export type Player = {
 	pos: number,
 	momentum: number,
 	timeLastMove: number,
@@ -41,14 +41,19 @@ export type Players = {
 	score: number,
 	user: User,
 	leaving: boolean,
-	clientId: UUID
+	clientId: SocketId
+}
+
+export type Viewer = {
+	user: User,
+	clientId: SocketId
 }
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 export interface IgameInfo {
 
-	players: Partial<Players>[], // requiered partial to strip client for Players
+	players: Partial<Player>[], // requiered partial to strip client for Players
 	posBall: Pos2D
 	status: GameStatus
 	date: Date
@@ -63,8 +68,8 @@ export class Game {
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
 	//private startTime: number = Date.now()
 	private intervalId: NodeJS.Timer
-	public players: Players[] = []
-	public viewers: User[] = []
+	public players: Player[] = []
+	public viewers: Viewer[] = []
 	public status: GameStatus = GameStatus.waiting
 	public readonly playerRoom: string
 	public readonly viewerRoom: string
@@ -143,6 +148,8 @@ export class Game {
 
 
 	addUser(user: User, client: Socket) {
+		// TODO: If player reconnect, check if he is in the game and change his socket
+		// Disconnect old socket
 		if (this.players.find((player) => player.user.id === user.id))
 			throw new NotFoundException('Already in game')
 
@@ -168,7 +175,7 @@ export class Game {
 			}
 		}
 		else {
-			this.viewers.push(user)
+			this.viewers.push({user, clientId: client.id})
 			client.join(this.viewerRoom)
 		}
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
@@ -277,7 +284,6 @@ export class Game {
 
 	play() {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 5)
-
 	}
 
 	get id(): UUID {
