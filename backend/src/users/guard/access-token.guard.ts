@@ -3,7 +3,6 @@ import {
 	ExecutionContext,
     Injectable
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth/auth.service';
 import { Request } from 'express';
 import { HttpException } from '@nestjs/common';
@@ -13,13 +12,15 @@ import jwt_decode from "jwt-decode";
 @Injectable()
 export class ATGuard implements CanActivate {
 
-    constructor(private authService: AuthService, private jwtService : JwtService) {}
+    constructor(private authService: AuthService) {}
 
 	async canActivate(context: ExecutionContext){
 		const request = context.switchToHttp().getRequest() as Request;
+		console.log("ATGuard: before replace", request.headers.authorization);
         const bearerToken = request.headers.authorization?.replace('Bearer ', '');
-
-		if (!bearerToken) {
+		console.log("ATGuard: after replace", request.headers.authorization);
+		console.log ("bearer token", bearerToken)
+		if (!bearerToken || bearerToken === 'Bearer') {
 			console.log("ATGuard: no bearer token");
 			return false;
 		}
