@@ -57,9 +57,11 @@ export function CreateGame() {
 			navigate(`/game/${game}`);
 		}
 		else {
-			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {map:'bob'}, ({ gameId }: { gameId: number }) => {
+			//customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {map:'bob'}, ({ gameId }: { gameId: number }) => {
+			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {map:'bob'}, (gameId : string ) => {
 				console.log("game created", gameId);
 				navigate(`/game/${gameId}`);
+				console.log("nav ok", gameId);
 			});
 		}
 	}

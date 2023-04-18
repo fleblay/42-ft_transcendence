@@ -43,7 +43,7 @@ export class GameService {
 			throw new NotFoundException('Game not found');
 		game.addUser(user, client);
 		//this.usersService.addConnectedUser(user.id)
-		return { gameId: game.id, gameInfo: game.generateGameInfo() };
+		return { gameId: game.gameId, gameInfo: game.generateGameInfo() };
 	}
 
 	listAll() {

@@ -61,6 +61,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	afterInit(server: Server) {
+
 		this.gameService.setWsServer(server)
 	}
 
@@ -102,21 +103,22 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	@SubscribeMessage('game.create')
-	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string } {
+	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto):  string {
 		console.log("New create event")
 		this.updateSocket(client, "gamecreate")
 		try {
-			const gameId = this.gameService.create(data[0].map)
+			const gameId = this.gameService.create(data.map)
+			//const gameId = this.gameService.create(data[0].map)
 			//console.log("Game id is : ", gameId);
-			return { gameId };
+			return gameId
 		}
 		catch (e) {
-			return { error: e.message as string }
+			return e.message
 		}
 	}
 
 	@SubscribeMessage('game.findOrCreate')
-	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): { gameId: string } | { error: string } {
+	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): string {
 		console.log("New findOrCreate event")
 		this.updateSocket(client, "findOrCreate")
 		try {
@@ -125,34 +127,39 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			<ref *1> { '0': [Circular *1] }
 			*/
 			console.log('trying to find or create game', data)
-			const gameId = this.gameService.findOrCreate(data[0].map)
+			//const gameId = this.gameService.findOrCreate(data[0].map)
+			const gameId = this.gameService.findOrCreate(data.map)
+			console.log('After log', gameId)
 			//console.log("Game id is : ", gameId);
-			return { gameId };
+			return gameId
 		}
+
 		catch (e) {
-			return { error: e.message as string }
+			return e.message
 		}
 	}
 
 	@SubscribeMessage('game.join')
-	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): { gameId: string, gameInfo: IgameInfo } | { error: string } {
-		//console.log("New join event")
+	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): string {
+		console.log("New join event")
 		this.updateSocket(client, "join")
+
 		try {
-			const { gameId, gameInfo } = this.gameService.join(client, user, data[0].gameId)
+			const { gameId, gameInfo } = this.gameService.join(client, user, data.gameId)
 			//console.log("Game id is : ", gameId);
-			return { gameId, gameInfo };
+			console.log("join event ok so far")
+			return JSON.stringify({ gameId, gameInfo });
 		}
 		catch (e) {
-			return { error: e.message as string }
+			return e.message
 		}
 	}
 
 	@SubscribeMessage('game.play.move')
 	handlePlayerInput(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: PlayerInputDto): void {
-		//console.log("gateway input handle")
+		console.log("gateway input handle")
 		this.updateSocket(client, "playerInput")
-		this.gameService.handlePlayerInput(client, user, data[0])
+		this.gameService.handlePlayerInput(client, user, data)
 	}
 
 	@SubscribeMessage('createLobby')

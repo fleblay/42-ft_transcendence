@@ -48,7 +48,7 @@ export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 export interface IgameInfo {
 
-	players: Players[],
+	players: Partial<Players>[], // requiered partial to strip client for Players
 	posBall: Pos2D
 	status: GameStatus
 	date: Date
@@ -119,8 +119,12 @@ export class Game {
 	}
 
 	generateGameInfo(): IgameInfo {
+		const partialPlayers = this.players.map((player)=> {
+			let {client, ...rest} = player
+			return rest
+		})
 		return {
-			players: this.players,
+			players: partialPlayers,
 			posBall: this.posBall,
 			status: this.status,
 			date: new Date()

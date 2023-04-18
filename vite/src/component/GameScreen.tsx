@@ -31,7 +31,8 @@ export function GamePage() {
 			setJoined(true)
 			return
 		}
-		customEmit('game.join', { gameId: idGame }, (response: any) => {
+		customEmit('game.join', { gameId: idGame }, (stringResponse: string) => {
+			const response = JSON.parse(stringResponse)
 			if (response.error) {
 				console.log(response.error);
 				setLoading(LoadingStatus.Failed);
