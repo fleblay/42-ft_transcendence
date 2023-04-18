@@ -17,10 +17,10 @@ export class ATGuard implements CanActivate {
 	async canActivate(context: ExecutionContext){
 		const request = context.switchToHttp().getRequest() as Request;
 		console.log("ATGuard: before replace", request.headers.authorization);
-        const bearerToken = request.headers.authorization?.replace('Bearer ', '');
+        const bearerToken = request.headers.authorization?.replace(/Bearer ?/, '');
 		console.log("ATGuard: after replace", request.headers.authorization);
 		console.log ("bearer token", bearerToken)
-		if (!bearerToken || bearerToken === 'Bearer') {
+		if (!bearerToken) {
 			console.log("ATGuard: no bearer token");
 			return false;
 		}

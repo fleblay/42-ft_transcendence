@@ -139,10 +139,13 @@ describe('AppController (e2e)', () => {
 				.expect(498);
 		});
 
+		it('[REFRESH TOKEN] should return new access token & new refresh token', async () => {
+			const res1 = await request(app.getHttpServer())
+				.post('/users/login')
+				.send({ email: 'admin1@admin.com', password: 'admin1' })
+				.expect(201);
 
-		it('[REFRESH TOKEN] should return 200 and new refresh and access token', async () => {
-			const refresh_token_payload = { username: "admin1", sub: 1 };
-			const valid_refresh_token = jwtService.sign(refresh_token_payload, refresh_token_options);
+			const valid_refresh_token = res1.body.refresh_token;
 
 			const res = await request(app.getHttpServer())
 				.get('/auth/refresh')
@@ -162,7 +165,16 @@ describe('AppController (e2e)', () => {
 			const jwtResponseRT = jwtService.decode(refresh_token) as decodeToken;
 			expect(jwtResponseAT.username).toEqual('admin1');
 			expect(jwtResponseRT.username).toEqual('admin1');
+		});
 
+		it('[REFRESH TOKEN] valid token but not in refresh token base', async () => {
+			const refresh_token_payload = { username: "admin1", sub: 1 };
+			const valid_refresh_token = jwtService.sign(refresh_token_payload, refresh_token_options);
+
+			const res = await request(app.getHttpServer())
+				.get('/auth/refresh')
+				.set('X-Refresh-Token', `${valid_refresh_token}`)
+				.expect(403);
 		});
 
 		it('[REFRESH TOKEN] user in not in database', async () => {
@@ -221,10 +233,6 @@ describe('AppController (e2e)', () => {
 				.get('/auth/refresh')
 				.expect(403);
 		});
-
-
-
-
 
 	}
 	);
