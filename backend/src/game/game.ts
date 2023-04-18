@@ -41,7 +41,7 @@ export type Players = {
 	score: number,
 	user: User,
 	leaving: boolean,
-	client: Socket
+	clientId: UUID
 }
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
@@ -66,8 +66,8 @@ export class Game {
 	public players: Players[] = []
 	public viewers: User[] = []
 	public status: GameStatus = GameStatus.waiting
-	private readonly playerRoom: string
-	private readonly viewerRoom: string
+	public readonly playerRoom: string
+	public readonly viewerRoom: string
 
 	constructor(public gameId: UUID, private server: Server, private privateGame: boolean = false, private gameCluster: GameCluster) {
 		this.playerRoom = gameId + ":player"
@@ -120,7 +120,7 @@ export class Game {
 
 	generateGameInfo(): IgameInfo {
 		const partialPlayers = this.players.map((player)=> {
-			let {client, ...rest} = player
+			let {clientId: client, ...rest} = player
 			return rest
 		})
 		return {
@@ -156,7 +156,7 @@ export class Game {
 				score: 0,
 				user,
 				leaving: false,
-				client
+				clientId: client.id
 			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1) {
