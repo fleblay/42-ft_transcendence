@@ -6,10 +6,10 @@ import { AuthService } from './auth/auth.service';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { ATGuard } from './guard/access-token.guard';
 import {CurrentUser} from './decorators/current-user.decorator'
-import { User } from "src/model/user.entity";
+import { User } from "../model/user.entity";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
-//import { Serialize } from 'src/interceptors/serialize.interceptor';
+//import { Serialize } from '../interceptors/serialize.interceptor';
 //import { UserDto } from './dtos/user.dto';
 
 @Controller('users')

@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import {GameService} from './game.service'
 import { UUID } from '../type';
-import { ATGuard } from 'src/users/guard/access-token.guard';
-import { CurrentUser } from 'src/users/decorators/current-user.decorator';
-import { User } from 'src/model/user.entity';
+import { ATGuard } from '../users/guard/access-token.guard';
+import { CurrentUser } from '../users/decorators/current-user.decorator';
+import { User } from '../model/user.entity';
 
 @Controller('game')
 export class GameController {

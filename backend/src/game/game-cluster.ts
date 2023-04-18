@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Game } from './game';
-import { SavedGame } from 'src/model/saved-game.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { UUID } from '../type';
 import { Server, Socket } from 'socket.io'
