@@ -9,6 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { Button } from '@mui/material';
 
 type Games = {
 	date: string,
@@ -101,7 +102,9 @@ export function ListUsers() {
 
 	return (
 		<div>
-			<button onClick={handleClick}>Update Users list</button>
+			<Button variant='contained' onClick={handleClick}>
+				Update Users list
+			</Button>
 			<p>{info}</p>
 			{muiTable}
 		</div>
