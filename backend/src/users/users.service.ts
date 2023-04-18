@@ -5,6 +5,7 @@ import { User } from '../model/user.entity'
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UserStatus } from '../type';
 import { createWriteStream } from 'fs';
+import * as sharp from 'sharp';
 
 
 @Injectable()
@@ -106,12 +107,17 @@ export class UsersService {
 	async uploadAvatar(user: User , file: Express.Multer.File) {
 		const path = '/usr/src/app/Avatars/' + user.id + '.png';
 		console.log("user.controller.uploadAvatar", file.buffer);
-		const writeStream = createWriteStream(path);
-		writeStream.write(file.buffer);
-		writeStream.end();
-		console.log("user.controller.uploadAvatar");
-		//save image
-		user.avatar = path;
+		await sharp(file.buffer)
+			.resize(200, 200)
+			.toFile(path, (err, info) => {
+				if (err) {
+					console.log("error while resizing image", err)
+				}
+				else {
+					console.log("image resized", info)
+				}
+			})
+			user.avatar = path;
 		console.log("path", path);
 		console.log ("user", user);
 		return this.repo.save(user);
