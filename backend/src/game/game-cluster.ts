@@ -75,7 +75,7 @@ export class GameCluster {
 		for (const game of this.gamesMap.values()) {
 			if (!game.players)
 				continue
-			if (game.players.find(player => player.user.id === id)) {
+			if (game.players.find(player => player.user.id === id && player.leaving === false)) {
 				stateArray.push("Ingame")
 				gameIdArray.push(game.id)
 			}
