@@ -23,17 +23,12 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	getAll() {
-		return this.repo.createQueryBuilder("user")
+	getAll() : Promise<User[]> {
+		const allDB =this.repo.createQueryBuilder("user")
 			.leftJoinAndSelect("user.savedGames", "savedgames")
 			.leftJoinAndSelect("user.wonGames", "wongames")
-			/*
-			.leftJoin("savedgames.players", "players")
-			.addSelect(["players.id", "players.username"])
-			.leftJoin("games.winner", "winner")
-			.addSelect(["winner.id", "winner.username"])
-			*/
 			.getMany()
+		return allDB
 	}
 
 
@@ -81,9 +76,9 @@ export class UsersService {
 
 	addConnectedUser(id: number) {
 		if (this.isConnected(id))
-			this.connectedUsers.get(id).push(UserStatus.online)
+			this.connectedUsers.get(id).push("online")
 		else
-			this.connectedUsers.set(id, [UserStatus.online])
+			this.connectedUsers.set(id, ["online"])
 	}
 
 	changeStatus(id: number, { newStatus, oldStatus }: { newStatus?: UserStatus, oldStatus?: UserStatus }) {
@@ -105,7 +100,7 @@ export class UsersService {
 
 	disconnect(id: number) {
 		console.log("user.service.disconnect")
-		this.changeStatus(id, { oldStatus: UserStatus.online })
+		this.changeStatus(id, { oldStatus: "online" })
 	}
 
 	async uploadAvatar(user: User , file: Express.Multer.File) {
@@ -121,7 +116,4 @@ export class UsersService {
 		console.log ("user", user);
 		return this.repo.save(user);
 	}
-
-
-
 }

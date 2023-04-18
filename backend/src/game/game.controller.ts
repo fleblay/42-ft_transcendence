@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import {GameService} from './game.service'
-import { UUID } from '../type';
+import { UUID, UserState } from '../type';
 import { ATGuard } from '../users/guard/access-token.guard';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../model/user.entity';
@@ -22,7 +22,7 @@ export class GameController {
 
 
 	@Get("/userstate/:id")
-	getUserState(@Param('id') id: string) : {state: string, gameId?: UUID}{
+	getUserState(@Param('id') id: string) : UserState {
 		return this.gameService.userState(parseInt(id))
 	}
 

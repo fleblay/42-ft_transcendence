@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Game } from './game';
+import { Game, Player } from './game';
 import { v4 as uuidv4 } from 'uuid';
-import { UUID } from '../type';
+import { SocketId, UUID, UserState, UserStatus } from '../type';
 import { Server, Socket } from 'socket.io'
 import { GameStatus } from './game';
 
@@ -67,84 +67,93 @@ export class GameCluster {
 		return uuidv4();
 	}
 
-
-	findUserStateById(id: number) {
-		let stateArray: string[] = []
-		let gameIdArray: string[] = []
+	findUserStateById(id: number): UserState {
+		let states: UserStatus[] = []
+		let gameIds: UUID[] = []
 		for (const game of this.gamesMap.values()) {
 			if (!game.players)
 				continue
-			if (game.players.find(player => player.user.id === id)) {
-				stateArray.push("Ingame")
-				gameIdArray.push(game.id)
+			if (game.players.find(player => player.user.id === id && player.leaving === false)) {
+				states.push("ingame")
+				gameIds.push(game.id)
 			}
-			if (game.viewers.find(viewer => viewer.id === id)) {
-				stateArray.push("Watching")
-				gameIdArray.push(game.id)
+			if (game.viewers.find(viewer => viewer.user.id === id)) {
+				states.push("watching")
+				gameIds.push(game.id)
 			}
 		}
-		if (stateArray.length === 0)
-			stateArray.push("None")
-		return { state: stateArray.join("-"), gameId: gameIdArray.join("-") }
+		return { states, gameIds }
 	}
 
-	private getClientFromSocketId(socketId: string): Socket {
+	private getClientFromSocketId(socketId: SocketId): Socket {
 		const sockets = this.server.sockets.sockets;
 		return sockets.get(socketId);
 	}
 
-	rageQuit(game: Game, quitterId: number) {
-		if (game.players.find(player => player.user.id === quitterId)) {
-			game.players.forEach(player => {
-				if (player.user.id === quitterId) {
-					player.leaving = true;
-					player.score = 0;
-					const client = this.getClientFromSocketId(player.clientId);
-					client.leave(game.playerRoom);
-				}
-				else {
-					player.score = 5;
-				}
-			});
-			game.status = GameStatus.end;
+	/**
+	 * If a player leave. Set his score to -42 and the other player to 5
+	 * @param game Game
+	 * @param quitter User who rage quit
+	 * @returns void
+	 */
+	rageQuit(game: Game, quitter: Player) {
+		if (!quitter) {
+			console.error("GameCluster: rageQuit: quitter not found");
+			return;
 		}
+		quitter.score = -42;
+		game.players.forEach(player => {
+			if (player.user.id !== quitter.user.id)
+				player.score = 5;
+		});
 	}
 
+	/*
+		Waiting
+		- 1 player: delete game: remove event
+
+		Start | Playing
+		- 1 player: rage quit : end
+
+		End
+		- 1 player: set leaving to true
+		- 2 players: delete : save game
+
+	*/
 	playerQuit(gameId: UUID, userId: number) {
 		const game = this.gamesMap.get(gameId);
-		let gameInfo = null;
 
 		if (!game) return;
 
-		if (game.status === GameStatus.waiting
-			&& game.players.length < 2) {
-			for (const player of game.players) {
-				const client = this.getClientFromSocketId(player.clientId);
-				client.leave(game.playerRoom);
+		const player = game.players.find(player => player.user.id === userId);
+		const viewer = game.viewers.find(viewer => viewer.user.id === userId);
+		const client = this.getClientFromSocketId(player?.clientId || viewer?.clientId);
+
+		if (viewer && player) {
+			console.error("GameCluster: playerQuit: player and viewer both exist");
+		}
+		if (viewer) {
+			client.leave(game.viewerRoom);
+			game.viewers = game.viewers.filter(viewer => viewer.user.id !== userId);
+		}
+		if (player) {
+			client.leave(game.playerRoom);
+			player.leaving = true;
+			if (game.status === GameStatus.playing || game.status === GameStatus.start) {
+				this.rageQuit(game, player);
+			}
+			game.status = GameStatus.end;
+		}
+
+		if (game.players.every(player => player.leaving)) {
+			for (const viewer of game.viewers) {
+				const client = this.getClientFromSocketId(viewer.clientId);
+				client.leave(game.viewerRoom);
 			}
 			this.gamesMap.delete(gameId);
+			if (game.players.length >= 2)
+				return game.generateSavedGameInfo();
 		}
-		else if (game.status === GameStatus.playing
-			|| game.status === GameStatus.start) {
-			this.rageQuit(game, userId);
-		}
-		if (game.status === GameStatus.end) {
-			const player = game.players.find(player => player.user.id === userId);
-			const client = this.getClientFromSocketId(player.clientId);
-			if (player)
-			{
-				player.leaving = true;
-				client.leave(game.playerRoom);
-			}
-			else if (game.viewers.find(viewer => viewer.id === userId))
-				client.leave(game.viewerRoom);
-
-			if (game.players.every(player => player.leaving)) {
-				gameInfo = game.generateSavedGameInfo();
-				this.gamesMap.delete(gameId);
-			}
-		}
-		return gameInfo;
+		return null;
 	}
-
 }

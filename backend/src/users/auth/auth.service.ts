@@ -7,7 +7,6 @@ import { LoginUserDto } from '../dtos/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from '../../model/refresh-token.entity';
 import { Repository } from 'typeorm';
-import { UserStatus } from '../../type';
 
 type Tokens = {
 	access_token: string;
