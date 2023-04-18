@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Game } from './game';
 import { SavedGame } from 'src/model/saved-game.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { UUID } from '../type';
+import { UUID, UserState, UserStatus } from '../type';
 import { Server, Socket } from 'socket.io'
 import { GameStatus } from './game';
 
@@ -48,9 +48,9 @@ export class GameCluster {
 		return null;
 	}
 
-	findByClient(client: Socket) : Game | null {
+	findByClient(client: Socket): Game | null {
 		for (const game of this.gamesMap.values()) {
-			if (game.players.find((player)=>{player.client == client}))
+			if (game.players.find((player) => { player.client == client }))
 				return game;
 		}
 		return null;
@@ -68,25 +68,22 @@ export class GameCluster {
 		return uuidv4();
 	}
 
-
-	findUserStateById(id: number) {
-		let stateArray: string[] = []
-		let gameIdArray: string[] = []
+	findUserStateById(id: number): UserState {
+		let states: UserStatus[] = []
+		let gameIds: UUID[] = []
 		for (const game of this.gamesMap.values()) {
 			if (!game.players)
 				continue
 			if (game.players.find(player => player.user.id === id)) {
-				stateArray.push("Ingame")
-				gameIdArray.push(game.id)
+				states.push("ingame")
+				gameIds.push(game.id)
 			}
 			if (game.viewers.find(viewer => viewer.id === id)) {
-				stateArray.push("Watching")
-				gameIdArray.push(game.id)
+				states.push("watching")
+				gameIds.push(game.id)
 			}
 		}
-		if (stateArray.length === 0)
-			stateArray.push("None")
-		return { state: stateArray.join("-"), gameId: gameIdArray.join("-") }
+		return { states, gameIds }
 	}
 
 
@@ -104,7 +101,6 @@ export class GameCluster {
 			game.status = GameStatus.end;
 		}
 	}
-
 
 	playerQuit(gameId: UUID, userId: number) {
 		const game = this.gamesMap.get(gameId);

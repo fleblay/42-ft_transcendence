@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, forwardRef, Inject} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Server, Socket } from 'socket.io'
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { GameCluster } from './game-cluster';
 import { User } from 'src/model/user.entity';
-import { UUID } from '../type';
+import { UUID, UserState } from '../type';
 import { v4 as uuidv4 } from 'uuid';
 import { PlayerInputDto } from '../events/dtos/player-input.dto'
 import { IgameInfo } from './game';
@@ -16,9 +16,12 @@ import { Game } from './game';
 export class GameService {
 
 	private server: Server;
-	constructor(private usersService: UsersService,
+	constructor(
 		@InjectRepository(SavedGame) private repo: Repository<SavedGame>,
-		private gameCluster: GameCluster) { }
+		private gameCluster: GameCluster,
+		@Inject(forwardRef(() =>  UsersService))
+		private usersService: UsersService
+			   ) { }
 
 	setWsServer(server: Server) {
 		this.server = server;
@@ -60,7 +63,7 @@ export class GameService {
 		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, { move: data.move, powerUp: data.powerup })
 	}
 
-	userState(id: number): { state: string, gameId?: UUID } {
+	userState(id: number): UserState {
 		return this.gameCluster.findUserStateById(id)
 	}
 

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { GameService } from './game.service';
 import { GameController } from './game.controller';
 import { UsersModule } from 'src/users/users.module';
@@ -12,7 +12,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 	providers: [GameService, GameCluster],
 	controllers: [GameController],
 	imports: [
-		UsersModule,
+		forwardRef(() => UsersModule),
 		TypeOrmModule.forFeature([SavedGame]),
 		JwtModule.register({
 			secret: 'secret', // not secure at all need to be changed in production  put in a .env file

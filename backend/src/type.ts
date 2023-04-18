@@ -1,8 +1,18 @@
+import {User} from './model/user.entity'
+
 export type UUID = string;
 
-export enum UserStatus {
-	  online = 'ONLINE',
-	  ingame = 'INGAME',
-	  offline = 'OFFLINE',
-	  watching = 'WATCHING',
+export type UserStatus = 'online' | 'ingame' | 'watching'
+
+export type UserState = {
+	states : UserStatus[],
+	gameIds : string[],
 }
+
+export type UserScore = {
+	points: number,
+	totalplayedGames: number,
+	totalwonGames: number,
+}
+
+export type UserInfo = User & UserState & UserScore & {userConnected: boolean}

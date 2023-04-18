@@ -124,7 +124,7 @@ export class Game {
 			return rest
 		})
 		return {
-			players: partialPlayers,
+			players: partialPlayers, // instead of Player
 			posBall: this.posBall,
 			status: this.status,
 			date: new Date()
