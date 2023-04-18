@@ -11,18 +11,27 @@ import Button from '@mui/material/Button';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthService } from '../auth/AuthService';
+import { getIdByToken } from '../token/token';
 
 const pages = ['Game', 'Leaderboard', 'Chat', 'About'];
 const menu = ['My profil', 'friends', 'Logout', 'all refresh token'];
 
 export function MuiAppBar() {
 
+    const auth = useAuthService()
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
-	const auth = useAuthService();
+    const [imgPath, setImgPath] = React.useState<string>("/Avatars/default.png");
 
+    React.useEffect(() => {
+        if (!auth.user) return;
+        const userId = getIdByToken();
+        console.log(userId);
+        setImgPath(`/Avatars/${userId}.png`);
+    }, [auth.user])
 
+        
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };
@@ -47,6 +56,7 @@ export function MuiAppBar() {
 		const path = page.replace(/\s/g, '');
         navigate("/" + path);
     };
+
 
 
     return (
@@ -152,7 +162,7 @@ export function MuiAppBar() {
                     <Box display="flex" sx={{ flexGrow: 0, marginLeft: 'auto' }}>
 
                         <IconButton sx={{ p: 0 }}>
-                            <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                            <Avatar alt="Remy Sharp" src={imgPath} />
                         </IconButton>
                         <Button onClick={handleOpenUserMenu} sx={{ color: 'white', display: 'block', fontWeight: 700 }}>
                             my profil
@@ -183,6 +193,7 @@ export function MuiAppBar() {
 
                 </Toolbar>
             </AppBar >
+            <div> {imgPath} </div>
         </React.Fragment>
 
     );

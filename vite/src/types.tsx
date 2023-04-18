@@ -2,6 +2,12 @@ export type userToken = {
 	  access_token: string;
 	  refresh_token?: string;
 	};
+export type DecodedToken = {
+	  sub: number;
+	  username: string;
+	  exp: number;
+	  iat: number;
+	};
 
 export type Pos2D = {
 		x: number,
