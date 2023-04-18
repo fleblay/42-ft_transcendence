@@ -194,7 +194,7 @@ function App() {
 						/>
 						<Route path="/Login" element={<LoginForm />} />
 						<Route path="/Register" element={<RegisterForm />} />
-						<Route path="/Allusers" element={<><ListUsers /> <FakeGames/></>} />
+						<Route path="/Allusers" element={<><ListUsers /> <br /> <FakeGames/></>} />
 						<Route path="/TestMenu" element={<MuiAppBar />} />
 						<Route path="/Leaderboard" element={<Leaderboard />} />
 						<Route path="/MyProfil" element={<MyProfil />} />

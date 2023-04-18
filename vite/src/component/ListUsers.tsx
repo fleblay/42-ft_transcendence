@@ -1,5 +1,15 @@
-import { useState} from "react";
+import { useState, useEffect } from "react";
 import apiClient from '../auth/interceptor.axios'
+
+//Mui
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { Button } from '@mui/material';
 
 type Games = {
 	date: string,
@@ -7,72 +17,80 @@ type Games = {
 	score: number[]
 }
 
-type User = {
-	avatar: string,
-	email: string,
-	gameIds: string[],
+type UserInfo = {
 	id: number,
 	username: string,
+	email: string,
+	password?: string, // To be removed in DTO in back
+	avatar: string,
+	savedGames: Games[],
+	wonGames: Games[],
+
 	states: string[],
-	userConnected: boolean
-	savedGames: Games[]
-	wonGames: Games[]
+	gameIds: string[],
 
-	totalScore: number
-	password?: string
+	points: number,
+	totalwonGames: number,
+	totalplayedGames: number,
+
+	userConnected: boolean,
 }
-
-type UserState = {
-  states : string[],
-  gameIds : string[],
-}
-
 
 export function ListUsers() {
 
-	const [info, setInfo] = useState<string>("No info yet...")
-	const [userList, setUserList] = useState<JSX.Element[]>([])
+	const [info, setInfo] = useState<string>("")
+	const [muiTable, setMuiTable] = useState<JSX.Element>(<div>Loading...</div>)
+
+	useEffect(() => handleClick(), [])
 
 	function handleClick(): void {
-			apiClient
+		setInfo("Waiting for backend to send User Database...")
+		apiClient
 			.get("/api/users/all")
-			.then((response) => {
-				console.log("ressponse from all: ", response)
-				setInfo("Successfully retrieve infos :")
-				let partialUserList = response.data.map((elem : User) => {
-					let {password, ...userInfo} = elem
-					return userInfo
-					})
-				return(partialUserList)
-				})
-			.then(async (partialUserList: User[]) => {
-				let partialUserList2 : User[] = await Promise.all(partialUserList.map(async (e: User) => {
-					const userStatus = (await apiClient .get(`/api/game/userstate/${e.id}`)).data as UserState
-					const userConnected = (await apiClient .get(`/api/users/connected/${e.id}`)).data as boolean
-					const totalScore = e.wonGames.reduce((acc, curr) => {
-						return acc + Math.max(...curr.score)
-						}, 0)
-					console.log("This is connected status", userConnected)
-					return {...e, ...userStatus, userConnected, totalScore}
-					}))
-				return(partialUserList2)
-				})
-			.then((partialUserList2) =>{
-				setUserList(partialUserList2.map((elem) =>{
-					return (
-						<li>{elem.id}
-							<ul style={{listStyleType: "none"}}>
-							<li>{elem.username}</li>
-							<li>{elem.email}</li>
-							<li>Total score : {elem.totalScore}</li>
-							<li>{(elem.states.join('-') == "" ? "No status": elem.states.join('-'))}</li>
-							<li>{(elem.gameIds.join('-') == "" ? "No game": elem.gameIds.join('-'))}</li>
-							<li>{(elem.userConnected) ? "En ligne": "Offline"}</li>
-							</ul>
-						</li>
-					)
-					}))
-				})
+			.then(({ data }) => {
+				console.log("response from all: ", data)
+				setInfo("Successfully retrieved infos !")
+				//Mui elements
+				setMuiTable(
+					<TableContainer component={Paper}>
+						<Table sx={{ minWidth: 650 }} aria-label="simple table">
+							<TableHead>
+								<TableRow>
+									<TableCell>Username</TableCell>
+									<TableCell align="right">Points</TableCell>
+									<TableCell align="right">Won Games</TableCell>
+									<TableCell align="right">Played Games</TableCell>
+									<TableCell align="right">UserId</TableCell>
+									<TableCell align="right">Email</TableCell>
+									<TableCell align="right">Online?</TableCell>
+									<TableCell align="right">Game Status</TableCell>
+									<TableCell align="right">GameId</TableCell>
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{data.map((elem: UserInfo) => (
+									<TableRow
+										key={elem.username}
+										sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+									>
+										<TableCell component="th" scope="row">
+											{elem.username}
+										</TableCell>
+										<TableCell align="right">{elem.points}</TableCell>
+										<TableCell align="right">{elem.totalwonGames}</TableCell>
+										<TableCell align="right">{elem.totalplayedGames}</TableCell>
+										<TableCell align="right">{elem.id}</TableCell>
+										<TableCell align="right">{elem.email}</TableCell>
+										<TableCell align="right">{(elem.userConnected) ? "Yes" : "No"}</TableCell>
+										<TableCell align="right">{(elem.states.join('-') == "") ? "None" : elem.states.join('-')}</TableCell>
+										<TableCell align="right">{(elem.gameIds.join('-') == "") ? "---" : elem.gameIds.join('-')}</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</TableContainer>
+				)
+			})
 			.catch((error) => {
 				console.log(error)
 				if (error?.response?.status === 502)
@@ -84,11 +102,11 @@ export function ListUsers() {
 
 	return (
 		<div>
-			<button onClick={handleClick}>Update Users list</button>
+			<Button variant='contained' onClick={handleClick}>
+				Update Users list
+			</Button>
 			<p>{info}</p>
-			<ul style={{listStyleType: "none"}}>
-				{...userList}
-			</ul>
+			{muiTable}
 		</div>
 	);
 }

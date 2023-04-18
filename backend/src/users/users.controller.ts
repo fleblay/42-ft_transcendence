@@ -50,6 +50,7 @@ export class UsersController {
 				userConnected: this.usersService.isConnected(user.id)
 			})
 		});
+		allUsers.sort((a, b) => b.points - a.points)
 		return allUsers
 	}
 

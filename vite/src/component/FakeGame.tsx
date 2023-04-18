@@ -1,10 +1,12 @@
 import { useState} from "react";
 import apiClient from '../auth/interceptor.axios'
+import { Button } from '@mui/material';
 
 export function FakeGames() {
 	const [info, setInfo] = useState<string>("No info yet")
 
-	async function handleClick2() : Promise<void> {
+	async function handleClick() : Promise<void> {
+		setInfo("Waiting for backend to generate fake games...")
 		let fakeArray = []
 		for(let i = 0; i < 10; i++) {
 			fakeArray.push(
@@ -13,7 +15,7 @@ export function FakeGames() {
 		}
 		try {
 		await Promise.all(fakeArray)
-		setInfo("Successfully added 10 fake games to history")
+		setInfo("Successfully added 10 fake games to history !")
 		} catch (e) {
 			console.log(e)
 			setInfo("Error. More info in console")
@@ -21,7 +23,9 @@ export function FakeGames() {
 	}
 	return (
 	<div>
-		<button onClick={handleClick2}>Generate Fake Game Info * 10</button>
+			<Button variant='contained' onClick={handleClick}>
+				Generate 10 fake games
+			</Button>
 		<p>{info}</p>
 	</div>
 	)
