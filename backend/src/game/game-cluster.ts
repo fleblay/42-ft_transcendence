@@ -21,7 +21,7 @@ export class GameCluster {
 			this.gamesMap.forEach((e) => {
 				info.push(e.players.map((e) => e.user.id).join('-'))
 			})
-			console.log("This is the game cluster", info)
+			//console.log("This is the game cluster", info)
 		}, 5000)
 	}
 

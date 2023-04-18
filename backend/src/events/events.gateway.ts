@@ -49,7 +49,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			const info = this.connectedSockets.map((e) => {
 				return e.username
 			})
-			console.log("\x1b[33mSockets info are : \x1b[0m", info.join('-'))
+			//console.log("\x1b[33mSockets info are : \x1b[0m", info.join('-'))
 		}, 5000)
 	}
 

@@ -16,21 +16,17 @@ export class RTGuard implements CanActivate {
 		console.log("RTGuard");
 		const request = context.switchToHttp().getRequest();
 		const refreshToken = request.get('X-Refresh-Token');
-		console.log("refresh token:" , refreshToken)
+		console.log("refresh token:", refreshToken)
 		if (!refreshToken) {
 			return false;
 		}
-		try {
-			const user =  await this.authService.validateRefreshToken(refreshToken);
-			//console.log("user:" , user);
-			if (!user) {
-				return false;
-			}
-			console.log("RTGuard return true");
-			return true;
-		} catch (e) {
-			console.error('RTGuard trycatch:', e)
-			return	false;
+		const user = await this.authService.validateRefreshToken(refreshToken);
+		//console.log("user:" , user);
+		if (!user) {
+			return false;
 		}
+		console.log("RTGuard return true");
+		return true;
+
 	}
 }

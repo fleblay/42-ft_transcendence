@@ -122,16 +122,28 @@ export class AuthService {
 	}
 
 	async validateRefreshToken(refreshToken: string) {
+
+		try {
+			const jwtResponse = this.jwtService.verify(refreshToken, refresh_token_options)
+			console.log(`User id is `, jwtResponse)
+		}
+		catch (e) {
+			console.log(`Error in validate Token refresh is ${e}`)
+			return null;
+		}
 		const user = await this.decodeToken(refreshToken);
 		if (!user) {
-			throw new ForbiddenException('Invalid refresh token');
+			console.log('Invalid refresh token');
+			return null;
 		}
 		const report = await this.repo.findOne({ where: { refreshToken } });
 		if (!report) {
-			throw new NotFoundException('User not found');
+			console.log('User not found');
+			return null;
 		}
 		if (report.userId !== user.id) {
-			throw new ForbiddenException('Invalid refresh token');
+			console.log('User id is not match');
+			return null;
 		}
 		return user;
 	}
