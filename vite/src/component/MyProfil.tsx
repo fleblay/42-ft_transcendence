@@ -1,11 +1,13 @@
 
-import { useState } from 'react';
-import { Button, TextField } from '@mui/material';
+import React, { useState } from 'react';
+import { Button, Container, TextField, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
 import { FormEvent } from 'react';
 import { Label } from '@mui/icons-material';
 import AvatarEditor from 'react-avatar-editor';
 import getCroppingRect from 'react-avatar-editor';
+import { Box } from '@mui/system';
+import { Paper } from '@mui/material';
 
 
 
@@ -46,13 +48,27 @@ export function MyProfil() {
 
 
 	return (
+		<React.Fragment>
 		<form onSubmit={handleSubmit}>
 			<div>	Choose profil pic</div>
 			<input  type="file" onChange={handleChange} />
 			<Button type="submit">Submit</Button>
 			<div> {error} </div>
-		
 		</form>
+		<Container maxWidth="md">
+		<Box sx={{
+					width: '100%',
+					border: '1px solid #D3C6C6',
+					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+					borderRadius: '16px',
+					p: '2rem',
+					}}>
+				<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1 }}>
+					My profil
+				</Typography>
+		</Box>
+		</Container>
+		</React.Fragment>
 
 	)
 }
