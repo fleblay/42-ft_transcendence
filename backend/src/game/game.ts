@@ -3,7 +3,7 @@ import { User } from '../model/user.entity'
 import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 import { GameCluster } from './game-cluster';
-import { SavedGame } from 'src/model/saved-game.entity';
+import { SavedGame } from '../model/saved-game.entity';
 
 const paddleLength = 100
 const paddleWidth = 5
