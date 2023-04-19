@@ -38,6 +38,7 @@ export class UsersService {
 		//return this.repo.findOneBy({ id });
 		return this.repo.createQueryBuilder("user")
 			.leftJoinAndSelect("user.savedGames", "savedgames")
+			.leftJoinAndSelect("user.wonGames", "wongames")
 			.where("user.id = :userId", {userId: id})
 			.getOne()
 	}

@@ -16,7 +16,7 @@ import { ResponsiveAppBar } from './component/ResponsiveAppBar'
 import { SocketProvider } from './socket/SocketProvider'
 import Leaderboard from './pages/Leaderboards'
 import { MuiAppBar } from './component/menu'
-import { MyProfil } from './component/MyProfil'
+import {  ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
 
 export interface Destinations {
@@ -38,6 +38,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "testMenu", path: "/TestMenu", public: false },
 	{ name: "MyProfil", path: "/MyProfil", public: false },
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
+	{ name: "Player", path: "/player", public: false},
 
 ]
 
@@ -197,8 +198,12 @@ function App() {
 						<Route path="/Allusers" element={<><ListUsers /> <br /> <FakeGames/></>} />
 						<Route path="/TestMenu" element={<MuiAppBar />} />
 						<Route path="/Leaderboard" element={<Leaderboard />} />
-						<Route path="/MyProfil" element={<MyProfil />} />
+						<Route path="/MyProfil" element={<ProfilPlayer />} />
 						<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
+						<Route path="/player/">
+							<Route path=":idPlayer" element={<ProfilPlayer />} />
+						</Route>
+
 
 						<Route path='*' element={<div>404</div>} />
 					</Route>
