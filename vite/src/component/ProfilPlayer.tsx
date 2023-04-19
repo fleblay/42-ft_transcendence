@@ -15,6 +15,7 @@ import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import { GameHistory } from './GameHistory';
 
 function fileToBlob(file: File) {
 	const blob = new Blob([file], { type: file.type });
@@ -160,6 +161,8 @@ export function ProfilPlayer() {
 					</Box>
 					<Box position="static" sx={{ height: 'auto' }}>
 						<Typography> Match history</Typography>
+						<Divider />
+						<GameHistory idPlayer={idPlayer}/>
 					</Box>
 				</Box>
 			</Container>

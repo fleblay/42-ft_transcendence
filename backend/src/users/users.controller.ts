@@ -12,6 +12,7 @@ import { User } from "../model/user.entity";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
 import { FileSizeGuard } from './guard/File-size.guard';
+import { SavedGame } from 'src/model/saved-game.entity';
 //import { Serialize } from '../interceptors/serialize.interceptor';
 //import { UserDto } from './dtos/user.dto';
 
@@ -91,7 +92,7 @@ export class UsersController {
 			points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
 		}
 		const status = this.gameService.userState(user.id).states;
-		console.log({...user, status, ...userScore, userConnected: await this.usersService.isConnected(user.id)});
-		return {...user, status , ...userScore, 	userConnected: await this.usersService.isConnected(user.id)};
+		console.log({...user, status, ...userScore, userConnected: await this.usersService.isConnected(user.id)}, user.savedGames);
+		return {...user, status , ...userScore, 	userConnected: await this.usersService.isConnected(user.id), savedGames: user.savedGames};
 	}
 }

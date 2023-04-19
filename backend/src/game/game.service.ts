@@ -89,6 +89,7 @@ export class GameService {
 		})
 	}
 
+
 	async getListGamesByUser(id: number) {
 		const fullDB = await this.repo.createQueryBuilder("game")
 			.leftJoin("game.players", "player")
