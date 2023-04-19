@@ -1,4 +1,5 @@
-import { Controller, Request, Query } from '@nestjs/common';
+import { Controller, Request, Query, Redirect, Response } from '@nestjs/common';
+import { Response as ExpressResponse } from 'express'
 import { Get } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common';
 import { ATGuard } from '../guard/access-token.guard';
@@ -35,26 +36,51 @@ export class AuthController {
 	}
 
 	@Get('/42auth')
-	async externalAuth(@Query() query: { code: string }) {
+	//For registering process !!!!
+	async externalAuth(@Response() res: ExpressResponse, @Query() query: { code: string }) {
+
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
 
 		const formData = new FormData()
-		formData.append("grant_type", "client_credentials")
-		formData.append("client_id", "u-s4t2ud-8dd21f008d6200a9e400a2deb0ccfe47fd119667e4de9dbb68559d40af8f70a2")
-		formData.append("client_secret", "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")
+		formData.append("grant_type", "authorization_code")
+		formData.append("client_id", `${process.env.API_CLIENT_ID}`)
+		formData.append("client_secret", `${process.env.API_CLIENT_SECRET}`)
+		formData.append("redirect_uri", "http://localhost:8080/api/auth/42auth") // Where users will be sent after authentification (here...)
 		formData.append("code", query.code)
 
-		const response = await fetch('https://api.intra.42.fr/oauth/token', {
+		//Fetch a token of type grant_type
+		const tokenRequest = await fetch('https://api.intra.42.fr/oauth/token', {
 			method: "POST",
 			body: formData
-		})
-		const data: {
-			access_token: string,
-			token_type: string,
-			expires_in: number,
-			scope: string,
-			created_at: number
-		} = await response.json()
-		console.log("\x1b[32mResponse data is :\x1b[0m", data.access_token)
+		}).then(response => response.json())
+		console.log("\x1b[32mResponse data is :\x1b[0m", tokenRequest)
+
+		//Fetch info about the received token
+		const tokenInfo = await fetch('https://api.intra.42.fr/oauth/token/info', {
+			headers: {
+				"Authorization": `Bearer ${tokenRequest.access_token}`
+			}
+		}).then(response => response.json())
+		console.log("\x1b[32mToken Info is :\x1b[0m", tokenInfo)
+
+		//Make request using that token
+		const { id: userId, email, login: username, image: imageURL } = await fetch('https://api.intra.42.fr/v2/me', {
+			headers: {
+				"Authorization": `Bearer ${tokenRequest.access_token}`
+			}
+		}).then(response => response.json())
+
+		//Proof the token is valid
+		console.log(`
+			userID : ${userId}
+			userEmail : ${email}
+			userLogin : ${username}
+			imageURL : ${imageURL.link}
+					`)
+		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
+		const tokens : {access_token: string, refresh_token: string} = await this.authService.register({email, username, password: "42"})
+		res.cookie('42API_access_token', `${tokens.access_token}`)
+		res.cookie('42API_refresh_token', `${tokens.refresh_token}`)
+		res.redirect(302, 'http://localhost:8080/')
 	}
 }
