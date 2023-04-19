@@ -11,6 +11,7 @@ import { UserInfo, UserScore } from '../type'
 import { User } from "../model/user.entity";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
+import { FileSizeGuard } from './guard/File-size.guard';
 //import { Serialize } from '../interceptors/serialize.interceptor';
 //import { UserDto } from './dtos/user.dto';
 
@@ -72,6 +73,7 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
+	@UseGuards(FileSizeGuard)
 	@Post('/uploadAvatar')
 	@UseInterceptors(FileInterceptor('image'))
 	async uploadAvatar(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File) {
@@ -83,6 +85,12 @@ export class UsersController {
 	@Get('/:id')
 	async findOne(@Param("id") id: string) {
 		const user = await this.usersService.findOne(parseInt(id));
-		return user;
+		const userScore: UserScore = {
+			totalplayedGames: user.savedGames.length,
+			totalwonGames: user.wonGames.length,
+			points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
+		}
+		console.log({...user, ...this.gameService.userState(user.id), ...userScore, userConnected: await this.usersService.isConnected(user.id)});
+		return {...user, ...this.gameService.userState(user.id), ...userScore, 	userConnected: await this.usersService.isConnected(user.id)};
 	}
 }

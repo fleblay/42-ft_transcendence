@@ -14,8 +14,8 @@ export class AuthController {
 
 	@Get('/refresh')
 	@UseGuards(RTGuard)
-	async refresh(@Request() req) {
-		console.log('refresh');
+	async refresh(@Request() req){
+		//console.log('refresh');
 		// token dans X-Refresh-Token
 		const refreshToken = req.get('X-Refresh-Token');
 		return this.authService.refreshToken(refreshToken);
@@ -29,8 +29,8 @@ export class AuthController {
 
 	@Get('/logout')
 	@UseGuards(ATGuard)
-	async logout(@Request() req) {
-		console.log('logout');
+	async logout(@Request() req){
+		//console.log('logout');
 		const refreshToken = req.get('X-Refresh-Token');
 		return this.authService.deleteRefreshToken(refreshToken);
 	}

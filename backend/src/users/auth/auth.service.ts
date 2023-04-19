@@ -34,26 +34,26 @@ export class AuthService {
 	async validateAccessToken(bearerToken: string): Promise<User> | null {
 		try {
 			const jwtResponse = this.jwtService.verify(bearerToken, access_token_options) // compliant to security rules of year 3000
-			//console.log(`User id is `, jwtResponse)
+			////console.log(`User id is `, jwtResponse)
 			return this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
-			console.log(`Error in validate Token access is ${e}`)
+			//console.log(`Error in validate Token access is ${e}`)
 			return null
 		}
 	}
 
 	decodeToken(bearerToken: string): Promise<User> | null {
 		try {
-			//console.log(`Bearer token is ${bearerToken}`)
+			////console.log(`Bearer token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.decode(bearerToken);
 			if (jwtResponse == null) {
-				console.log(`error in decode token`)
+				//console.log(`error in decode token`)
 				return null
 			}
-			//console.log(`Decode :  `, jwtResponse);
+			////console.log(`Decode :  `, jwtResponse);
 			return this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
-			console.log("Error in decode Token is :", e)
+			//console.log("Error in decode Token is :", e)
 			return null
 		}
 	}
@@ -66,7 +66,7 @@ export class AuthService {
 			throw new ForbiddenException('Password not match');
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
-		console.log(`tokens are ${tokens.access_token}`);
+		//console.log(`tokens are ${tokens.access_token}`);
 		return tokens;
 	}
 
@@ -91,7 +91,7 @@ export class AuthService {
 		const user = await this.usersService.create(dataUser);
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
-		console.log(`tokens are ${tokens}`);
+		//console.log(`tokens are ${tokens}`);
 		return tokens;
 	}
 
@@ -116,7 +116,7 @@ export class AuthService {
 		}
 		const tokens = this.getTokens(user);
 		await this.updateRefreshToken(user.id, tokens.refresh_token);
-		console.log("tokens are ", tokens);
+		//console.log("tokens are ", tokens);
 		return tokens;
 	}
 
@@ -124,24 +124,24 @@ export class AuthService {
 
 		try {
 			const jwtResponse = this.jwtService.verify(refreshToken, refresh_token_options)
-			console.log(`User id is `, jwtResponse)
+			//console.log(`User id is `, jwtResponse)
 		}
 		catch (e) {
-			console.log(`Error in validate Token refresh is ${e}`)
+			//console.log(`Error in validate Token refresh is ${e}`)
 			return null;
 		}
 		const user = await this.decodeToken(refreshToken);
 		if (!user) {
-			console.log('Invalid refresh token');
+			//console.log('Invalid refresh token');
 			return null;
 		}
 		const report = await this.repo.findOne({ where: { refreshToken } });
 		if (!report) {
-			console.log('User not found');
+			//console.log('User not found');
 			return null;
 		}
 		if (report.userId !== user.id) {
-			console.log('User id is not match');
+			//console.log('User id is not match');
 			return null;
 		}
 		return user;

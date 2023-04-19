@@ -52,6 +52,11 @@ export function MuiAppBar() {
 			auth.logout();
 			return;
 		}
+        if (page === 'My profil') {
+            const path = `/player/${getIdByToken()}`;
+            navigate(path);
+            return;
+        }
         console.log("handleNavigate", page)
 		const path = page.replace(/\s/g, '');
         navigate("/" + path);

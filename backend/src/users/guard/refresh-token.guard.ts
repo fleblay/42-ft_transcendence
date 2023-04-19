@@ -13,10 +13,10 @@ export class RTGuard implements CanActivate {
 	constructor(private authService: AuthService, private jwtService: JwtService) { }
 
 	async canActivate(context: ExecutionContext) {
-		console.log("RTGuard");
+		//console.log("RTGuard");
 		const request = context.switchToHttp().getRequest();
 		const refreshToken = request.get('X-Refresh-Token');
-		console.log("refresh token:", refreshToken)
+		//console.log("refresh token:", refreshToken)
 		if (!refreshToken) {
 			return false;
 		}
@@ -25,7 +25,7 @@ export class RTGuard implements CanActivate {
 		if (!user) {
 			return false;
 		}
-		console.log("RTGuard return true");
+		//console.log("RTGuard return true");
 		return true;
 
 	}
