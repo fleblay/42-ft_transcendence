@@ -90,7 +90,8 @@ export class UsersController {
 			totalwonGames: user.wonGames.length,
 			points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
 		}
-		console.log({...user, ...this.gameService.userState(user.id), ...userScore, userConnected: await this.usersService.isConnected(user.id)});
-		return {...user, ...this.gameService.userState(user.id), ...userScore, 	userConnected: await this.usersService.isConnected(user.id)};
+		const status = this.gameService.userState(user.id).states;
+		console.log({...user, status, ...userScore, userConnected: await this.usersService.isConnected(user.id)});
+		return {...user, status , ...userScore, 	userConnected: await this.usersService.isConnected(user.id)};
 	}
 }
