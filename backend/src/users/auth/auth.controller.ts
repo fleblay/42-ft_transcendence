@@ -36,6 +36,7 @@ export class AuthController {
 	}
 
 	@Get('/42auth')
+	//For registering process !!!!
 	async externalAuth(@Response() res: ExpressResponse, @Query() query: { code: string }) {
 
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
@@ -63,7 +64,7 @@ export class AuthController {
 		console.log("\x1b[32mToken Info is :\x1b[0m", tokenInfo)
 
 		//Make request using that token
-		const { id: userId, email: userEmail, login: userLogin, image: imageURL } = await fetch('https://api.intra.42.fr/v2/me', {
+		const { id: userId, email, login: username, image: imageURL } = await fetch('https://api.intra.42.fr/v2/me', {
 			headers: {
 				"Authorization": `Bearer ${tokenRequest.access_token}`
 			}
@@ -72,12 +73,14 @@ export class AuthController {
 		//Proof the token is valid
 		console.log(`
 			userID : ${userId}
-			userEmail : ${userEmail}
-			userLogin : ${userLogin}
+			userEmail : ${email}
+			userLogin : ${username}
 			imageURL : ${imageURL.link}
 					`)
 		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
-		res.cookie('testCookie', `${userId}`)
+		const tokens : {access_token: string, refresh_token: string} = await this.authService.register({email, username, password: "42"})
+		res.cookie('42API_access_token', `${tokens.access_token}`)
+		res.cookie('42API_refresh_token', `${tokens.refresh_token}`)
 		res.redirect(302, 'http://localhost:8080/')
 	}
 }
