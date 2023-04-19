@@ -58,6 +58,7 @@ export function ListUsers() {
 								<TableRow>
 									<TableCell>Username</TableCell>
 									<TableCell align="right">Points</TableCell>
+									<TableCell align="right">Win/Lose Ratio</TableCell>
 									<TableCell align="right">Won Games</TableCell>
 									<TableCell align="right">Played Games</TableCell>
 									<TableCell align="right">UserId</TableCell>
@@ -77,6 +78,7 @@ export function ListUsers() {
 											{elem.username}
 										</TableCell>
 										<TableCell align="right">{elem.points}</TableCell>
+										<TableCell align="right">{elem.totalplayedGames ? (elem.totalwonGames/elem.totalplayedGames).toPrecision(2) : 0}</TableCell>
 										<TableCell align="right">{elem.totalwonGames}</TableCell>
 										<TableCell align="right">{elem.totalplayedGames}</TableCell>
 										<TableCell align="right">{elem.id}</TableCell>
