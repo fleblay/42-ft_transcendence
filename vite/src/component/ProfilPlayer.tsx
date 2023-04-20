@@ -16,6 +16,8 @@ import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { GameHistory } from './GameHistory';
+import { Modal } from '@mui/material';
+
 
 function fileToBlob(file: File) {
 	const blob = new Blob([file], { type: file.type });
@@ -28,6 +30,7 @@ export function ProfilPlayer() {
 	const [error, setError] = useState<string | null>(null);
 	const [itsMe, setItsMe] = useState<boolean>(false);
 	const [userData, setUserData] = useState<any>(null);
+	const [openImg, setOpenImg] = useState<boolean>(false);
 	const auth = useAuthService()
 	const { idPlayer } = useParams<{ idPlayer: string }>();
 	const imgPath = `/avatars/${idPlayer}.png`
