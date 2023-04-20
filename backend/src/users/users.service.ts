@@ -106,7 +106,7 @@ export class UsersService {
 	}
 
 	async uploadAvatar(user: User , file: Express.Multer.File) {
-		const path = '/usr/src/app/Avatars/' + user.id + '.png';
+		const path = '/usr/src/app/avatars/' + user.id + '.png';
 		console.log("user.controller.uploadAvatar", file.buffer);
 		await sharp(file.buffer)
 			.resize(200, 200)

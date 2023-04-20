@@ -13,10 +13,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
 import { FileSizeGuard } from './guard/File-size.guard';
 import { SavedGame } from 'src/model/saved-game.entity';
-//import { Serialize } from '../interceptors/serialize.interceptor';
-//import { UserDto } from './dtos/user.dto';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
+
 
 @Controller('users')
+@Serialize(UserDto)
 export class UsersController {
 
 	constructor(private usersService: UsersService,
