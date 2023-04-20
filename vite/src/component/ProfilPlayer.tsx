@@ -69,7 +69,7 @@ export function ProfilPlayer() {
 			const file = event.target.files[0] as File;
 			if (file) {
 				setFile(file);
-				if(file.name.length > 20)
+				if (file.name.length > 20)
 					setFileName(file.name.substring(0, 20) + "...");
 				else
 					setFileName(file.name);
@@ -158,31 +158,31 @@ export function ProfilPlayer() {
 										Edit profil picture
 									</Button>
 									<Modal open={openImg} onClose={handleCloseImg} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-									<Container maxWidth="sm" className="centered-container" >
-										<Box sx={{
-											width: '100%',
-											border: '1px solid #D3C6C6',
-											boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-											borderRadius: '16px',
-											display: 'flex',
-											flexDirection: 'column',
-											alignItems: 'center',
-										}}
-											style={{
-												backgroundColor: '#f0f0f0'
-											}}>
-											<form onSubmit={handleSubmit}>
-												<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Update avatar</Typography>
-												<Divider />
-												<Button variant="contained" component="label" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }} >       {fileName ? fileName : '+ Upload file'} <input type="file" hidden onChange={handleChange} /> </Button>
-												<Button variant="outlined" type="submit" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>Submit</Button>
-												<Divider />
-												<div> {responseFile} </div>
-											</form>
-											<Button onClick={handleCloseImg}>Fermer</Button>
-										</Box>
-									</Container>
-								</Modal>
+										<Container maxWidth="sm" className="centered-container" >
+											<Box sx={{
+												width: '100%',
+												border: '1px solid #D3C6C6',
+												boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+												borderRadius: '16px',
+												display: 'flex',
+												flexDirection: 'column',
+												alignItems: 'center',
+											}}
+												style={{
+													backgroundColor: '#f0f0f0'
+												}}>
+												<form onSubmit={handleSubmit}>
+													<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Update avatar</Typography>
+													<Divider />
+													<Button variant="contained" component="label" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }} >       {fileName ? fileName : '+ Upload file'} <input type="file" hidden onChange={handleChange} /> </Button>
+													<Button variant="outlined" type="submit" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>Submit</Button>
+													<Divider />
+													<div> {responseFile} </div>
+												</form>
+												<Button onClick={handleCloseImg}>Fermer</Button>
+											</Box>
+										</Container>
+									</Modal>
 									<FormGroup>
 										<FormControlLabel control={<Switch defaultChecked />} label="Active 2fA" />
 									</FormGroup>
@@ -227,9 +227,13 @@ export function ProfilPlayer() {
 						</div>
 					</Box>
 					<Divider />
-					<Box position="static" sx={{ height: 'auto' }}>
-					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Match History</Typography>
-						<GameHistory idPlayer={idPlayer} />
+					<Box position="static" sx={{ height: 'auto' ,display: 'flex',
+												flexDirection: 'column',
+												alignItems: 'center',
+												mb:'30px'}}>
+						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '1rem' }} > Match History</Typography>
+
+							<GameHistory idPlayer={idPlayer} />
 					</Box>
 				</Box>
 			</Container>

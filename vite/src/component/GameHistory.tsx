@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import apiClient from "../auth/interceptor.axios";
 import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link } from "@mui/material";
 import { Link as LinkRouter } from "react-router-dom";
+import { TablePagination } from "@mui/material";
 
 type User = {
 	id: number;
@@ -26,6 +27,28 @@ function formattedDate(date: string) {
 export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 
 	const [listGames, setListGames] = useState<SaveGame[] | null>(null);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const rows = listGames?.map((game) => {
+        return {
+            players: game.players,
+            score: game.score.sort((a: number, b: number) => b - a).join(' '),
+            date: formattedDate(game.date),
+            winner: game.players[0].username,
+        }
+    }) as any;
+
+
+
+    const handleChangePage = (event : any, newPage : number) => {
+        setPage(newPage);
+      };
+      const handleChangeRowsPerPage = (event : any) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+      };
+    
+
 
 	useEffect(() => {
         if (idPlayer === undefined) return;
@@ -59,28 +82,38 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{listGames.map((game) => (
+                    {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row : any) => (
 							<TableRow
-								key={game.id}
+								key={row.id}
 								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 							>
 								<TableCell component="th" scope="row">
 									{
-										game.players.map((player: User) => {
+										row.players.map((player: User) => {
 											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username} </Link>
 										})
 									}
 								</TableCell>
-								<TableCell align="right">{game.score.sort((a: number, b: number) => b - a).map((score: number) => score.toString()).join(' ')}</TableCell>
-								<TableCell align="right">{formattedDate(game.date)}</TableCell>
+								<TableCell align="right">{row.score}</TableCell>
+								<TableCell align="right">{row.date}</TableCell>
 								<TableCell align="right"> 
-                                <Link key={game.players[0].id} component={LinkRouter} to={`/player/${game.players[0].id}`}>{game.players[0].username} </Link>
+                                <Link key={row.players[0].id} component={LinkRouter} to={`/player/${row.players[0].id}`}>{row.players[0].username} </Link>
                                 </TableCell>
 							</TableRow>
-						))}
+                        )   
+                        )}
 					</TableBody>
 				</Table>
-			</TableContainer>
+                <TablePagination
+        rowsPerPageOptions={[10, 25, 50]}
+        component="div"
+        count={rows.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </TableContainer>
 		</div>
 	);
 }
