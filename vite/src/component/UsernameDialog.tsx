@@ -30,14 +30,18 @@ export function UsernameDialog() {
 			open={true}
 			onClose={() => {}}
 		>
-			<DialogTitle id="alert-dialog-title">
+			<DialogTitle>
 				{"You don't have a username."}
 			</DialogTitle>
 			<DialogContent>
-				<DialogContentText id="alert-dialog-description">
+				<DialogContentText>
 					Choose a unique username to play the game.
 				</DialogContentText>
-				<TextField error={!!error} helperText={error} size='small' id="standard-basic" label="Username" margin="normal" fullWidth />
+				<TextField
+					error={!!error} helperText={error}
+					size='small' margin="normal" fullWidth
+					label="Username"
+				/>
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={handleConfirm} autoFocus>
