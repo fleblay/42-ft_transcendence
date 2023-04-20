@@ -15,6 +15,13 @@ interface SaveGame {
 	winner: User;
 }
 
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+
+function formattedDate(date: string) {
+    const d = new Date(date);
+    return d.toLocaleDateString() + " " + d.toLocaleTimeString();
+}
 
 export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 
@@ -29,7 +36,14 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 		})
 	}, [])
 
-	if (listGames === null) return <div>Loading...</div>
+	if (listGames === null) return (
+        <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
+
+        <Box sx={{ display: 'flex' }}>
+          <CircularProgress />
+        </Box>
+        </div>
+      );
 
 	return (
 		<div>
@@ -38,8 +52,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
 					<TableHead>
 						<TableRow>
-							<TableCell>Game id</TableCell>
-							<TableCell align="right">Players</TableCell>
+							<TableCell align="left">Players</TableCell>
 							<TableCell align="right">Score</TableCell>
 							<TableCell align="right">Date</TableCell>
 							<TableCell align="right">Winner</TableCell>
@@ -52,19 +65,16 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 							>
 								<TableCell component="th" scope="row">
-									{game.id}
-								</TableCell>
-								<TableCell align="right">
 									{
 										game.players.map((player: User) => {
-											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
+											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username} </Link>
 										})
 									}
 								</TableCell>
 								<TableCell align="right">{game.score.sort((a: number, b: number) => b - a).map((score: number) => score.toString()).join(' ')}</TableCell>
-								<TableCell align="right">{game.date}</TableCell>
+								<TableCell align="right">{formattedDate(game.date)}</TableCell>
 								<TableCell align="right"> 
-                                "not implemented yet"
+                                <Link key={game.players[0].id} component={LinkRouter} to={`/player/${game.players[0].id}`}>{game.players[0].username} </Link>
                                 </TableCell>
 							</TableRow>
 						))}

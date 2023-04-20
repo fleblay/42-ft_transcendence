@@ -228,8 +228,7 @@ export function ProfilPlayer() {
 					</Box>
 					<Divider />
 					<Box position="static" sx={{ height: 'auto' }}>
-						<Typography> Match history</Typography>
-						<Divider />
+					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Match History</Typography>
 						<GameHistory idPlayer={idPlayer} />
 					</Box>
 				</Box>
