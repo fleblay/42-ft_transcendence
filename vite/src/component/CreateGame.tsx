@@ -95,9 +95,7 @@ export function CreateGame() {
 						{privateGame ? "Create a private game" : "Join a game"}
 					</Button>
 				</Box>
-			</Container>
-			<JoinGames joinGames={joinGames} />
-			<Container maxWidth="md">
+				<JoinGames joinGames={joinGames} />
 				<FinishGames />
 			</Container>
 		</>
