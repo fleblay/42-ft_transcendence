@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import apiClient from '../auth/interceptor.axios'
+import { Link as LinkRouter } from "react-router-dom";
 
 //Mui
 import Table from '@mui/material/Table';
@@ -9,7 +10,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Button } from '@mui/material';
+import { Avatar, Button, Link } from '@mui/material';
 
 type Games = {
 	date: string,
@@ -41,7 +42,13 @@ export function ListUsers() {
 	const [info, setInfo] = useState<string>("")
 	const [muiTable, setMuiTable] = useState<JSX.Element>(<div>Loading...</div>)
 
-	useEffect(() => handleClick(), [])
+	useEffect(() => {
+		setTimeout(handleClick, 50)
+		const refreshTimer = setInterval(handleClick, 2000)
+		return (
+			() => clearInterval(refreshTimer)
+		)
+	}, [])
 
 	function handleClick(): void {
 		setInfo("Waiting for backend to send User Database...")
@@ -75,15 +82,17 @@ export function ListUsers() {
 										sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 									>
 										<TableCell component="th" scope="row">
-											{elem.username}
+											<Link key={elem.id} component={LinkRouter} to={`/player/${elem.id}`}>{elem.username} </Link>
 										</TableCell>
 										<TableCell align="right">{elem.points}</TableCell>
-										<TableCell align="right">{elem.totalplayedGames ? (elem.totalwonGames/elem.totalplayedGames).toPrecision(2) : 0}</TableCell>
+										<TableCell align="right">{elem.totalplayedGames ? (elem.totalwonGames / elem.totalplayedGames).toPrecision(2) : 0}</TableCell>
 										<TableCell align="right">{elem.totalwonGames}</TableCell>
 										<TableCell align="right">{elem.totalplayedGames}</TableCell>
 										<TableCell align="right">{elem.id}</TableCell>
 										<TableCell align="right">{elem.email}</TableCell>
-										<TableCell align="right">{(elem.userConnected) ? "Yes" : "No"}</TableCell>
+										<TableCell align="right">
+											<Avatar sx={{ bgcolor: elem.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar>
+										</TableCell>
 										<TableCell align="right">{(elem.states.join('-') == "") ? "None" : elem.states.join('-')}</TableCell>
 										<TableCell align="right">{(elem.gameIds.join('-') == "") ? "---" : elem.gameIds.join('-')}</TableCell>
 									</TableRow>
@@ -105,7 +114,7 @@ export function ListUsers() {
 	return (
 		<div>
 			<Button variant='contained' onClick={handleClick}>
-				Update Users list
+				Manually Update Users list
 			</Button>
 			<p>{info}</p>
 			{muiTable}
