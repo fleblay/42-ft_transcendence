@@ -123,4 +123,9 @@ export class UsersService {
 		console.log ("user", user);
 		return this.repo.save(user);
 	}
+
+	changeUsername(user: User, newUsername: string) {
+		user.username = newUsername;
+		return this.repo.save(user);
+	}
 }
