@@ -13,7 +13,7 @@ export function saveToken(token: userToken) {
 export function getAccessToken() {
 	const cookieArray = document.cookie.split(';').map((val)=> {
 		const splited_token = val.split('=')
-		return ({key: splited_token[0].trim(), value: splited_token[1].trim()})})
+		return ({key: splited_token[0]?.trim(), value: splited_token[1]?.trim()})})
 	const access_token_42 = cookieArray.find((cookie)=> cookie.key == "42API_access_token")?.value
 	console.log("Cookie 42 access token is [", access_token_42, "]")
 	//return localStorage.getItem("access_token") || access_token_42;

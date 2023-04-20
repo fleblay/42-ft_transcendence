@@ -81,6 +81,6 @@ export class AuthController {
 		const tokens : {access_token: string, refresh_token: string} = await this.authService.register({email, username, password: "42"})
 		res.cookie('42API_access_token', `${tokens.access_token}`)
 		res.cookie('42API_refresh_token', `${tokens.refresh_token}`)
-		res.redirect(302, 'http://localhost:8080/')
+		res.redirect(302, '/')
 	}
 }
