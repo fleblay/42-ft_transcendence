@@ -9,12 +9,13 @@ import { Post } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
+	redirectURI = "http://localhost:8080/api/auth/42auth"
 
 	constructor(private authService: AuthService) { }
 
 	@Get('/refresh')
 	@UseGuards(RTGuard)
-	async refresh(@Request() req){
+	async refresh(@Request() req) {
 		//console.log('refresh');
 		// token dans X-Refresh-Token
 		const refreshToken = req.get('X-Refresh-Token');
@@ -29,25 +30,31 @@ export class AuthController {
 
 	@Get('/logout')
 	@UseGuards(ATGuard)
-	async logout(@Request() req){
+	async logout(@Request() req) {
 		//console.log('logout');
 		const refreshToken = req.get('X-Refresh-Token');
 		return this.authService.deleteRefreshToken(refreshToken);
 	}
 
+	@Get('/42externalauth')
+	redirectTo42Api(@Response() res: ExpressResponse) {
+		res.redirect(302, `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.API_CLIENT_ID}&redirect_uri=${encodeURI(this.redirectURI)}&response_type=code`)
+	}
+
 	@Get('/42auth')
 	async externalAuth(@Response() res: ExpressResponse, @Query() query: { code: string }) {
 
+		//Code received after user granted acces to our app visiting the link in this.redirectTo42Api
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
 
+		//Fetch a token of type grant_type
 		const formData = new FormData()
 		formData.append("grant_type", "authorization_code")
 		formData.append("client_id", `${process.env.API_CLIENT_ID}`)
 		formData.append("client_secret", `${process.env.API_CLIENT_SECRET}`)
-		formData.append("redirect_uri", "http://localhost:8080/api/auth/42auth") // Where users will be sent after authentification (here...)
+		formData.append("redirect_uri", this.redirectURI) // Where users will be sent after authentification (here...)
 		formData.append("code", query.code)
 
-		//Fetch a token of type grant_type
 		const tokenRequest = await fetch('https://api.intra.42.fr/oauth/token', {
 			method: "POST",
 			body: formData
@@ -76,17 +83,13 @@ export class AuthController {
 			userLogin : ${username}
 			imageURL : ${imageURL.link}
 					`)
-			console.log("Other keys", Object.keys(rest))
-		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
-		const tokens : {access_token: string, refresh_token: string} = await this.authService.login42API({email, username, password: "42"})
+		console.log("Other keys", Object.keys(rest))
 
+		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
+		const tokens: { access_token: string, refresh_token: string } = await this.authService.login42API({ email, username, password: "42" })
 		res.cookie('42API_access_token', `${tokens.access_token}`)
 		res.cookie('42API_refresh_token', `${tokens.refresh_token}`)
 		res.redirect(302, '/')
 	}
 
-	@Get('/42externalauth')
-	redirectTo42Api(@Response() res: ExpressResponse) {
-		res.redirect(302, `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.API_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fauth%2F42auth&response_type=code`)
-	}
 }
