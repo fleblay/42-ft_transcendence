@@ -154,7 +154,7 @@ export function ProfilPlayer() {
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} />
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Ratio : {userData?.totalplayedGames / userData?.totalwonGames}
+									Ratio : {(userData?.totalplayedGames / userData?.totalwonGames).toFixed(2)}
 								</Typography>
 							</div>
 						</div>
