@@ -63,7 +63,6 @@ export const UsernameDialog: React.FC<UsernameDialogProps> = ({ open = true, qui
 					onChange={e => {
 						setUsername(e.target.value)
 					}}
-					multiline
 				/>
 			</DialogContent>
 			<DialogActions>

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../model/user.entity'
@@ -124,7 +124,15 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	changeUsername(user: User, newUsername: string) {
+	async changeUsername(user: User, newUsername: string) {
+		if (!newUsername)
+			throw new BadRequestException("Username is required");
+		if (user.username == newUsername)
+			return user;
+		if (await this.findOneByUsername(newUsername))
+			throw new BadRequestException("Username already taken");
+		if (newUsername.length < 3 || newUsername.length > 20)
+			throw new BadRequestException("Username must be between 3 and 20 characters");
 		user.username = newUsername;
 		return this.repo.save(user);
 	}
