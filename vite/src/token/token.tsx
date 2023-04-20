@@ -2,39 +2,58 @@ import { userToken } from "../types";
 import jwt_decode from "jwt-decode";
 import { DecodedToken } from "../types";
 
+function getCookieArray(): { key: string, value: string }[] {
+	const cookieArray = document.cookie.split('; ').map((val: string) => {
+		const splited_token = val.split('=')
+		if (splited_token.length == 2)
+			return ({
+				key: splited_token[0],
+				value: splited_token[1]
+			})
+		else
+			return null
+	}).filter(elem => elem)
+	return cookieArray as {key: string, value: string}[]
+}
+
+function getCookieValue(key: string) : string | null {
+	const foundCookie = getCookieArray().find((cookie: {key: string, value: string}) => cookie.key == key)
+	return (foundCookie ? foundCookie.value : null)
+}
+
+function removeCookie(key: string) : void {
+	document.cookie = `${key}=; expires = Thu, 01 Jan 1970 00:00:00 GMT`
+	}
+
 export function saveToken(token: userToken) {
 	localStorage.setItem("access_token", token.access_token);
 	if (token.refresh_token)
 		localStorage.setItem("refresh_token", token.refresh_token);
 }
 
-//TODO : Ecrire un cookie provider qui permettra de les lires plus simplement
-//TODO : Gestion des cookies et du local storage pour le register et l'auth
 export function getAccessToken() {
-	const cookieArray = document.cookie.split(';').map((val)=> {
-		const splited_token = val.split('=')
-		return ({key: splited_token[0]?.trim(), value: splited_token[1]?.trim()})})
-	const access_token_42 = cookieArray.find((cookie)=> cookie.key == "42API_access_token")?.value
-	console.log("Cookie 42 access token is [", access_token_42, "]")
-	//return localStorage.getItem("access_token") || access_token_42;
-	return localStorage.getItem("access_token")
+	const access_token_42 = getCookieValue("42API_access_token")
+	//return localStorage.getItem("access_token")
+	return localStorage.getItem("access_token") || access_token_42;
 }
 
 export function getRefreshToken() {
-	return localStorage.getItem("refresh_token");
+	const refresh_token_42 = getCookieValue("42API_refresh_token")
+	//return localStorage.getItem("refresh_token");
+	return localStorage.getItem("access_token") || refresh_token_42;
 }
-
 
 export function delAccessToken() {
 	localStorage.removeItem('access_token');
+	removeCookie('42API_access_token')
 }
 
 export function delRefreshToken() {
 	localStorage.removeItem('refresh_token');
+	removeCookie('42API_refresh_token')
 }
 
-export function getIdByToken()
-{
+export function getIdByToken() {
 	console.log("getIdByToken");
 	const token = getAccessToken();
 	if (token) {
