@@ -17,6 +17,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { GameHistory } from './GameHistory';
 import { Modal } from '@mui/material';
+import { UsernameDialog } from './UsernameDialog';
 
 
 function fileToBlob(file: File) {
@@ -35,6 +36,7 @@ export function ProfilPlayer() {
 	const { idPlayer } = useParams<{ idPlayer: string }>();
 	const imgPath = `/avatars/${idPlayer}.png`
 
+	const [openUsername, setOpenUsername] = useState<boolean>(false);
 
 	React.useEffect(() => {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
@@ -84,15 +86,17 @@ export function ProfilPlayer() {
 		});
 	};
 
-
 	return (
 		<React.Fragment>
-			{itsMe ? <form onSubmit={handleSubmit}>
-				<div>	Choose profil pic</div>
-				<input type="file" onChange={handleChange} />
-				<Button type="submit">Submit</Button>
-				<div> {error} </div>
-			</form> : null}
+			<UsernameDialog open={openUsername} quit={() => setOpenUsername(false)} />
+			{itsMe ? (
+				<form onSubmit={handleSubmit}>
+					<div>	Choose profil pic</div>
+					<input type="file" onChange={handleChange} />
+					<Button type="submit">Submit</Button>
+					<div> {error} </div>
+				</form>
+			) : null}
 			<Container maxWidth="md">
 				<Box sx={{
 					width: '100%',
@@ -126,11 +130,29 @@ export function ProfilPlayer() {
 								</div>
 								{userData && userData.status.lenght > 0 ? <Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>status </Typography> : null}
 							</Box>
-							{!itsMe ? <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 3, mb: 2 }} > add a friend </Button> : <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 3, mb: 2 }} > edit profil picture </Button>}
-							{!itsMe ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 3, mb: 2 }} > block</Button> :  <FormGroup>
-							<FormControlLabel control={<Switch defaultChecked />} label="Active 2fA" />
-						  	</FormGroup>}
-
+							{itsMe ? (
+								<>
+									<Button
+										variant="contained" sx={{ ml: 'auto', mt: 2, mb: 2 }}
+										onClick={() => setOpenUsername(true)}
+									>
+										Change username
+									</Button>
+									<Button
+										variant="contained" sx={{ ml: 1, mr: 1, mt: 2, mb: 2 }}
+									>
+										Edit profil picture
+									</Button>
+									<FormGroup>
+										<FormControlLabel control={<Switch defaultChecked />} label="Active 2fA" />
+									</FormGroup>
+								</>
+							) : (
+								<>
+									<Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} >add a friend </Button>
+									<Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }}>block</Button>
+								</>
+							)}
 
 						</div>
 					</Box>
@@ -159,7 +181,7 @@ export function ProfilPlayer() {
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} />
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Ratio : { userData?.totalplayedGame ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
+									Ratio : {userData?.totalplayedGame ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
 								</Typography>
 							</div>
 						</div>
@@ -167,7 +189,7 @@ export function ProfilPlayer() {
 					<Box position="static" sx={{ height: 'auto' }}>
 						<Typography> Match history</Typography>
 						<Divider />
-						<GameHistory idPlayer={idPlayer}/>
+						<GameHistory idPlayer={idPlayer} />
 					</Box>
 				</Box>
 			</Container>
