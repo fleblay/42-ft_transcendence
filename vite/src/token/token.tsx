@@ -40,7 +40,7 @@ export function getAccessToken() {
 export function getRefreshToken() {
 	const refresh_token_42 = getCookieValue("42API_refresh_token")
 	//return localStorage.getItem("refresh_token");
-	return localStorage.getItem("access_token") || refresh_token_42;
+	return localStorage.getItem("refresh_token") || refresh_token_42;
 }
 
 export function delAccessToken() {
