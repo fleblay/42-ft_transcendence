@@ -1,4 +1,4 @@
-import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject } from '@nestjs/common';
+import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch } from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -72,6 +72,13 @@ export class UsersController {
 		}
 		const token = auth.replace('Bearer ', '');
 		return this.authService.validateAccessToken(token);
+	}
+
+	@UseGuards(ATGuard)
+	@Patch('/me')
+	@Serialize(UserDto)
+	changeUsername(@CurrentUser() user: User, @Body() body: { username: string }) {
+		return this.usersService.changeUsername(user, body.username);
 	}
 
 	@UseGuards(ATGuard)

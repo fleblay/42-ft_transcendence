@@ -71,10 +71,10 @@ export class AuthService {
 	}
 
 	getTokens(user: User) {
-		const access_token_payload = { username: user.username, sub: user.id };
+		const access_token_payload = { username: user.email, sub: user.id };
 		const access_token = this.jwtService.sign(access_token_payload, access_token_options);
 
-		const refresh_token_payload = { username: user.username, sub: user.id };
+		const refresh_token_payload = { username: user.email, sub: user.id };
 		const refresh_token = this.jwtService.sign(refresh_token_payload, refresh_token_options);
 
 		return { access_token, refresh_token };
