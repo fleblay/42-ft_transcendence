@@ -75,14 +75,7 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
-	@Patch('/me')
-	@Serialize(UserDto)
-	changeUsername(@CurrentUser() user: User, @Body() body: { username: string }) {
-		return this.usersService.changeUsername(user, body.username);
-	}
-
-	@UseGuards(ATGuard)
-	@UseGuards(FileSizeGuard)
+	//@UseGuards(FileSizeGuard)
 	@Post('/uploadAvatar')
 	@UseInterceptors(FileInterceptor('image'))
 	async uploadAvatar(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File) {
