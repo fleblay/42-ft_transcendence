@@ -55,10 +55,10 @@ export class GameController {
 
 	@UseGuards(ATGuard)
 	@Get('/history/:id')
-	async getLeaderboardById(@Param('id') id: number) {
+	async getHistory(@Param('id') id: number) {
 	
 		const games = await this.gameService.getListGamesByUser(id);
-		console.log('games: ', games);
+		//console.log('games: ', games);
 		return games;
 	}
 
