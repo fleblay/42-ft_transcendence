@@ -18,6 +18,7 @@ import Leaderboard from './pages/Leaderboards'
 import { MuiAppBar } from './component/menu'
 import {  ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
+import { UsernameDialog } from './component/UsernameDialog'
 
 export interface Destinations {
 	name: string,
@@ -85,6 +86,12 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 			<Link to="/login">Login Page</Link>;
 			<Link to="/register">Register Page</Link>;
 		</>
+	}
+	if (!auth.user.username)
+	{
+		return (
+			<UsernameDialog />
+		)
 	}
 
 	return children;
@@ -203,8 +210,6 @@ function App() {
 						<Route path="/player/">
 							<Route path=":idPlayer" element={<ProfilPlayer />} />
 						</Route>
-
-
 						<Route path='*' element={<div>404</div>} />
 					</Route>
 				</Routes>
