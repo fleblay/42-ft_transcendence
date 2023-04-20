@@ -70,7 +70,6 @@ export class AuthService {
 		return tokens;
 	}
 
-
 	getTokens(user: User) {
 		const access_token_payload = { username: user.username, sub: user.id };
 		const access_token = this.jwtService.sign(access_token_payload, access_token_options);
@@ -93,6 +92,13 @@ export class AuthService {
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
 		console.log(`tokens are access [${tokens.access_token}], refresh [${tokens.refresh_token}]`);
 		return tokens;
+	}
+
+	async login42API(dataUser: CreateUserDto) {
+		if (await this.usersService.findOneByEmail(dataUser.email))
+			return this.login(dataUser)
+		else
+			return this.register(dataUser)
 	}
 
 	async saveRefreshToken(userId: number, refreshToken: string) {

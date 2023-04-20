@@ -3,12 +3,12 @@ import jwt_decode from "jwt-decode";
 import { DecodedToken } from "../types";
 
 function getCookieArray(): { key: string, value: string }[] {
-	const cookieArray = document.cookie.split(';').map((val: string) => {
+	const cookieArray = document.cookie.split('; ').map((val: string) => {
 		const splited_token = val.split('=')
 		if (splited_token.length == 2)
 			return ({
-				key: splited_token[0]?.trim(),
-				value: splited_token[1]?.trim()
+				key: splited_token[0],
+				value: splited_token[1]
 			})
 		else
 			return null
@@ -21,7 +21,9 @@ function getCookieValue(key: string) : string | null {
 	return (foundCookie ? foundCookie.value : null)
 }
 
-function removeCookie({key, value}: {key: string, value : string}) : void {}
+function removeCookie(key: string) : void {
+	document.cookie = `${key}=; expires = Thu, 01 Jan 1970 00:00:00 GMT`
+	}
 
 export function saveToken(token: userToken) {
 	localStorage.setItem("access_token", token.access_token);
@@ -29,26 +31,26 @@ export function saveToken(token: userToken) {
 		localStorage.setItem("refresh_token", token.refresh_token);
 }
 
-//TODO : Ecrire un cookie provider qui permettra de les lires plus simplement
-//TODO : Gestion des cookies et du local storage pour le register et l'auth
 export function getAccessToken() {
 	const access_token_42 = getCookieValue("42API_access_token")
-	console.log("Cookie 42 access token is now [", access_token_42, "]")
-	//return localStorage.getItem("access_token") || access_token_42;
-	return localStorage.getItem("access_token")
+	//return localStorage.getItem("access_token")
+	return localStorage.getItem("access_token") || access_token_42;
 }
 
 export function getRefreshToken() {
-	return localStorage.getItem("refresh_token");
+	const refresh_token_42 = getCookieValue("42API_refresh_token")
+	//return localStorage.getItem("refresh_token");
+	return localStorage.getItem("access_token") || refresh_token_42;
 }
-
 
 export function delAccessToken() {
 	localStorage.removeItem('access_token');
+	removeCookie('42API_access_token')
 }
 
 export function delRefreshToken() {
 	localStorage.removeItem('refresh_token');
+	removeCookie('42API_refresh_token')
 }
 
 export function getIdByToken() {

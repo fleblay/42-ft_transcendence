@@ -38,13 +38,17 @@ export function LoginForm() {
 		}).catch((error) => {
 			let errorInfo = {
 				status: error?.response?.status,
-				statusText:  error?.response?.statusText,
+				statusText: error?.response?.statusText,
 				message: error?.response?.data?.message
-				}
+			}
 			setInfo(`Login failed : ${errorInfo.status} - ${errorInfo.statusText}${" : " + (errorInfo.message || "No additional info")}`)
 			console.log(error)
 		});
 	};
+
+	const handle42login = () => {
+			window.location.replace(`${window.location.origin}/api/auth/42externalauth`)
+	}
 
 	return (
 		<div>
@@ -69,6 +73,9 @@ export function LoginForm() {
 							</Grid>
 						</Grid>
 					</form>
+					<Grid item xs={12}>
+						<Button onClick={handle42login} variant="contained" color="success" fullWidth sx={{ my: 2 }}>Login with 42</Button>
+					</Grid>
 
 					<Box sx={{ my: 3 }}>
 						<Link to="/register">No account ? Register</Link>

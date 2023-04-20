@@ -21,6 +21,7 @@ export function FakeGames() {
 			setInfo("Error. More info in console")
 		}
 	}
+
 	return (
 	<div>
 			<Button variant='contained' onClick={handleClick}>

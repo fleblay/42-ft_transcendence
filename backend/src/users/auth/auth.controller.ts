@@ -36,7 +36,6 @@ export class AuthController {
 	}
 
 	@Get('/42auth')
-	//For registering process !!!!
 	async externalAuth(@Response() res: ExpressResponse, @Query() query: { code: string }) {
 
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
@@ -64,7 +63,7 @@ export class AuthController {
 		console.log("\x1b[32mToken Info is :\x1b[0m", tokenInfo)
 
 		//Make request using that token
-		const { id: userId, email, login: username, image: imageURL } = await fetch('https://api.intra.42.fr/v2/me', {
+		const { id: userId, email, login: username, image: imageURL, ...rest } = await fetch('https://api.intra.42.fr/v2/me', {
 			headers: {
 				"Authorization": `Bearer ${tokenRequest.access_token}`
 			}
@@ -77,10 +76,17 @@ export class AuthController {
 			userLogin : ${username}
 			imageURL : ${imageURL.link}
 					`)
+			console.log("Other keys", Object.keys(rest))
 		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
-		const tokens : {access_token: string, refresh_token: string} = await this.authService.register({email, username, password: "42"})
+		const tokens : {access_token: string, refresh_token: string} = await this.authService.login42API({email, username, password: "42"})
+
 		res.cookie('42API_access_token', `${tokens.access_token}`)
 		res.cookie('42API_refresh_token', `${tokens.refresh_token}`)
 		res.redirect(302, '/')
+	}
+
+	@Get('/42externalauth')
+	redirectTo42Api(@Response() res: ExpressResponse) {
+		res.redirect(302, `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.API_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fauth%2F42auth&response_type=code`)
 	}
 }
