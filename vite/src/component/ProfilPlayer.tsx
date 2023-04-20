@@ -17,6 +17,8 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { GameHistory } from './GameHistory';
 import { Modal } from '@mui/material';
+import { Input } from '@mui/material';
+
 
 
 function fileToBlob(file: File) {
@@ -31,6 +33,8 @@ export function ProfilPlayer() {
 	const [itsMe, setItsMe] = useState<boolean>(false);
 	const [userData, setUserData] = useState<any>(null);
 	const [openImg, setOpenImg] = useState<boolean>(false);
+	const [fileName, setFileName] = useState<string>('');
+	const [responseFile, setResponseFile] = useState<string>('');
 	const auth = useAuthService()
 	const { idPlayer } = useParams<{ idPlayer: string }>();
 	const imgPath = `/avatars/${idPlayer}.png`
@@ -61,38 +65,50 @@ export function ProfilPlayer() {
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files) {
-			setFile(event.target.files[0]);
+			const file = event.target.files[0] as File;
+			if (file) {
+				setFile(file);
+				if(file.name.length > 20)
+					setFileName(file.name.substring(0, 20) + "...");
+				else
+					setFileName(file.name);
+
+			}
 		}
 	};
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (file?.type !== 'image/png') {
-			setError('Only png files are allowed');
+			setResponseFile('Only png files are allowed');
+			return;
+		}
+		if (file?.size > 1000000) {
+			setResponseFile('File size must be less than 1MB');
 			return;
 		}
 		const formData = new FormData();
+		console.log(file);
 		formData.append('image', fileToBlob(file as File));
 		apiClient.post('/api/users/uploadAvatar', formData, {
 			headers: {
 				'Content-Type': 'multipart/form-data'
 			}
 		}).then((response) => {
+			setResponseFile("Image uploaded successfully");
 			console.log(response);
 		}).catch((error) => {
+			setResponseFile("Error while uploading image");
 			console.log(error);
 		});
 	};
 
+	const handleOpenImg = () => setOpenImg(true);
+	const handleCloseImg = () => setOpenImg(false);
 
 	return (
 		<React.Fragment>
-			{itsMe ? <form onSubmit={handleSubmit}>
-				<div>	Choose profil pic</div>
-				<input type="file" onChange={handleChange} />
-				<Button type="submit">Submit</Button>
-				<div> {error} </div>
-			</form> : null}
+
 			<Container maxWidth="md">
 				<Box sx={{
 					width: '100%',
@@ -126,10 +142,36 @@ export function ProfilPlayer() {
 								</div>
 								{userData && userData.status.lenght > 0 ? <Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>status </Typography> : null}
 							</Box>
-							{!itsMe ? <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 3, mb: 2 }} > add a friend </Button> : <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 3, mb: 2 }} > edit profil picture </Button>}
-							{!itsMe ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 3, mb: 2 }} > block</Button> :  <FormGroup>
-							<FormControlLabel control={<Switch defaultChecked />} label="Active 2fA" />
-						  	</FormGroup>}
+							{!itsMe ? <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 3, mb: 2 }} > add a friend </Button> : <Button variant="contained" onClick={handleOpenImg} sx={{ ml: 'auto', mr: 1, mt: 3, mb: 2 }} > edit profil picture </Button>}
+							{!itsMe ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 3, mb: 2 }} > block</Button> : <FormGroup>
+								<Modal open={openImg} onClose={handleCloseImg} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+									<Container maxWidth="sm" className="centered-container" >
+										<Box sx={{
+											width: '100%',
+											border: '1px solid #D3C6C6',
+											boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+											borderRadius: '16px',
+											display: 'flex',
+											flexDirection: 'column',
+											alignItems: 'center',
+										}}
+											style={{
+												backgroundColor: '#f0f0f0'
+											}}>
+											<form onSubmit={handleSubmit}>
+												<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Update avatar</Typography>
+												<Divider />
+												<Button variant="contained" component="label" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }} >       {fileName ? fileName : '+ Upload file'} <input type="file" hidden onChange={handleChange} /> </Button>
+												<Button variant="outlined" type="submit" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>Submit</Button>
+												<Divider />
+												<div> {responseFile} </div>
+											</form>
+											<Button onClick={handleCloseImg}>Fermer</Button>
+										</Box>
+									</Container>
+								</Modal>
+								<FormControlLabel control={<Switch defaultChecked />} label="Active 2fA" />
+							</FormGroup>}
 
 
 						</div>
@@ -159,15 +201,16 @@ export function ProfilPlayer() {
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} />
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Ratio : { userData?.totalplayedGame ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
+									Ratio : {userData?.totalplayedGame ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
 								</Typography>
 							</div>
 						</div>
 					</Box>
+					<Divider />
 					<Box position="static" sx={{ height: 'auto' }}>
 						<Typography> Match history</Typography>
 						<Divider />
-						<GameHistory idPlayer={idPlayer}/>
+						<GameHistory idPlayer={idPlayer} />
 					</Box>
 				</Box>
 			</Container>
