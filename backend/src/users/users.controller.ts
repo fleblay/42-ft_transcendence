@@ -18,7 +18,6 @@ import { UserDto } from './dtos/user.dto';
 
 
 @Controller('users')
-@Serialize(UserDto)
 export class UsersController {
 
 	constructor(private usersService: UsersService,
@@ -66,7 +65,7 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/me')
-	//@Serialize(UserDto)
+	@Serialize(UserDto)
 	getMe(@Headers('authorization') auth: string) {
 		if (!auth) {
 			throw new ForbiddenException('No token provided');
