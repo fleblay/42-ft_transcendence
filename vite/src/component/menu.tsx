@@ -22,16 +22,16 @@ export function MuiAppBar() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
-    const [imgPath, setImgPath] = React.useState<string>("/Avatars/default.png");
+    const [imgPath, setImgPath] = React.useState<string>("/avatars/default.png");
 
     React.useEffect(() => {
         if (!auth.user) return;
         const userId = getIdByToken();
         console.log(userId);
-        setImgPath(`/Avatars/${userId}.png`);
+        setImgPath(`/avatars/${userId}.png`);
     }, [auth.user])
 
-        
+
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };

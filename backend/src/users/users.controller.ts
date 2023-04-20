@@ -13,8 +13,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
 import { FileSizeGuard } from './guard/File-size.guard';
 import { SavedGame } from 'src/model/saved-game.entity';
-//import { Serialize } from '../interceptors/serialize.interceptor';
-//import { UserDto } from './dtos/user.dto';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
+
 
 @Controller('users')
 export class UsersController {
@@ -64,7 +65,7 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/me')
-	//@Serialize(UserDto)
+	@Serialize(UserDto)
 	getMe(@Headers('authorization') auth: string) {
 		if (!auth) {
 			throw new ForbiddenException('No token provided');

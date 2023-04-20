@@ -30,7 +30,7 @@ export function ProfilPlayer() {
 	const [userData, setUserData] = useState<any>(null);
 	const auth = useAuthService()
 	const { idPlayer } = useParams<{ idPlayer: string }>();
-	const imgPath = `/Avatars/${idPlayer}.png`
+	const imgPath = `/avatars/${idPlayer}.png`
 
 
 	React.useEffect(() => {
@@ -49,8 +49,10 @@ export function ProfilPlayer() {
 		if (idPlayer !== undefined && parseInt(idPlayer) === getIdByToken()) {
 			setItsMe(true);
 		}
+		else
+			setItsMe(false);
 		// need to recup url 
-	}, [auth.user])
+	}, [auth.user, idPlayer])
 
 
 
@@ -154,7 +156,7 @@ export function ProfilPlayer() {
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} />
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Ratio : {(userData?.totalplayedGames / userData?.totalwonGames).toFixed(2)}
+									Ratio : { userData.totalplayedGame ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
 								</Typography>
 							</div>
 						</div>

@@ -28,7 +28,7 @@ services:
       - postgres
     volumes:
       - ./backend:/usr/src/app
-      - ./nginx/Avatars:/usr/src/app/Avatars
+      - ./nginx/avatars:/usr/src/app/avatars
     networks:
       - backend
     ports:
@@ -52,7 +52,7 @@ services:
       - 8080:8080
     volumes:
       - ./vite/dist:/www/vite/dist
-      - ./nginx/Avatars:/www/Avatars
+      - ./nginx/avatars:/www/avatars
     networks:
       - backend
 
