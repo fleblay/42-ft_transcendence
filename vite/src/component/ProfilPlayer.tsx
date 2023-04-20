@@ -18,7 +18,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { GameHistory } from './GameHistory';
 import { Modal } from '@mui/material';
 import { Input } from '@mui/material';
-
+import { UsernameDialog } from './UsernameDialog';
 
 
 function fileToBlob(file: File) {
@@ -39,6 +39,7 @@ export function ProfilPlayer() {
 	const { idPlayer } = useParams<{ idPlayer: string }>();
 	const imgPath = `/avatars/${idPlayer}.png`
 
+	const [openUsername, setOpenUsername] = useState<boolean>(false);
 
 	React.useEffect(() => {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
@@ -142,9 +143,21 @@ export function ProfilPlayer() {
 								</div>
 								{userData && userData.status.lenght > 0 ? <Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>status </Typography> : null}
 							</Box>
-							{!itsMe ? <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 3, mb: 2 }} > add a friend </Button> : <Button variant="contained" onClick={handleOpenImg} sx={{ ml: 'auto', mr: 1, mt: 3, mb: 2 }} > edit profil picture </Button>}
-							{!itsMe ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 3, mb: 2 }} > block</Button> : <FormGroup>
-								<Modal open={openImg} onClose={handleCloseImg} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+
+							{itsMe ? (
+								<>
+									<Button
+										variant="contained" sx={{ ml: 'auto', mt: 2, mb: 2 }}
+										onClick={() => setOpenUsername(true)}
+									>
+										Change username
+									</Button>
+									<Button
+										variant="contained" sx={{ ml: 1, mr: 1, mt: 2, mb: 2 }} onClick={handleOpenImg}
+									>
+										Edit profil picture
+									</Button>
+									<Modal open={openImg} onClose={handleCloseImg} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 									<Container maxWidth="sm" className="centered-container" >
 										<Box sx={{
 											width: '100%',
@@ -170,9 +183,16 @@ export function ProfilPlayer() {
 										</Box>
 									</Container>
 								</Modal>
-								<FormControlLabel control={<Switch defaultChecked />} label="Active 2fA" />
-							</FormGroup>}
-
+									<FormGroup>
+										<FormControlLabel control={<Switch defaultChecked />} label="Active 2fA" />
+									</FormGroup>
+								</>
+							) : (
+								<>
+									<Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} >add a friend </Button>
+									<Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }}>block</Button>
+								</>
+							)}
 
 						</div>
 					</Box>
