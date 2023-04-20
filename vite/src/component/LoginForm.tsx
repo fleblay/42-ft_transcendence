@@ -47,7 +47,7 @@ export function LoginForm() {
 	};
 
 	const handle42login = () => {
-			window.location.replace(`${window.location.origin}/api/auth/42externalauth`)
+			window.location.replace(`/api/auth/42externalauth`)
 	}
 
 	return (
