@@ -49,8 +49,10 @@ export function ProfilPlayer() {
 		if (idPlayer !== undefined && parseInt(idPlayer) === getIdByToken()) {
 			setItsMe(true);
 		}
-		// need to recup url
-	}, [auth.user])
+		else
+			setItsMe(false);
+		// need to recup url 
+	}, [auth.user, idPlayer])
 
 
 
@@ -154,7 +156,7 @@ export function ProfilPlayer() {
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} />
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Ratio : {(userData?.totalplayedGames / userData?.totalwonGames).toFixed(2)}
+									Ratio : { userData.totalplayedGame ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
 								</Typography>
 							</div>
 						</div>
