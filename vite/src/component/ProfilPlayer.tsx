@@ -30,7 +30,7 @@ export function ProfilPlayer() {
 	const [userData, setUserData] = useState<any>(null);
 	const auth = useAuthService()
 	const { idPlayer } = useParams<{ idPlayer: string }>();
-	const imgPath = `/Avatars/${idPlayer}.png`
+	const imgPath = `/avatars/${idPlayer}.png`
 
 
 	React.useEffect(() => {
@@ -49,7 +49,7 @@ export function ProfilPlayer() {
 		if (idPlayer !== undefined && parseInt(idPlayer) === getIdByToken()) {
 			setItsMe(true);
 		}
-		// need to recup url 
+		// need to recup url
 	}, [auth.user])
 
 
