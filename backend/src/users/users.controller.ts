@@ -110,7 +110,7 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
-	@Get('/friendsList/:id')
+	@Get('/friends/:id')
 	async getFriendsList(@Param("id") id: string) {
 		return await this.usersService.getFriendsList(parseInt(id));
 	}
