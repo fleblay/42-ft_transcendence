@@ -34,6 +34,7 @@ clean: stop-all rm-all rm-vol rm-net
 
 fclean : clean rm-modules
 	docker system prune -f --volumes -a
+	rm -rf nginx/avatars && mkdir -p nginx/avatars
 
 #####CLEANING#####
 stop-all :
