@@ -67,16 +67,3 @@ export function delRefreshToken() {
 	localStorage.removeItem('refresh_token');
 	removeCookie('42API_refresh_token')
 }
-
-export function getIdByToken() {
-	console.log("getIdByToken");
-	const token = getAccessToken();
-	if (token) {
-		jwt_decode(token);
-		console.log("token: " + token)
-		const decodedToken = jwt_decode(token) as DecodedToken;
-		console.log("decodedToken", decodedToken);
-		return decodedToken.sub;
-	}
-	return null;
-}

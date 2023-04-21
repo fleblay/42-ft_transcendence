@@ -10,7 +10,7 @@ export class EventGuard implements CanActivate {
 		const bearerToken = context.switchToWs().getClient().handshake.auth?.token
 		if (!bearerToken)
 			return false
-		console.log(`Bearer token received in EventGuard is ${bearerToken}`)
+		// console.log(`Bearer token received in EventGuard is ${bearerToken}`)
 		const foundUser =  await this.authService.validateAccessToken(bearerToken)
 		console.log(`User is ${foundUser}`)
 		return !!foundUser

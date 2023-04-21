@@ -5,7 +5,6 @@ import apiClient from '../auth/interceptor.axios';
 import { FormEvent } from 'react';
 
 import { Box } from '@mui/system';
-import { getIdByToken } from '../token/token';
 import { Divider } from '@mui/material';
 import { Friend } from '../types';
 import { useEffect } from 'react';

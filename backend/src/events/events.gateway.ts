@@ -157,7 +157,6 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	@SubscribeMessage('game.play.move')
 	handlePlayerInput(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: PlayerInputDto): void {
-		console.log("gateway input handle")
 		this.updateSocket(client, "playerInput")
 		this.gameService.handlePlayerInput(client, user, data)
 	}
