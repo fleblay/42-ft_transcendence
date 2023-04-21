@@ -171,7 +171,7 @@ export class Game {
 				this.play()
 			}
 			if (this.players.length === 2) {
-				setTimeout(() => this.status = GameStatus.playing, 3000)
+				this.countdown(3)
 			}
 		}
 		else {
@@ -237,6 +237,19 @@ export class Game {
 		this.posBall = newBall;
 	}
 
+	private countdown(timeSec: number) {
+		let countdown = timeSec
+		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
+		let intervalId = setInterval(() => {
+			countdown--
+			this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
+			if (countdown === 0) {
+				clearInterval(intervalId)
+				this.status = GameStatus.playing
+			}
+		}, 1000)
+	}
+
 	gameLoop() {
 		//Move de la balle
 		if (this.status === GameStatus.playing) {
@@ -245,7 +258,7 @@ export class Game {
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
 				this.status = GameStatus.start
-				setTimeout(() => this.status = GameStatus.playing, 3000)
+				this.countdown(3)
 				this.players[1].score += 1
 				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
 				this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
@@ -256,7 +269,7 @@ export class Game {
 			}
 			else if (this.posBall.x >= canvasWidth) {
 				this.status = GameStatus.start
-				setTimeout(() => this.status = GameStatus.playing, 3000)
+				this.countdown(3)
 				this.players[0].score += 1
 				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
 				this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
