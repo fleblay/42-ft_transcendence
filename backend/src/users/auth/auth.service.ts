@@ -68,7 +68,7 @@ export class AuthService {
 			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
-		console.log(`tokens are ${tokens.access_token}`);
+		// console.log(`tokens are ${tokens.access_token}`);
 		return tokens;
 	}
 
@@ -92,7 +92,7 @@ export class AuthService {
 		const user = await this.usersService.create(dataUser);
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
-		console.log(`tokens are access [${tokens.access_token}], refresh [${tokens.refresh_token}]`);
+		// console.log(`tokens are access [${tokens.access_token}], refresh [${tokens.refresh_token}]`);
 		return tokens;
 	}
 
@@ -124,7 +124,7 @@ export class AuthService {
 		}
 		const tokens = this.getTokens(user);
 		await this.updateRefreshToken(user.id, tokens.refresh_token);
-		console.log("tokens are ", tokens);
+		// console.log("tokens are ", tokens);
 		return tokens;
 	}
 
