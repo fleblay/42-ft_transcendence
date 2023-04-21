@@ -35,14 +35,15 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
             date: formattedDate(game.date),
             winner: game.players[0].username,
         }
-    }) as any;
+    });
 
 
 
-    const handleChangePage = (event : any, newPage : number) => {
+    const handleChangePage = (event : any , newPage : number) => {
         setPage(newPage);
       };
-      const handleChangeRowsPerPage = (event : any) => {
+
+    const handleChangeRowsPerPage = (event: any) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
       };
@@ -81,7 +82,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-                    {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row : any) => (
+                    {rows?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
 							<TableRow
 								key={row.id}
 								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -106,7 +107,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
                 <TablePagination
         rowsPerPageOptions={[10, 25, 50]}
         component="div"
-        count={rows.length}
+        count={rows?.length || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
