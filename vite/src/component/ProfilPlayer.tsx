@@ -260,7 +260,7 @@ export function ProfilPlayer() {
 										</Container>
 									</Modal>
 									<FormGroup>
-										<FormControlLabel control={<Switch checked={false} onChange={handle2FaChange} />} label="Active 2fA" />
+										<FormControlLabel control={<Switch checked={userData?.dfa} onChange={handle2FaChange} />} label="Active 2fA" />
 									</FormGroup>
 								</>
 							) : (
