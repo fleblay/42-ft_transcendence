@@ -27,6 +27,8 @@ export class UsersService {
 	create(dataUser: CreateUserDto) {
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
 		const user = this.repo.create(dataUser);
+		user.friendsId = [];
+		user.blockedId = [];
 		console.log("save user :", user);
 		return this.repo.save(user);
 	}
@@ -177,6 +179,7 @@ export class UsersService {
 	async getFriendsList(userId: number) : Promise<Friend[]>{
 		
 		const user = await this.findOne(userId);
+		console.log("user friends", user.friendsId);
 		if (!user)
 			throw new NotFoundException("User not found");
 		const partialFriendList = await this.repo.find({

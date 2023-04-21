@@ -14,10 +14,10 @@ export class User {
 	@Column()
 	password: string;
 
-	@Column({ type: 'simple-array', default: [] })
+	@Column("int", { array: true })
 	friendsId: number[];
 
-	@Column({ type: 'simple-array', default: [] })
+	@Column("int", { array: true })
 	blockedId: number[];
 
 	@Column({default : false})
