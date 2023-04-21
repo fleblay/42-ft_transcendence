@@ -4,20 +4,18 @@ import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody
 import { Link as LinkRouter } from "react-router-dom";
 import { TablePagination } from "@mui/material";
 
-type User = {
-	id: number;
-	username: string;
-}
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import { UserInfo } from "../types";
+
 interface SaveGame {
 	date: string;
 	id: string;
-	players: User[];
+	players: Partial<UserInfo>[];
 	score: number[];
-	winner: User;
+	winner: Partial<UserInfo>;
 }
 
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
 
 function formattedDate(date: string) {
     const d = new Date(date);
@@ -48,7 +46,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
       };
-    
+
 
 
 	useEffect(() => {
@@ -90,18 +88,18 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 							>
 								<TableCell component="th" scope="row">
 									{
-										row.players.map((player: User) => {
+										row.players.map((player: Partial<UserInfo>) => {
 											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username} </Link>
 										})
 									}
 								</TableCell>
 								<TableCell align="right">{row.score}</TableCell>
 								<TableCell align="right">{row.date}</TableCell>
-								<TableCell align="right"> 
+								<TableCell align="right">
                                 <Link key={row.players[0].id} component={LinkRouter} to={`/player/${row.players[0].id}`}>{row.players[0].username} </Link>
                                 </TableCell>
 							</TableRow>
-                        )   
+                        )
                         )}
 					</TableBody>
 				</Table>

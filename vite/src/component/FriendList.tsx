@@ -5,7 +5,6 @@ import apiClient from '../auth/interceptor.axios';
 import { FormEvent } from 'react';
 
 import { Box } from '@mui/system';
-import { getIdByToken } from '../token/token';
 import { Divider } from '@mui/material';
 import { Friend } from '../types';
 import { useEffect } from 'react';
@@ -78,14 +77,14 @@ export function FriendList() {
 
 									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px', marginLeft: '10px' }} sx={{ flexGrow: 1, ml: '20px', mr: '20px' }}>
 										{friend.username}
-									</Typography>											
+									</Typography>
 									{<Avatar sx={{ bgcolor: friend && friend.online ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
 								</div>
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>{friend.status} </Typography>
 							</Box>
 
 							<Button variant="outlined" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }}>view profil</Button>
-						
+
 						</div>)})}
 					</Box>
 

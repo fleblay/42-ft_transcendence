@@ -6,7 +6,6 @@ import { FormEvent } from 'react';
 
 import { Box } from '@mui/system';
 import { useAuthService } from '../auth/AuthService';
-import { getIdByToken } from '../token/token';
 import { useParams } from 'react-router-dom';
 import { Divider } from '@mui/material';
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
@@ -54,7 +53,7 @@ export function ProfilPlayer() {
 	React.useEffect(() => {
 		console.log("idPlayer", idPlayer);
 		if (!auth.user) return;
-		if (idPlayer !== undefined && parseInt(idPlayer) === getIdByToken()) {
+		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id) {
 			setItsMe(true);
 		}
 		else

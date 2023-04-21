@@ -4,7 +4,7 @@ export type userToken = {
 };
 export type DecodedToken = {
 	sub: number;
-	username: string;
+	email: string;
 	exp: number;
 	iat: number;
 };

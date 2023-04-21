@@ -11,7 +11,6 @@ import Button from '@mui/material/Button';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthService } from '../auth/AuthService';
-import { getIdByToken } from '../token/token';
 
 const pages = ['Game', 'Leaderboard', 'Chat', 'About'];
 const menu = ['My profil', 'friends', 'Logout', 'all refresh token'];
@@ -26,7 +25,7 @@ export function MuiAppBar() {
 
     React.useEffect(() => {
         if (!auth.user) return;
-        const userId = getIdByToken();
+        const userId = auth.user.id;
         console.log(userId);
         setImgPath(`/avatars/${userId}.png`);
     }, [auth.user])
@@ -53,7 +52,7 @@ export function MuiAppBar() {
 			return;
 		}
         if (page === 'My profil') {
-            const path = `/player/${getIdByToken()}`;
+            const path = `/player/${auth.user?.id}`;
             navigate(path);
             return;
         }

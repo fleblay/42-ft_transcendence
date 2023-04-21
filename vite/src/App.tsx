@@ -14,7 +14,6 @@ import { GamePage } from './component/GameScreen'
 import apiClient from './auth/interceptor.axios'
 import { ResponsiveAppBar } from './component/ResponsiveAppBar'
 import { SocketProvider } from './socket/SocketProvider'
-import Leaderboard from './pages/Leaderboards'
 import { MuiAppBar } from './component/menu'
 import {  ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
@@ -35,7 +34,6 @@ export const allRoutes: Destinations[] = [
 	{ name: "Chat", path: "/Chat", public: false },
 	{ name: "Game", path: "/Game", public: false },
 	{ name: "ListAll", path: "/List", public: true },
-	{ name: "Leaderboard", path: "/Leaderboard", public: false },
 	{ name: "UserDataBase", path: "/Allusers", public: false },
 	{ name: "testMenu", path: "/TestMenu", public: false },
 	{ name: "MyProfil", path: "/MyProfil", public: false },
@@ -206,7 +204,6 @@ function App() {
 						<Route path="/Register" element={<RegisterForm />} />
 						<Route path="/Allusers" element={<><ListUsers /> <br /> <FakeGames/></>} />
 						<Route path="/TestMenu" element={<MuiAppBar />} />
-						<Route path="/Leaderboard" element={<Leaderboard />} />
 						<Route path="/MyProfil" element={<ProfilPlayer />} />
 						<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
 						<Route path="/player/">

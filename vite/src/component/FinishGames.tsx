@@ -4,17 +4,14 @@ import { getAccessToken } from "../token/token";
 import apiClient from "../auth/interceptor.axios";
 import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link } from "@mui/material";
 import { Link as LinkRouter } from "react-router-dom";
+import { UserInfo } from "../types";
 
-type User = {
-	id: number;
-	username: string;
-}
 interface SaveGame {
 	date: string;
 	id: string;
-	players: User[];
+	players: Partial<UserInfo>[];
 	score: number[];
-	winner: User;
+	winner: Partial<UserInfo>;
 }
 
 
@@ -57,11 +54,11 @@ export function FinishGames() {
 								</TableCell>
 								<TableCell align="right">
 									{
-										game.players.sort((a: User, b: User) => {
+										game.players.sort((a, b) => {
 											if (a.id === game.winner.id) return -1;
 											if (b.id === game.winner.id) return 1;
 											return 1;
-										}).map((player: User) => {
+										}).map((player) => {
 											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
 										})
 									}
