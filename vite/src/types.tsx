@@ -23,14 +23,14 @@ export interface IPlayers {
 	paddleLength: number,
 	paddleWidth: number,
 	score: number,
+	user: plainUser,
+	leaving: boolean,
 }
 
+
 export interface IgameInfo {
-	//posP1: number
-	//posP2: number
 	players: IPlayers[],
 	posBall: Pos2D
-	//score: number[]
 	status: GameStatus
 	date: Date
 }
@@ -48,15 +48,18 @@ export type Games = {
 	score: number[]
 }
 
-export type UserInfo = {
+export type plainUser = {
 	id: number,
 	username: string,
 	email: string,
 	password?: string, // To be removed in DTO in back
-	avatar: string,
+	stud: boolean,
+	dfa: boolean
+}
+
+export type UserInfo = plainUser & {
 	savedGames: Games[],
 	wonGames: Games[],
-	stud: boolean
 
 	states: string[],
 	gameIds: string[],

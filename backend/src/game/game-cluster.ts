@@ -134,15 +134,16 @@ export class GameCluster {
 		const client = this.getClientFromSocketId(player?.clientId || viewer?.clientId);
 
 		if (!client) {
-			console.warn("\x1b[31mMISSING CLIENT !!! PROBLEM !!\x1b[0m")
-			return null
+			console.warn("\x1b[31mMISSING CLIENT\x1b[0m")
 		}
 		if (viewer) {
-			client.leave(game.viewerRoom);
+			if (client)
+				client.leave(game.viewerRoom);
 			game.viewers = game.viewers.filter(viewer => viewer.user.id !== userId);
 		}
 		else if (player) {
-			client.leave(game.playerRoom);
+			if (client)
+				client.leave(game.playerRoom);
 			player.leaving = true;
 			if (game.status === GameStatus.playing || game.status === GameStatus.start) {
 				this.rageQuit(game, player);
@@ -152,7 +153,8 @@ export class GameCluster {
 		if (game.players.every(player => player.leaving)) {
 			for (const viewer of game.viewers) {
 				const client = this.getClientFromSocketId(viewer.clientId);
-				client.leave(game.viewerRoom);
+				if (client)
+					client.leave(game.viewerRoom);
 			}
 			this.gamesMap.delete(gameId);
 			if (game.players.length >= 2)
