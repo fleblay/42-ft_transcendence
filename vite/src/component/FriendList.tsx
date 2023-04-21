@@ -38,7 +38,7 @@ export function FriendList() {
 
 	const handleViewProfil = (id : number) => {
 		console.log('view profil');
-		navigate(`/profil/${id}`);
+		navigate(`/player/${id}`);
 	}
 
 	return (
@@ -57,35 +57,38 @@ export function FriendList() {
 						</Typography>
 					</AppBar>
 					<Box position="static" sx={{ height: 'auto' }}>
+						{friendList?.length === 0 ? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any friends yet </Typography> : null}
 						{friendList?.map((friend: Friend) => {
 							const imgPath = `/avatars/${friend.id}.png`
 
 							return (
+								<React.Fragment>
 
-						<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
+								<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
 
-							<Box sx={{ mr: '20px', ml: '20px' }}>
-								<Avatar src={imgPath} style={{ width: '50px', height: '50px' }} />
-							</Box>
-							<Box sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'center',
-							}}
-							>
-								<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-
-									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px', marginLeft: '10px' }} sx={{ flexGrow: 1, ml: '20px', mr: '20px' }}>
-										{friend.username}
-									</Typography>
-									{<Avatar sx={{ bgcolor: friend && friend.online ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
-								</div>
-								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>{friend.status} </Typography>
-							</Box>
-
-							<Button variant="outlined" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }}>view profil</Button>
-
-						</div>)})}
+								<Box sx={{ mr: '20px', ml: '20px' }}>
+									<Avatar src={imgPath} style={{ width: '80px', height: '80px' }} />
+								</Box>
+								<Box sx={{
+									display: 'flex',
+									flexDirection: 'column',
+									alignItems: 'flex-start',
+								}}
+								>
+									<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+	
+										<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px'}} sx={{ flexGrow: 1, mr: '10px' }}>
+											{friend?.username}
+										</Typography>
+										{<Avatar sx={{ bgcolor: friend.online ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
+									</div>
+									{ friend && friend.status ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{ friend.status}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend?.online ? "online" : "offline" }</Typography> }
+								</Box>
+								<Button variant="contained" sx={{ ml: 'auto', mr: 3, mt: 2, mb: 2 }} onClick={()=>handleViewProfil(friend.id)} >view profil </Button>
+							</div>
+							<Divider />
+							</React.Fragment>
+							)})}
 					</Box>
 
 				</Box>
