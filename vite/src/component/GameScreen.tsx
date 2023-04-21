@@ -145,7 +145,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			if (keyDown.down) {
 				customEmit('game.play.move', { gameId: gameId, move: 'Down' })
 			}
-		}, 5);
+		}, 8);
 		return () => clearInterval(interval);
 	}, [keyDown])
 
@@ -224,10 +224,16 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			context.current.fillText(`${gameInfo.players[1].score}`, canvasWidth / 2 + 60, 80)
 
 		// Player Info
-		context.current.font = "24 serif"
-		context.current.fillText(`${gameInfo.players[0].user.id}`, 0, 30)
+		context.current.font = "20px serif"
+		context.current.fillStyle = "red"
+		context.current.fillText(`${gameInfo.players[0].user.username}`, 10, 20)
+		context.current.font = "20px serif"
+		context.current.fillStyle = "blue"
 		if (gameInfo.players[1])
-			context.current.fillText(`${gameInfo.players[1].user.id}`, canvasWidth - 50, 30)
+		{
+			const player2username = gameInfo.players[1].user.username
+			context.current.fillText(player2username, canvasWidth - (10 + context.current.measureText(player2username).width), 20)
+		}
 
 	}, [gameInfo.players, gameInfo.posBall]);
 

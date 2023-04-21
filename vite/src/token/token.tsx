@@ -32,22 +32,22 @@ export function saveToken(token: userToken) {
 }
 
 export function getAccessToken() {
-	console.log('Begin getAccessToken')
+	//console.log('Begin getAccessToken')
 	const access_token_42 = getCookieValue("42API_access_token")
 	const access_token = localStorage.getItem("access_token")
 	if (access_token_42)
 	{
-		console.log("Using 42 API acess token : ", access_token_42)
+		//console.log("Using 42 API acess token : ", access_token_42)
 		return access_token_42
 	}
 	else if (access_token)
 	{
-		console.log("Using normal acess token : ", access_token)
+		//console.log("Using normal acess token : ", access_token)
 		return access_token
 	}
 	else
 	{
-		console.log("Both token are falsy")
+		//console.log("Both token are falsy")
 		return null
 	}
 }
