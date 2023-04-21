@@ -58,13 +58,13 @@ export class AuthService {
 		}
 	}
 
-	async login(dataUser: LoginUserDto) {
+	async login(dataUser: LoginUserDto, checkStud: boolean = true) {
 		const user = await this.usersService.findOneByEmail(dataUser.email);
 		if (!user)
 			throw new NotFoundException("User not existing");
 		if (user.password !== dataUser.password)
 			throw new ForbiddenException('Password not match');
-		if (user.stud)
+		if (user.stud && checkStud)
 			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
@@ -98,7 +98,7 @@ export class AuthService {
 
 	async login42API(dataUser: CreateUserDto) {
 		if (await this.usersService.findOneByEmail(dataUser.email))
-			return this.login(dataUser)
+			return this.login(dataUser, false)
 		else
 			return this.register(dataUser)
 	}
