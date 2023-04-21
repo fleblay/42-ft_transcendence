@@ -8,8 +8,8 @@ export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column()
-	username: string;
+	@Column({ nullable: true })
+	username: string | null;
 	@Column()
 	email: string;
 	@Column()
@@ -17,7 +17,7 @@ export class User {
 
 	@Column({default: "/default-avatar.png"})
 	avatar: string;
-	
+
 	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
 	@JoinTable({})
 	savedGames: SavedGame[];
