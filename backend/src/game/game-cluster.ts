@@ -41,7 +41,7 @@ export class GameCluster {
 
 	findAvailable() {
 		for (const game of this.gamesMap.values()) {
-			if (game.freeSlot)
+			if (!game.privateGame && game.freeSlot)
 				return game;
 		}
 		return null;
