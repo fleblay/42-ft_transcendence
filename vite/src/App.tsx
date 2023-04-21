@@ -24,16 +24,10 @@ export interface Destinations {
 export const allRoutes: Destinations[] = [
 	{ name: "Register", path: "/Register", public: true },
 	{ name: "Login", path: "/Login", public: true },
-	{ name: "Public", path: "/Public", public: true },
-	{ name: "About", path: "/About", public: true },
-	{ name: "Chat", path: "/Chat", public: false },
-	{ name: "Game", path: "/Game", public: false },
-	{ name: "ListAll", path: "/List", public: true },
-	{ name: "UserDataBase", path: "/Allusers", public: false },
-	{ name: "testMenu", path: "/TestMenu", public: false },
-	{ name: "MyProfil", path: "/MyProfil", public: false },
+	{ name: "Chat", path: "/chat", public: false },
+	{ name: "Game", path: "/game", public: false },
+	{ name: "Leaderboard", path: "/leaderboard", public: false },
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
-	{ name: "Player", path: "/player", public: false},
 	{ name: "Friends", path: "/friends", public: false},
 
 ]
@@ -197,9 +191,7 @@ function App() {
 						/>
 						<Route path="/Login" element={<LoginForm />} />
 						<Route path="/Register" element={<RegisterForm />} />
-						<Route path="/Allusers" element={<><ListUsers /> <br /> <FakeGames/></>} />
-						<Route path="/TestMenu" element={<MuiAppBar />} />
-						<Route path="/MyProfil" element={<ProfilPlayer />} />
+						<Route path="/leaderboard" element={<><ListUsers /> <br /> <FakeGames/></>} />
 						<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
 						<Route path="/player/">
 							<Route path=":idPlayer" element={<ProfilPlayer />} />
