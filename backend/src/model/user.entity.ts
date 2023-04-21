@@ -1,7 +1,6 @@
 
 import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { SavedGame } from './saved-game.entity';
-import { Url } from 'url';
 
 @Entity()
 export class User {
@@ -15,9 +14,18 @@ export class User {
 	@Column()
 	password: string;
 
-	@Column({default: "/default-avatar.png"})
-	avatar: string;
-	
+	@Column({ type: 'simple-array', default: [] })
+	friendsId: number[];
+
+	@Column({ type: 'simple-array', default: [] })
+	blockedId: number[];
+
+	@Column({default : false})
+	stud : boolean;
+
+	@Column({default : false})
+	dfa: boolean;
+
 	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
 	@JoinTable({})
 	savedGames: SavedGame[];

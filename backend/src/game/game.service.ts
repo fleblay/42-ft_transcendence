@@ -10,6 +10,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { PlayerInputDto } from '../events/dtos/player-input.dto'
 import { IgameInfo } from './game';
 import { SavedGame } from '../model/saved-game.entity';
+import { UserStatus } from '../type';
+
 
 @Injectable()
 export class GameService {
@@ -65,6 +67,15 @@ export class GameService {
 	userState(id: number): UserState {
 		return this.gameCluster.findUserStateById(id)
 	}
+	
+	userStatus(id: number): UserStatus {
+		const allStates = this.gameCluster.findUserStateById(id) as UserState;
+		if (allStates.states.length === 0)
+			return 'offline'
+		else
+			return allStates.states[allStates.states.length - 1];
+
+	}
 
 	quitGame(Userid: number, gameId: UUID) {
 		const gameInfo = this.gameCluster.playerQuit(gameId, Userid);
@@ -95,7 +106,8 @@ export class GameService {
 			.leftJoin("game.players", "player")
 			.addSelect(['player.id', 'player.username'])
 			.getMany()
-		return fullDB.filter((element) => element.players[0].id == id || element.players[1] .id == id)
+		fullDB.forEach((element : SavedGame) => { console.log("elements :" , element)});
+		return fullDB.filter((element : SavedGame) => element.players.find((player) => player.id == id) != undefined);
 	}
 
 	async saveFakeGame() {
