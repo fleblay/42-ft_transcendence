@@ -137,6 +137,10 @@ export class GameCluster {
 			game.viewers = game.viewers.filter(viewer => viewer.user.id !== userId);
 		}
 		if (player) {
+			if (!client) {
+				console.warn("\x1b[31mMISSING CLIENT !!! PROBLEM !!\x1b[0m")
+				return null
+			}
 			client.leave(game.playerRoom);
 			player.leaving = true;
 			if (game.status === GameStatus.playing || game.status === GameStatus.start) {

@@ -20,7 +20,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
 	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket | null {
 		if (!socket.current) return null;
-		return socket.current.emit(eventname, { ...data, _access_token: getAccessToken() }, callback)
+		const usedCallback = callback ? callback : () => {}
+		return socket.current.emit(eventname, { ...data, _access_token: getAccessToken() }, usedCallback)
 	}
 
 	const onConnect = React.useCallback(() => {
