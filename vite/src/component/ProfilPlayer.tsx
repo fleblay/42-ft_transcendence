@@ -163,17 +163,17 @@ export function ProfilPlayer() {
 							<Box sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								alignItems: 'center',
+								alignItems: 'flex-start',
 							}}
 							>
 								<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 
-									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px', marginLeft: '10px' }} sx={{ flexGrow: 1, ml: '20px', mr: '20px' }}>
+									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px'}} sx={{ flexGrow: 1, mr: '10px' }}>
 										{userData?.username}
 									</Typography>
 									{<Avatar sx={{ bgcolor: userData && userData.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
 								</div>
-								{userData && userData.states ? <Typography variant="h6" sx={{ flexGrow: 1, marginTop: '10px' }}>{ userData.states.join('-')}</Typography> : null}
+								{ userData && userData.states.join("-") != "" ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{ userData.states[0]}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{userData?.userConnected ? "online" : "offline" }</Typography> }
 							</Box>
 
 							{itsMe ? (
