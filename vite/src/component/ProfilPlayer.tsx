@@ -173,7 +173,7 @@ export function ProfilPlayer() {
 									</Typography>
 									{<Avatar sx={{ bgcolor: userData && userData.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
 								</div>
-								{userData && userData.states.length> 0 ? <Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>status </Typography> : null}
+								{userData && userData.states ? <Typography variant="h6" sx={{ flexGrow: 1, marginTop: '10px' }}>{ userData.states.join('-')}</Typography> : null}
 							</Box>
 
 							{itsMe ? (
