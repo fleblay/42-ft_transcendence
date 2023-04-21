@@ -19,7 +19,7 @@ import { GameHistory } from './GameHistory';
 import { Modal } from '@mui/material';
 import { UserInfo } from '../types';
 
-
+import { UsernameDialog } from './UsernameDialog';
 
 function fileToBlob(file: File) {
 	const blob = new Blob([file], { type: file.type });
@@ -141,6 +141,7 @@ export function ProfilPlayer() {
 	return (
 		<React.Fragment>
 
+			<UsernameDialog open={openUsername} quit={() => setOpenUsername(false)} />
 			<Container maxWidth="md">
 				<Box sx={{
 					width: '100%',
@@ -169,7 +170,7 @@ export function ProfilPlayer() {
 
 									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px', marginLeft: '10px' }} sx={{ flexGrow: 1, ml: '20px', mr: '20px' }}>
 										{userData?.username}
-									</Typography>											
+									</Typography>
 									{<Avatar sx={{ bgcolor: userData && userData.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
 								</div>
 								{userData && userData.states.length> 0 ? <Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>status </Typography> : null}
