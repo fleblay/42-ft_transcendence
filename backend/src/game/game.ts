@@ -158,7 +158,7 @@ export class Game {
 				pos: canvasHeight / 2 - paddleLength / 2,
 				momentum: 0,
 				timeLastMove: Date.now(),
-				paddleLength: Math.floor(paddleLength + ((Math.random() > 0.5) ? -1 : 1) * (Math.random() * paddleLength / 2)),
+				paddleLength: Math.floor(paddleLength + ((Math.random() > 0.5) ? -1 : 1) * (Math.random() * paddleLength / 3)),
 				paddleWidth: paddleWidth,
 				score: 0,
 				user,
@@ -171,7 +171,7 @@ export class Game {
 				this.play()
 			}
 			if (this.players.length === 2) {
-				this.countdown(3)
+				this.countdown(5)
 			}
 		}
 		else {
@@ -241,14 +241,14 @@ export class Game {
 		let countdown = timeSecond
 		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 		let intervalId = setInterval(() => {
-			countdown--
+			countdown-=1
 			this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 			if (countdown <= 0) {
 				clearInterval(intervalId)
 				if (this.status !== GameStatus.end)
 					this.status = GameStatus.playing
 			}
-		}, 1000)
+		}, 700)
 	}
 
 	gameLoop() {

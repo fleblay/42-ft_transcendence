@@ -96,7 +96,8 @@ export function GamePage() {
 								width: '100%',
 								height: '100%',
 								backgroundColor: 'rgba(0, 0, 0, 0.5)',
-								zIndex: 1
+								zIndex: 1,
+								transition: 'all 0.5s'
 							}
 						}>
 							<div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '50px', color: 'white' }}>
@@ -187,28 +188,23 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	useEffect(() => {
 		if (!context.current) return;
 
+		const player1color = "rgba(255, 100, 100, 1.0)"
+		const player2color = "rgba(140, 140, 255, 1.0)"
+		const ballcolor = "rgba(230, 190, 1, 1.0)"
+
 		// Clear canvas
 		context.current.clearRect(0, 0, canvasWidth, canvasHeight);
-		context.current.fillStyle = "black";
+		context.current.fillStyle = "rgba(0, 0, 0, 1)";
 		context.current.fillRect(0, 0, canvasWidth, canvasHeight);
 
-		// Set color of players
-		context.current.fillStyle = "white";
-
 		// Player One
+		context.current.fillStyle = player1color
 		if (gameInfo.players[0])
 			context.current.fillRect(0, gameInfo.players[0].pos, gameInfo.players[0].paddleWidth, gameInfo.players[0].paddleLength);
 		// Player Two
+		context.current.fillStyle = player2color
 		if (gameInfo.players[1])
 			context.current.fillRect(canvasWidth - gameInfo.players[1].paddleWidth, gameInfo.players[1].pos, gameInfo.players[1].paddleWidth, gameInfo.players[1].paddleLength);
-
-		// Ball
-		context.current.fillStyle = "white";
-		// context.current.fillRect(posBall.x, posBall.y, ballSize, ballSize);
-
-		context.current.beginPath();
-		context.current.arc(gameInfo.posBall.x, gameInfo.posBall.y, ballSize, 0, 2 * Math.PI)
-		context.current.fill();
 
 		// center line
 		context.current.beginPath();
@@ -216,6 +212,13 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		context.current.moveTo(canvasWidth / 2, 0);
 		context.current.lineTo(canvasWidth / 2, canvasHeight);
 		context.current.stroke();
+
+		// Ball
+		context.current.fillStyle = ballcolor
+		context.current.beginPath();
+		context.current.arc(gameInfo.posBall.x, gameInfo.posBall.y, ballSize, 0, 2 * Math.PI)
+		context.current.fill();
+
 
 		// Scores
 		context.current.font = "48px serif"
@@ -225,14 +228,14 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 
 		// Player Info
 		context.current.font = "20px serif"
-		context.current.fillStyle = "red"
-		context.current.fillText(`${gameInfo.players[0].user.username}`, 10, 20)
+		context.current.fillStyle = player1color
+		context.current.fillText(`${gameInfo.players[0].user.username}`, 5, 20)
 		context.current.font = "20px serif"
-		context.current.fillStyle = "blue"
+		context.current.fillStyle = player2color
 		if (gameInfo.players[1])
 		{
 			const player2username = gameInfo.players[1].user.username
-			context.current.fillText(player2username, canvasWidth - (10 + context.current.measureText(player2username).width), 20)
+			context.current.fillText(player2username, canvasWidth - (5 + context.current.measureText(player2username).width), 20)
 		}
 
 	}, [gameInfo.players, gameInfo.posBall]);
