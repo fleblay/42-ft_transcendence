@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from '../socket/SocketProvider';
 import { IgameInfo, GameStatus } from "../types";
 import { useParams } from "react-router-dom";
+import {useAuthService} from '../auth/AuthService'
 
 interface Iprops {
 	gameInfo: IgameInfo,
@@ -129,6 +130,7 @@ function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
 }
 
 export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
+	const auth = useAuthService()
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
@@ -143,7 +145,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			if (keyDown.down) {
 				customEmit('game.play.move', { gameId: gameId, move: 'Down' })
 			}
-		}, 10);
+		}, 5);
 		return () => clearInterval(interval);
 	}, [keyDown])
 
@@ -215,7 +217,19 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		context.current.lineTo(canvasWidth / 2, canvasHeight);
 		context.current.stroke();
 
-	}, [gameInfo.players[0].pos, gameInfo.players[1]?.pos, gameInfo.posBall]);
+		// Scores
+		context.current.font = "48px serif"
+		context.current.fillText(`${gameInfo.players[0].score}`, canvasWidth / 2 - 80, 80)
+		if (gameInfo.players[1])
+			context.current.fillText(`${gameInfo.players[1].score}`, canvasWidth / 2 + 60, 80)
+
+		// Player Info
+		context.current.font = "24 serif"
+		context.current.fillText(`${gameInfo.players[0].user.id}`, 0, 30)
+		if (gameInfo.players[1])
+			context.current.fillText(`${gameInfo.players[1].user.id}`, canvasWidth - 50, 30)
+
+	}, [gameInfo.players, gameInfo.posBall]);
 
 	// useEffect(() => {
 	// 	function handleKeyDown(e: KeyboardEvent) {

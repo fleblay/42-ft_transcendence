@@ -120,43 +120,45 @@ export class GameCluster {
 		- 2 players: delete : save game
 
 	*/
-	playerQuit(gameId: UUID, userId: number) {
+	playerQuit(gameId: UUID, userId: number): Game | null {
 		const game = this.gamesMap.get(gameId);
 
 		if (!game) return;
 
 		const player = game.players.find(player => player.user.id === userId);
 		const viewer = game.viewers.find(viewer => viewer.user.id === userId);
+		if (!(player || viewer) || (player && viewer)) {
+			console.error("playerQuit: player and viewer not found or both found");
+			return null;
+		}
 		const client = this.getClientFromSocketId(player?.clientId || viewer?.clientId);
 
-		if (viewer && player) {
-			console.error("GameCluster: playerQuit: player and viewer both exist");
+		if (!client) {
+			console.warn("\x1b[31mMISSING CLIENT\x1b[0m")
 		}
 		if (viewer) {
-			client.leave(game.viewerRoom);
+			if (client)
+				client.leave(game.viewerRoom);
 			game.viewers = game.viewers.filter(viewer => viewer.user.id !== userId);
 		}
-		if (player) {
-			if (!client) {
-				console.warn("\x1b[31mMISSING CLIENT !!! PROBLEM !!\x1b[0m")
-				return null
-			}
-			client.leave(game.playerRoom);
+		else if (player) {
+			if (client)
+				client.leave(game.playerRoom);
 			player.leaving = true;
 			if (game.status === GameStatus.playing || game.status === GameStatus.start) {
 				this.rageQuit(game, player);
 			}
 			game.status = GameStatus.end;
 		}
-
 		if (game.players.every(player => player.leaving)) {
 			for (const viewer of game.viewers) {
 				const client = this.getClientFromSocketId(viewer.clientId);
-				client.leave(game.viewerRoom);
+				if (client)
+					client.leave(game.viewerRoom);
 			}
 			this.gamesMap.delete(gameId);
 			if (game.players.length >= 2)
-				return game.generateSavedGameInfo();
+				return game;
 		}
 		return null;
 	}

@@ -237,15 +237,16 @@ export class Game {
 		this.posBall = newBall;
 	}
 
-	private countdown(timeSec: number) {
-		let countdown = timeSec
+	private countdown(timeSecond: number) {
+		let countdown = timeSecond
 		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 		let intervalId = setInterval(() => {
 			countdown--
 			this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
-			if (countdown === 0) {
+			if (countdown <= 0) {
 				clearInterval(intervalId)
-				this.status = GameStatus.playing
+				if (this.status !== GameStatus.end)
+					this.status = GameStatus.playing
 			}
 		}, 1000)
 	}
@@ -281,6 +282,7 @@ export class Game {
 
 			//Condition fin de jeu
 			if (this.players[0].score + this.players[1]?.score === gameRounds) {
+				console.log('Game ended with 5 round')
 				this.status = GameStatus.end
 			}
 			//Reset des momentum

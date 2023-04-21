@@ -67,7 +67,7 @@ export class GameService {
 	userState(id: number): UserState {
 		return this.gameCluster.findUserStateById(id)
 	}
-	
+
 	userStatus(id: number): UserStatus {
 		const allStates = this.gameCluster.findUserStateById(id) as UserState;
 		if (allStates.states.length === 0)
@@ -77,13 +77,12 @@ export class GameService {
 
 	}
 
-	quitGame(Userid: number, gameId: UUID) {
-		const gameInfo = this.gameCluster.playerQuit(gameId, Userid);
-		//console.log("game", this.gameCluster.findOne(gameId));
-		console.log("game", gameInfo)
-		if (gameInfo) {
-			let saveObject = this.repo.create(gameInfo);
-			this.repo.save(saveObject);
+	quitGame(userId: number, gameId: UUID) {
+		const game = this.gameCluster.playerQuit(gameId, userId);
+		if (game) {
+			const savedGame = game.generateSavedGameInfo();
+			let saveObject = this.repo.create(savedGame);
+			this.repo.save(savedGame);
 			return "Succes in leaving and saving game as last user"
 		}
 		else
