@@ -110,6 +110,7 @@ export function ProfilPlayer() {
 	return (
 		<React.Fragment>
 
+			<UsernameDialog open={openUsername} quit={() => setOpenUsername(false)} />
 			<Container maxWidth="md">
 				<Box sx={{
 					width: '100%',
