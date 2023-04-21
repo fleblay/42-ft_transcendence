@@ -115,6 +115,12 @@ export class UsersController {
 		return await this.usersService.getFriendsList(parseInt(id));
 	}
 
+	@UseGuards(ATGuard)
+	@Get('/blocked/:id')
+	async getBlockedUsersList(@Param("id") id: string) {
+		return await this.usersService.getBlockedUsersList(parseInt(id));
+	}
+
 	
 	@UseGuards(ATGuard)
 	@Post('/addFriend/:id')
@@ -139,5 +145,11 @@ export class UsersController {
 	async unblock(@CurrentUser() user: User, @Param("id") id: string) {
 		return await this.usersService.unblockUser(user, parseInt(id));
 	}
+
+	@UseGuards(ATGuard)
+	@Post('/toggle2fa')
+	async dfa(@CurrentUser() user: User) {
+		return await this.usersService.dfa(user);
+	};
 
 }

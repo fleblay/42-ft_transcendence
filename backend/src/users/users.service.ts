@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../model/user.entity'
 import { CreateUserDto } from './dtos/create-user.dto';
-import { UserStatus } from '../type';
-import { createWriteStream } from 'fs';
+import { UserStatus, Blocked } from '../type';
 import * as sharp from 'sharp';
 import { In } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
@@ -22,7 +21,7 @@ export class UsersService {
 	constructor(@InjectRepository(User) private repo: Repository<User>, @Inject(forwardRef(() => GameService))
 	private gameService: GameService) {
 		//setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
-}
+	}
 
 	create(dataUser: CreateUserDto) {
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
@@ -33,8 +32,8 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	getAll() : Promise<User[]> {
-		const allDB =this.repo.createQueryBuilder("user")
+	getAll(): Promise<User[]> {
+		const allDB = this.repo.createQueryBuilder("user")
 			.leftJoinAndSelect("user.savedGames", "savedgames")
 			.leftJoinAndSelect("user.wonGames", "wongames")
 			.getMany()
@@ -48,7 +47,7 @@ export class UsersService {
 		return this.repo.createQueryBuilder("user")
 			.leftJoinAndSelect("user.savedGames", "savedgames")
 			.leftJoinAndSelect("user.wonGames", "wongames")
-			.where("user.id = :userId", {userId: id})
+			.where("user.id = :userId", { userId: id })
 			.getOne()
 	}
 
@@ -93,7 +92,7 @@ export class UsersService {
 	}
 
 	changeStatus(id: number, { newStatus, oldStatus }: { newStatus?: UserStatus, oldStatus?: UserStatus }) {
-		console.log('changing status : new ', newStatus,'old :', oldStatus)
+		console.log('changing status : new ', newStatus, 'old :', oldStatus)
 		if (!this.isConnected(id))
 			this.addConnectedUser(id);
 
@@ -114,7 +113,7 @@ export class UsersService {
 		this.changeStatus(id, { oldStatus: "online" })
 	}
 
-	async uploadAvatar(user: User , file: Express.Multer.File) {
+	async uploadAvatar(user: User, file: Express.Multer.File) {
 		const path = '/usr/src/app/avatars/' + user.id + '.png';
 		console.log("user.controller.uploadAvatar", file.buffer);
 		await sharp(file.buffer)
@@ -128,7 +127,7 @@ export class UsersService {
 				}
 			})
 		console.log("path", path);
-		console.log ("user", user);
+		console.log("user", user);
 		return this.repo.save(user);
 	}
 
@@ -136,8 +135,8 @@ export class UsersService {
 		if (!newUsername)
 			throw new BadRequestException("Username is required");
 		if (user.username == newUsername)
-		if (newUsername.length < 3 || newUsername.length > 20)
-			throw new BadRequestException("Username must be between 3 and 20 characters");
+			if (newUsername.length < 3 || newUsername.length > 20)
+				throw new BadRequestException("Username must be between 3 and 20 characters");
 		if (await this.findOneByUsername(newUsername))
 			throw new BadRequestException("Username already taken");
 		user.username = newUsername;
@@ -175,8 +174,8 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	async getFriendsList(userId: number) : Promise<Friend[]>{
-		
+	async getFriendsList(userId: number): Promise<Friend[]> {
+
 		const user = await this.findOne(userId);
 		console.log("user friends", user.friendsId);
 		if (!user)
@@ -184,18 +183,39 @@ export class UsersService {
 		const partialFriendList = await this.repo.find({
 			select: ['id', 'username'],
 			where: { id: In(user.friendsId) },
-		  }) as Partial<Friend>[];
+		}) as Partial<Friend>[];
 
-		  const friendList = partialFriendList.map((friend : Partial<Friend>) => {
-			  return {
-				  id: friend.id,
-				  username: friend.username,
-				  online : this.isConnected(friend.id),
-				  status : this.gameService.userStatus(friend.id)
-			  }
+		const friendList = partialFriendList.map((friend: Partial<Friend>) => {
+			return {
+				id: friend.id,
+				username: friend.username,
+				online: this.isConnected(friend.id),
+				status: this.gameService.userStatus(friend.id)
 			}
-		  );
-		  return friendList;
+		}
+		);
+		return friendList;
 	}
 
+
+	async getBlockedUsersList(userId: number): Promise<Blocked[]> {
+
+		const user = await this.findOne(userId);
+		if (!user)
+			throw new NotFoundException("User not found");
+		const BlockedList = await this.repo.find({
+			select: ['id', 'username'],
+			where: { id: In(user.friendsId) },
+		}) as Blocked[];
+		return BlockedList;
+	}
+
+	async dfa(user: User) : Promise<User> {
+
+		if (user.dfa)
+			user.dfa = false;
+		else
+			user.dfa = true;
+		return this.repo.save(user);
+	}
 }

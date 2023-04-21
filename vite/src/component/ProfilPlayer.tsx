@@ -17,6 +17,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { GameHistory } from './GameHistory';
 import { Modal } from '@mui/material';
 import { UserInfo } from '../types';
+import { Friend, Blocked } from '../types';
 
 import { UsernameDialog } from './UsernameDialog';
 
@@ -37,7 +38,8 @@ export function ProfilPlayer() {
 	const auth = useAuthService()
 	const { idPlayer } = useParams<{ idPlayer: string }>();
 	const imgPath = `/avatars/${idPlayer}.png`
-
+	const [isFriend, setIsFriend] = useState<boolean>(false);
+	const [isBan, setIsBan] = useState<boolean>(false);
 	const [openUsername, setOpenUsername] = useState<boolean>(false);
 
 	React.useEffect(() => {
@@ -56,9 +58,34 @@ export function ProfilPlayer() {
 		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id) {
 			setItsMe(true);
 		}
-		else
+		else {
 			setItsMe(false);
-		// need to recup url
+			if (idPlayer !== undefined) {
+				apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
+					const friendList = response.data as Friend[];
+					friendList.find((friend) => {
+						if (friend.id === parseInt(idPlayer))
+							setIsFriend(true);
+					})
+				}).catch((error) => {
+					console.log(error);
+
+				});
+				apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
+					const blockList = response.data as Blocked[];
+					blockList.find((friend) => {
+						if (friend.id === parseInt(idPlayer))
+							setIsBan(true);
+					})
+				}).catch((error) => {
+					console.log(error);
+
+				}
+				);
+
+			}
+		}
+
 	}, [auth.user, idPlayer])
 
 
@@ -105,33 +132,50 @@ export function ProfilPlayer() {
 
 
 	const handleAddFriend = () => {
+		setIsFriend(true);
 		apiClient.post(`/api/users/addFriend/${idPlayer}`).then((response) => {
 			console.log(response);
 		}).catch((error) => {
 			console.log(error);
-		});}
+		});
+	}
 
 
 	const handleRemoveFriend = () => {
+		setIsFriend(false);
 		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
 			console.log(response);
 		}).catch((error) => {
 			console.log(error);
-		});}
+		});
+	}
 
 	const handleBlockUser = () => {
+		setIsBan(true);
 		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
 			console.log(response);
 		}).catch((error) => {
 			console.log(error);
-		});}
+		});
+	}
 
 	const handleUnblockUser = () => {
+		setIsBan(false);
 		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
 			console.log(response);
 		}).catch((error) => {
 			console.log(error);
-		});}
+		});
+	}
+
+	const handle2FaChange = () => {
+		apiClient.post(`/api/users/toggle2fa`).then((response) => {
+			console.log(response);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}
+
 
 
 	const handleOpenImg = () => setOpenImg(true);
@@ -141,14 +185,15 @@ export function ProfilPlayer() {
 		<React.Fragment>
 
 			<UsernameDialog open={openUsername} quit={() => setOpenUsername(false)} />
-			<Container maxWidth="md">
+			<Container maxWidth="md" >
 				<Box sx={{
 					width: '100%',
 					border: '1px solid #D3C6C6',
 					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-					borderRadius: '16px'
+					borderRadius: '16px',
+					bgcolor: 'background.paper',
 				}}>
-					<AppBar position="static" sx={{ backgroundColor: '#1776D1', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+					<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 							{userData?.username}
 						</Typography>
@@ -167,12 +212,12 @@ export function ProfilPlayer() {
 							>
 								<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 
-									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px'}} sx={{ flexGrow: 1, mr: '10px' }}>
+									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, mr: '10px' }}>
 										{userData?.username}
 									</Typography>
-									{<Avatar sx={{ bgcolor: userData && userData.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
+									{<Avatar sx={{ bgcolor: userData && userData.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar>}
 								</div>
-								{ userData && userData.states.join("-") != "" ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{ userData.states[0]}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{userData?.userConnected ? "online" : "offline" }</Typography> }
+								{userData && userData.states.join("-") != "" ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{userData.states[0]}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{userData?.userConnected ? "online" : "offline"}</Typography>}
 							</Box>
 
 							{itsMe ? (
@@ -215,13 +260,13 @@ export function ProfilPlayer() {
 										</Container>
 									</Modal>
 									<FormGroup>
-										<FormControlLabel control={<Switch defaultChecked />} label="Active 2fA" />
+										<FormControlLabel control={<Switch checked={userData?.dfa} onChange={handle2FaChange} />} label="Active 2fA" />
 									</FormGroup>
 								</>
 							) : (
 								<>
-									<Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend} >add a friend </Button>
-									<Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleBlockUser}>block</Button>
+									{isFriend ? <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleRemoveFriend} >remove friend </Button> : <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend} >add a friend </Button>}
+									{ isBan ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleUnblockUser}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleBlockUser}>block</Button>}
 								</>
 							)}
 
@@ -258,13 +303,15 @@ export function ProfilPlayer() {
 						</div>
 					</Box>
 					<Divider />
-					<Box position="static" sx={{ height: 'auto' ,display: 'flex',
-												flexDirection: 'column',
-												alignItems: 'center',
-												mb:'30px'}}>
+					<Box position="static" sx={{
+						height: 'auto', display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						mb: '30px'
+					}}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '1rem' }} > Match History</Typography>
 
-							<GameHistory idPlayer={idPlayer} />
+						<GameHistory idPlayer={idPlayer} />
 					</Box>
 				</Box>
 			</Container>
