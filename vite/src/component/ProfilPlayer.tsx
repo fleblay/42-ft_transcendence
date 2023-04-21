@@ -17,8 +17,8 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { GameHistory } from './GameHistory';
 import { Modal } from '@mui/material';
-import { Input } from '@mui/material';
-import { UsernameDialog } from './UsernameDialog';
+import { UserInfo } from '../types';
+
 
 
 function fileToBlob(file: File) {
@@ -31,7 +31,7 @@ export function ProfilPlayer() {
 	const [file, setFile] = useState<File | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [itsMe, setItsMe] = useState<boolean>(false);
-	const [userData, setUserData] = useState<any>(null);
+	const [userData, setUserData] = useState<UserInfo | null>(null);
 	const [openImg, setOpenImg] = useState<boolean>(false);
 	const [fileName, setFileName] = useState<string>('');
 	const [responseFile, setResponseFile] = useState<string>('');
@@ -104,6 +104,37 @@ export function ProfilPlayer() {
 		});
 	};
 
+
+	const handleAddFriend = () => {
+		apiClient.post(`/api/users/addFriend/${idPlayer}`).then((response) => {
+			console.log(response);
+		}).catch((error) => {
+			console.log(error);
+		});}
+
+
+	const handleRemoveFriend = () => {
+		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
+			console.log(response);
+		}).catch((error) => {
+			console.log(error);
+		});}
+
+	const handleBlockUser = () => {
+		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
+			console.log(response);
+		}).catch((error) => {
+			console.log(error);
+		});}
+
+	const handleUnblockUser = () => {
+		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
+			console.log(response);
+		}).catch((error) => {
+			console.log(error);
+		});}
+
+
 	const handleOpenImg = () => setOpenImg(true);
 	const handleCloseImg = () => setOpenImg(false);
 
@@ -138,10 +169,10 @@ export function ProfilPlayer() {
 
 									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px', marginLeft: '10px' }} sx={{ flexGrow: 1, ml: '20px', mr: '20px' }}>
 										{userData?.username}
-									</Typography>
-									{userData && userData.userConnected ? <Avatar sx={{ bgcolor: 'green' }} style={{ width: '15px', height: '15px' }}> </Avatar> : <Avatar sx={{ bgcolor: 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar>}
+									</Typography>											
+									{<Avatar sx={{ bgcolor: userData && userData.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
 								</div>
-								{userData && userData.status.lenght > 0 ? <Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>status </Typography> : null}
+								{userData && userData.states.length> 0 ? <Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, p: '2rem' }}>status </Typography> : null}
 							</Box>
 
 							{itsMe ? (
@@ -179,7 +210,7 @@ export function ProfilPlayer() {
 													<Divider />
 													<div> {responseFile} </div>
 												</form>
-												<Button onClick={handleCloseImg}>Fermer</Button>
+												<Button onClick={handleCloseImg}>Close</Button>
 											</Box>
 										</Container>
 									</Modal>
@@ -189,8 +220,8 @@ export function ProfilPlayer() {
 								</>
 							) : (
 								<>
-									<Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} >add a friend </Button>
-									<Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }}>block</Button>
+									<Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend} >add a friend </Button>
+									<Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleBlockUser}>block</Button>
 								</>
 							)}
 
@@ -214,14 +245,14 @@ export function ProfilPlayer() {
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<ThumbDownAltOutlinedIcon sx={{ ml: 2 }} />
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Loose : {userData?.totalplayedGames - userData?.totalwonGames}
+									Loose : {userData?.totalplayedGames ? userData.totalplayedGames - userData?.totalwonGames : 0}
 								</Typography>
 							</div>
 
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} />
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Ratio : {userData?.totalplayedGame ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
+									Ratio : {userData?.totalplayedGames ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
 								</Typography>
 							</div>
 						</div>

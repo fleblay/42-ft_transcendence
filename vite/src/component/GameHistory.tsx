@@ -31,6 +31,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const rows = listGames?.map((game) => {
         return {
+			id: game.id,
             players: game.players,
             score: game.score.sort((a: number, b: number) => b - a).join(' '),
             date: formattedDate(game.date),

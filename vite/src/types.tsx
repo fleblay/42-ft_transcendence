@@ -41,3 +41,38 @@ export interface PlayerInput {
 		move: Move
 		powerUp?: string
 	}
+
+export type Games = {
+		date: string,
+		id: string,
+		score: number[]
+	}
+	
+export type UserInfo = {
+		id: number,
+		username: string,
+		email: string,
+		password?: string, // To be removed in DTO in back
+		avatar: string,
+		savedGames: Games[],
+		wonGames: Games[],
+	
+		states: string[],
+		gameIds: string[],
+	
+		points: number,
+		totalwonGames: number,
+		totalplayedGames: number,
+	
+		userConnected: boolean,
+	}
+export type UserStatus = 'online' | 'ingame' | 'watching' | 'offline';
+
+
+export type Friend = {
+		id: number,
+		username: string,
+		online: boolean,
+		status: UserStatus,
+	}
+	
