@@ -64,6 +64,8 @@ export class AuthService {
 			throw new NotFoundException("User not existing");
 		if (user.password !== dataUser.password)
 			throw new ForbiddenException('Password not match');
+		if (user.stud)
+			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
 		console.log(`tokens are ${tokens.access_token}`);
