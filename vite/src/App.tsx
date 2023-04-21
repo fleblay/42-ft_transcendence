@@ -19,6 +19,7 @@ import { MuiAppBar } from './component/menu'
 import {  ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
 import { UsernameDialog } from './component/UsernameDialog'
+import { FriendList } from './component/FriendList'
 
 export interface Destinations {
 	name: string,
@@ -40,6 +41,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "MyProfil", path: "/MyProfil", public: false },
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
 	{ name: "Player", path: "/player", public: false},
+	{ name: "Friends", path: "/friends", public: false},
 
 ]
 
@@ -210,6 +212,7 @@ function App() {
 						<Route path="/player/">
 							<Route path=":idPlayer" element={<ProfilPlayer />} />
 						</Route>
+						<Route path="/friends" element={<FriendList/>} />
 						<Route path='*' element={<div>404</div>} />
 					</Route>
 				</Routes>

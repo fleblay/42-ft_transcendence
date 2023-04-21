@@ -26,9 +26,13 @@ export function FriendList() {
 
 
 	React.useEffect(() => {
+		console.log('useEffect');
+		console.log(auth.user);
 		if (!auth.user) return;
-		apiClient.get(`/api/user/friends/${auth.user.id}`).then((response) => {
+		apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
 			setFriendList(response.data);
+		console.log('friendlist');
+		console.log(response.data);
 		});
 
 	}, [auth.user]);
