@@ -24,6 +24,8 @@ export function GamePage() {
 	const [joined, setJoined] = useState<boolean>(false);
 	const { socket, customEmit } = useContext(SocketContext);
 
+	const [countdown, setCountdown] = useState<number>(0);
+
 	const { idGame } = useParams();
 
 	useEffect(() => {
@@ -52,10 +54,16 @@ export function GamePage() {
 		function onGameUpdate(data: IgameInfo) {
 			setGameInfo(data);
 		}
+		function onCountdown(data: number) {
+			console.log('game.countdown', data);
+			setCountdown(data);
+		}
 		socket.on('game.update', onGameUpdate)
+		socket.on('game.countdown', onCountdown)
 		return () => {
 			if (!socket) return;
 			socket.off('game.update', onGameUpdate)
+			socket.off('game.countdown', onCountdown)
 		}
 	}, [window.location.pathname])
 
@@ -69,16 +77,35 @@ export function GamePage() {
 
 	// TODO: Crash, gameInfo is undefined. game.update est seulement dans gamescreen. game.join envoie un gameInfo pour init ?
 	if (loading === LoadingStatus.Loaded && idGame) {
-		if (gameInfo.status === GameStatus.waiting) {
+		if (gameInfo.status === GameStatus.waiting || gameInfo.status === GameStatus.playing || gameInfo.status === GameStatus.start) {
 			return (
-				<div>
-					Waiting for players...
+				<>
+					{
+						gameInfo.status === GameStatus.waiting &&
+							<div>
+								Waiting for players...
+							</div>
+					}
+					{countdown !== 0 &&
+						<div style={
+							{
+								position: 'absolute',
+								top: 0,
+								left: 0,
+								width: '100%',
+								height: '100%',
+								backgroundColor: 'rgba(0, 0, 0, 0.5)',
+								zIndex: 1
+							}
+						}>
+							<div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '50px', color: 'white' }}>
+								{countdown}
+							</div>
+						</div>
+					}
 					<GameScreen gameInfo={gameInfo} gameId={idGame} />
-				</div>
-			);
-		}
-		if (gameInfo.status === GameStatus.playing || gameInfo.status === GameStatus.start) {
-			return <GameScreen gameInfo={gameInfo} gameId={idGame} />
+				</>
+			)
 		}
 		if (gameInfo.status === GameStatus.end) {
 			return <GameFinishedScreen gameInfo={gameInfo} />
