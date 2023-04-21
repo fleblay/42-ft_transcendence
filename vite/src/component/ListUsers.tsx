@@ -13,10 +13,6 @@ import Paper from '@mui/material/Paper';
 import { Avatar, Button, Link } from '@mui/material';
 import { UserInfo} from "../types";
 
-
-
-
-
 export function ListUsers() {
 
 	const [info, setInfo] = useState<string>("")
@@ -62,7 +58,7 @@ export function ListUsers() {
 										sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 									>
 										<TableCell component="th" scope="row">
-											<Link key={elem.id} component={LinkRouter} to={`/player/${elem.id}`}>{elem.username} </Link>
+											<Link key={elem.id} component={LinkRouter} to={`/player/${elem.id}`}>{elem.stud ? elem.username: "NOT_A_STUD_"+elem.username} </Link>
 										</TableCell>
 										<TableCell align="right">{elem.points}</TableCell>
 										<TableCell align="right">{elem.totalplayedGames ? (elem.totalwonGames / elem.totalplayedGames).toPrecision(2) : 0}</TableCell>

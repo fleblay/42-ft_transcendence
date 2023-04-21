@@ -1,18 +1,18 @@
 export type userToken = {
-	  access_token: string;
-	  refresh_token?: string;
-	};
+	access_token: string;
+	refresh_token?: string;
+};
 export type DecodedToken = {
-	  sub: number;
-	  username: string;
-	  exp: number;
-	  iat: number;
-	};
+	sub: number;
+	username: string;
+	exp: number;
+	iat: number;
+};
 
 export type Pos2D = {
-		x: number,
-		y: number
-	}
+	x: number,
+	y: number
+}
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
@@ -38,41 +38,42 @@ export interface IgameInfo {
 export enum Move { "Up" = 1, "Down" }
 
 export interface PlayerInput {
-		move: Move
-		powerUp?: string
-	}
+	move: Move
+	powerUp?: string
+}
 
 export type Games = {
-		date: string,
-		id: string,
-		score: number[]
-	}
-	
+	date: string,
+	id: string,
+	score: number[]
+}
+
 export type UserInfo = {
-		id: number,
-		username: string,
-		email: string,
-		password?: string, // To be removed in DTO in back
-		avatar: string,
-		savedGames: Games[],
-		wonGames: Games[],
-	
-		states: string[],
-		gameIds: string[],
-	
-		points: number,
-		totalwonGames: number,
-		totalplayedGames: number,
-	
-		userConnected: boolean,
-	}
+	id: number,
+	username: string,
+	email: string,
+	password?: string, // To be removed in DTO in back
+	avatar: string,
+	savedGames: Games[],
+	wonGames: Games[],
+	stud: boolean
+
+	states: string[],
+	gameIds: string[],
+
+	points: number,
+	totalwonGames: number,
+	totalplayedGames: number,
+
+	userConnected: boolean,
+}
 export type UserStatus = 'online' | 'ingame' | 'watching' | 'offline';
 
 
 export type Friend = {
-		id: number,
-		username: string,
-		online: boolean,
-		status: UserStatus,
-	}
-	
+	id: number,
+	username: string,
+	online: boolean,
+	status: UserStatus,
+}
+
