@@ -18,7 +18,7 @@ export class WebSocketUserInterceptor implements NestInterceptor {
 		*/
 		const data = request.getData()
 		const bearerToken = data["_access_token"]
-		console.log("data in websocketUserInterceptor is [", data, "]")
+		// console.log("data in websocketUserInterceptor is [", data, "]")
 		const foundUser = await this.authService.decodeToken(bearerToken)
 		request.getData()["_user"] = foundUser
 		return next.handle().pipe()

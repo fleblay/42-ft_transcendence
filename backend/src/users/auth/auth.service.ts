@@ -44,7 +44,7 @@ export class AuthService {
 
 	decodeToken(bearerToken: string): Promise<User> | null {
 		try {
-			console.log(`Bearer token is ${bearerToken}`)
+			// console.log(`Bearer token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.decode(bearerToken);
 			if (jwtResponse == null) {
 				console.log(`error in decode token`)
