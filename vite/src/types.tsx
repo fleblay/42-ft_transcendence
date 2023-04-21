@@ -77,3 +77,10 @@ export type Friend = {
 	status: UserStatus,
 }
 
+
+export type Blocked= {
+	id: number,
+	username: string
+}
+
+

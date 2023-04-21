@@ -8,6 +8,7 @@ import {
 	useLocation,
 } from "react-router-dom";
 
+import { Paper, ThemeProvider, createTheme } from '@mui/material';
 
 export const RouterContext = React.createContext<{to: string, from: string}>(null!!);
 
@@ -24,11 +25,40 @@ const RouterProvider = ({ children }: { children: JSX.Element }) => {
 	</RouterContext.Provider>
 }
 
+const themeLight = createTheme({
+	palette: {
+	  background: {
+		default: "#eff0f4",
+	  },
+	  primary: {
+		main: "#3f51b5"
+	  },
+	
+	}
+  });
+  
+  const themeDark = createTheme({
+	palette: {
+	  background: {
+		default: "#010409",
+		paper: "#333333"
+	  },
+	  primary: {
+		main: "#3f51b5"
+	  },
+	  text: {
+		primary: "#ffffff"
+	  }
+	}
+  });
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
 		<BrowserRouter>
 			<RouterProvider>
-				<App />
+				<ThemeProvider theme={true ? themeLight : themeDark}>
+					<App />
+				</ThemeProvider>
 			</RouterProvider>
 		</BrowserRouter>
 	</React.StrictMode>,

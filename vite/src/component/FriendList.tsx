@@ -49,9 +49,10 @@ export function FriendList() {
 					width: '100%',
 					border: '1px solid #D3C6C6',
 					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-					borderRadius: '16px'
+					borderRadius: '16px',
+					bgcolor: 'background.paper',
 				}}>
-					<AppBar position="static" sx={{ backgroundColor: '#1776D1', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+					<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 							Friends
 						</Typography>

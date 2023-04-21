@@ -23,3 +23,10 @@ export type Friend = {
 	online: boolean,
 	status: UserStatus,
 }
+
+
+export type Blocked= {
+	id: number,
+	username: string
+}
+
