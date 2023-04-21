@@ -92,15 +92,52 @@ export class UsersController {
 	}
 
 	@Get('/:id')
-	async findOne(@Param("id") id: string) {
+	async findOne(@Param("id") id: string): Promise<UserInfo>
+	{
 		const user = await this.usersService.findOne(parseInt(id));
 		const userScore: UserScore = {
-			totalplayedGames: user.savedGames.length,
-			totalwonGames: user.wonGames.length,
-			points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
+				totalplayedGames: user.savedGames.length,
+				totalwonGames: user.wonGames.length,
+				points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
 		}
-		const status = this.gameService.userState(user.id).states;
-		console.log({...user, status, ...userScore, userConnected: await this.usersService.isConnected(user.id)}, user.savedGames);
-		return {...user, status , ...userScore, 	userConnected: await this.usersService.isConnected(user.id), savedGames: user.savedGames};
+
+			return ({
+				...user,
+				...this.gameService.userState(user.id),
+				...userScore,
+				userConnected: this.usersService.isConnected(user.id)
+			});
 	}
+
+	@UseGuards(ATGuard)
+	@Get('/friendsList/:id')
+	async getFriendsList(@Param("id") id: string) {
+		return await this.usersService.getFriendsList(parseInt(id));
+	}
+
+	
+	@UseGuards(ATGuard)
+	@Post('/addFriend/:id')
+	async addFriend(@CurrentUser() user: User, @Param("id") id: string) {
+		return await this.usersService.addFriend(user, parseInt(id));
+	}
+
+	@UseGuards(ATGuard)
+	@Post('/removeFriend/:id')
+	async removeFriend(@CurrentUser() user: User, @Param("id") id: string) {
+		return await this.usersService.removeFriend(user, parseInt(id));
+	}
+
+	@UseGuards(ATGuard)
+	@Post('/blockUser/:id')
+	async block(@CurrentUser() user: User, @Param("id") id: string) {
+		return await this.usersService.blockUser(user, parseInt(id));
+	}
+
+	@UseGuards(ATGuard)
+	@Post('/unblockUser/:id')
+	async unblock(@CurrentUser() user: User, @Param("id") id: string) {
+		return await this.usersService.unblockUser(user, parseInt(id));
+	}
+
 }

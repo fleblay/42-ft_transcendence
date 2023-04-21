@@ -11,31 +11,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Avatar, Button, Link } from '@mui/material';
+import { UserInfo} from "../types";
 
-type Games = {
-	date: string,
-	id: string,
-	score: number[]
-}
 
-type UserInfo = {
-	id: number,
-	username: string,
-	email: string,
-	password?: string, // To be removed in DTO in back
-	avatar: string,
-	savedGames: Games[],
-	wonGames: Games[],
 
-	states: string[],
-	gameIds: string[],
 
-	points: number,
-	totalwonGames: number,
-	totalplayedGames: number,
-
-	userConnected: boolean,
-}
 
 export function ListUsers() {
 

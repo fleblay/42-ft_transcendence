@@ -6,6 +6,12 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UserStatus } from '../type';
 import { createWriteStream } from 'fs';
 import * as sharp from 'sharp';
+import { In } from 'typeorm';
+import { NotFoundException } from '@nestjs/common';
+import { Friend } from '../type';
+import { GameService } from '../game/game.service';
+import { forwardRef } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 
 
 @Injectable()
@@ -13,7 +19,8 @@ export class UsersService {
 
 	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
 
-	constructor(@InjectRepository(User) private repo: Repository<User>) {
+	constructor(@InjectRepository(User) private repo: Repository<User>, @Inject(forwardRef(() => GameService))
+	private gameService: GameService) {
 		//setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
 }
 
@@ -118,7 +125,6 @@ export class UsersService {
 					console.log("image resized", info)
 				}
 			})
-			user.avatar = path;
 		console.log("path", path);
 		console.log ("user", user);
 		return this.repo.save(user);
@@ -135,4 +141,58 @@ export class UsersService {
 		user.username = newUsername;
 		return this.repo.save(user);
 	}
+
+	addFriend(user: User, friendId: number) {
+		if (user.friendsId.includes(friendId))
+			throw new BadRequestException("User is already your friend");
+		user.friendsId.push(friendId);
+		return this.repo.save(user);
+	}
+
+	removeFriend(user: User, friendId: number) {
+		const index = user.friendsId.indexOf(friendId);
+		if (index > -1) {
+			user.friendsId.splice(index, 1);
+		}
+		return this.repo.save(user);
+	}
+
+
+	blockUser(user: User, blockedId: number) {
+		if (user.blockedId.includes(blockedId))
+			throw new BadRequestException("User is already blocked");
+		user.blockedId.push(blockedId);
+		return this.repo.save(user);
+	}
+
+	unblockUser(user: User, blockedId: number) {
+		const index = user.blockedId.indexOf(blockedId);
+		if (index > -1) {
+			user.blockedId.splice(index, 1);
+		}
+		return this.repo.save(user);
+	}
+
+	async getFriendsList(userId: number) : Promise<Friend[]>{
+		
+		const user = await this.findOne(userId);
+		if (!user)
+			throw new NotFoundException("User not found");
+		const partialFriendList = await this.repo.find({
+			select: ['id', 'username'],
+			where: { id: In(user.friendsId) },
+		  }) as Partial<Friend>[];
+
+		  const friendList = partialFriendList.map((friend : Partial<Friend>) => {
+			  return {
+				  id: friend.id,
+				  username: friend.username,
+				  online : this.isConnected(friend.id),
+				  status : this.gameService.userStatus(friend.id)
+			  }
+			}
+		  );
+		  return friendList;
+	}
+
 }
