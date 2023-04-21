@@ -9,7 +9,7 @@ import { Post } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
-	redirectURI = "http://localhost:8080/api/auth/42auth"
+	redirectURI = `http://${process.env.HOSTNAME}:8080/api/auth/42auth`
 
 	constructor(private authService: AuthService) { }
 

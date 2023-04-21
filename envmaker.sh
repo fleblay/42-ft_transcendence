@@ -26,6 +26,16 @@ sed -i $EXTENSION "s/\(TOKEN_KEY=\).*/\1${RANDOMINPUT[3]}/" .env
 sed -i $EXTENSION "s/\(RANDOM_NUMBER1=\).*/\1${RANDOMINPUT[4]}/" .env
 sed -i $EXTENSION "s/\(RANDOM_NUMBER2=\).*/\1${RANDOMINPUT[5]}/" .env
 
+HOSTNAME=$(uname -n)
+if [[ "$HOSTNAME" == *".clusters.42paris.fr" ]]
+then
+	echo -e "\x1b[33m42paris device : changing HOSTNAME from localhost to ${HOSTNAME}\x1b[0m"
+else
+	echo -e "\x1b[33m42Outside 42paris : HOSTNAME set to localhost to\x1b[0m"
+	HOSTNAME="localhost"
+fi
+sed -i $EXTENSION "s/\(HOSTNAME=\).*/\1${HOSTNAME}/" .env
+
 rm -rf .env.backup
 
 echo -e "\x1b[32mEnv File successfully created\x1b[0m"
