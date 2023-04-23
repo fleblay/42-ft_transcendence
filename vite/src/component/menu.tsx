@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthService } from '../auth/AuthService';
 
 const pages = ['Game', 'Leaderboard', 'Chat', 'About'];
-const menu = ['My profil', 'friends', 'Logout', 'all refresh token'];
+const menu = ['My profil', 'friends', 'blocked', 'Logout', 'all refresh token'];
 
 export function MuiAppBar() {
 

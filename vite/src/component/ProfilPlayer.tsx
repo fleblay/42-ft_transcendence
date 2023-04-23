@@ -276,26 +276,26 @@ export function ProfilPlayer() {
 					<Box position="static" sx={{ height: 'auto' }}>
 						<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem' }}>
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<MilitaryTechOutlinedIcon sx={{ ml: 2 }} />
+								<MilitaryTechOutlinedIcon sx={{ ml: 2 }} color="primary" />
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
 									Rank : {userData?.totalwonGames}
 								</Typography>
 							</div>
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<EmojiEventsOutlinedIcon sx={{ ml: 2 }} />
+								<EmojiEventsOutlinedIcon sx={{ ml: 2 } } color="primary"/>
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
 									Win : {userData?.totalwonGames}
 								</Typography>
 							</div>
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<ThumbDownAltOutlinedIcon sx={{ ml: 2 }} />
+								<ThumbDownAltOutlinedIcon sx={{ ml: 2 }} color="primary"/>
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
 									Loose : {userData?.totalplayedGames ? userData.totalplayedGames - userData?.totalwonGames : 0}
 								</Typography>
 							</div>
 
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} />
+								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} color="primary"/>
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
 									Ratio : {userData?.totalplayedGames ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
 								</Typography>

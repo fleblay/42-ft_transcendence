@@ -205,7 +205,7 @@ export class UsersService {
 			throw new NotFoundException("User not found");
 		const BlockedList = await this.repo.find({
 			select: ['id', 'username'],
-			where: { id: In(user.friendsId) },
+			where: { id: In(user.blockedId) },
 		}) as Blocked[];
 		return BlockedList;
 	}

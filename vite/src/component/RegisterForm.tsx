@@ -67,7 +67,7 @@ export function RegisterForm() {
 								<TextField required fullWidth label="password" type="password" name="password" autoComplete="current-password" />
 							</Grid>
 							<Grid item xs={12}>
-								<Button fullWidth variant="contained" color="success" type="submit" sx={{ my: 2 }}>Submit</Button>
+								<Button fullWidth variant="contained" color="primary" type="submit" sx={{ my: 2 }}>Submit</Button>
 							</Grid>
 						</Grid>
 					</form>
