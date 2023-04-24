@@ -22,7 +22,9 @@ follow:
 
 build: .env.template backend/Dockerfile
 	bash envmaker.sh
+	mkdir -p nginx/avatars
 	docker-compose build
+	curl https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Vimlogo.svg/langfr-320px-Vimlogo.svg.png -sSo nginx/avatars/default.png
 
 down:
 	docker-compose down -t 3
@@ -34,7 +36,7 @@ clean: stop-all rm-all rm-vol rm-net
 
 fclean : clean rm-modules
 	docker system prune -f --volumes -a
-	rm -rf nginx/avatars && mkdir -p nginx/avatars
+	rm -rf nginx/avatars
 	rm -rf ./.env
 
 #####CLEANING#####
