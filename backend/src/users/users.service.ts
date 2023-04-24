@@ -113,10 +113,10 @@ export class UsersService {
 		this.changeStatus(id, { oldStatus: "online" })
 	}
 
-	async uploadAvatar(user: User, file: Express.Multer.File) {
+	uploadAvatar(user: User, file: Express.Multer.File) {
 		const path = '/usr/src/app/avatars/' + user.id + '.png';
 		console.log("user.controller.uploadAvatar", file.buffer);
-		await sharp(file.buffer)
+		sharp(file.buffer)
 			.resize(200, 200)
 			.toFile(path, (err, info) => {
 				if (err) {
