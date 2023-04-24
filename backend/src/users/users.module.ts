@@ -7,10 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { RefreshToken } from '../model/refresh-token.entity';
 import {GameModule} from '../game/game.module'
+import { FriendRequest } from 'src/model/friend-request.entity';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([User, RefreshToken]),
+		TypeOrmModule.forFeature([User, RefreshToken, FriendRequest]),
 		JwtModule.register({
 			secret: 'secret', // not secure at all need to be changed in production  put in a .env file
 			signOptions: { expiresIn: '600s' },

@@ -11,6 +11,7 @@ import { Friend } from '../type';
 import { GameService } from '../game/game.service';
 import { forwardRef } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
+import { FriendRequest, FriendRequestStatus } from '../model/friend-request.entity';
 
 
 @Injectable()
@@ -18,16 +19,17 @@ export class UsersService {
 
 	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
 
-	constructor(@InjectRepository(User) private repo: Repository<User>, @Inject(forwardRef(() => GameService))
-	private gameService: GameService) {
+	constructor(
+		@InjectRepository(User) private repo: Repository<User>,
+		@Inject(forwardRef(() => GameService)) private gameService: GameService,
+		@InjectRepository(FriendRequest) private friendReqRepo: Repository<FriendRequest>
+	) {
 		//setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
 	}
 
 	create(dataUser: CreateUserDto) {
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
 		const user = this.repo.create(dataUser);
-		user.friendsId = [];
-		user.blockedId = [];
 		console.log("save user :", user);
 		return this.repo.save(user);
 	}
@@ -36,6 +38,8 @@ export class UsersService {
 		const allDB = this.repo.createQueryBuilder("user")
 			.leftJoinAndSelect("user.savedGames", "savedgames")
 			.leftJoinAndSelect("user.wonGames", "wongames")
+			.leftJoinAndSelect("user.sentRequests", "sentrequests")
+			.leftJoinAndSelect("user.receiveRequests", "receiverequests")
 			.getMany()
 		return allDB
 	}
@@ -143,31 +147,67 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	addFriend(user: User, friendId: number) {
-		if (user.friendsId.includes(friendId))
-		{
-			console.log("User is already your friend");
+	async addFriend(user: User, friendId: number) {
+
+		const friend = await this.findOne(friendId);
+		if (!friend) {
+			console.log("User not found");
 			return;
 		}
+
+		if (user.id === friendId) {
+			console.log("You can't add yourself as a friend");
+			return;
+		}
+		if (await this.friendReqRepo.createQueryBuilder("friendreq")
+			.leftJoin("friendreq.sender", "sender")
+			.addSelect("sender.id")
+			.leftJoin("friendreq.receiver", "receiver")
+			.addSelect("receiver.id")
+			.where("sender.id = :senderId", { senderId: user.id })
+			.andWhere("receiver.id = :receiverId", { receiverId: friendId })
+			.getOne()) {
+			console.log("You already sent a friend request to this user");
+			return;
+		}
+
+		const newRequest = this.friendReqRepo.create({
+			sender: user,
+			receiver: friend,
+			status: 'pending'
+		});
+		this.friendReqRepo.save(newRequest);
 		this.unblockUser(user, friendId);
-		user.friendsId.push(friendId);
-		this.repo.save(user);
 	}
 
-	removeFriend(user: User, friendId: number) {
-		const index = user.friendsId.indexOf(friendId);
-		if (index === -1) {
-			console.log("User is not your friend")
+
+	async removeFriend(user: User, friendId: number) {
+		const friend = await this.findOne(friendId);
+		if (!friend) {
+			console.log("User not found");
 			return;
 		}
-		user.friendsId.splice(index, 1);
-		return this.repo.save(user);
+
+		if (user.id === friendId) {
+			console.log("You can't remove yourself as a friend");
+			return;
+		}
+
+		const friendRequest = await this.friendReqRepo.createQueryBuilder("friendreq")
+			.leftJoin("friendreq.sender", "sender")
+			.addSelect("sender.id")
+			.leftJoin("friendreq.receiver", "receiver")
+			.addSelect("receiver.id")
+			.where("sender.id = :senderId AND receiver.id = :receiverId", { senderId: user.id, receiverId: friendId })
+			.orWhere("sender.id = :senderId AND receiver.id = :receiverId", { senderId: friendId, receiverId: user.id })
+			.getOne()
+		if (friendRequest)
+			this.friendReqRepo.softRemove(friendRequest);
 	}
 
 
 	blockUser(user: User, blockedId: number) {
-		if (user.blockedId.includes(blockedId))
-		{
+		if (user.blockedId.includes(blockedId)) {
 			console.log("User is already blocked");
 			return;
 		}
@@ -179,34 +219,37 @@ export class UsersService {
 	unblockUser(user: User, blockedId: number) {
 		const index = user.blockedId.indexOf(blockedId);
 		if (index === -1) {
-			console.log ("User is not blocked");
+			console.log("User is not blocked");
 			return;
 		}
 		user.blockedId.splice(index, 1);
 		return this.repo.save(user);
 	}
 
-	async getFriendsList(userId: number): Promise<Friend[]> {
+	async getFriendsList(userId: number, wantedStatus: FriendRequestStatus = 'accepted'): Promise<Friend[]> {
 
 		const user = await this.findOne(userId);
-		console.log("user friends", user.friendsId);
 		if (!user)
 			throw new NotFoundException("User not found");
-		const partialFriendList = await this.repo.find({
-			select: ['id', 'username'],
-			where: { id: In(user.friendsId) },
-		}) as Partial<Friend>[];
 
-		const friendList = partialFriendList.map((friend: Partial<Friend>) => {
+		const friendList = await this.friendReqRepo.createQueryBuilder("friendreq")
+			.leftJoin("friendreq.sender", "sender")
+			.addSelect(["sender.id", "receiver.username"])
+			.leftJoin("friendreq.receiver", "receiver")
+			.addSelect(["receiver.id", "receiver.username"])
+			.where("(sender.id = :senderId OR receiver.id = :receiverId)", { senderId: user.id, receiverId: user.id})
+			.andWhere("friendreq.status = :statusFilter", { statusFilter: wantedStatus })
+			.getMany();
+		return friendList.map(({ sender, receiver }) => {
+			let friend = sender.id === user.id ? receiver : sender;
+		
 			return {
 				id: friend.id,
 				username: friend.username,
 				online: this.isConnected(friend.id),
 				status: this.gameService.userStatus(friend.id)
-			}
-		}
-		);
-		return friendList;
+			};
+		});
 	}
 
 
@@ -222,7 +265,7 @@ export class UsersService {
 		return BlockedList;
 	}
 
-	async dfa(user: User) : Promise<User> {
+	async dfa(user: User): Promise<User> {
 
 		if (user.dfa)
 			user.dfa = false;

@@ -1,6 +1,7 @@
 
 import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { SavedGame } from './saved-game.entity';
+import { FriendRequest } from './friend-request.entity';
 
 @Entity()
 export class User {
@@ -14,10 +15,7 @@ export class User {
 	@Column()
 	password: string;
 
-	@Column("int", { array: true })
-	friendsId: number[];
-
-	@Column("int", { array: true })
+	@Column("int", { array: true, default: [] })
 	blockedId: number[];
 
 	@Column({default : false})
@@ -33,6 +31,15 @@ export class User {
 	@OneToMany(() => SavedGame, (savedGame) => savedGame.winner)
 	//@JoinTable()
 	wonGames: SavedGame[];
+
+	@OneToMany(() => FriendRequest , (friendRequest) => friendRequest.sender)
+	@JoinTable({})	
+	sentRequests: FriendRequest[];
+
+	@OneToMany(() => FriendRequest , (friendRequest) => friendRequest.receiver)
+	@JoinTable({})
+	receivedRequests: FriendRequest[];
+
 
 /* 	@AfterInsert()
 	logInsert() {

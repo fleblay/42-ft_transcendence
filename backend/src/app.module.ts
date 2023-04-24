@@ -11,6 +11,7 @@ import { GameModule } from './game/game.module';
 import { SavedGame } from './model/saved-game.entity';
 import { RefreshToken } from './model/refresh-token.entity';
 import { AuthModule } from './users/auth/auth.module';
+import { FriendRequest } from './model/friend-request.entity';
 
 @Module({
 	imports: [
@@ -27,7 +28,7 @@ import { AuthModule } from './users/auth/auth.module';
 				username: config.get<string>("POSTGRES_USER"),
 				password: config.get<string>("POSTGRES_PASSWORD"),
 				synchronize: true,
-				entities:[User, SavedGame, RefreshToken]
+				entities:[User, SavedGame, RefreshToken, FriendRequest]
 			})
 		}),
 		UsersModule,
