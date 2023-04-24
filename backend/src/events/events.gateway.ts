@@ -50,7 +50,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			const info = this.connectedSockets.map((e) => {
 				return e.username
 			})
-			//console.log("\x1b[33mSockets info are : \x1b[0m", info.join('-'))
+			console.log("\x1b[33mSockets info are : \x1b[0m", info.join('-'))
 		}, 5000)
 	}
 
@@ -77,6 +77,9 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		console.log("New Connection User:", foundUser.username)
 		this.connectedSockets.push({ id: socket.id, username: foundUser.username, userId: foundUser.id, actions: ["connection"] })
 		this.userServices.addConnectedUser(foundUser.id)
+		this.server.to(`/player/${foundUser.id}`).emit('page.player', {
+			connected: true
+		})
 	}
 
 	async handleDisconnect(socket: Socket) {
@@ -87,6 +90,10 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		if (foundUser) {
 			console.log("Disconnect User:", foundUser.username)
 			this.userServices.disconnect(foundUser.id)
+
+			this.server.to(`/player/${foundUser.id}`).emit('page.player', {
+				connected: false
+			})
 		}
 		const currentGame = this.gameService.findByClient(socket)
 		if (currentGame && foundUser)
@@ -160,9 +167,13 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.gameService.handlePlayerInput(client, user, data)
 	}
 
-	@SubscribeMessage('createLobby')
-	createLobby(client: Socket): void {
-		this.updateSocket(client, "Lobby")
-		client.broadcast.emit('newLobby', 'Lobby id 1');
+
+	@SubscribeMessage('client.nav')
+	handleClientNav(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: {to :string, from : string }): void {
+		this.updateSocket(client, "clientNav");
+		console.log(data);
+		client.join(data.to);
+		client.leave(data.from);
 	}
+
 }

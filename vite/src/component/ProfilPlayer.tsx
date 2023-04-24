@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { AppBar, Avatar, Button, Container, Switch, TextField, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
 import { FormEvent } from 'react';
 
 import { Box } from '@mui/system';
 import { useAuthService } from '../auth/AuthService';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Divider } from '@mui/material';
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
@@ -18,6 +18,7 @@ import { GameHistory } from './GameHistory';
 import { Modal } from '@mui/material';
 import { UserInfo } from '../types';
 import { Friend, Blocked } from '../types';
+import { SocketContext } from '../socket/SocketProvider';
 
 import { UsernameDialog } from './UsernameDialog';
 
@@ -43,6 +44,8 @@ export function ProfilPlayer() {
 	const [openUsername, setOpenUsername] = useState<boolean>(false);
 	const [changeRelation, setChangeRelation] = useState<boolean>(false);
 	const [dfa , setDfa] = useState<boolean>(false);
+	const location = useLocation();
+	const {customEmit, socket, customOn, customOff} = useContext(SocketContext);
 
 	React.useEffect(() => {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
@@ -54,6 +57,21 @@ export function ProfilPlayer() {
 		
 
 	}, [idPlayer])
+
+	React.useEffect(() => {
+		console.log('yo je pas listen')
+		if (!socket) return;
+		console.log('yo je listen')
+		customOn('page.player' , (data: any) => {
+			console.log("data", data);
+			if (userData)
+				setUserData({ ...userData, userConnected: data.connected });
+		})
+		return (() => {
+			customOff('page.player');
+		})
+	}, [socket, userData]);
+		
 
 
 	React.useEffect(() => {
