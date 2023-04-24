@@ -41,6 +41,8 @@ export function ProfilPlayer() {
 	const [isFriend, setIsFriend] = useState<boolean>(false);
 	const [isBan, setIsBan] = useState<boolean>(false);
 	const [openUsername, setOpenUsername] = useState<boolean>(false);
+	const [changeRelation, setChangeRelation] = useState<boolean>(false);
+	const [dfa , setDfa] = useState<boolean>(false);
 
 	React.useEffect(() => {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
@@ -49,6 +51,8 @@ export function ProfilPlayer() {
 		}).catch((error) => {
 			console.log(error);
 		});
+		
+
 	}, [idPlayer])
 
 
@@ -57,36 +61,32 @@ export function ProfilPlayer() {
 		if (!auth.user) return;
 		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id) {
 			setItsMe(true);
+			setDfa(!!userData?.dfa as boolean);
 		}
 		else {
 			setItsMe(false);
 			if (idPlayer !== undefined) {
 				apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
 					const friendList = response.data as Friend[];
-					friendList.find((friend) => {
-						if (friend.id === parseInt(idPlayer))
-							setIsFriend(true);
-					})
-				}).catch((error) => {
+					setIsFriend(friendList.find((friend) => friend.id === parseInt(idPlayer)) !== undefined);
+					}).catch((error) => {
 					console.log(error);
 
 				});
 				apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
 					const blockList = response.data as Blocked[];
-					blockList.find((friend) => {
-						if (friend.id === parseInt(idPlayer))
-							setIsBan(true);
-					})
+					setIsBan(blockList.find((ban) => ban.id === parseInt(idPlayer)) !== undefined);
 				}).catch((error) => {
 					console.log(error);
-
 				}
 				);
 
 			}
+			console.log("isFriend", isFriend);
+			console.log("isBan", isBan);
 		}
 
-	}, [auth.user, idPlayer])
+	}, [auth.user, idPlayer, changeRelation])
 
 
 
@@ -132,9 +132,9 @@ export function ProfilPlayer() {
 
 
 	const handleAddFriend = () => {
-		setIsFriend(true);
 		apiClient.post(`/api/users/addFriend/${idPlayer}`).then((response) => {
 			console.log(response);
+			setChangeRelation(!changeRelation);
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -142,33 +142,35 @@ export function ProfilPlayer() {
 
 
 	const handleRemoveFriend = () => {
-		setIsFriend(false);
 		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
 			console.log(response);
+			setChangeRelation(!changeRelation);
 		}).catch((error) => {
 			console.log(error);
 		});
 	}
 
 	const handleBlockUser = () => {
-		setIsBan(true);
 		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
 			console.log(response);
+			setChangeRelation(!changeRelation);
+
 		}).catch((error) => {
 			console.log(error);
 		});
 	}
 
 	const handleUnblockUser = () => {
-		setIsBan(false);
 		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
 			console.log(response);
+			setChangeRelation(!changeRelation);
 		}).catch((error) => {
 			console.log(error);
 		});
 	}
 
 	const handle2FaChange = () => {
+		setDfa(!dfa);
 		apiClient.post(`/api/users/toggle2fa`).then((response) => {
 			console.log(response);
 		}).catch((error) => {
@@ -260,7 +262,7 @@ export function ProfilPlayer() {
 										</Container>
 									</Modal>
 									<FormGroup>
-										<FormControlLabel control={<Switch checked={userData?.dfa} onChange={handle2FaChange} />} label="Active 2fA" />
+										<FormControlLabel control={<Switch checked={dfa} onChange={handle2FaChange} />} label="Active 2fA" />
 									</FormGroup>
 								</>
 							) : (

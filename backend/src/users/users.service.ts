@@ -145,32 +145,44 @@ export class UsersService {
 
 	addFriend(user: User, friendId: number) {
 		if (user.friendsId.includes(friendId))
-			throw new BadRequestException("User is already your friend");
+		{
+			console.log("User is already your friend");
+			return;
+		}
+		this.unblockUser(user, friendId);
 		user.friendsId.push(friendId);
-		return this.repo.save(user);
+		this.repo.save(user);
 	}
 
 	removeFriend(user: User, friendId: number) {
 		const index = user.friendsId.indexOf(friendId);
-		if (index > -1) {
-			user.friendsId.splice(index, 1);
+		if (index === -1) {
+			console.log("User is not your friend")
+			return;
 		}
+		user.friendsId.splice(index, 1);
 		return this.repo.save(user);
 	}
 
 
 	blockUser(user: User, blockedId: number) {
 		if (user.blockedId.includes(blockedId))
-			throw new BadRequestException("User is already blocked");
+		{
+			console.log("User is already blocked");
+			return;
+		}
+		this.removeFriend(user, blockedId);
 		user.blockedId.push(blockedId);
 		return this.repo.save(user);
 	}
 
 	unblockUser(user: User, blockedId: number) {
 		const index = user.blockedId.indexOf(blockedId);
-		if (index > -1) {
-			user.blockedId.splice(index, 1);
+		if (index === -1) {
+			console.log ("User is not blocked");
+			return;
 		}
+		user.blockedId.splice(index, 1);
 		return this.repo.save(user);
 	}
 
