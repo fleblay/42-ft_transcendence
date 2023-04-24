@@ -4,41 +4,36 @@ import { AppBar, Avatar, Button, Container, Switch, TextField, Typography } from
 import apiClient from '../auth/interceptor.axios';
 import { Box } from '@mui/system';
 import { Divider } from '@mui/material';
-import { Friend } from '../types';
+import { Blocked } from '../types';
 import { useAuthService } from '../auth/AuthService';
 import { useNavigate } from 'react-router-dom';
 
-export function FriendList() {
+export function BlockedList() {
 	//send a post with image
-	const [friendList, setFriendList] = useState<Friend[]| null>(null);
+	const [blockedList, setBlockedList] = useState<Blocked[]| null>(null);
 	const auth = useAuthService();
     const navigate = useNavigate();
-
+	
 	React.useEffect(() => {
 		console.log('useEffect');
 		console.log(auth.user);
 		if (!auth.user) return;
-		apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
-			setFriendList(response.data);
-		console.log('friendlist');
+		apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
+			setBlockedList(response.data);
+		console.log('blockedlist');
 		console.log(response.data);
 		});
 
 	}, [auth.user]);
 
-	const handleViewProfil = (id : number) => {
-		console.log('view profil');
-		navigate(`/player/${id}`);
-	}
-
-	const handleRemoveFriend = (idPlayer : number) => {
-		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
-			if (!auth.user) return;
-			apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
-				setFriendList(response.data);
-			console.log('friendlist');
-			console.log(response.data);
-			});
+    const handleUnblockUser = (idPlayer : number) => {
+		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
+            if (!auth.user) return;
+            apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
+                setBlockedList(response.data);
+            console.log('blockedlist');
+            console.log(response.data);
+            });
 			console.log(response);
 		}).catch((error) => {
 			console.log(error);
@@ -58,13 +53,13 @@ export function FriendList() {
 				}}>
 					<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
-							Friends
+							blockeds
 						</Typography>
 					</AppBar>
 					<Box position="static" sx={{ height: 'auto' }}>
-						{friendList?.length === 0 ? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any friends yet </Typography> : null}
-						{friendList?.map((friend: Friend) => {
-							const imgPath = `/avatars/${friend.id}.png`
+						{blockedList?.length === 0 ? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any blockeds yet </Typography> : null}
+						{blockedList?.map((blocked: Blocked) => {
+							const imgPath = `/avatars/${blocked.id}.png`
 
 							return (
 								<React.Fragment>
@@ -83,14 +78,11 @@ export function FriendList() {
 									<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 	
 										<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px'}} sx={{ flexGrow: 1, mr: '10px' }}>
-											{friend?.username}
+											{blocked?.username}
 										</Typography>
-										{<Avatar sx={{ bgcolor: friend.online ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
 									</div>
-									{ friend && friend.status ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{ friend.status}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend?.online ? "online" : "offline" }</Typography> }
 								</Box>
-								<Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={()=>handleRemoveFriend(friend.id)} >remove friend </Button> 
-								<Button variant="contained" sx={{ ml: '2', mr: 3, mt: 2, mb: 2 }} onClick={()=>handleViewProfil(friend.id)} >view profil </Button>
+								<Button variant="outlined" color="error" sx={{ ml: 'auto', mr: 3, mt: 2, mb: 2 }} onClick={()=>handleUnblockUser(blocked.id)} >unblock </Button>
 							</div>
 							<Divider />
 							</React.Fragment>

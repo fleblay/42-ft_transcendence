@@ -69,12 +69,12 @@ export function LoginForm() {
 								<TextField required fullWidth label="password" type="password" name="password" autoComplete="current-password" />
 							</Grid>
 							<Grid item xs={12}>
-								<Button variant="contained" color="success" type="submit" fullWidth sx={{ my: 2 }}>Submit</Button>
+								<Button variant="contained" color="primary" type="submit" fullWidth sx={{ my: 2 }}>Submit</Button>
 							</Grid>
 						</Grid>
 					</form>
 					<Grid item xs={12}>
-						<Button onClick={handle42login} variant="contained" color="success" fullWidth sx={{ my: 2 }}>Login with 42</Button>
+						<Button onClick={handle42login} variant="contained" color="primary" fullWidth sx={{ my: 2 }}>Login with 42</Button>
 					</Grid>
 
 					<Box sx={{ my: 3 }}>

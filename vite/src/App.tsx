@@ -14,6 +14,7 @@ import {  ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
 import { UsernameDialog } from './component/UsernameDialog'
 import { FriendList } from './component/FriendList'
+import { BlockedList } from './component/BlockedList';
 
 export interface Destinations {
 	name: string,
@@ -29,6 +30,8 @@ export const allRoutes: Destinations[] = [
 	{ name: "Leaderboard", path: "/leaderboard", public: false },
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
 	{ name: "Friends", path: "/friends", public: false},
+	{ name: "Blocked", path: "/blocked", public: false},
+
 
 ]
 
@@ -197,6 +200,8 @@ function App() {
 							<Route path=":idPlayer" element={<ProfilPlayer />} />
 						</Route>
 						<Route path="/friends" element={<FriendList/>} />
+						<Route path="/blocked" element={<BlockedList/>} />
+
 						<Route path='*' element={<div>404</div>} />
 					</Route>
 				</Routes>

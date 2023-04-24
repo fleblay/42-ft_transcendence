@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
 import { delAccessToken, getAccessToken, saveToken } from '../token/token'
 import { useAuthService } from '../auth/AuthService'
@@ -8,6 +8,8 @@ import apiClient from '../auth/interceptor.axios'
 export interface SocketContextType {
 	socket: Socket | null
 	customEmit: (eventname: string, data: any, callback?: (response: any) => void) => Socket | null
+	customOn: (eventName: string, callback: (data: any) => void) => Socket | null
+	customOff: (eventName: string, callback?: (data: any) => void) => Socket | null
 }
 export let SocketContext = React.createContext<SocketContextType>(null!)
 
@@ -15,13 +17,37 @@ export let SocketContext = React.createContext<SocketContextType>(null!)
 // Creer le socket quand auth.user est defini (On est connecter)
 export function SocketProvider({ children }: { children: React.ReactNode }) {
 	const auth = useAuthService()
-	const socket = React.useRef<Socket | null>(null);
+	const [socket, setSocket] = React.useState<Socket | null>(null);
 	const nav = React.useContext(RouterContext)
 
+	const listOn = React.useRef<string[]>([])
+
 	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket | null {
-		if (!socket.current) return null;
-		const usedCallback = callback ? callback : () => {}
-		return socket.current.emit(eventname, { ...data, _access_token: getAccessToken() }, usedCallback)
+		if (!socket) return null;
+		const usedCallback = callback ? callback : () => { }
+		return socket.emit(eventname, { ...data, _access_token: getAccessToken() }, usedCallback)
+	}
+
+	useEffect(() => {
+		function displayListEvent() {
+			console.log('List of events on', listOn.current)
+		}
+		const intervalId = setInterval(displayListEvent, 5000)
+		return () => clearInterval(intervalId)
+	}, [listOn.current])
+
+	function customOn(eventName: string, callback: (data: any) => void) {
+		if (!socket) return null;
+
+		listOn.current.push(eventName)
+		return socket.on(eventName, callback)
+	}
+
+	function customOff(eventName: string, listener?: (data: any) => void) {
+		if (!socket) return null;
+
+		listOn.current = listOn.current.filter((event) => event !== eventName)
+		return socket.off(eventName, listener)
 	}
 
 	const onConnect = React.useCallback(() => {
@@ -29,17 +55,18 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		customEmit('ping', { message: "This is my first ping" }, (response: any) => {
 			console.log(response)
 		})
-	}, [socket.current])
+	}, [socket])
 
 	React.useEffect(() => {
 		if (!auth.user) return;
-		if (socket.current === null) {
-			socket.current = io({
+		if (socket === null) {
+			setSocket(io({
 				auth: {
 					token: getAccessToken()
 				}
-			})
+			}))
 			console.log("Socket Creation")
+			return;
 		}
 
 		function onMessage(data: any) {
@@ -49,33 +76,38 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		function onDisconnect() {
 			console.log('Disconnected from socket')
 		}
-		socket.current.on('connect', onConnect);
-		socket.current.on('disconnect', onDisconnect);
-		socket.current.on('message', onMessage)
+		socket.on('connect', onConnect);
+		socket.on('disconnect', onDisconnect);
+		socket.on('message', onMessage)
 		return () => {
-			if (!socket.current) return;
-			socket.current.off('connect', onConnect);
-			socket.current.off('message', onMessage);
-			socket.current.off('disconnect', onDisconnect);
-			if (socket.current.connected) {
-				socket.current.disconnect();
-				socket.current = null;
+			if (!socket) return;
+			socket.off('connect', onConnect);
+			socket.off('message', onMessage);
+			socket.off('disconnect', onDisconnect);
+			if (socket.connected) {
+				socket.disconnect();
+				setSocket(null)
 			}
 		}
-	}, [auth.user])
+	}, [auth.user, socket])
 
 	React.useEffect(() => {
-		if (socket.current && nav.to != nav.from && nav.from.startsWith('/game/')) {
+		if (socket && nav.to != nav.from && nav.from.startsWith('/game/')) {
 			console.log("Leaving game page")
 			const gameId = nav.from.split('/')[2]
-			if (gameId)
-			{
+			if (gameId) {
 				console.log(`quit Game : ${gameId}`)
 				apiClient.get(`/api/game/quit/${gameId}`)
 			}
 		}
 	}, [nav])
 
-	const value = { customEmit, socket: socket.current }
+	React.useEffect(() => {
+		if (socket && auth.user) {
+			customEmit('client.nav', { to: nav.to, from: nav.from })
+		}
+	}, [nav, auth.user, socket])
+
+	const value = { customEmit, socket: socket, customOn, customOff }
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
 }
