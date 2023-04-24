@@ -37,7 +37,7 @@ type SocketInfo = {
 	},
 })
 
-//@UseGuards(EventGuard)
+@UseGuards(EventGuard)
 // Adds client info into data of message -> Needed for EventUserDecorator
 @UseInterceptors(WebSocketUserInterceptor)
 export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
