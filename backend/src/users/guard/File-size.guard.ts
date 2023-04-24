@@ -4,12 +4,13 @@ import * as multer from "multer";
 @Injectable()
 export class FileSizeGuard implements CanActivate {
 
-    private readonly maxSize: number = 1024 * 1024 * 5;
+    private readonly maxSize: number = 1000000;
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest();
-        const file = request.file as Express.Multer.File;
-        console.log(file)
-        return file.size <= this.maxSize;
+		const request = context.switchToHttp().getRequest() as Request;
+
+		const fileSize = request.headers?.["content-length"];
+		console.log("fileSize", fileSize);
+        return fileSize <= this.maxSize;
     }
     }

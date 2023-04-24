@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { AppBar, Avatar, Button, Container, Switch, TextField, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
 import { Box } from '@mui/system';
@@ -7,12 +7,16 @@ import { Divider } from '@mui/material';
 import { Friend } from '../types';
 import { useAuthService } from '../auth/AuthService';
 import { useNavigate } from 'react-router-dom';
+import { SocketContext } from '../socket/SocketProvider';
+
 
 export function FriendList() {
 	//send a post with image
 	const [friendList, setFriendList] = useState<Friend[]| null>(null);
 	const auth = useAuthService();
     const navigate = useNavigate();
+	const {customEmit, socket, customOn, customOff} = useContext(SocketContext);
+
 
 	React.useEffect(() => {
 		console.log('useEffect');
@@ -25,6 +29,21 @@ export function FriendList() {
 		});
 
 	}, [auth.user]);
+	
+/* 
+	React.useEffect(() => {
+		console.log('yo je pas listen')
+		if (!socket) return;
+		console.log('yo je listen')
+		customOn('page.player' , (data: any) => {
+			console.log("data", data);
+			if (userData)
+				setUserData({ ...friendList, userConnected: data.connected });
+		})
+		return (() => {
+			customOff('page.player');
+		})
+	}, [socket, friendList]); */
 
 	const handleViewProfil = (id : number) => {
 		console.log('view profil');

@@ -35,7 +35,6 @@ export class AuthController {
 		const refreshToken = req.get('X-Refresh-Token');
 		return this.authService.deleteRefreshToken(refreshToken);
 	}
-
 	@Get('/42externalauth')
 	redirectTo42Api(@Response() res: ExpressResponse) {
 		res.redirect(302, `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.API_CLIENT_ID}&redirect_uri=${encodeURI(this.redirectURI)}&response_type=code`)

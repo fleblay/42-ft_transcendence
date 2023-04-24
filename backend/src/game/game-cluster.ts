@@ -126,6 +126,7 @@ export class GameCluster {
 		const game = this.gamesMap.get(gameId);
 
 		if (!game) return;
+		//if (!game.players) return;
 
 		const player = game.players.find(player => player.user.id === userId);
 		const viewer = game.viewers.find(viewer => viewer.user.id === userId);
