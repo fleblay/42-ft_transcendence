@@ -21,6 +21,7 @@ import { GameCreateDto } from './dtos/game-create.dto';
 import { AuthService } from '../users/auth/auth.service';
 import { IgameInfo } from '../game/game';
 import { UsersService } from '../users/users.service'
+import { instrument } from '@socket.io/admin-ui';
 
 type SocketInfo = {
 	id: string,
@@ -61,8 +62,10 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	afterInit(server: Server) {
-
 		this.gameService.setWsServer(server)
+		instrument(this.server, {
+			auth: false
+		})
 	}
 
 	async handleConnection(socket: Socket) {
