@@ -23,9 +23,14 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 	const listOn = React.useRef<string[]>([])
 
 	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket | null {
-		if (!socket) return null;
+		const access_token = getAccessToken()
+		if (!socket)
+			return null
+		if (!access_token) {
+			window.location.replace(`/login`)
+			}
 		const usedCallback = callback ? callback : () => { }
-		return socket.emit(eventname, { ...data, _access_token: getAccessToken() }, usedCallback)
+		return socket.emit(eventname, { ...data, _access_token: access_token }, usedCallback)
 	}
 
 	useEffect(() => {
