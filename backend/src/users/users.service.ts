@@ -39,7 +39,7 @@ export class UsersService {
 			.leftJoinAndSelect("user.savedGames", "savedgames")
 			.leftJoinAndSelect("user.wonGames", "wongames")
 			.leftJoinAndSelect("user.sentRequests", "sentrequests")
-			.leftJoinAndSelect("user.receiveRequests", "receiverequests")
+			.leftJoinAndSelect("user.receivedRequests", "receivedrequests")
 			.getMany()
 		return allDB
 	}
