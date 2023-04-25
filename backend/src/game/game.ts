@@ -191,13 +191,17 @@ export class Game {
 	private handleCollision(elem: gameAsset, newBall: Pos2D) {
 		let intersect: Pos2D = { x: 0, y: 0 }
 		let relativeIntersectY: number = 0
+		let relativeIntersectX: number = 0
 		let bounceAngle: number = 0
 		let newballSpeed: number = 0
 		let ballTravelLeft: number = 0
+		let ballTravelUp: number = 0
 
 		let collide = false
 		let leftCollide: boolean = false
 		let rightCollide: boolean = false
+		let upCollide: boolean = false
+		let downCollide: boolean = false
 
 		//Collision droite
 		if (!collide && newBall.x <= elem.x + elem.width && this.posBall.x >= elem.x + elem.width) {
@@ -218,14 +222,34 @@ export class Game {
 			}
 		}
 
+		//Collision bas
+		if (!collide && newBall.y <= elem.y + elem.height && this.posBall.y >= elem.y + elem.height) {
+			intersect.y = elem.y + elem.height;
+			intersect.x = this.posBall.x + ((intersect.y - this.posBall.y) * (this.posBall.x - newBall.x) / (this.posBall.y - newBall.y));
+			if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width) {
+				collide = true
+				downCollide = true
+			}
+		}
+
 		newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y); // A Ajuster avec momentum
 
-		if (collide) {
+		if (collide && (leftCollide || rightCollide)) {
 			relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
 			bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
 			ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
 			this.velocityBall.x = newballSpeed * (rightCollide ? 1 : -1) * Math.cos(bounceAngle); // seul changement
 			this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
+			newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
+			newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
+		}
+
+		else if (collide && (upCollide || downCollide)) {
+			relativeIntersectX = (elem.x + (elem.width / 2)) - intersect.x;
+			bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
+			ballTravelUp = (newBall.x - intersect.x) / (newBall.x - this.posBall.x);
+			this.velocityBall.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
+			this.velocityBall.y = newballSpeed * Math.cos(bounceAngle);
 			newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
 			newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
 		}
