@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io'
 import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
-const paddleLength = 550
+const paddleLength = 150 // 550
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 2
@@ -76,10 +76,10 @@ export class Game {
 	private intervalId: NodeJS.Timer
 	public players: Player[] = []
 	public assets: gameAsset[] = [
-		{x: 100, y: 70, width: 80, height: 80},
-		{x: canvasWidth - 70 - 80, y: canvasHeight - 100 - 80, width: 80, height: 80},
-		{x: 250, y: 200, width: 80, height: 80},
-		{x: canvasWidth - 250 - 80, y: canvasHeight - 200 - 80, width: 80, height: 80},
+		{ x: 100, y: 70, width: 80, height: 80 },
+		{ x: canvasWidth - 70 - 80, y: canvasHeight - 100 - 80, width: 80, height: 80 },
+		{ x: 250, y: 200, width: 80, height: 80 },
+		{ x: canvasWidth - 250 - 80, y: canvasHeight - 200 - 80, width: 80, height: 80 },
 	]
 	public viewers: Viewer[] = []
 	public status: GameStatus = GameStatus.waiting
@@ -141,7 +141,7 @@ export class Game {
 		})
 		return {
 			players: partialPlayers, // instead of Player
-			assets : this.assets,
+			assets: this.assets,
 			posBall: this.posBall,
 			status: this.status,
 			date: new Date()
@@ -193,7 +193,7 @@ export class Game {
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
 	}
 
-	private handleCollision(elem: gameAsset, newBall: Pos2D) {
+	private handleCollision(elem: gameAsset, newBall: Pos2D, momentum: number = 0) {
 		let intersect: Pos2D = { x: 0, y: 0 }
 		let relativeIntersectY: number = 0
 		let relativeIntersectX: number = 0
@@ -255,6 +255,10 @@ export class Game {
 			ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
 			this.velocityBall.x = newballSpeed * (rightCollide ? 1 : -1) * Math.cos(bounceAngle); // seul changement
 			this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
+
+			if (momentum) {
+				this.velocityBall.y *= (1 + (momentum / 180) * this.velocityBall.y)
+			}
 			newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
 			newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
 		}
@@ -289,7 +293,7 @@ export class Game {
 			y: this.players[0].pos,
 			width: this.players[0].paddleWidth,
 			height: this.players[0].paddleLength
-		}, newBall)
+		}, newBall, this.players[0].momentum)
 
 		//player 1
 		this.handleCollision({
@@ -297,7 +301,7 @@ export class Game {
 			y: this.players[1].pos,
 			width: this.players[1].paddleWidth,
 			height: this.players[1].paddleLength
-		}, newBall)
+		}, newBall, this.players[1].momentum)
 
 		//assets
 		this.assets.forEach((asset) => this.handleCollision(asset, newBall))
