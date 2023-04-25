@@ -39,7 +39,7 @@ export class UsersService {
 			.leftJoinAndSelect("user.savedGames", "savedgames")
 			.leftJoinAndSelect("user.wonGames", "wongames")
 			.leftJoinAndSelect("user.sentRequests", "sentrequests")
-			.leftJoinAndSelect("user.receiveRequests", "receiverequests")
+			.leftJoinAndSelect("user.receivedRequests", "receivedrequests")
 			.getMany()
 		return allDB
 	}
@@ -180,6 +180,34 @@ export class UsersService {
 		this.unblockUser(user, friendId);
 	}
 
+	async acceptFriend(user: User, friendId: number) {
+		const friend = await this.findOne(friendId);
+		if (!friend) {
+			console.log("User not found");
+			return;
+		}
+
+		if (user.id === friendId) {
+			console.log("You can't add yourself as a friend");
+			return;
+		}
+
+		const friendRequest = await this.friendReqRepo.createQueryBuilder("friendreq")
+			.leftJoin("friendreq.sender", "sender")
+			.addSelect("sender.id")
+			.leftJoin("friendreq.receiver", "receiver")
+			.addSelect("receiver.id")
+			.where("sender.id = :senderId AND receiver.id = :receiverId", { senderId: friendId, receiverId: user.id })
+			.andWhere("friendreq.status = :status", { status: 'pending' })
+			.getOne();
+		if (!friendRequest) {
+			console.log("You don't have a friend request from this user");
+			return;
+		}
+		friendRequest.status = 'accepted';
+		this.friendReqRepo.save(friendRequest);
+		this.unblockUser(user, friendId);
+	}
 
 	async removeFriend(user: User, friendId: number) {
 		const friend = await this.findOne(friendId);
@@ -242,7 +270,7 @@ export class UsersService {
 			.getMany();
 		return friendList.map(({ sender, receiver }) => {
 			let friend = sender.id === user.id ? receiver : sender;
-		
+
 			return {
 				id: friend.id,
 				username: friend.username,

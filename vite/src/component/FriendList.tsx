@@ -9,13 +9,68 @@ import { useAuthService } from '../auth/AuthService';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from '../socket/SocketProvider';
 
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+
+// import PeopleIcon from '@mui/icons-material/People';
+// import GroupAddIcon from '@mui/icons-material/GroupAdd';
+// import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
+
+
+interface TabPanelProps {
+	children?: React.ReactNode;
+	index: number;
+	value: number;
+}
+function TabPanel(props: TabPanelProps) {
+	const { children, value, index, ...other } = props;
+
+	return (
+		<div
+			role="tabpanel"
+			hidden={value !== index}
+			id={`simple-tabpanel-${index}`}
+			aria-labelledby={`simple-tab-${index}`}
+			{...other}
+		>
+			{value === index && (
+				<Box sx={{ p: 3 }}>
+					<Typography>{children}</Typography>
+				</Box>
+			)}
+		</div>
+	);
+}
+interface FriendsTabsProps {
+	value: number;
+	setValue: React.Dispatch<React.SetStateAction<number>>;
+}
+
+function FriendsTabs({ value, setValue }: FriendsTabsProps) {
+
+	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+		setValue(newValue);
+	};
+	return (
+		<Box sx={{ borderBottom: 1, borderColor: 'divider'}} display="flex" flexDirection={'column'} alignItems={'center'} justifyContent={'center'}>
+			<Tabs value={value} onChange={handleChange} aria-label="icon label tabs example">
+				<Tab label="Friends" />
+				<Tab label="Incomings" />
+				<Tab label="Outgoings" />
+				{/* <Tab icon={<PeopleIcon />} label="Friends" /> */}
+				{/* <Tab icon={<GroupAddIcon />} label="Incomings" /> */}
+				{/* <Tab icon={<GroupRemoveIcon />} label="Outgoings" /> */}
+			</Tabs>
+		</Box>
+	);
+}
 
 export function FriendList() {
 	//send a post with image
-	const [friendList, setFriendList] = useState<Friend[]| null>(null);
+	const [friendList, setFriendList] = useState<Friend[] | null>(null);
 	const auth = useAuthService();
-    const navigate = useNavigate();
-	const {customEmit, socket, customOn, customOff} = useContext(SocketContext);
+	const navigate = useNavigate();
+	const { customEmit, socket, customOn, customOff } = useContext(SocketContext);
 
 
 	React.useEffect(() => {
@@ -24,45 +79,47 @@ export function FriendList() {
 		if (!auth.user) return;
 		apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
 			setFriendList(response.data);
-		console.log('friendlist');
-		console.log(response.data);
+			console.log('friendlist');
+			console.log(response.data);
 		});
 
 	}, [auth.user]);
-	
-/* 
-	React.useEffect(() => {
-		console.log('yo je pas listen')
-		if (!socket) return;
-		console.log('yo je listen')
-		customOn('page.player' , (data: any) => {
-			console.log("data", data);
-			if (userData)
-				setUserData({ ...friendList, userConnected: data.connected });
-		})
-		return (() => {
-			customOff('page.player');
-		})
-	}, [socket, friendList]); */
 
-	const handleViewProfil = (id : number) => {
+	/*
+		React.useEffect(() => {
+			console.log('yo je pas listen')
+			if (!socket) return;
+			console.log('yo je listen')
+			customOn('page.player' , (data: any) => {
+				console.log("data", data);
+				if (userData)
+					setUserData({ ...friendList, userConnected: data.connected });
+			})
+			return (() => {
+				customOff('page.player');
+			})
+		}, [socket, friendList]); */
+
+	const handleViewProfil = (id: number) => {
 		console.log('view profil');
 		navigate(`/player/${id}`);
 	}
 
-	const handleRemoveFriend = (idPlayer : number) => {
+	const handleRemoveFriend = (idPlayer: number) => {
 		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
 			if (!auth.user) return;
 			apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
 				setFriendList(response.data);
-			console.log('friendlist');
-			console.log(response.data);
+				console.log('friendlist');
+				console.log(response.data);
 			});
 			console.log(response);
 		}).catch((error) => {
 			console.log(error);
 		});
 	}
+
+	const [tabs, setTabs] = useState<number>(0);
 
 	return (
 		<React.Fragment>
@@ -80,6 +137,7 @@ export function FriendList() {
 							Friends
 						</Typography>
 					</AppBar>
+					<FriendsTabs value={tabs} setValue={setTabs} />
 					<Box position="static" sx={{ height: 'auto' }}>
 						{friendList?.length === 0 ? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any friends yet </Typography> : null}
 						{friendList?.map((friend: Friend) => {
@@ -88,36 +146,46 @@ export function FriendList() {
 							return (
 								<React.Fragment>
 
-								<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
+									<TabPanel value={tabs} index={0}>
+										Item One
+									</TabPanel>
+									<TabPanel value={tabs} index={1}>
+										Item Two
+									</TabPanel>
+									<TabPanel value={tabs} index={2}>
+										Item Three
+									</TabPanel>
+									<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
 
-								<Box sx={{ mr: '20px', ml: '20px' }}>
-									<Avatar src={imgPath} style={{ width: '80px', height: '80px' }} />
-								</Box>
-								<Box sx={{
-									display: 'flex',
-									flexDirection: 'column',
-									alignItems: 'flex-start',
-								}}
-								>
-									<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-	
-										<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px'}} sx={{ flexGrow: 1, mr: '10px' }}>
-											{friend?.username}
-										</Typography>
-										{<Avatar sx={{ bgcolor: friend.online ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar> }
+										<Box sx={{ mr: '20px', ml: '20px' }}>
+											<Avatar src={imgPath} style={{ width: '80px', height: '80px' }} />
+										</Box>
+										<Box sx={{
+											display: 'flex',
+											flexDirection: 'column',
+											alignItems: 'flex-start',
+										}}
+										>
+											<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+
+												<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, mr: '10px' }}>
+													{friend?.username}
+												</Typography>
+												{<Avatar sx={{ bgcolor: friend.online ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar>}
+											</div>
+											{friend && friend.status ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend.status}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend?.online ? "online" : "offline"}</Typography>}
+										</Box>
+										<Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={() => handleRemoveFriend(friend.id)} >remove friend </Button>
+										<Button variant="contained" sx={{ ml: '2', mr: 3, mt: 2, mb: 2 }} onClick={() => handleViewProfil(friend.id)} >view profil </Button>
 									</div>
-									{ friend && friend.status ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{ friend.status}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend?.online ? "online" : "offline" }</Typography> }
-								</Box>
-								<Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={()=>handleRemoveFriend(friend.id)} >remove friend </Button> 
-								<Button variant="contained" sx={{ ml: '2', mr: 3, mt: 2, mb: 2 }} onClick={()=>handleViewProfil(friend.id)} >view profil </Button>
-							</div>
-							<Divider />
-							</React.Fragment>
-							)})}
+									<Divider />
+								</React.Fragment>
+							)
+						})}
 					</Box>
 
 				</Box>
-		</Container>
+			</Container>
 		</React.Fragment>
 	)
 }
