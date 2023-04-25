@@ -10,6 +10,7 @@ import {  UserDataContext } from '../userDataProvider/userDataProvider';
 import { UpdateProfil } from './UpdateProfil';
 import apiClient from '../auth/interceptor.axios';
 import { Friend, } from '../types';
+import { SocketContext } from '../socket/SocketProvider';
 
 interface UserInfoDisplayProps {
 	idPlayer: string | undefined;
@@ -23,6 +24,8 @@ export function UserInfoDisplay({ idPlayer, relation, setRelation, itsme }: User
     const { userData, setUserData } = useContext(UserDataContext);
     const imgPath = `/avatars/${idPlayer}.png`;
 	const isBlocked = false;
+	const { customEmit, socket, customOn, customOff } = useContext(SocketContext);
+
  
 
     const handleAddFriend = () => {

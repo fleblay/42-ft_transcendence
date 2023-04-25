@@ -63,6 +63,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	afterInit(server: Server) {
 		this.gameService.setWsServer(server)
+		this.userServices.setWsServer(server)
 		instrument(this.server, {
 			auth: false
 		})

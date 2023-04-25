@@ -81,7 +81,6 @@ export type UserStatus = 'online' | 'ingame' | 'watching' | 'offline';
 
 export type RelationType = 'sent' | 'received';
 
-
 export type Friend = {
 	id: number,
 	username: string,
@@ -90,7 +89,6 @@ export type Friend = {
 	type : RelationType,
 	requestStatus: 'accepted' | 'pending',
 }
-
 
 export type Blocked= {
 	id: number,
