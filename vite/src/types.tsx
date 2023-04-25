@@ -27,9 +27,16 @@ export interface IPlayers {
 	leaving: boolean,
 }
 
+export interface IgameAsset {
+	x: number,
+	y: number,
+	width : number,
+	height : number
+}
 
 export interface IgameInfo {
 	players: IPlayers[],
+	assets: IgameAsset[],
 	posBall: Pos2D
 	status: GameStatus
 	date: Date

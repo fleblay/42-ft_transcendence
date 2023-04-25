@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from '../socket/SocketProvider';
 import { IgameInfo, GameStatus } from "../types";
 import { useParams } from "react-router-dom";
-import {useAuthService} from '../auth/AuthService'
+import { useAuthService } from '../auth/AuthService'
 
 interface Iprops {
 	gameInfo: IgameInfo,
@@ -83,9 +83,9 @@ export function GamePage() {
 				<>
 					{
 						gameInfo.status === GameStatus.waiting &&
-							<div>
-								Waiting for players...
-							</div>
+						<div>
+							Waiting for players...
+						</div>
 					}
 					{countdown !== 0 &&
 						<div style={
@@ -190,6 +190,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 
 		const player1color = "rgba(255, 100, 100, 1.0)"
 		const player2color = "rgba(140, 140, 255, 1.0)"
+		const assetcolor = "rgba(100, 100, 100, 1.0)"
 		const ballcolor = "rgba(230, 190, 1, 1.0)"
 
 		// Clear canvas
@@ -205,6 +206,14 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		context.current.fillStyle = player2color
 		if (gameInfo.players[1])
 			context.current.fillRect(canvasWidth - gameInfo.players[1].paddleWidth, gameInfo.players[1].pos, gameInfo.players[1].paddleWidth, gameInfo.players[1].paddleLength);
+
+		// Assets
+		context.current.fillStyle = assetcolor
+		if (gameInfo.assets.length > 0) {
+			gameInfo.assets.forEach((asset) => {
+				context.current?.fillRect(asset.x, asset.y, asset.width, asset.height);
+			})
+		}
 
 		// center line
 		context.current.beginPath();
@@ -232,8 +241,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		context.current.fillText(`${gameInfo.players[0].user.username}`, 5, 20)
 		context.current.font = "20px serif"
 		context.current.fillStyle = player2color
-		if (gameInfo.players[1])
-		{
+		if (gameInfo.players[1]) {
 			const player2username = gameInfo.players[1].user.username
 			context.current.fillText(player2username, canvasWidth - (5 + context.current.measureText(player2username).width), 20)
 		}

@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io'
 import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
-const paddleLength = 400
+const paddleLength = 550
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 2
@@ -60,6 +60,7 @@ export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 export interface IgameInfo {
 
 	players: Partial<Player>[], // requiered partial to strip client for Players
+	assets: gameAsset[],
 	posBall: Pos2D
 	status: GameStatus
 	date: Date
@@ -74,6 +75,7 @@ export class Game {
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
 	private intervalId: NodeJS.Timer
 	public players: Player[] = []
+	public assets: gameAsset[] = [{x: 120, y: 200, width: 400, height: 30}]
 	public viewers: Viewer[] = []
 	public status: GameStatus = GameStatus.waiting
 	public readonly playerRoom: string
@@ -134,6 +136,7 @@ export class Game {
 		})
 		return {
 			players: partialPlayers, // instead of Player
+			assets : this.assets,
 			posBall: this.posBall,
 			status: this.status,
 			date: new Date()
@@ -226,7 +229,6 @@ export class Game {
 			newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
 			newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
 		}
-
 	}
 
 	private updateBall() {
@@ -242,56 +244,24 @@ export class Game {
 			this.velocityBall.y *= -1
 		}
 
+		//player 0
+		this.handleCollision({
+			x: 0,
+			y: this.players[0].pos,
+			width: this.players[0].paddleWidth,
+			height: this.players[0].paddleLength
+		}, newBall)
 
-		this.handleCollision({ x: 0, y: this.players[0].pos, width: this.players[0].paddleWidth, height: this.players[0].paddleLength }, newBall)
-		this.handleCollision({ x: canvasWidth - this.players[1].paddleWidth, y: this.players[1].pos, width: this.players[1].paddleWidth, height: this.players[1].paddleLength }, newBall)
+		//player 1
+		this.handleCollision({
+			x: canvasWidth - this.players[1].paddleWidth,
+			y: this.players[1].pos,
+			width: this.players[1].paddleWidth,
+			height: this.players[1].paddleLength
+		}, newBall)
 
-		/*
-		let intersect: Pos2D = {x: 0, y: 0}
-		let relativeIntersectY: number = 0
-		let bounceAngle: number = 0
-		let newballSpeed: number = 0
-		let ballTravelLeft: number = 0
-
-		const leftPlayer = this.players[0]
-		// condition pour declencher le check de colision paddle gauche ou point a donner (newPosBallx est inf a la largeur du paddle, et avant etait supp)
-		if (newBall.x <= leftPlayer.paddleWidth && this.posBall.x >= leftPlayer.paddleWidth) {
-			intersect.x = leftPlayer.paddleWidth;
-			// intersect y est le y correspondant au x de la collision, cad (intersect x - oldPosBall) * coeff directeur de la trajectoire
-			intersect.y = this.posBall.y - ((this.posBall.x - leftPlayer.paddleWidth) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
-			//si la collison entre en contact avec le paddle gauche (y supp au debut du paddle et inf a la fin du paddle)
-			if (intersect.y >= leftPlayer.pos && intersect.y <= leftPlayer.pos + leftPlayer.paddleLength) {
-				//intersection relative dans le repere positionne au niveau du milieur du paddle (pour calculer l'angle de bounce)
-				relativeIntersectY = (leftPlayer.pos + (leftPlayer.paddleLength / 2)) - intersect.y;
-				// ratio sur la paddleLength pour angle de rebounce multiplie par angle max (Pi/2 - offset)
-				bounceAngle = (relativeIntersectY / (leftPlayer.paddleLength / 2)) * (Math.PI / 2 - MaxBounceAngle);
-				//Ball speed ne change pas (c'est la norme du vecteur velocityBall ie sqrt(x2 + y2)
-				newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y);
-				//Chemin parcouru en x par la balle apres intersection -> on calcule avec le nouveau vecteur de balle
-				ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
-				this.velocityBall.x = newballSpeed * Math.cos(bounceAngle); // projection sur axe X de l'angle
-				this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle); // projection sur axe Y de l'angle
-				newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
-				newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
-			}
-		}
-
-		const rightPlayer = this.players[1];
-		if (newBall.x > canvasWidth - rightPlayer.paddleWidth && this.posBall.x <= canvasWidth - rightPlayer.paddleWidth) {
-			intersect.x = canvasWidth - rightPlayer.paddleWidth;
-			intersect.y = this.posBall.y - ((this.posBall.x - (canvasWidth - rightPlayer.paddleWidth)) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
-			if (intersect.y >= rightPlayer.pos && intersect.y <= rightPlayer.pos + rightPlayer.paddleLength) {
-				relativeIntersectY = (rightPlayer.pos + (rightPlayer.paddleLength / 2)) - intersect.y;
-				bounceAngle = (relativeIntersectY / (rightPlayer.paddleLength / 2)) * (Math.PI / 2 - MaxBounceAngle);
-				newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y);
-				ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
-				this.velocityBall.x = newballSpeed * -Math.cos(bounceAngle); // seul changement entre les deux car collision par la gauche au lieu de droite
-				this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
-				newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
-				newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
-			}
-		}
-		*/
+		//assets
+		this.assets.forEach((asset) => this.handleCollision(asset, newBall))
 
 		this.posBall = newBall;
 	}
