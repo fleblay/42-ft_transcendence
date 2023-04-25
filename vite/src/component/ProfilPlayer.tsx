@@ -34,6 +34,7 @@ export function ProfilPlayer() {
 			setItsMe(false);
 			if (idPlayer !== undefined) {
 				apiClient.get(`/api/users/friends/${idPlayer}`).then((response) => {
+					console.log("response friend:", response.data);
 					setRelation(response.data);
 				}).catch((error) => {
 					console.log(error);
@@ -95,7 +96,7 @@ export function ProfilPlayer() {
 								{userData?.username}
 							</Typography>
 						</AppBar>
-						<UserInfoDisplay idPlayer={idPlayer} relation={relation} itsme={itsMe} />
+						<UserInfoDisplay idPlayer={idPlayer} relation={relation} setRelation={setRelation} itsme={itsMe} />
 						<UserAchivement/>
 						
 						<Box position="static" sx={{

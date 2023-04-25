@@ -38,7 +38,6 @@ export interface IgameInfo {
 	players: IPlayers[],
 	assets: IgameAsset[],
 	posBall: Pos2D
-	velocityBall: number,
 	status: GameStatus
 	date: Date
 }
@@ -80,13 +79,15 @@ export type UserInfo = plainUser & {
 }
 export type UserStatus = 'online' | 'ingame' | 'watching' | 'offline';
 
+export type RelationType = 'sent' | 'received';
+
 
 export type Friend = {
 	id: number,
 	username: string,
 	online: boolean,
 	status: UserStatus,
-	type : 'send' | 'received',
+	type : RelationType,
 	requestStatus: 'accepted' | 'pending',
 }
 
