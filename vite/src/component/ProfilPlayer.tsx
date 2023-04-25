@@ -52,7 +52,7 @@ export function ProfilPlayer() {
 		
 		}
 
-	}, [auth.user, idPlayer])
+	}, [auth.user, idPlayer, userData])
 
 
 
@@ -71,7 +71,7 @@ export function ProfilPlayer() {
 		customOn('page.player', (data: any) => {
 			console.log("data", data);
 			if (userData)
-				setUserData({ ...userData, userConnected: data.connected });
+				setUserData({ ...userData, ...data });
 		})
 		return (() => {
 			customOff('page.player');

@@ -12,13 +12,14 @@ import { GameService } from '../game/game.service';
 import { forwardRef } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { FriendRequest, FriendRequestStatus } from '../model/friend-request.entity';
+import { Server, Socket } from 'socket.io'
 
 
 @Injectable()
 export class UsersService {
 
 	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
-
+	private server : Server;
 	constructor(
 		@InjectRepository(User) private repo: Repository<User>,
 		@Inject(forwardRef(() => GameService)) private gameService: GameService,
@@ -26,6 +27,11 @@ export class UsersService {
 	) {
 		//setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
 	}
+
+	setWsServer(server: any) {
+		this.server = server;
+	}
+
 
 	create(dataUser: CreateUserDto) {
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
@@ -169,7 +175,12 @@ export class UsersService {
 		});
 		this.friendReqRepo.save(newRequest);
 		this.unblockUser(user, friendId);
-		return this.generateFriend(user, friend, newRequest);
+		const newFriend = this.generateFriend(user, friend, newRequest);
+
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${friendId}`).emit('page.player', {})
+
+		return newFriend;
 	}
 
 	generateFriend(user: User, friend: User, friendRequest: FriendRequest) {
