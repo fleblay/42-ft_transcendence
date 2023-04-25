@@ -105,7 +105,6 @@ export class GameService {
 			.leftJoin("game.players", "player")
 			.addSelect(['player.id', 'player.username'])
 			.getMany()
-		fullDB.forEach((element : SavedGame) => { console.log("elements :" , element)});
 		return fullDB.filter((element : SavedGame) => element.players.find((player) => player.id == id) != undefined);
 	}
 
@@ -125,7 +124,6 @@ export class GameService {
 		game.players = [randUser1, randUser2]
 		game.score = [score1, score2]
 		game.winner = (score1 > score2) ? randUser1 : randUser2
-		console.log('game info is now', game)
 		let saveObject = this.repo.create(game);
 			return this.repo.save(saveObject);
 	}
