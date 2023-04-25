@@ -1,6 +1,6 @@
 
 import React, { useContext, useState } from 'react';
-import { AppBar,  Container, Typography } from '@mui/material';
+import { AppBar, Container, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
 import { Box } from '@mui/system';
 import { useParams } from 'react-router-dom';
@@ -11,13 +11,14 @@ import { UserInfoDisplay } from './UserInfoDisplay';
 import { UserAchivement } from './UserAchievment';
 import { useAuthService } from '../auth/AuthService';
 import { Blocked, Friend } from '../types';
+import { FriendList } from './FriendList';
 
 
 export function ProfilPlayer() {
 	//send a post with image
 	const { idPlayer } = useParams<{ idPlayer: string }>();
 	const { customEmit, socket, customOn, customOff } = useContext(SocketContext);
-	const { userData , setUserData } = useContext(UserDataContext);
+	const { userData, setUserData } = useContext(UserDataContext);
 	const auth = useAuthService();
 	const [relation, setRelation] = useState<Friend | null>(null);
 	const [itsMe, setItsMe] = useState<boolean>(false);
@@ -49,7 +50,7 @@ export function ProfilPlayer() {
 				);
 
 			}
-		
+
 		}
 
 	}, [auth.user, idPlayer, userData])
@@ -83,34 +84,35 @@ export function ProfilPlayer() {
 
 	return (
 		<React.Fragment>
-				<Container maxWidth="md" >
-					<Box sx={{
-						width: '100%',
-						border: '1px solid #D3C6C6',
-						boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-						borderRadius: '16px',
-						bgcolor: 'background.paper',
-					}}>
-						<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
-							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
-								{userData?.username}
-							</Typography>
-						</AppBar>
-						<UserInfoDisplay idPlayer={idPlayer} relation={relation} setRelation={setRelation} itsme={itsMe} />
-						<UserAchivement/>
-						
-						<Box position="static" sx={{
-							height: 'auto', display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
-							mb: '30px'
-						}}>
-							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '1rem' }} > Match History</Typography>
+			<Container maxWidth="md" >
+				<Box sx={{
+					width: '100%',
+					border: '1px solid #D3C6C6',
+					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+					borderRadius: '16px',
+					bgcolor: 'background.paper',
+				}}>
+					<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
+							{userData?.username}
+						</Typography>
+					</AppBar>
+					<UserInfoDisplay idPlayer={idPlayer} relation={relation} setRelation={setRelation} itsme={itsMe} />
+					<UserAchivement />
 
-							<GameHistory idPlayer={idPlayer} />
-						</Box>
+					<Box position="static" sx={{
+						height: 'auto', display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						mb: '30px'
+					}}>
+						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '1rem' }} > Match History</Typography>
+
+						<GameHistory idPlayer={idPlayer} />
 					</Box>
-				</Container>
+				</Box>
+				{itsMe && <FriendList />}
+			</Container>
 		</React.Fragment>
 	)
 }

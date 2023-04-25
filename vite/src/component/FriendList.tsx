@@ -11,6 +11,7 @@ import { SocketContext } from '../socket/SocketProvider';
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import { UserInfoDisplay } from './UserInfoDisplay';
 
 // import PeopleIcon from '@mui/icons-material/People';
 // import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -115,8 +116,9 @@ export function FriendList() {
 							const imgPath = `/avatars/${friend.id}.png`
 
 							return (
-								<React.Fragment>
-									<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
+								<React.Fragment key={friend.id}>
+									<UserInfoDisplay idPlayer={`${friend.id}`} itsme={false} relation={friend} setRelation={()=>{}}  />
+									{/* <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
 
 										<Box sx={{ mr: '20px', ml: '20px' }}>
 											<Avatar src={imgPath} style={{ width: '80px', height: '80px' }} />
@@ -136,9 +138,9 @@ export function FriendList() {
 											</div>
 											{friend && friend.status ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend.status}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend?.online ? "online" : "offline"}</Typography>}
 										</Box>
-										{/* <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={() => handleRemoveFriend(friend.id)} >remove friend </Button> */}
+										<Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={() => handleRemoveFriend(friend.id)} >remove friend </Button> }
 										<Button variant="contained" sx={{ ml: '2', mr: 3, mt: 2, mb: 2 }} onClick={() => handleViewProfil(friend.id)} >view profil </Button>
-									</div>
+									</div> */}
 									<Divider />
 								</React.Fragment>
 							)
