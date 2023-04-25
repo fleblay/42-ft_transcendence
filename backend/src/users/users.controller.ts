@@ -147,7 +147,7 @@ export class UsersController {
 
 	@Get('/:id')
 	async findOne(@Param("id") id: string): Promise<UserInfo> {
-		const user = await this.usersService.findOne(parseInt(id));
+		const user = await this.usersService.findOne(parseInt(id), true);
 		if (!user) {
 			throw new ForbiddenException('User not found');
 		}

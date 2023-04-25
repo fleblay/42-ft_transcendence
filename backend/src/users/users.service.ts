@@ -51,14 +51,12 @@ export class UsersService {
 	}
 
 
-	findOne(id: number) {
+	findOne(id: number, withGames: boolean = false) {
 		if (!id) return null;
-		//return this.repo.findOneBy({ id });
-		return this.repo.createQueryBuilder("user")
-			.leftJoinAndSelect("user.savedGames", "savedgames")
-			.leftJoinAndSelect("user.wonGames", "wongames")
-			.where("user.id = :userId", { userId: id })
-			.getOne()
+		return this.repo.findOne({
+			where: { id },
+			relations: withGames ? ["savedGames", "wonGames"] : []
+		})
 	}
 
 	async findOneByUsername(username: string) {
