@@ -251,7 +251,7 @@ export class Game {
 
 		newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y); // A Ajuster avec momentum
 			if ((leftCollide || rightCollide) && momentum != 0) {
-				newballSpeed *= (1 + (momentum / 180) * this.velocityBall.y)
+				newballSpeed *= (1 + (momentum / 120) * this.velocityBall.y)
 			}
 
 		if (collide && (leftCollide || rightCollide)) {

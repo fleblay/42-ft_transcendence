@@ -10,6 +10,6 @@ export class EventGuard implements CanActivate {
 		const request = context.switchToWs()
 		const data = request.getData()
 		const bearerToken = data["_access_token"]
-		return !!(await this.authService.validateAccessToken(bearerToken))
+		return !!(await this.authService.decodeToken(bearerToken))
 	}
 }
