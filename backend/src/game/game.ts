@@ -75,18 +75,18 @@ export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
 	private intervalId: NodeJS.Timer
+	private reduceInterval : NodeJS.Timer
 	public players: Player[] = []
 	public assets: gameAsset[] = [
-		{ x: 100, y: 70, width: 80, height: 80 },
-		{ x: canvasWidth - 70 - 80, y: canvasHeight - 100 - 80, width: 80, height: 80 },
-		{ x: 250, y: 200, width: 80, height: 80 },
-		{ x: canvasWidth - 250 - 80, y: canvasHeight - 200 - 80, width: 80, height: 80 },
+		{ x: 100, y: 70, width: 70, height: 70 },
+		{ x: canvasWidth - 70 - 70, y: canvasHeight - 100 - 70, width: 70, height: 70 },
+		{ x: 250, y: 200, width: 70, height: 70 },
+		{ x: canvasWidth - 250 - 70, y: canvasHeight - 200 - 80, width: 70, height: 70 },
 	]
 	public viewers: Viewer[] = []
 	public status: GameStatus = GameStatus.waiting
 	public readonly playerRoom: string
 	public readonly viewerRoom: string
-	private reduceInterval
 
 	constructor(public gameId: UUID, private server: Server, public privateGame: boolean = false, private gameCluster: GameCluster) {
 		this.playerRoom = gameId + ":player"
@@ -187,12 +187,12 @@ export class Game {
 			}
 			if (this.players.length === 2) {
 				this.countdown(5)
-				this.reduceInterval = setInterval(()=>{
+				this.reduceInterval = setInterval(() => {
 					if (this.players[0].paddleLength > 70)
-						this.players[0].paddleLength -= 5
+						this.players[0].paddleLength -= 2
 					if (this.players[1].paddleLength > 70)
-						this.players[1].paddleLength -= 5
-				}, 1000)
+						this.players[1].paddleLength -= 2
+				}, 500)
 			}
 		}
 		else {
@@ -257,9 +257,9 @@ export class Game {
 		}
 
 		newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y); // A Ajuster avec momentum
-			if ((leftCollide || rightCollide) && momentum != 0) {
-				newballSpeed *= (1 + (momentum / 120) * this.velocityBall.y)
-			}
+		if ((leftCollide || rightCollide) && momentum != 0) {
+			newballSpeed *= (1 + (momentum / 120) * this.velocityBall.y)
+		}
 
 		if (collide && (leftCollide || rightCollide)) {
 			relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
@@ -326,8 +326,12 @@ export class Game {
 			this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 			if (countdown <= 0) {
 				clearInterval(intervalId)
-				if (this.status !== GameStatus.end)
+				if (this.status !== GameStatus.end) {
 					this.status = GameStatus.playing
+					this.players.forEach((player)=> {
+						player.paddleLength = paddleLength
+					})
+				}
 			}
 		}, 700)
 	}
@@ -372,11 +376,10 @@ export class Game {
 					player.momentum = 0
 			})
 		}
-		if (this.status == GameStatus.end)
-			{
+		if (this.status == GameStatus.end) {
 			clearInterval(this.intervalId)
 			clearInterval(this.reduceInterval)
-			}
+		}
 		//Envoi des infos
 		this.updateInfo(this.generateGameInfo());
 	}
