@@ -75,7 +75,12 @@ export class Game {
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
 	private intervalId: NodeJS.Timer
 	public players: Player[] = []
-	public assets: gameAsset[] = [{x: 120, y: 200, width: 400, height: 30}]
+	public assets: gameAsset[] = [
+		{x: 100, y: 70, width: 80, height: 80},
+		{x: canvasWidth - 70 - 80, y: canvasHeight - 100 - 80, width: 80, height: 80},
+		{x: 250, y: 200, width: 80, height: 80},
+		{x: canvasWidth - 250 - 80, y: canvasHeight - 200 - 80, width: 80, height: 80},
+	]
 	public viewers: Viewer[] = []
 	public status: GameStatus = GameStatus.waiting
 	public readonly playerRoom: string
@@ -232,6 +237,16 @@ export class Game {
 			}
 		}
 
+		//Collision up
+		if (!collide && newBall.y >= elem.y && this.posBall.y <= elem.y) {
+			intersect.y = elem.y;
+			intersect.x = this.posBall.x + ((intersect.y - this.posBall.y) * (this.posBall.x - newBall.x) / (this.posBall.y - newBall.y));
+			if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width) {
+				collide = true
+				upCollide = true
+			}
+		}
+
 		newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y); // A Ajuster avec momentum
 
 		if (collide && (leftCollide || rightCollide)) {
@@ -249,9 +264,9 @@ export class Game {
 			bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
 			ballTravelUp = (newBall.x - intersect.x) / (newBall.x - this.posBall.x);
 			this.velocityBall.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
-			this.velocityBall.y = newballSpeed * Math.cos(bounceAngle);
-			newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
-			newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
+			this.velocityBall.y = newballSpeed * (downCollide ? 1 : -1) * Math.cos(bounceAngle);
+			newBall.x = intersect.x + (ballTravelUp * newballSpeed * Math.cos(bounceAngle));
+			newBall.y = intersect.y + (ballTravelUp * newballSpeed * Math.sin(bounceAngle));
 		}
 	}
 
