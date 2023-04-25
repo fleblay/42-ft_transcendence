@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, DeleteDateColumn } from 'typeorm';
 import { User } from './user.entity';
 
 
@@ -17,5 +17,8 @@ export class FriendRequest {
 
 	@Column({default : "pending"})
 	status: FriendRequestStatus;
+
+	@DeleteDateColumn()
+	deletedAt: Date;
 }
 
