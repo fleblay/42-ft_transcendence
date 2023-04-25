@@ -191,48 +191,24 @@ export class UsersService {
 			console.log("You can't add yourself as a friend");
 			return;
 		}
-
-		const friendRequest = await this.friendReqRepo.createQueryBuilder("friendreq")
-			.leftJoin("friendreq.sender", "sender")
-			.addSelect("sender.id")
-			.leftJoin("friendreq.receiver", "receiver")
-			.addSelect("receiver.id")
-			.where("sender.id = :senderId AND receiver.id = :receiverId", { senderId: friendId, receiverId: user.id })
-			.andWhere("friendreq.status = :status", { status: 'pending' })
-			.getOne();
-		if (!friendRequest) {
+		const friendShip = await this.getFriendRequest(user, friendId, 'pending');
+		if (!friendShip) {
 			console.log("You don't have a friend request from this user");
 			return;
 		}
-		friendRequest.status = 'accepted';
-		this.friendReqRepo.save(friendRequest);
+		friendShip.friendRequest.status = 'accepted';
+		this.friendReqRepo.save(friendShip.friendRequest);
 		this.unblockUser(user, friendId);
 	}
 
 	async removeFriend(user: User, friendId: number) {
-		const friend = await this.findOne(friendId);
-		if (!friend) {
-			console.log("User not found");
-			return;
+		const friendShip = await this.getFriendRequest(user, friendId);
+		if (!friendShip) {
+			console.log("You are not friends with this user");
+			return null;
 		}
-
-		if (user.id === friendId) {
-			console.log("You can't remove yourself as a friend");
-			return;
-		}
-
-		const friendRequest = await this.friendReqRepo.createQueryBuilder("friendreq")
-			.leftJoin("friendreq.sender", "sender")
-			.addSelect("sender.id")
-			.leftJoin("friendreq.receiver", "receiver")
-			.addSelect("receiver.id")
-			.where("sender.id = :senderId AND receiver.id = :receiverId", { senderId: user.id, receiverId: friendId })
-			.orWhere("sender.id = :senderId AND receiver.id = :receiverId", { senderId: friendId, receiverId: user.id })
-			.getOne()
-		if (friendRequest)
-			this.friendReqRepo.softRemove(friendRequest);
+		this.friendReqRepo.softRemove(friendShip.friendRequest);
 	}
-
 
 	blockUser(user: User, blockedId: number) {
 		if (user.blockedId.includes(blockedId)) {
@@ -254,20 +230,46 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
+	async getFriendRequest(user: User, friendId: number, status?: FriendRequestStatus ): Promise<{ friendRequest: FriendRequest, type: 'sent' | 'received' } | null> {
+		const friend = await this.findOne(friendId);
+		if (!friend) {
+			console.log("User not found");
+			return null;
+		}
+
+		if (user.id === friendId) {
+			console.log("You can't add yourself as a friend");
+			return null;
+		}
+
+		const friendRequest = await this.friendReqRepo.findOne({
+			where: [
+				{ sender: { id: friend.id }, receiver: { id: user.id }, status },
+				{ receiver: { id: friend.id }, sender: { id: user.id }, status },
+			],
+			relations: { sender: true, receiver: true }
+		});
+
+		return {
+			friendRequest,
+			type: friendRequest.sender.id === user.id ? 'sent' : 'received'
+		}
+	}
+
 	async getFriendsList(userId: number, wantedStatus: FriendRequestStatus = 'accepted'): Promise<Friend[]> {
 
 		const user = await this.findOne(userId);
 		if (!user)
 			throw new NotFoundException("User not found");
 
-		const friendList = await this.friendReqRepo.createQueryBuilder("friendreq")
-			.leftJoin("friendreq.sender", "sender")
-			.addSelect(["sender.id", "receiver.username"])
-			.leftJoin("friendreq.receiver", "receiver")
-			.addSelect(["receiver.id", "receiver.username"])
-			.where("(sender.id = :senderId OR receiver.id = :receiverId)", { senderId: user.id, receiverId: user.id})
-			.andWhere("friendreq.status = :statusFilter", { statusFilter: wantedStatus })
-			.getMany();
+		const friendList = await this.friendReqRepo.find({
+			where: [
+				{ sender: { id: user.id }, status: wantedStatus },
+				{ receiver: { id: user.id }, status: wantedStatus }
+			],
+			relations: { sender: true, receiver: true }
+		});
+
 		return friendList.map(({ sender, receiver }) => {
 			let friend = sender.id === user.id ? receiver : sender;
 
@@ -275,7 +277,8 @@ export class UsersService {
 				id: friend.id,
 				username: friend.username,
 				online: this.isConnected(friend.id),
-				status: this.gameService.userStatus(friend.id)
+				status: this.gameService.userStatus(friend.id),
+				type: sender.id === user.id ? 'sent' : 'received'
 			};
 		});
 	}

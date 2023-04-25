@@ -22,6 +22,7 @@ export type Friend = {
 	username: string,
 	online: boolean,
 	status: UserStatus,
+	type: 'sent' | 'received'
 }
 
 
