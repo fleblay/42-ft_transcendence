@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io'
 import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
-const paddleLength = 150 // 550
+const paddleLength = 300
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 2
@@ -86,6 +86,7 @@ export class Game {
 	public status: GameStatus = GameStatus.waiting
 	public readonly playerRoom: string
 	public readonly viewerRoom: string
+	private reduceInterval
 
 	constructor(public gameId: UUID, private server: Server, public privateGame: boolean = false, private gameCluster: GameCluster) {
 		this.playerRoom = gameId + ":player"
@@ -186,6 +187,12 @@ export class Game {
 			}
 			if (this.players.length === 2) {
 				this.countdown(5)
+				this.reduceInterval = setInterval(()=>{
+					if (this.players[0].paddleLength > 70)
+						this.players[0].paddleLength -= 5
+					if (this.players[1].paddleLength > 70)
+						this.players[1].paddleLength -= 5
+				}, 1000)
 			}
 		}
 		else {
@@ -366,7 +373,10 @@ export class Game {
 			})
 		}
 		if (this.status == GameStatus.end)
+			{
 			clearInterval(this.intervalId)
+			clearInterval(this.reduceInterval)
+			}
 		//Envoi des infos
 		this.updateInfo(this.generateGameInfo());
 	}
