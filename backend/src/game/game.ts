@@ -5,6 +5,7 @@ import { Server, Socket } from 'socket.io'
 import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
+const victoryRounds = 5
 const paddleLength = 300
 const paddleWidth = 5
 const ballSize = 5
@@ -12,7 +13,6 @@ const ballSpeed = 2
 const playerSpeed = 3
 const canvasHeight = 600
 const canvasWidth = 800
-const gameRounds = 5
 const MaxBounceAngle = Math.PI / 12;
 
 export type Pos2D = {
@@ -366,8 +366,8 @@ export class Game {
 			}
 
 			//Condition fin de jeu
-			if (this.players[0].score + this.players[1]?.score === gameRounds) {
-				console.log('Game ended with 5 round')
+			if (this.players[0].score == victoryRounds || this.players[1]?.score == victoryRounds) {
+				console.log(`Game ended with ${victoryRounds} round`)
 				this.status = GameStatus.end
 			}
 			//Reset des momentum

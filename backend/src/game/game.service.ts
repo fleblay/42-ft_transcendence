@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, forwardRef, Inject} from '@nestjs/common';
+import { Injectable, NotFoundException, forwardRef, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Server, Socket } from 'socket.io'
 import { UsersService } from '../users/users.service';
@@ -20,9 +20,9 @@ export class GameService {
 	constructor(
 		@InjectRepository(SavedGame) private repo: Repository<SavedGame>,
 		private gameCluster: GameCluster,
-		@Inject(forwardRef(() =>  UsersService))
+		@Inject(forwardRef(() => UsersService))
 		private usersService: UsersService
-			   ) { }
+	) { }
 
 	setWsServer(server: Server) {
 		this.server = server;
@@ -105,12 +105,12 @@ export class GameService {
 			.leftJoin("game.players", "player")
 			.addSelect(['player.id', 'player.username'])
 			.getMany()
-		return fullDB.filter((element : SavedGame) => element.players.find((player) => player.id == id) != undefined);
+		return fullDB.filter((element: SavedGame) => element.players.find((player) => player.id == id) != undefined);
 	}
 
 	async saveFakeGame() {
 		const game = new SavedGame()
-		const playersList : User[] = await this.usersService.getAll()
+		const playersList: User[] = await this.usersService.getAll()
 		if (playersList.length < 2)
 			throw new NotFoundException('Only one useer in DB');
 		let randUser1: User = playersList[Math.floor(Math.random() * playersList.length)]
@@ -118,14 +118,16 @@ export class GameService {
 
 		while (randUser2 == randUser1)
 			randUser2 = playersList[Math.floor(Math.random() * playersList.length)]
-		const score1 = Math.floor(Math.random() * 6)
-		const score2 = 5 - score1
+		let score1 = Math.floor(Math.random() * 5)
+		let score2 = 5
+		if (Math.random() > 0.5)
+			[score1, score2] = [score2, score1]
 		game.id = uuidv4();
 		game.players = [randUser1, randUser2]
 		game.score = [score1, score2]
 		game.winner = (score1 > score2) ? randUser1 : randUser2
 		let saveObject = this.repo.create(game);
-			return this.repo.save(saveObject);
+		return this.repo.save(saveObject);
 	}
 
 }
