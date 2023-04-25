@@ -211,6 +211,10 @@ export class UsersService {
 			return null;
 		}
 		this.friendReqRepo.softRemove(friendRequest);
+		return {
+			friendId: friendId,
+			status: 'declined'
+		}
 	}
 
 	blockUser(user: User, blockedId: number) {
