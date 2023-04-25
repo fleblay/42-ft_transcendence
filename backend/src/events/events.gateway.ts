@@ -172,7 +172,6 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@SubscribeMessage('client.nav')
 	handleClientNav(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: {to :string, from : string }): void {
 		this.updateSocket(client, "clientNav");
-		console.log(data);
 		client.join(data.to);
 		client.leave(data.from);
 	}

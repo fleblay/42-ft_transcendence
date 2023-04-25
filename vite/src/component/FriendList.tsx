@@ -41,22 +41,23 @@ function TabPanel(props: TabPanelProps) {
 		</div>
 	);
 }
+
+type FriendTabsValue = 'accepted' | 'pending';
 interface FriendsTabsProps {
-	value: number;
-	setValue: React.Dispatch<React.SetStateAction<number>>;
+	value: FriendTabsValue;
+	setValue: React.Dispatch<React.SetStateAction<FriendTabsValue>>;
 }
 
 function FriendsTabs({ value, setValue }: FriendsTabsProps) {
 
-	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+	const handleChange = (event: React.SyntheticEvent, newValue: FriendTabsValue) => {
 		setValue(newValue);
 	};
 	return (
 		<Box sx={{ borderBottom: 1, borderColor: 'divider'}} display="flex" flexDirection={'column'} alignItems={'center'} justifyContent={'center'}>
 			<Tabs value={value} onChange={handleChange} aria-label="icon label tabs example">
-				<Tab label="Friends" />
-				<Tab label="Incomings" />
-				<Tab label="Outgoings" />
+				<Tab value={'accepted'} label="Friends" />
+				<Tab value={'pending'} label="Pending" />
 				{/* <Tab icon={<PeopleIcon />} label="Friends" /> */}
 				{/* <Tab icon={<GroupAddIcon />} label="Incomings" /> */}
 				{/* <Tab icon={<GroupRemoveIcon />} label="Outgoings" /> */}
@@ -67,59 +68,29 @@ function FriendsTabs({ value, setValue }: FriendsTabsProps) {
 
 export function FriendList() {
 	//send a post with image
-	const [friendList, setFriendList] = useState<Friend[] | null>(null);
+	const [friendList, setFriendList] = useState<{[status: string]: Friend[]}>({});
 	const auth = useAuthService();
 	const navigate = useNavigate();
-	const { customEmit, socket, customOn, customOff } = useContext(SocketContext);
-
+	const [tabs, setTabs] = useState<'accepted' | 'pending'>('accepted');
 
 	React.useEffect(() => {
-		console.log('useEffect');
-		console.log(auth.user);
 		if (!auth.user) return;
-		apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
-			setFriendList(response.data);
-			console.log('friendlist');
-			console.log(response.data);
+		console.log('Fetching friends')
+		apiClient.get(`/api/users/friends?status=${tabs}`).then((response) => {
+			console.log('Friends: ', response.data);
+			setFriendList((oldList) => {
+				return { ...oldList, [tabs]: response.data };
+			});
+		}).catch((error) => {
+			console.error('Error fetching friends: ', error.response.data);
 		});
 
-	}, [auth.user]);
-
-	/*
-		React.useEffect(() => {
-			console.log('yo je pas listen')
-			if (!socket) return;
-			console.log('yo je listen')
-			customOn('page.player' , (data: any) => {
-				console.log("data", data);
-				if (userData)
-					setUserData({ ...friendList, userConnected: data.connected });
-			})
-			return (() => {
-				customOff('page.player');
-			})
-		}, [socket, friendList]); */
+	}, [auth.user, tabs]);
 
 	const handleViewProfil = (id: number) => {
-		console.log('view profil');
 		navigate(`/player/${id}`);
 	}
-
-	const handleRemoveFriend = (idPlayer: number) => {
-		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
-			if (!auth.user) return;
-			apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
-				setFriendList(response.data);
-				console.log('friendlist');
-				console.log(response.data);
-			});
-			console.log(response);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
-	const [tabs, setTabs] = useState<number>(0);
+	if (!friendList) return null;
 
 	return (
 		<React.Fragment>
@@ -139,22 +110,12 @@ export function FriendList() {
 					</AppBar>
 					<FriendsTabs value={tabs} setValue={setTabs} />
 					<Box position="static" sx={{ height: 'auto' }}>
-						{friendList?.length === 0 ? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any friends yet </Typography> : null}
-						{friendList?.map((friend: Friend) => {
+						{friendList[tabs]?.length === 0 ? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any friends yet </Typography> : null}
+						{friendList[tabs]?.map((friend: Friend) => {
 							const imgPath = `/avatars/${friend.id}.png`
 
 							return (
 								<React.Fragment>
-
-									<TabPanel value={tabs} index={0}>
-										Item One
-									</TabPanel>
-									<TabPanel value={tabs} index={1}>
-										Item Two
-									</TabPanel>
-									<TabPanel value={tabs} index={2}>
-										Item Three
-									</TabPanel>
 									<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
 
 										<Box sx={{ mr: '20px', ml: '20px' }}>
@@ -175,7 +136,7 @@ export function FriendList() {
 											</div>
 											{friend && friend.status ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend.status}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{friend?.online ? "online" : "offline"}</Typography>}
 										</Box>
-										<Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={() => handleRemoveFriend(friend.id)} >remove friend </Button>
+										{/* <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={() => handleRemoveFriend(friend.id)} >remove friend </Button> */}
 										<Button variant="contained" sx={{ ml: '2', mr: 3, mt: 2, mb: 2 }} onClick={() => handleViewProfil(friend.id)} >view profil </Button>
 									</div>
 									<Divider />

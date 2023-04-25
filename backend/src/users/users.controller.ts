@@ -90,26 +90,8 @@ export class UsersController {
 		return await this.usersService.uploadAvatar(user, file);
 	}
 
-	@Get('/:id')
-	async findOne(@Param("id") id: string): Promise<UserInfo>
-	{
-		const user = await this.usersService.findOne(parseInt(id));
-		const userScore: UserScore = {
-				totalplayedGames: user.savedGames.length,
-				totalwonGames: user.wonGames.length,
-				points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
-		}
-
-			return ({
-				...user,
-				...this.gameService.userState(user.id),
-				...userScore,
-				userConnected: this.usersService.isConnected(user.id)
-			});
-	}
-
 	@UseGuards(ATGuard)
-	@Get('/friends/')
+	@Get('/friends')
 	getFriendsList(@CurrentUser() user: User, @Query('status') status: FriendRequestStatus) {
 		return this.usersService.getFriendsList(user, status);
 	}
@@ -163,4 +145,23 @@ export class UsersController {
 		return await this.usersService.dfa(user);
 	};
 
+	@Get('/:id')
+	async findOne(@Param("id") id: string): Promise<UserInfo> {
+		const user = await this.usersService.findOne(parseInt(id));
+		if (!user) {
+			throw new ForbiddenException('User not found');
+		}
+		const userScore: UserScore = {
+			totalplayedGames: user.savedGames.length,
+			totalwonGames: user.wonGames.length,
+			points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
+		}
+
+		return ({
+			...user,
+			...this.gameService.userState(user.id),
+			...userScore,
+			userConnected: this.usersService.isConnected(user.id)
+		});
+	}
 }
