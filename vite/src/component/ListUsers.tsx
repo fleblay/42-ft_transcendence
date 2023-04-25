@@ -20,7 +20,7 @@ export function ListUsers() {
 
 	useEffect(() => {
 		setTimeout(handleClick, 50)
-		const refreshTimer = setInterval(handleClick, 2000)
+		const refreshTimer = setInterval(handleClick, 1000)
 		return (
 			() => clearInterval(refreshTimer)
 		)
