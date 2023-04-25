@@ -1,3 +1,4 @@
+import { FriendRequestStatus } from './model/friend-request.entity';
 import {User} from './model/user.entity'
 export type SocketId = string;
 export type UUID = string;
@@ -23,6 +24,7 @@ export type Friend = {
 	online: boolean,
 	status: UserStatus,
 	type: 'sent' | 'received'
+	requestStatus: FriendRequestStatus
 }
 
 

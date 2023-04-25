@@ -87,7 +87,6 @@ export class UsersService {
 		return (this.connectedUsers.get(+id) != undefined)
 	}
 
-
 	addConnectedUser(id: number) {
 		if (this.isConnected(id))
 			this.connectedUsers.get(id).push("online")
@@ -191,13 +190,13 @@ export class UsersService {
 			console.log("You can't add yourself as a friend");
 			return;
 		}
-		const friendShip = await this.getFriendRequest(user, friendId, 'pending');
-		if (!friendShip) {
+		const friendRequest = await this.getFriendRequest(user, friendId, 'pending');
+		if (!friendRequest) {
 			console.log("You don't have a friend request from this user");
 			return;
 		}
-		friendShip.friendRequest.status = 'accepted';
-		this.friendReqRepo.save(friendShip.friendRequest);
+		friendRequest.status = 'accepted';
+		this.friendReqRepo.save(friendRequest);
 		this.unblockUser(user, friendId);
 	}
 
@@ -207,7 +206,7 @@ export class UsersService {
 			console.log("You are not friends with this user");
 			return null;
 		}
-		this.friendReqRepo.softRemove(friendShip.friendRequest);
+		this.friendReqRepo.softRemove(friendShip);
 	}
 
 	blockUser(user: User, blockedId: number) {
@@ -230,7 +229,7 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	async getFriendRequest(user: User, friendId: number, status?: FriendRequestStatus ): Promise<{ friendRequest: FriendRequest, type: 'sent' | 'received' } | null> {
+	async getFriendRequest(user: User, friendId: number, status?: FriendRequestStatus ): Promise<FriendRequest | null> {
 		const friend = await this.findOne(friendId);
 		if (!friend) {
 			console.log("User not found");
@@ -249,11 +248,24 @@ export class UsersService {
 			],
 			relations: { sender: true, receiver: true }
 		});
+		return friendRequest;
+	}
+
+
+	async getFriend(user: User, friendId: number): Promise<Friend | null> {
+		const friendRequest = await this.getFriendRequest(user, friendId);
 		if (!friendRequest)
 			return null;
+		const friend = await this.findOne(friendId);
+		if (!friend)
+			return null;
 		return {
-			friendRequest,
-			type: friendRequest.sender.id === user.id ? 'sent' : 'received'
+			id: friend.id,
+			username: friend.username,
+			online: this.isConnected(friend.id),
+			status: this.gameService.userStatus(friend.id),
+			type: friendRequest.sender.id === user.id ? 'sent' : 'received',
+			requestStatus: friendRequest.status
 		}
 	}
 
@@ -278,7 +290,8 @@ export class UsersService {
 				username: friend.username,
 				online: this.isConnected(friend.id),
 				status: this.gameService.userStatus(friend.id),
-				type: sender.id === user.id ? 'sent' : 'received'
+				type: sender.id === user.id ? 'sent' : 'received',
+				requestStatus: wantedStatus
 			};
 		});
 	}
