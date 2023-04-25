@@ -61,8 +61,9 @@ export interface IgameInfo {
 
 	players: Partial<Player>[], // requiered partial to strip client for Players
 	assets: gameAsset[],
-	posBall: Pos2D
-	status: GameStatus
+	posBall: Pos2D,
+	velocityBall: number,
+	status: GameStatus,
 	date: Date
 }
 interface PlayerInput {
@@ -144,6 +145,7 @@ export class Game {
 			assets: this.assets,
 			posBall: this.posBall,
 			status: this.status,
+			velocityBall: Math.sqrt(Math.pow(this.velocityBall.x, 2) + Math.pow(this.velocityBall.y, 2)),
 			date: new Date()
 		}
 	}
@@ -248,6 +250,9 @@ export class Game {
 		}
 
 		newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y); // A Ajuster avec momentum
+			if ((leftCollide || rightCollide) && momentum != 0) {
+				newballSpeed *= (1 + (momentum / 180) * this.velocityBall.y)
+			}
 
 		if (collide && (leftCollide || rightCollide)) {
 			relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
@@ -256,9 +261,6 @@ export class Game {
 			this.velocityBall.x = newballSpeed * (rightCollide ? 1 : -1) * Math.cos(bounceAngle); // seul changement
 			this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
 
-			if (momentum) {
-				this.velocityBall.y *= (1 + (momentum / 180) * this.velocityBall.y)
-			}
 			newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
 			newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
 		}

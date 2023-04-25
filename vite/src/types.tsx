@@ -38,6 +38,7 @@ export interface IgameInfo {
 	players: IPlayers[],
 	assets: IgameAsset[],
 	posBall: Pos2D
+	velocityBall: number,
 	status: GameStatus
 	date: Date
 }

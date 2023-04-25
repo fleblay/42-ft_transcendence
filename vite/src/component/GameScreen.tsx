@@ -267,6 +267,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 
 	return <div>
 		<div> <h1>Game Info :</h1></div>
+		<div> Velocity :{gameInfo?.velocityBall.toPrecision(3)} </div>
 		<div> posBall x :{gameInfo?.posBall.x} </div>
 		<div> posBall y: {gameInfo?.posBall.y} </div>
 		<div> posP1: {gameInfo?.players[0].pos} </div>
