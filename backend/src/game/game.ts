@@ -66,7 +66,6 @@ interface PlayerInput {
 export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
-	//private startTime: number = Date.now()
 	private intervalId: NodeJS.Timer
 	public players: Player[] = []
 	public viewers: Viewer[] = []
@@ -110,7 +109,6 @@ export class Game {
 					foundPlayer.timeLastMove = Date.now()
 					break
 				default:
-					//console.log(`Input is ${input.move}`)
 			}
 		}
 	}
@@ -194,7 +192,6 @@ export class Game {
 			this.velocityBall.y *= -1
 		}
 
-
 		let intersect: Pos2D = {x: 0, y: 0}
 		let relativeIntersectY: number = 0
 		let bounceAngle: number = 0
@@ -202,17 +199,23 @@ export class Game {
 		let ballTravelLeft: number = 0
 
 		const leftPlayer = this.players[0]
-		// Colision paddle gauche
+		// condition pour declencher le check de colision paddle gauche ou point a donner (newPosBallx est inf a la largeur du paddle, et avant etait supp)
 		if (newBall.x <= leftPlayer.paddleWidth && this.posBall.x >= leftPlayer.paddleWidth) {
 			intersect.x = leftPlayer.paddleWidth;
+			// intersect y est le y correspondant au x de la collision, cad (intersect x - oldPosBall) * coeff directeur de la trajectoire
 			intersect.y = this.posBall.y - ((this.posBall.x - leftPlayer.paddleWidth) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
+			//si la collison entre en contact avec le paddle gauche (y supp au debut du paddle et inf a la fin du paddle)
 			if (intersect.y >= leftPlayer.pos && intersect.y <= leftPlayer.pos + leftPlayer.paddleLength) {
+				//intersection relative dans le repere positionne au niveau du milieur du paddle (pour calculer l'angle de bounce)
 				relativeIntersectY = (leftPlayer.pos + (leftPlayer.paddleLength / 2)) - intersect.y;
+				// ratio sur la paddleLength pour angle de rebounce multiplie par angle max (Pi/2 - offset)
 				bounceAngle = (relativeIntersectY / (leftPlayer.paddleLength / 2)) * (Math.PI / 2 - MaxBounceAngle);
+				//Ball speed ne change pas (c'est la norme du vecteur velocityBall ie sqrt(x2 + y2)
 				newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y);
+				//Chemin parcouru en x par la balle apres intersection -> on calcule avec le nouveau vecteur de balle
 				ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
-				this.velocityBall.x = newballSpeed * Math.cos(bounceAngle);
-				this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
+				this.velocityBall.x = newballSpeed * Math.cos(bounceAngle); // projection sur axe X de l'angle
+				this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle); // projection sur axe Y de l'angle
 				newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
 				newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
 			}
