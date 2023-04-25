@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io'
 import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
-const paddleLength = 100
+const paddleLength = 400
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 2
@@ -14,7 +14,6 @@ const canvasHeight = 600
 const canvasWidth = 800
 const gameRounds = 5
 const MaxBounceAngle = Math.PI / 12;
-
 
 export type Pos2D = {
 
@@ -30,6 +29,13 @@ export type GameSetting = {
 	playerSpeed: number,
 	canvasHeight: number,
 	canvasWidth: number,
+}
+
+interface gameAsset {
+	x: number,
+	y: number,
+	width: number,
+	height: number
 }
 
 export type Player = {
@@ -122,8 +128,8 @@ export class Game {
 	}
 
 	generateGameInfo(): IgameInfo {
-		const partialPlayers = this.players.map((player)=> {
-			let {clientId: client, ...rest} = player
+		const partialPlayers = this.players.map((player) => {
+			let { clientId: client, ...rest } = player
 			return rest
 		})
 		return {
@@ -156,7 +162,7 @@ export class Game {
 				pos: canvasHeight / 2 - paddleLength / 2,
 				momentum: 0,
 				timeLastMove: Date.now(),
-				paddleLength: Math.floor(paddleLength + ((Math.random() > 0.5) ? -1 : 1) * (Math.random() * paddleLength / 3)),
+				paddleLength: paddleLength, //Math.floor(paddleLength + ((Math.random() > 0.5) ? -1 : 1) * (Math.random() * paddleLength / 3)),
 				paddleWidth: paddleWidth,
 				score: 0,
 				user,
@@ -173,10 +179,54 @@ export class Game {
 			}
 		}
 		else {
-			this.viewers.push({user, clientId: client.id})
+			this.viewers.push({ user, clientId: client.id })
 			client.join(this.viewerRoom)
 		}
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
+	}
+
+	private handleCollision(elem: gameAsset, newBall: Pos2D) {
+		let intersect: Pos2D = { x: 0, y: 0 }
+		let relativeIntersectY: number = 0
+		let bounceAngle: number = 0
+		let newballSpeed: number = 0
+		let ballTravelLeft: number = 0
+
+		let collide = false
+		let leftCollide: boolean = false
+		let rightCollide: boolean = false
+
+		//Collision droite
+		if (!collide && newBall.x <= elem.x + elem.width && this.posBall.x >= elem.x + elem.width) {
+			intersect.x = elem.x + elem.width;
+			intersect.y = this.posBall.y + ((intersect.x - this.posBall.x) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
+			if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height) {
+				collide = true
+				rightCollide = true
+			}
+		}
+		//Collision gauche
+		if (!collide && newBall.x >= elem.x && this.posBall.x <= elem.x) {
+			intersect.x = elem.x
+			intersect.y = this.posBall.y + ((intersect.x - this.posBall.x) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
+			if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height) {
+				collide = true
+				leftCollide = true
+			}
+		}
+
+		newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y); // A Ajuster avec momentum
+
+		if (collide) {
+			relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
+			bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
+			ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
+			this.velocityBall.x = newballSpeed * (rightCollide ? 1 : -1) * Math.cos(bounceAngle); // seul changement
+			this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
+			newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
+			newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
+		}
+
 	}
 
 	private updateBall() {
@@ -184,7 +234,7 @@ export class Game {
 
 		newBall.x += this.velocityBall.x * ballSpeed
 		newBall.y += this.velocityBall.y * ballSpeed
-		// Colision mur
+		// Collision mur
 		if (newBall.y > canvasHeight - ballSize && this.velocityBall.y > 0) {
 			this.velocityBall.y *= -1
 		}
@@ -192,6 +242,11 @@ export class Game {
 			this.velocityBall.y *= -1
 		}
 
+
+		this.handleCollision({ x: 0, y: this.players[0].pos, width: this.players[0].paddleWidth, height: this.players[0].paddleLength }, newBall)
+		this.handleCollision({ x: canvasWidth - this.players[1].paddleWidth, y: this.players[1].pos, width: this.players[1].paddleWidth, height: this.players[1].paddleLength }, newBall)
+
+		/*
 		let intersect: Pos2D = {x: 0, y: 0}
 		let relativeIntersectY: number = 0
 		let bounceAngle: number = 0
@@ -230,12 +285,13 @@ export class Game {
 				bounceAngle = (relativeIntersectY / (rightPlayer.paddleLength / 2)) * (Math.PI / 2 - MaxBounceAngle);
 				newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y);
 				ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
-				this.velocityBall.x = newballSpeed * -Math.cos(bounceAngle);
+				this.velocityBall.x = newballSpeed * -Math.cos(bounceAngle); // seul changement entre les deux car collision par la gauche au lieu de droite
 				this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
 				newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
 				newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
 			}
 		}
+		*/
 
 		this.posBall = newBall;
 	}
@@ -244,7 +300,7 @@ export class Game {
 		let countdown = timeSecond
 		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 		let intervalId = setInterval(() => {
-			countdown-=1
+			countdown -= 1
 			this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 			if (countdown <= 0) {
 				clearInterval(intervalId)
