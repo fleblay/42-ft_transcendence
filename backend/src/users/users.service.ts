@@ -158,14 +158,7 @@ export class UsersService {
 			console.log("You can't add yourself as a friend");
 			return;
 		}
-		if (await this.friendReqRepo.createQueryBuilder("friendreq")
-			.leftJoin("friendreq.sender", "sender")
-			.addSelect("sender.id")
-			.leftJoin("friendreq.receiver", "receiver")
-			.addSelect("receiver.id")
-			.where("sender.id = :senderId", { senderId: user.id })
-			.andWhere("receiver.id = :receiverId", { receiverId: friendId })
-			.getOne()) {
+		if (await this.getFriendRequest(user, friendId)) {
 			console.log("You already sent a friend request to this user");
 			return;
 		}
@@ -179,6 +172,16 @@ export class UsersService {
 		this.unblockUser(user, friendId);
 	}
 
+	generateFriend(user: User, friend: User, friendRequest: FriendRequest) {
+		return {
+			id: friend.id,
+			username: friend.username,
+			online: this.isConnected(friend.id),
+			status: this.gameService.userStatus(friend.id),
+			type: friendRequest.sender.id === user.id ? 'sent' : 'received',
+			requestStatus: friendRequest.status
+		} as Friend
+	}
 	async acceptFriend(user: User, friendId: number) {
 		const friend = await this.findOne(friendId);
 		if (!friend) {
@@ -198,15 +201,16 @@ export class UsersService {
 		friendRequest.status = 'accepted';
 		this.friendReqRepo.save(friendRequest);
 		this.unblockUser(user, friendId);
+		return this.generateFriend(user, friend, friendRequest);
 	}
 
 	async removeFriend(user: User, friendId: number) {
-		const friendShip = await this.getFriendRequest(user, friendId);
-		if (!friendShip) {
+		const friendRequest = await this.getFriendRequest(user, friendId);
+		if (!friendRequest) {
 			console.log("You are not friends with this user");
 			return null;
 		}
-		this.friendReqRepo.softRemove(friendShip);
+		this.friendReqRepo.softRemove(friendRequest);
 	}
 
 	blockUser(user: User, blockedId: number) {
@@ -259,14 +263,7 @@ export class UsersService {
 		const friend = await this.findOne(friendId);
 		if (!friend)
 			return null;
-		return {
-			id: friend.id,
-			username: friend.username,
-			online: this.isConnected(friend.id),
-			status: this.gameService.userStatus(friend.id),
-			type: friendRequest.sender.id === user.id ? 'sent' : 'received',
-			requestStatus: friendRequest.status
-		}
+		return this.generateFriend(user, friend, friendRequest);
 	}
 
 	async getFriendsList(user: User, wantedStatus: FriendRequestStatus = 'accepted'): Promise<Friend[]> {
