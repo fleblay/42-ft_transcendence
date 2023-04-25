@@ -1,68 +1,73 @@
 
 import React, { useContext, useState } from 'react';
-import { AppBar, Avatar, Button, Container, Switch, TextField, Typography } from '@mui/material';
+import { AppBar,  Container, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
-import { FormEvent } from 'react';
-
 import { Box } from '@mui/system';
-import { useAuthService } from '../auth/AuthService';
-import { useLocation, useParams } from 'react-router-dom';
-import { Divider } from '@mui/material';
-import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
-import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
-import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
-import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { useParams } from 'react-router-dom';
 import { GameHistory } from './GameHistory';
-import { Modal } from '@mui/material';
-import { UserInfo } from '../types';
-import { Friend, Blocked } from '../types';
 import { SocketContext } from '../socket/SocketProvider';
+import { UserDataContext } from '../userDataProvider/userDataProvider';
+import { UserInfoDisplay } from './UserInfoDisplay';
+import { UserAchivement } from './UserAchievment';
+import { useAuthService } from '../auth/AuthService';
+import { Blocked, Friend } from '../types';
 
-import { UsernameDialog } from './UsernameDialog';
-
-function fileToBlob(file: File) {
-	const blob = new Blob([file], { type: file.type });
-	return blob;
-}
 
 export function ProfilPlayer() {
 	//send a post with image
-	const [file, setFile] = useState<File | null>(null);
-	const [error, setError] = useState<string | null>(null);
-	const [itsMe, setItsMe] = useState<boolean>(false);
-	const [userData, setUserData] = useState<UserInfo | null>(null);
-	const [openImg, setOpenImg] = useState<boolean>(false);
-	const [fileName, setFileName] = useState<string>('');
-	const [responseFile, setResponseFile] = useState<string>('');
-	const auth = useAuthService()
 	const { idPlayer } = useParams<{ idPlayer: string }>();
-	const imgPath = `/avatars/${idPlayer}.png`
-	const [isFriend, setIsFriend] = useState<boolean>(false);
-	const [isBan, setIsBan] = useState<boolean>(false);
-	const [openUsername, setOpenUsername] = useState<boolean>(false);
-	const [changeRelation, setChangeRelation] = useState<boolean>(false);
-	const [dfa , setDfa] = useState<boolean>(false);
-	const location = useLocation();
-	const {customEmit, socket, customOn, customOff} = useContext(SocketContext);
+	const { customEmit, socket, customOn, customOff } = useContext(SocketContext);
+	const { userData , setUserData } = useContext(UserDataContext);
+	const auth = useAuthService();
+	const [relation, setRelation] = useState<Friend | null>(null);
+	const [itsMe, setItsMe] = useState<boolean>(false);
+	const [isBlocked, setIsBlocked] = useState<boolean>(false);
+
+
+	React.useEffect(() => {
+		console.log("idPlayer", idPlayer);
+		if (!auth.user) return;
+		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id) {
+			setItsMe(true);
+		}
+		else {
+			setItsMe(false);
+			if (idPlayer !== undefined) {
+				apiClient.get(`/api/users/friends/${idPlayer}`).then((response) => {
+					setRelation(response.data);
+				}).catch((error) => {
+					console.log(error);
+
+				});
+				apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
+					const blockList = response.data as Blocked[];
+					setIsBlocked(blockList.find((ban) => ban.id === parseInt(idPlayer)) !== undefined);
+				}).catch((error) => {
+					console.log(error);
+				}
+				);
+
+			}
+		
+		}
+
+	}, [auth.user, idPlayer])
+
+
 
 	React.useEffect(() => {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
+			console.log("response", response);
 			setUserData(response.data);
 			console.log("userData", userData);
 		}).catch((error) => {
 			console.log(error);
 		});
-		
-
 	}, [idPlayer])
 
 	React.useEffect(() => {
-		console.log('yo je pas listen')
 		if (!socket) return;
-		console.log('yo je listen')
-		customOn('page.player' , (data: any) => {
+		customOn('page.player', (data: any) => {
 			console.log("data", data);
 			if (userData)
 				setUserData({ ...userData, userConnected: data.connected });
@@ -71,270 +76,40 @@ export function ProfilPlayer() {
 			customOff('page.player');
 		})
 	}, [socket, userData]);
-		
 
 
-	React.useEffect(() => {
-		console.log("idPlayer", idPlayer);
-		if (!auth.user) return;
-		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id) {
-			setItsMe(true);
-			setDfa(!!userData?.dfa as boolean);
-		}
-		else {
-			setItsMe(false);
-			if (idPlayer !== undefined) {
-				apiClient.get(`/api/users/friends/${auth.user.id}`).then((response) => {
-					const friendList = response.data as Friend[];
-					setIsFriend(friendList.find((friend) => friend.id === parseInt(idPlayer)) !== undefined);
-					}).catch((error) => {
-					console.log(error);
-
-				});
-				apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
-					const blockList = response.data as Blocked[];
-					setIsBan(blockList.find((ban) => ban.id === parseInt(idPlayer)) !== undefined);
-				}).catch((error) => {
-					console.log(error);
-				}
-				);
-
-			}
-			console.log("isFriend", isFriend);
-			console.log("isBan", isBan);
-		}
-
-	}, [auth.user, idPlayer, changeRelation])
-
-
-
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		if (event.target.files) {
-			const file = event.target.files[0] as File;
-			if (file) {
-				setFile(file);
-				if (file.name.length > 20)
-					setFileName(file.name.substring(0, 20) + "...");
-				else
-					setFileName(file.name);
-
-			}
-		}
-	};
-
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		if (file?.type !== 'image/png') {
-			setResponseFile('Only png files are allowed');
-			return;
-		}
-		if (file?.size > 1000000) {
-			setResponseFile('File size must be less than 1MB');
-			return;
-		}
-		const formData = new FormData();
-		console.log(file);
-		formData.append('image', fileToBlob(file as File));
-		apiClient.post('/api/users/uploadAvatar', formData, {
-			headers: {
-				'Content-Type': 'multipart/form-data'
-			}
-		}).then((response) => {
-			setResponseFile("Image uploaded successfully");
-			console.log(response);
-		}).catch((error) => {
-			setResponseFile("Error while uploading image");
-			console.log(error);
-		});
-	};
-
-
-	const handleAddFriend = () => {
-		apiClient.post(`/api/users/addFriend/${idPlayer}`).then((response) => {
-			console.log(response);
-			setChangeRelation(!changeRelation);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
-
-	const handleRemoveFriend = () => {
-		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
-			console.log(response);
-			setChangeRelation(!changeRelation);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
-	const handleBlockUser = () => {
-		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
-			console.log(response);
-			setChangeRelation(!changeRelation);
-
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
-	const handleUnblockUser = () => {
-		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
-			console.log(response);
-			setChangeRelation(!changeRelation);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
-	const handle2FaChange = () => {
-		setDfa(!dfa);
-		apiClient.post(`/api/users/toggle2fa`).then((response) => {
-			console.log(response);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
-
-
-	const handleOpenImg = () => setOpenImg(true);
-	const handleCloseImg = () => setOpenImg(false);
+	if (!userData) return (<div>Loading data</div>);
 
 	return (
 		<React.Fragment>
-
-			<UsernameDialog open={openUsername} quit={() => setOpenUsername(false)} />
-			<Container maxWidth="md" >
-				<Box sx={{
-					width: '100%',
-					border: '1px solid #D3C6C6',
-					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-					borderRadius: '16px',
-					bgcolor: 'background.paper',
-				}}>
-					<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
-						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
-							{userData?.username}
-						</Typography>
-					</AppBar>
-					<Box position="static" sx={{ height: 'auto' }}>
-						<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
-
-							<Box sx={{ mr: '20px', ml: '20px' }}>
-								<Avatar src={imgPath} style={{ width: '80px', height: '80px' }} />
-							</Box>
-							<Box sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'flex-start',
-							}}
-							>
-								<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-
-									<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, mr: '10px' }}>
-										{userData?.username}
-									</Typography>
-									{<Avatar sx={{ bgcolor: userData && userData.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar>}
-								</div>
-								{userData && userData.states.join("-") != "" ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{userData.states[0]}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{userData?.userConnected ? "online" : "offline"}</Typography>}
-							</Box>
-
-							{itsMe ? (
-								<>
-									<Button
-										variant="contained" sx={{ ml: 'auto', mt: 2, mb: 2 }}
-										onClick={() => setOpenUsername(true)}
-									>
-										Change username
-									</Button>
-									<Button
-										variant="contained" sx={{ ml: 1, mr: 1, mt: 2, mb: 2 }} onClick={handleOpenImg}
-									>
-										Edit profil picture
-									</Button>
-									<Modal open={openImg} onClose={handleCloseImg} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-										<Container maxWidth="sm" className="centered-container" >
-											<Box sx={{
-												width: '100%',
-												border: '1px solid #D3C6C6',
-												boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-												borderRadius: '16px',
-												display: 'flex',
-												flexDirection: 'column',
-												alignItems: 'center',
-											}}
-												style={{
-													backgroundColor: '#f0f0f0'
-												}}>
-												<form onSubmit={handleSubmit}>
-													<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Update avatar</Typography>
-													<Divider />
-													<Button variant="contained" component="label" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }} >       {fileName ? fileName : '+ Upload file'} <input type="file" hidden onChange={handleChange} /> </Button>
-													<Button variant="outlined" type="submit" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>Submit</Button>
-													<Divider />
-													<div> {responseFile} </div>
-												</form>
-												<Button onClick={handleCloseImg}>Close</Button>
-											</Box>
-										</Container>
-									</Modal>
-									<FormGroup>
-										<FormControlLabel control={<Switch checked={dfa} onChange={handle2FaChange} />} label="Active 2fA" />
-									</FormGroup>
-								</>
-							) : (
-								<>
-									{isFriend ? <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleRemoveFriend} >remove friend </Button> : <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend} >add a friend </Button>}
-									{ isBan ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleUnblockUser}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleBlockUser}>block</Button>}
-								</>
-							)}
-
-						</div>
-					</Box>
-					<Divider />
-					<Box position="static" sx={{ height: 'auto' }}>
-						<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem' }}>
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<MilitaryTechOutlinedIcon sx={{ ml: 2 }} color="primary" />
-								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Rank : {userData?.totalwonGames}
-								</Typography>
-							</div>
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<EmojiEventsOutlinedIcon sx={{ ml: 2 } } color="primary"/>
-								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Win : {userData?.totalwonGames}
-								</Typography>
-							</div>
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<ThumbDownAltOutlinedIcon sx={{ ml: 2 }} color="primary"/>
-								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Loose : {userData?.totalplayedGames ? userData.totalplayedGames - userData?.totalwonGames : 0}
-								</Typography>
-							</div>
-
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} color="primary"/>
-								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									Ratio : {userData?.totalplayedGames ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
-								</Typography>
-							</div>
-						</div>
-					</Box>
-					<Divider />
-					<Box position="static" sx={{
-						height: 'auto', display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'center',
-						mb: '30px'
+				<Container maxWidth="md" >
+					<Box sx={{
+						width: '100%',
+						border: '1px solid #D3C6C6',
+						boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+						borderRadius: '16px',
+						bgcolor: 'background.paper',
 					}}>
-						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '1rem' }} > Match History</Typography>
+						<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
+								{userData?.username}
+							</Typography>
+						</AppBar>
+						<UserInfoDisplay idPlayer={idPlayer} relation={relation} itsme={itsMe} />
+						<UserAchivement/>
+						
+						<Box position="static" sx={{
+							height: 'auto', display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'center',
+							mb: '30px'
+						}}>
+							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '1rem' }} > Match History</Typography>
 
-						<GameHistory idPlayer={idPlayer} />
+							<GameHistory idPlayer={idPlayer} />
+						</Box>
 					</Box>
-				</Box>
-			</Container>
+				</Container>
 		</React.Fragment>
 	)
 }

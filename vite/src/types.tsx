@@ -74,8 +74,8 @@ export type UserInfo = plainUser & {
 	points: number,
 	totalwonGames: number,
 	totalplayedGames: number,
-
 	userConnected: boolean,
+	twoFactorEnable: boolean,
 }
 export type UserStatus = 'online' | 'ingame' | 'watching' | 'offline';
 
@@ -85,6 +85,8 @@ export type Friend = {
 	username: string,
 	online: boolean,
 	status: UserStatus,
+	type : 'send' | 'received',
+	requestStatus: 'accepted' | 'pending',
 }
 
 
@@ -92,5 +94,4 @@ export type Blocked= {
 	id: number,
 	username: string
 }
-
 
