@@ -121,6 +121,12 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
+	@Patch('/friends/:id')
+	async acceptFriend(@CurrentUser() user: User, @Param("id") id: string) {
+		return await this.usersService.acceptFriend(user, parseInt(id));
+	}
+
+	@UseGuards(ATGuard)
 	@Get('/blocked/:id')
 	async getBlockedUsersList(@Param("id") id: string) {
 		return await this.usersService.getBlockedUsersList(parseInt(id));
@@ -131,12 +137,6 @@ export class UsersController {
 	@Post('/addFriend/:id')
 	async addFriend(@CurrentUser() user: User, @Param("id") id: string) {
 		return await this.usersService.addFriend(user, parseInt(id));
-	}
-
-	@UseGuards(ATGuard)
-	@Patch('/friend/:id')
-	async acceptFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.usersService.acceptFriend(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
