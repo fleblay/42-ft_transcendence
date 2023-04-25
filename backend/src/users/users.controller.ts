@@ -117,7 +117,7 @@ export class UsersController {
 	@UseGuards(ATGuard)
 	@Get('/friends/:id')
 	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
-		return this.usersService.getFriendRequest(user, parseInt(id));
+		return this.usersService.getFriend(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)

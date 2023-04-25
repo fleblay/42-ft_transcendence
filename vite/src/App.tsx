@@ -4,17 +4,18 @@ import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
 import { CreateGame } from './component/CreateGame'
-import { ListUsers} from './component/ListUsers'
+import { ListUsers } from './component/ListUsers'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { GamePage } from './component/GameScreen'
 import { SocketProvider } from './socket/SocketProvider'
 import { MuiAppBar } from './component/menu'
-import {  ProfilPlayer } from './component/ProfilPlayer'
+import { ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
 import { UsernameDialog } from './component/UsernameDialog'
 import { FriendList } from './component/FriendList'
 import { BlockedList } from './component/BlockedList';
+import { UserDataProvider } from './userDataProvider/userDataProvider';
 
 export interface Destinations {
 	name: string,
@@ -29,8 +30,8 @@ export const allRoutes: Destinations[] = [
 	{ name: "Game", path: "/game", public: false },
 	{ name: "Leaderboard", path: "/leaderboard", public: false },
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
-	{ name: "Friends", path: "/friends", public: false},
-	{ name: "Blocked", path: "/blocked", public: false},
+	{ name: "Friends", path: "/friends", public: false },
+	{ name: "Blocked", path: "/blocked", public: false },
 
 
 ]
@@ -79,8 +80,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 			<Link to="/register">Register Page</Link>;
 		</>
 	}
-	if (!auth.user.username)
-	{
+	if (!auth.user.username) {
 		return (
 			<UsernameDialog />
 		)
@@ -194,13 +194,17 @@ function App() {
 						/>
 						<Route path="/Login" element={<LoginForm />} />
 						<Route path="/Register" element={<RegisterForm />} />
-						<Route path="/leaderboard" element={<><ListUsers /> <br /> <FakeGames/></>} />
+						<Route path="/leaderboard" element={<><ListUsers /> <br /> <FakeGames /></>} />
 						<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
 						<Route path="/player/">
-							<Route path=":idPlayer" element={<ProfilPlayer />} />
+							<Route path=":idPlayer" element={
+								<UserDataProvider>
+									<ProfilPlayer />
+								</UserDataProvider>
+							} />
 						</Route>
-						<Route path="/friends" element={<FriendList/>} />
-						<Route path="/blocked" element={<BlockedList/>} />
+						<Route path="/friends" element={<FriendList />} />
+						<Route path="/blocked" element={<BlockedList />} />
 
 						<Route path='*' element={<div>404</div>} />
 					</Route>
