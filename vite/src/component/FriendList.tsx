@@ -52,7 +52,6 @@ function FriendsTabs({ value, setValue }: FriendsTabsProps) {
 
 	const handleChange = (event: React.SyntheticEvent, newValue: FriendTabsValue) => {
 		setValue(newValue);
-		console.log(newValue)
 	};
 	return (
 		<Box sx={{ borderBottom: 1, borderColor: 'divider'}} display="flex" flexDirection={'column'} alignItems={'center'} justifyContent={'center'}>
@@ -69,7 +68,7 @@ function FriendsTabs({ value, setValue }: FriendsTabsProps) {
 
 export function FriendList() {
 	//send a post with image
-	const [friendList, setFriendList] = useState<{[status: string]: Friend[]} | null>(null);
+	const [friendList, setFriendList] = useState<{[status: string]: Friend[]}>({});
 	const auth = useAuthService();
 	const navigate = useNavigate();
 	const [tabs, setTabs] = useState<'accepted' | 'pending'>('accepted');
@@ -77,14 +76,16 @@ export function FriendList() {
 	React.useEffect(() => {
 		if (!auth.user) return;
 		console.log('Fetching friends')
-		apiClient.get(`/api/users/friends?status=pending`).then((response) => {
-			console.log(response.data)
-			setFriendList(response.data);
+		apiClient.get(`/api/users/friends?status=${tabs}`).then((response) => {
+			console.log('Friends: ', response.data);
+			setFriendList((oldList) => {
+				return { ...oldList, [tabs]: response.data };
+			});
 		}).catch((error) => {
-			console.log(error);
+			console.error('Error fetching friends: ', error.response.data);
 		});
 
-	}, [auth.user]);
+	}, [auth.user, tabs]);
 
 	const handleViewProfil = (id: number) => {
 		navigate(`/player/${id}`);

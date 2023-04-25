@@ -99,7 +99,6 @@ export class UsersController {
 	@UseGuards(ATGuard)
 	@Get('/friends/:id')
 	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
-		console.log('/friends/id',user.username, id)
 		return this.usersService.getFriend(user, parseInt(id));
 	}
 
