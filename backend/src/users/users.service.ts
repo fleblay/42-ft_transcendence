@@ -249,16 +249,16 @@ export class UsersService {
 			],
 			relations: { sender: true, receiver: true }
 		});
-
+		if (!friendRequest)
+			return null;
 		return {
 			friendRequest,
 			type: friendRequest.sender.id === user.id ? 'sent' : 'received'
 		}
 	}
 
-	async getFriendsList(userId: number, wantedStatus: FriendRequestStatus = 'accepted'): Promise<Friend[]> {
+	async getFriendsList(user: User, wantedStatus: FriendRequestStatus = 'accepted'): Promise<Friend[]> {
 
-		const user = await this.findOne(userId);
 		if (!user)
 			throw new NotFoundException("User not found");
 

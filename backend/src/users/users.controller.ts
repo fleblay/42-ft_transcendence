@@ -1,4 +1,4 @@
-import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch } from '@nestjs/common';
+import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query } from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -15,6 +15,7 @@ import { FileSizeGuard } from './guard/File-size.guard';
 import { SavedGame } from 'src/model/saved-game.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
+import { FriendRequestStatus } from 'src/model/friend-request.entity';
 
 
 @Controller('users')
@@ -108,9 +109,15 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
+	@Get('/friends/')
+	getFriendsList(@CurrentUser() user: User, @Query('status') status: FriendRequestStatus) {
+		return this.usersService.getFriendsList(user, status);
+	}
+
+	@UseGuards(ATGuard)
 	@Get('/friends/:id')
-	async getFriendsList(@Param("id") id: string) {
-		return await this.usersService.getFriendsList(parseInt(id));
+	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
+		return this.usersService.getFriendRequest(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
