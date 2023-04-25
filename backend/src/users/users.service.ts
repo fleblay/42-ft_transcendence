@@ -151,18 +151,17 @@ export class UsersService {
 		const friend = await this.findOne(friendId);
 		if (!friend) {
 			console.log("User not found");
-			return;
+			return null;
 		}
 
 		if (user.id === friendId) {
 			console.log("You can't add yourself as a friend");
-			return;
+			return null;
 		}
 		if (await this.getFriendRequest(user, friendId)) {
 			console.log("You already sent a friend request to this user");
-			return;
+			return null;
 		}
-
 		const newRequest = this.friendReqRepo.create({
 			sender: user,
 			receiver: friend,
@@ -170,6 +169,7 @@ export class UsersService {
 		});
 		this.friendReqRepo.save(newRequest);
 		this.unblockUser(user, friendId);
+		return this.generateFriend(user, friend, newRequest);
 	}
 
 	generateFriend(user: User, friend: User, friendRequest: FriendRequest) {

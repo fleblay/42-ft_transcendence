@@ -104,7 +104,7 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
-	@Patch('/friends/:id')
+	@Post('/acceptFriend/:id')
 	async acceptFriend(@CurrentUser() user: User, @Param("id") id: string) {
 		return await this.usersService.acceptFriend(user, parseInt(id));
 	}

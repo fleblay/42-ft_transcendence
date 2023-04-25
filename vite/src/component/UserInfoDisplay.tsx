@@ -1,43 +1,59 @@
 
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Avatar, Button, Typography } from '@mui/material';
 
 
 import { Box } from '@mui/system';
-import { useAuthService } from '../auth/AuthService';
 import { Divider } from '@mui/material';
 
-import { UserDataProvider, UserDataContext } from '../userDataProvider/userDataProvider';
+import {  UserDataContext } from '../userDataProvider/userDataProvider';
 import { UpdateProfil } from './UpdateProfil';
 import apiClient from '../auth/interceptor.axios';
-import { Blocked, Friend } from '../types';
+import { Friend, } from '../types';
 
+interface UserInfoDisplayProps {
+	idPlayer: string | undefined;
+	relation: Friend | null;
+	setRelation: (relation: Friend | null) => void;
+	itsme: boolean;
+}
 
-export function UserInfoDisplay({ idPlayer, relation, itsme }: { idPlayer: string | undefined, relation: Friend | null, itsme: boolean}) {
+export function UserInfoDisplay({ idPlayer, relation, setRelation, itsme }: UserInfoDisplayProps) {
 
     const { userData, setUserData } = useContext(UserDataContext);
     const imgPath = `/avatars/${idPlayer}.png`;
-	const [isBan, setIsBan] = useState<boolean>(false);
-    const [changeRelation, setChangeRelation] = useState<boolean>(false);
-
-
+	const isBlocked = false;
  
 
     const handleAddFriend = () => {
 		apiClient.post(`/api/users/addFriend/${idPlayer}`).then((response) => {
-			console.log(response);
-			setChangeRelation(!changeRelation);
+			console.log("reponseAddFriend",response.data);
+			if (response.data) {
+				setRelation(response.data);
+			}
 		}).catch((error) => {
 			console.log(error);
 		});
 	}
 
+	const handleAcceptFriend = () => {
+		apiClient.post(`/api/users/acceptFriend/${idPlayer}`).then((response) => {
+			console.log("reponseAcceptFriend",response.data);
+			if (response.data) {
+				setRelation(response.data);
+			}
+				}).catch((error) => {
+			console.log(error);
+		});
+	}
 
 	const handleRemoveFriend = () => {
 		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
-			console.log(response);
-			setChangeRelation(!changeRelation);
-		}).catch((error) => {
+			console.log("remove",response.data);
+			if (response.data) {
+				setRelation(null);
+			}
+				}).catch((error) => {
 			console.log(error);
 		});
 	}
@@ -45,7 +61,7 @@ export function UserInfoDisplay({ idPlayer, relation, itsme }: { idPlayer: strin
 	const handleBlockUser = () => {
 		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
 			console.log(response);
-			setChangeRelation(!changeRelation);
+			//setChangeRelation(!changeRelation);
 
 		}).catch((error) => {
 			console.log(error);
@@ -55,13 +71,36 @@ export function UserInfoDisplay({ idPlayer, relation, itsme }: { idPlayer: strin
 	const handleUnblockUser = () => {
 		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
 			console.log(response);
-			setChangeRelation(!changeRelation);
+			//setChangeRelation(!changeRelation);
 		}).catch((error) => {
 			console.log(error);
 		});
 	}
 
+	const renderButton = (relation : Friend | null) => {
 
+		console.log ("relation", relation);
+		if (!relation)
+			return <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend}>Add Friend</Button>;
+
+		switch (relation?.requestStatus) {
+			case null:
+				return <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend}>Add Friend</Button>;
+			case "accepted":
+				return <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleRemoveFriend}>Remove Friend</Button>;
+			case "pending":
+				{
+					if (relation?.type === 'sent')
+						return <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleRemoveFriend}>Cancel Request</Button>;
+					else
+						return <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAcceptFriend}>Accept Request</Button>;
+				}
+		
+		}
+	}
+
+
+	
 
 
     return (
@@ -90,8 +129,8 @@ export function UserInfoDisplay({ idPlayer, relation, itsme }: { idPlayer: strin
 
                     {itsme ? <UpdateProfil /> : (
                         <>
-                            {relation ? <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleRemoveFriend} >remove friend </Button> : <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend} >add a friend </Button>}
-                            {isBan ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleUnblockUser}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleBlockUser}>block</Button>}
+							{renderButton(relation)}
+                            {isBlocked? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleUnblockUser}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleBlockUser}>block</Button>}
                         </>
                     )}
 
