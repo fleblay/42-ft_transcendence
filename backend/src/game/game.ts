@@ -205,7 +205,7 @@ export class Game {
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
 	}
 
-	private handleCollision(elem: gameAsset, ball: {pos: Pos2D, velocity: Pos2D}, newBall: Pos2D, momentum: number = 0) {
+	private handleCollision(elem: gameAsset, ball: { pos: Pos2D, velocity: Pos2D }, newBall: Pos2D, bouncing: boolean = true, momentum: number = 0): boolean {
 		let intersect: Pos2D = { x: 0, y: 0 }
 		let relativeIntersectY: number = 0
 		let relativeIntersectX: number = 0
@@ -253,39 +253,49 @@ export class Game {
 
 		//Calcul du changement de trajectoire de la balle, et update de sa nouvelle position
 		if (collide) {
-			if (collide == Collide.left || collide == Collide.right) {
-				relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
-				bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
-				ball.velocity.x = newballSpeed * ((collide == Collide.right) ? 1 : -1) * Math.cos(bounceAngle); // seul changement
-				ball.velocity.y = newballSpeed * -Math.sin(bounceAngle);
-				ballTravelAfterBounce = (newBall.y - intersect.y) / (newBall.y - ball.pos.y);
-			}
+			if (bouncing) {
+				if (collide == Collide.left || collide == Collide.right) {
+					relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
+					bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
+					ball.velocity.x = newballSpeed * ((collide == Collide.right) ? 1 : -1) * Math.cos(bounceAngle); // seul changement
+					ball.velocity.y = newballSpeed * -Math.sin(bounceAngle);
+					ballTravelAfterBounce = (newBall.y - intersect.y) / (newBall.y - ball.pos.y);
+				}
 
-			else if (collide == Collide.up || collide == Collide.down) {
-				relativeIntersectX = (elem.x + (elem.width / 2)) - intersect.x;
-				bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
-				ball.velocity.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
-				ball.velocity.y = newballSpeed * ((collide == Collide.down) ? 1 : -1) * Math.cos(bounceAngle);
-				ballTravelAfterBounce = (newBall.x - intersect.x) / (newBall.x - ball.pos.x);
+				else if (collide == Collide.up || collide == Collide.down) {
+					relativeIntersectX = (elem.x + (elem.width / 2)) - intersect.x;
+					bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
+					ball.velocity.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
+					ball.velocity.y = newballSpeed * ((collide == Collide.down) ? 1 : -1) * Math.cos(bounceAngle);
+					ballTravelAfterBounce = (newBall.x - intersect.x) / (newBall.x - ball.pos.x);
+				}
+				newBall.x = intersect.x + (ballTravelAfterBounce * newballSpeed * Math.cos(bounceAngle));
+				newBall.y = intersect.y + (ballTravelAfterBounce * newballSpeed * Math.sin(bounceAngle));
 			}
-			newBall.x = intersect.x + (ballTravelAfterBounce * newballSpeed * Math.cos(bounceAngle));
-			newBall.y = intersect.y + (ballTravelAfterBounce * newballSpeed * Math.sin(bounceAngle));
+			else {
+				//mettre la pos de la balle a zero et set sa speed a 0
+			}
+			return true
 		}
+		else
+			return false
 	}
 
-	private updateBall() {
-		let newBall: Pos2D = { ...this.posBall };
+	private updateBall(ball: { pos: Pos2D, velocity: Pos2D }) {
+		//Essai de position pour la nouvelle balle
+		let newBall: Pos2D = { ...ball.pos };
+		newBall.x += ball.velocity.x * ballSpeed
+		newBall.y += ball.velocity.y * ballSpeed
 
-		newBall.x += this.velocityBall.x * ballSpeed
-		newBall.y += this.velocityBall.y * ballSpeed
 		// Collision mur
-		if (newBall.y > canvasHeight - ballSize && this.velocityBall.y > 0) {
-			this.velocityBall.y *= -1
+		if (newBall.y > canvasHeight - ballSize && ball.velocity.y > 0) {
+			ball.velocity.y *= -1
 		}
-		else if (newBall.y < ballSize && this.velocityBall.y < 0) {
-			this.velocityBall.y *= -1
+		else if (newBall.y < ballSize && ball.velocity.y < 0) {
+			ball.velocity.y *= -1
 		}
 
+		//TODO : stopper le calcul des collision si on a eu un collide dans l'une d'elle avec val de retour
 		//Collision players
 		this.players.forEach((player, index) => {
 			this.handleCollision({
@@ -293,13 +303,15 @@ export class Game {
 				y: player.pos,
 				width: player.paddleWidth,
 				height: player.paddleLength
-			}, {pos: this.posBall, velocity: this.velocityBall}, newBall, player.momentum)
+			}, ball, newBall, true, player.momentum)
 		})
 
 		//Collision assets
-		this.assets.forEach((asset) => this.handleCollision(asset,{pos: this.posBall, velocity: this.velocityBall} , newBall))
+		this.assets.forEach((asset) => this.handleCollision(asset, ball, newBall))
 
-		this.posBall = newBall;
+		//Pointer Magic => cannot use ball.pos = newBall
+		ball.pos.x = newBall.x;
+		ball.pos.y = newBall.y;
 	}
 
 	private countdown(timeSecond: number) {
@@ -331,7 +343,7 @@ export class Game {
 	gameLoop() {
 		//Move de la balle
 		if (this.status === GameStatus.playing) {
-			this.updateBall()
+			this.updateBall({pos: this.posBall, velocity : this.velocityBall})
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
