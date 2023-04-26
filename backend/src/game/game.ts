@@ -281,7 +281,8 @@ export class Game {
 			return false
 	}
 
-	private updateBall(ball: { pos: Pos2D, velocity: Pos2D }) {
+	private updateBall(ball: { pos: Pos2D, velocity: Pos2D }) : boolean {
+		let collide = false
 		//Essai de position pour la nouvelle balle
 		let newBall: Pos2D = { ...ball.pos };
 		newBall.x += ball.velocity.x * ballSpeed
@@ -295,10 +296,9 @@ export class Game {
 			ball.velocity.y *= -1
 		}
 
-		//TODO : stopper le calcul des collision si on a eu un collide dans l'une d'elle avec val de retour
 		//Collision players
 		this.players.forEach((player, index) => {
-			this.handleCollision({
+			collide = collide || this.handleCollision({
 				x: (index == 0) ? 0 : canvasWidth - player.paddleWidth,
 				y: player.pos,
 				width: player.paddleWidth,
@@ -307,11 +307,14 @@ export class Game {
 		})
 
 		//Collision assets
-		this.assets.forEach((asset) => this.handleCollision(asset, ball, newBall))
+		this.assets.forEach((asset) => {
+			collide = collide || this.handleCollision(asset, ball, newBall)
+		})
 
 		//Pointer Magic => cannot use ball.pos = newBall
 		ball.pos.x = newBall.x;
 		ball.pos.y = newBall.y;
+		return collide
 	}
 
 	private countdown(timeSecond: number) {
@@ -343,6 +346,8 @@ export class Game {
 	gameLoop() {
 		//Move de la balle
 		if (this.status === GameStatus.playing) {
+
+			//Gestion de la collision des assets avec mouvement
 			this.updateBall({pos: this.posBall, velocity : this.velocityBall})
 
 			//Condition de marquage de point
