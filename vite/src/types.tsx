@@ -30,17 +30,24 @@ export interface IPlayers {
 export interface IgameAsset {
 	x: number,
 	y: number,
-	width : number,
-	height : number
+	width: number,
+	height: number
+}
+
+export type projectile = {
+	pos: Pos2D,
+	velocity: Pos2D,
+	active: boolean
 }
 
 export interface IgameInfo {
 	players: IPlayers[],
 	assets: IgameAsset[],
 	velocityBall: number,
-	posBall: Pos2D
-	status: GameStatus
-	date: Date
+	posBall: Pos2D,
+	shootP1: projectile,
+	status: GameStatus,
+	date: Date,
 }
 
 export enum Move { "Up" = 1, "Down" }
@@ -87,11 +94,11 @@ export type Friend = {
 	username: string,
 	online: boolean,
 	status: UserStatus,
-	type : RelationType,
+	type: RelationType,
 	requestStatus: 'accepted' | 'pending',
 }
 
-export type Blocked= {
+export type Blocked = {
 	id: number,
 	username: string
 }

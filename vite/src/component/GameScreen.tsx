@@ -135,7 +135,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
-	const [keyDown, setKeyDown] = useState({ up: false, down: false });
+	const [keyDown, setKeyDown] = useState({ up: false, down: false , shoot: false});
 	const [canvasRatio, setCanvasRatio] = useState<number>(0.7 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
 	const bottomRef = useRef<HTMLInputElement>(null)
@@ -170,6 +170,9 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			if (keyDown.down) {
 				customEmit('game.play.move', { gameId: gameId, move: 'Down' })
 			}
+			if (keyDown.shoot) {
+				customEmit('game.play.move', { gameId: gameId, move: 'Shoot' })
+			}
 		}, 8);
 		return () => clearInterval(interval);
 	}, [keyDown])
@@ -178,18 +181,24 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		function handleKeyDown(e: KeyboardEvent) {
 			e.preventDefault();
 			if (e.key === 'ArrowUp' && keyDown.up === false) {
-				setKeyDown({ up: true, down: false })
+				setKeyDown({ up: true, down: false , shoot: false})
 			}
 			if (e.key === 'ArrowDown' && keyDown.down === false) {
-				setKeyDown({ up: false, down: true })
+				setKeyDown({ up: false, down: true , shoot: false})
+			}
+			if (e.key === ' ' && keyDown.shoot === false) {
+				setKeyDown({ up: false, down: false , shoot: true})
 			}
 		}
 		function handleKeyUp(e: KeyboardEvent) {
 			if (e.key === 'ArrowUp') {
-				setKeyDown({ up: false, down: false })
+				setKeyDown({ up: false, down: false, shoot: false })
 			}
 			if (e.key === 'ArrowDown') {
-				setKeyDown({ up: false, down: false })
+				setKeyDown({ up: false, down: false , shoot: false})
+			}
+			if (e.key === ' ') {
+				setKeyDown({ up: false, down: false , shoot: false})
 			}
 		}
 		window.addEventListener('keydown', handleKeyDown)

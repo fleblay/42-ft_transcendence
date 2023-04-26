@@ -21,6 +21,12 @@ export type Pos2D = {
 	y: number
 }
 
+export type projectile = {
+	pos: Pos2D,
+	velocity: Pos2D,
+	active: boolean
+}
+
 export type GameSetting = {
 	paddleLength: number,
 	paddleWidth: number,
@@ -62,6 +68,7 @@ export interface IgameInfo {
 	players: Partial<Player>[], // requiered partial to strip client for Players
 	assets: gameAsset[],
 	posBall: Pos2D,
+	shootP1: projectile,
 	velocityBall: number,
 	status: GameStatus,
 	date: Date
@@ -77,6 +84,7 @@ enum Collide { "none" = 0, "left", "right", "down", "up" }
 export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
+	private shootP1: projectile = { pos: { x: 0, y: 0 }, velocity: { x: 0, y: 0 }, active: false }
 	private intervalId: NodeJS.Timer
 	private reduceInterval: NodeJS.Timer
 	public players: Player[] = []
@@ -102,7 +110,7 @@ export class Game {
 		if (foundPlayer === null)
 			return
 		if (input.move !== undefined) {
-			//console.log(`Input is ${input.move}`)
+			console.log(`Input is ${input.move}`)
 			switch (input.move) {
 				case ("Up"):
 					foundPlayer.momentum = (foundPlayer.momentum <= 0) ? foundPlayer.momentum - 1 : 0
@@ -126,6 +134,9 @@ export class Game {
 					foundPlayer.momentum = (foundPlayer.pos >= canvasHeight - foundPlayer.paddleLength) ? 0 : foundPlayer.momentum
 					foundPlayer.timeLastMove = Date.now()
 					break
+				case ("Shoot"):
+					console.log("Shoot")
+					break
 				default:
 			}
 		}
@@ -148,6 +159,7 @@ export class Game {
 			players: partialPlayers, // instead of Player
 			assets: this.assets,
 			posBall: this.posBall,
+			shootP1: this.shootP1,
 			status: this.status,
 			velocityBall: Math.sqrt(Math.pow(this.velocityBall.x, 2) + Math.pow(this.velocityBall.y, 2)),
 			date: new Date()
@@ -281,7 +293,7 @@ export class Game {
 			return false
 	}
 
-	private updateBall(ball: { pos: Pos2D, velocity: Pos2D }) : boolean {
+	private updateBall(ball: { pos: Pos2D, velocity: Pos2D }): boolean {
 		let collide = false
 		//Essai de position pour la nouvelle balle
 		let newBall: Pos2D = { ...ball.pos };
@@ -348,7 +360,7 @@ export class Game {
 		if (this.status === GameStatus.playing) {
 
 			//Gestion de la collision des assets avec mouvement
-			this.updateBall({pos: this.posBall, velocity : this.velocityBall})
+			this.updateBall({ pos: this.posBall, velocity: this.velocityBall })
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
