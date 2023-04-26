@@ -211,7 +211,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		if (!context.current) return;
 
 		const player1color = "rgba(255, 100, 100, 1.0)"
-		const player2color = "rgba(140, 140, 255, 1.0)"
+		const player2color = "rgba(180, 180, 255, 1.0)"
 		const assetcolor = "rgba(100, 100, 100, 1.0)"
 		const ballcolor = "rgba(230, 190, 1, 1.0)"
 

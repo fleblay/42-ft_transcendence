@@ -75,7 +75,7 @@ export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
 	private intervalId: NodeJS.Timer
-	private reduceInterval : NodeJS.Timer
+	private reduceInterval: NodeJS.Timer
 	public players: Player[] = []
 	public assets: gameAsset[] = [
 		{ x: 100, y: 70, width: 70, height: 70 },
@@ -296,23 +296,15 @@ export class Game {
 			this.velocityBall.y *= -1
 		}
 
-		//player 0
-		this.handleCollision({
-			x: 0,
-			y: this.players[0].pos,
-			width: this.players[0].paddleWidth,
-			height: this.players[0].paddleLength
-		}, newBall, this.players[0].momentum)
+		//Collision players
+		this.players.forEach((player, index)=> {this.handleCollision({
+			x: (index == 0) ? 0 : canvasWidth - player.paddleWidth,
+			y: player.pos,
+			width: player.paddleWidth,
+			height: player.paddleLength
+		}, newBall, player.momentum)})
 
-		//player 1
-		this.handleCollision({
-			x: canvasWidth - this.players[1].paddleWidth,
-			y: this.players[1].pos,
-			width: this.players[1].paddleWidth,
-			height: this.players[1].paddleLength
-		}, newBall, this.players[1].momentum)
-
-		//assets
+		//Collision assets
 		this.assets.forEach((asset) => this.handleCollision(asset, newBall))
 
 		this.posBall = newBall;
@@ -326,14 +318,22 @@ export class Game {
 			this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 			if (countdown <= 0) {
 				clearInterval(intervalId)
-				if (this.status !== GameStatus.end) {
+				if (this.status !== GameStatus.end)
 					this.status = GameStatus.playing
-					this.players.forEach((player)=> {
-						player.paddleLength = paddleLength
-					})
-				}
 			}
 		}, 700)
+	}
+
+	resetBallAndPlayers() {
+		this.status = GameStatus.start
+		this.countdown(3)
+		this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
+		this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
+		this.players.forEach((player) => {
+			player.pos = canvasHeight / 2 - player.paddleLength / 2
+			player.momentum = 0
+			player.paddleLength = paddleLength
+		})
 	}
 
 	gameLoop() {
@@ -343,26 +343,12 @@ export class Game {
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
-				this.status = GameStatus.start
-				this.countdown(3)
 				this.players[1].score += 1
-				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-				this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
-				this.players.forEach((player) => {
-					player.pos = canvasHeight / 2 - player.paddleLength / 2
-					player.momentum = 0
-				})
+				this.resetBallAndPlayers()
 			}
 			else if (this.posBall.x >= canvasWidth) {
-				this.status = GameStatus.start
-				this.countdown(3)
 				this.players[0].score += 1
-				this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-				this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
-				this.players.forEach((player) => {
-					player.pos = canvasHeight / 2 - player.paddleLength / 2
-					player.momentum = 0
-				})
+				this.resetBallAndPlayers()
 			}
 
 			//Condition fin de jeu
@@ -372,7 +358,7 @@ export class Game {
 			}
 			//Reset des momentum
 			this.players.forEach((player) => {
-				if (Date.now() - player.timeLastMove > 100)
+				if (Date.now() - player.timeLastMove > 150)
 					player.momentum = 0
 			})
 		}
