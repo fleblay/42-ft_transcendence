@@ -137,31 +137,9 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const { customEmit } = useContext(SocketContext);
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
 	const [canvasRatio, setCanvasRatio] = useState<number>(0.8)
-	const [info, setInfo] = useState<JSX.Element>(<></>)
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
 
 	const handleClick = () => {
-		if (!displayInfo) {
-			setInfo(
-				<>
-					<div> <h1>Game Info :</h1></div>
-					<div> Velocity :{gameInfo?.velocityBall.toPrecision(3)} </div>
-					<div> posBall x :{gameInfo?.posBall.x} </div>
-					<div> posBall y: {gameInfo?.posBall.y} </div>
-					<div> posP1: {gameInfo?.players[0].pos} </div>
-					<div> momentumP1: {gameInfo?.players[0].momentum} </div>
-					<div> paddleLengthP1: {gameInfo?.players[0].paddleLength} </div>
-					<div> posP2: {gameInfo?.players[1]?.pos} </div>
-					<div> momentumP2: {gameInfo?.players[1]?.momentum} </div>
-					<div> paddleLengthP2: {gameInfo?.players[1]?.paddleLength} </div>
-					<div> score: {`${gameInfo?.players[0].score}:${gameInfo?.players[1]?.score}`} </div>
-					<div> status: {gameInfo?.status} </div>
-					<div> date: {gameInfo?.date.toString()} </div>
-				</>
-			)
-		}
-		else
-			setInfo(<></>)
 		setDisplayInfo(!displayInfo)
 	}
 	useEffect(() => {
@@ -279,7 +257,23 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	return (
 		<div>
 			<button onClick={handleClick}>{(displayInfo) ? "Hide" : "Show" + " Info"}</button>
-			<div>{info}</div>
+			<div> {displayInfo ?
+				<>
+					<div> <h1>Game Info :</h1></div>
+					<div> Velocity :{gameInfo?.velocityBall.toPrecision(3)} </div>
+					<div> posBall x :{gameInfo?.posBall.x} </div>
+					<div> posBall y: {gameInfo?.posBall.y} </div>
+					<div> posP1: {gameInfo?.players[0].pos} </div>
+					<div> momentumP1: {gameInfo?.players[0].momentum} </div>
+					<div> paddleLengthP1: {gameInfo?.players[0].paddleLength} </div>
+					<div> posP2: {gameInfo?.players[1]?.pos} </div>
+					<div> momentumP2: {gameInfo?.players[1]?.momentum} </div>
+					<div> paddleLengthP2: {gameInfo?.players[1]?.paddleLength} </div>
+					<div> score: {`${gameInfo?.players[0].score}:${gameInfo?.players[1]?.score}`} </div>
+					<div> status: {gameInfo?.status} </div>
+					<div> date: {gameInfo?.date.toString()} </div>
+				</> : <></>}
+			</div>
 			<div>
 				<canvas width={canvasWidth * canvasRatio} height={canvasHeight * canvasRatio} style={{ border: "1px solid black", display: "block", marginLeft: "auto", marginRight: "auto" }} ref={canvasRef} />
 			</div>
