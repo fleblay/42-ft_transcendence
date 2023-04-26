@@ -137,7 +137,33 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const { customEmit } = useContext(SocketContext);
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
 	const [canvasRatio, setCanvasRatio] = useState<number>(0.8)
+	const [info, setInfo] = useState<JSX.Element>(<></>)
+	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
 
+	const handleClick = () => {
+		if (!displayInfo) {
+			setInfo(
+				<>
+					<div> <h1>Game Info :</h1></div>
+					<div> Velocity :{gameInfo?.velocityBall.toPrecision(3)} </div>
+					<div> posBall x :{gameInfo?.posBall.x} </div>
+					<div> posBall y: {gameInfo?.posBall.y} </div>
+					<div> posP1: {gameInfo?.players[0].pos} </div>
+					<div> momentumP1: {gameInfo?.players[0].momentum} </div>
+					<div> paddleLengthP1: {gameInfo?.players[0].paddleLength} </div>
+					<div> posP2: {gameInfo?.players[1]?.pos} </div>
+					<div> momentumP2: {gameInfo?.players[1]?.momentum} </div>
+					<div> paddleLengthP2: {gameInfo?.players[1]?.paddleLength} </div>
+					<div> score: {`${gameInfo?.players[0].score}:${gameInfo?.players[1]?.score}`} </div>
+					<div> status: {gameInfo?.status} </div>
+					<div> date: {gameInfo?.date.toString()} </div>
+				</>
+			)
+		}
+		else
+			setInfo(<></>)
+		setDisplayInfo(!displayInfo)
+	}
 	useEffect(() => {
 		window.addEventListener("resize", () => setCanvasRatio(0.8 * window.innerWidth / canvasWidth))
 		return () => setCanvasRatio(0.8 * window.innerWidth / canvasWidth)
@@ -234,9 +260,9 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 
 		// Scores
 		context.current.font = `${48 * canvasRatio}px serif`
-		context.current.fillText(`${gameInfo.players[0].score}`, (canvasWidth/ 2 - 80) * canvasRatio, 80 * canvasRatio)
+		context.current.fillText(`${gameInfo.players[0].score}`, (canvasWidth / 2 - 80) * canvasRatio, 80 * canvasRatio)
 		if (gameInfo.players[1])
-			context.current.fillText(`${gameInfo.players[1].score}`, (canvasWidth/ 2 + 60) * canvasRatio, 80 * canvasRatio)
+			context.current.fillText(`${gameInfo.players[1].score}`, (canvasWidth / 2 + 60) * canvasRatio, 80 * canvasRatio)
 
 		// Player Info
 		context.current.font = `${20 * canvasRatio}px serif`
@@ -250,39 +276,13 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 
 	}, [gameInfo.players, gameInfo.posBall]);
 
-	// useEffect(() => {
-	// 	function handleKeyDown(e: KeyboardEvent) {
-	// 		if (e.key === 'ArrowUp') {
-	// 			console.log('game.play.move', {input :{move : 'Up'}});
-	// 			customEmit('game.play.move', {gameId : gameId, move : 'Up'})
-	// 		}
-	// 		if (e.key === 'ArrowDown') {
-	// 			console.log('game.play.move', {input :{move : 'Up'}});
-	// 			customEmit('game.play.move', {gameId: gameId , move : 'Down'})
-	// 		}
-	// 	}
-	// 	window.addEventListener('keydown', handleKeyDown)
-	// 	return () => {
-	// 		window.removeEventListener('keydown', handleKeyDown)
-	// 	}
-	// }, [])
-
-	return <div>
-		<div> <h1>Game Info :</h1></div>
-		<div> Velocity :{gameInfo?.velocityBall.toPrecision(3)} </div>
-		<div> posBall x :{gameInfo?.posBall.x} </div>
-		<div> posBall y: {gameInfo?.posBall.y} </div>
-		<div> posP1: {gameInfo?.players[0].pos} </div>
-		<div> momentumP1: {gameInfo?.players[0].momentum} </div>
-		<div> paddleLengthP1: {gameInfo?.players[0].paddleLength} </div>
-		<div> posP2: {gameInfo?.players[1]?.pos} </div>
-		<div> momentumP2: {gameInfo?.players[1]?.momentum} </div>
-		<div> paddleLengthP2: {gameInfo?.players[1]?.paddleLength} </div>
-		<div> score: {`${gameInfo?.players[0].score}:${gameInfo?.players[1]?.score}`} </div>
-		<div> status: {gameInfo?.status} </div>
-		<div> date: {gameInfo?.date.toString()} </div>
+	return (
 		<div>
-			<canvas width={canvasWidth * canvasRatio} height={canvasHeight * canvasRatio} style={{ border: "1px solid black", display: "block", marginLeft : "auto", marginRight: "auto" }} ref={canvasRef} />
+			<button onClick={handleClick}>{(displayInfo) ? "Hide" : "Show" + " Info"}</button>
+			<div>{info}</div>
+			<div>
+				<canvas width={canvasWidth * canvasRatio} height={canvasHeight * canvasRatio} style={{ border: "1px solid black", display: "block", marginLeft: "auto", marginRight: "auto" }} ref={canvasRef} />
+			</div>
 		</div>
-	</div>
+	)
 }
