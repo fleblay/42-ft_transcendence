@@ -1,11 +1,11 @@
 import { Inject, Injectable, NotFoundException, forwardRef } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FriendRequest, FriendRequestStatus } from "src/model/friend-request.entity";
+import { FriendRequest, FriendRequestStatus } from "../model/friend-request.entity";
 import { Repository } from "typeorm";
-import { User } from "src/model/user.entity";
-import { Friend } from "src/type";
-import { GameService } from "src/game/game.service";
+import { User } from "../model/user.entity";
+import { Friend } from "../type";
+import { GameService } from "../game/game.service";
 
 @Injectable()
 export class FriendsService {

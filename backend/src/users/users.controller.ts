@@ -12,10 +12,10 @@ import { User } from "../model/user.entity";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
 import { FileSizeGuard } from './guard/File-size.guard';
-import { SavedGame } from 'src/model/saved-game.entity';
+import { SavedGame } from '../model/saved-game.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
-import { FriendRequestStatus } from 'src/model/friend-request.entity';
+import { FriendRequestStatus } from '../model/friend-request.entity';
 import { FriendsService } from './friends.service';
 
 
