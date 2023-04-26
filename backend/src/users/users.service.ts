@@ -13,6 +13,7 @@ import { forwardRef } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { FriendRequest, FriendRequestStatus } from '../model/friend-request.entity';
 import { Server, Socket } from 'socket.io'
+import { FriendsService } from './friends.service';
 
 
 @Injectable()
@@ -23,7 +24,8 @@ export class UsersService {
 	constructor(
 		@InjectRepository(User) private repo: Repository<User>,
 		@Inject(forwardRef(() => GameService)) private gameService: GameService,
-		@InjectRepository(FriendRequest) private friendReqRepo: Repository<FriendRequest>
+		@InjectRepository(FriendRequest) private friendReqRepo: Repository<FriendRequest>,
+		@Inject(forwardRef(() => FriendsService)) private friendsService: FriendsService
 	) {
 		//setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
 	}
@@ -150,91 +152,13 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	async addFriend(user: User, friendId: number) {
-
-		const friend = await this.findOne(friendId);
-		if (!friend) {
-			console.log("User not found");
-			return null;
-		}
-
-		if (user.id === friendId) {
-			console.log("You can't add yourself as a friend");
-			return null;
-		}
-		if (await this.getFriendRequest(user, friendId)) {
-			console.log("You already sent a friend request to this user");
-			return null;
-		}
-		const newRequest = this.friendReqRepo.create({
-			sender: user,
-			receiver: friend,
-			status: 'pending'
-		});
-		this.friendReqRepo.save(newRequest);
-		this.unblockUser(user, friendId);
-		const newFriend = this.generateFriend(user, friend, newRequest);
-
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
-		this.server.to(`/player/${friendId}`).emit('page.player', {})
-		return newFriend;
-	}
-
-	generateFriend(user: User, friend: User, friendRequest: FriendRequest) {
-		return {
-			id: friend.id,
-			username: friend.username,
-			online: this.isConnected(friend.id),
-			status: this.gameService.userStatus(friend.id),
-			type: friendRequest.sender.id === user.id ? 'sent' : 'received',
-			requestStatus: friendRequest.status
-		} as Friend
-	}
-	async acceptFriend(user: User, friendId: number) {
-		const friend = await this.findOne(friendId);
-		if (!friend) {
-			console.log("User not found");
-			return;
-		}
-
-		if (user.id === friendId) {
-			console.log("You can't add yourself as a friend");
-			return;
-		}
-		const friendRequest = await this.getFriendRequest(user, friendId, 'pending');
-		if (!friendRequest) {
-			console.log("You don't have a friend request from this user");
-			return;
-		}
-		friendRequest.status = 'accepted';
-		this.friendReqRepo.save(friendRequest);
-		this.unblockUser(user, friendId);
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
-		this.server.to(`/player/${friendId}`).emit('page.player', {})
-		return this.generateFriend(user, friend, friendRequest);
-	}
-
-	async removeFriend(user: User, friendId: number) {
-		const friendRequest = await this.getFriendRequest(user, friendId);
-		if (!friendRequest) {
-			console.log("You are not friends with this user");
-			return null;
-		}
-		this.friendReqRepo.softRemove(friendRequest);
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
-		this.server.to(`/player/${friendId}`).emit('page.player', {})
-		return {
-			friendId: friendId,
-			status: 'declined'
-		}
-	}
 
 	blockUser(user: User, blockedId: number) {
 		if (user.blockedId.includes(blockedId)) {
 			console.log("User is already blocked");
 			return;
 		}
-		this.removeFriend(user, blockedId);
+		this.friendsService.removeFriend(user, blockedId);
 		user.blockedId.push(blockedId);
 		this.server.to(`/player/${user.id}`).emit('page.player', {})
 		this.server.to(`/player/${blockedId}`).emit('page.player', {})
@@ -253,38 +177,6 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	async getFriendRequest(user: User, friendId: number, status?: FriendRequestStatus ): Promise<FriendRequest | null> {
-		const friend = await this.findOne(friendId);
-		if (!friend) {
-			console.log("User not found");
-			return null;
-		}
-
-		if (user.id === friendId) {
-			console.log("You can't add yourself as a friend");
-			return null;
-		}
-
-		const friendRequest = await this.friendReqRepo.findOne({
-			where: [
-				{ sender: { id: friend.id }, receiver: { id: user.id }, status },
-				{ receiver: { id: friend.id }, sender: { id: user.id }, status },
-			],
-			relations: { sender: true, receiver: true }
-		});
-		return friendRequest;
-	}
-
-
-	async getFriend(user: User, friendId: number): Promise<Friend | null> {
-		const friendRequest = await this.getFriendRequest(user, friendId);
-		if (!friendRequest)
-			return null;
-		const friend = await this.findOne(friendId);
-		if (!friend)
-			return null;
-		return this.generateFriend(user, friend, friendRequest);
-	}
 
 	async getBlocked(user: User, friendId: number): Promise <Blocked | null> {
 		if (!user)
@@ -295,33 +187,6 @@ export class UsersService {
 				username: (await this.findOne(friendId)).username
 			}
 		return null;
-	}
-
-	async getFriendsList(user: User, wantedStatus: FriendRequestStatus = 'accepted'): Promise<Friend[]> {
-
-		if (!user)
-			throw new NotFoundException("User not found");
-
-		const friendList = await this.friendReqRepo.find({
-			where: [
-				{ sender: { id: user.id }, status: wantedStatus },
-				{ receiver: { id: user.id }, status: wantedStatus }
-			],
-			relations: { sender: true, receiver: true }
-		});
-
-		return friendList.map(({ sender, receiver }) => {
-			let friend = sender.id === user.id ? receiver : sender;
-
-			return {
-				id: friend.id,
-				username: friend.username,
-				online: this.isConnected(friend.id),
-				status: this.gameService.userStatus(friend.id),
-				type: sender.id === user.id ? 'sent' : 'received',
-				requestStatus: wantedStatus
-			};
-		});
 	}
 
 

@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { RefreshToken } from '../model/refresh-token.entity';
 import {GameModule} from '../game/game.module'
 import { FriendRequest } from 'src/model/friend-request.entity';
+import { FriendsService } from './friends.service';
 
 @Module({
 	imports: [
@@ -19,8 +20,8 @@ import { FriendRequest } from 'src/model/friend-request.entity';
 		forwardRef(() => GameModule)
 	],
 	controllers: [UsersController],
-	providers: [AuthService, UsersService],
-	exports: [AuthService, UsersService],
+	providers: [AuthService, UsersService, FriendsService,],
+	exports: [AuthService, FriendsService, UsersService],
 })
 export class UsersModule { }
 //

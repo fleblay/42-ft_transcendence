@@ -16,6 +16,7 @@ import { SavedGame } from 'src/model/saved-game.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { FriendRequestStatus } from 'src/model/friend-request.entity';
+import { FriendsService } from './friends.service';
 
 
 @Controller('users')
@@ -24,7 +25,8 @@ export class UsersController {
 	constructor(private usersService: UsersService,
 		private authService: AuthService,
 		@Inject(forwardRef(() => GameService))
-		private gameService: GameService
+		private gameService: GameService,
+		private friendsService: FriendsService
 	) { }
 
 	//@UseGuards(LocalAuthGuard)
@@ -93,19 +95,19 @@ export class UsersController {
 	@UseGuards(ATGuard)
 	@Get('/friends')
 	getFriendsList(@CurrentUser() user: User, @Query('status') status: FriendRequestStatus) {
-		return this.usersService.getFriendsList(user, status);
+		return this.friendsService.getFriendsList(user, status);
 	}
 
 	@UseGuards(ATGuard)
 	@Get('/friends/:id')
 	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
-		return this.usersService.getFriend(user, parseInt(id));
+		return this.friendsService.getFriend(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/acceptFriend/:id')
 	async acceptFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.usersService.acceptFriend(user, parseInt(id));
+		return await this.friendsService.acceptFriend(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
@@ -125,13 +127,13 @@ export class UsersController {
 	@UseGuards(ATGuard)
 	@Post('/addFriend/:id')
 	async addFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.usersService.addFriend(user, parseInt(id));
+		return await this.friendsService.addFriend(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/removeFriend/:id')
 	async removeFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.usersService.removeFriend(user, parseInt(id));
+		return await this.friendsService.removeFriend(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
