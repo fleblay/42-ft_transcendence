@@ -66,10 +66,13 @@ export interface IgameInfo {
 	status: GameStatus,
 	date: Date
 }
+
 interface PlayerInput {
 	move: string
 	powerUp?: string
 }
+
+enum Collide { "none" = 0, "left", "right", "down", "up" }
 
 export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
@@ -202,84 +205,71 @@ export class Game {
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
 	}
 
-	private handleCollision(elem: gameAsset, newBall: Pos2D, momentum: number = 0) {
+	private handleCollision(elem: gameAsset, ball: {pos: Pos2D, velocity: Pos2D}, newBall: Pos2D, momentum: number = 0) {
 		let intersect: Pos2D = { x: 0, y: 0 }
 		let relativeIntersectY: number = 0
 		let relativeIntersectX: number = 0
 		let bounceAngle: number = 0
 		let newballSpeed: number = 0
-		let ballTravelLeft: number = 0
-		let ballTravelUp: number = 0
+		let ballTravelAfterBounce: number = 0
 
-		let collide = false
-		let leftCollide: boolean = false
-		let rightCollide: boolean = false
-		let upCollide: boolean = false
-		let downCollide: boolean = false
+		let collide: Collide = Collide.none
 
 		//Collision droite
-		if (!collide && newBall.x <= elem.x + elem.width && this.posBall.x >= elem.x + elem.width) {
+		if (!collide && newBall.x <= elem.x + elem.width && ball.pos.x >= elem.x + elem.width) {
 			intersect.x = elem.x + elem.width;
-			intersect.y = this.posBall.y + ((intersect.x - this.posBall.x) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
-			if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height) {
-				collide = true
-				rightCollide = true
-			}
+			intersect.y = ball.pos.y + ((intersect.x - ball.pos.x) * (ball.pos.y - newBall.y) / (ball.pos.x - newBall.x));
+			if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height)
+				collide = Collide.right
 		}
 		//Collision gauche
-		if (!collide && newBall.x >= elem.x && this.posBall.x <= elem.x) {
+		else if (!collide && newBall.x >= elem.x && ball.pos.x <= elem.x) {
 			intersect.x = elem.x
-			intersect.y = this.posBall.y + ((intersect.x - this.posBall.x) * (this.posBall.y - newBall.y) / (this.posBall.x - newBall.x));
-			if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height) {
-				collide = true
-				leftCollide = true
-			}
+			intersect.y = ball.pos.y + ((intersect.x - ball.pos.x) * (ball.pos.y - newBall.y) / (ball.pos.x - newBall.x));
+			if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height)
+				collide = Collide.left
 		}
 
 		//Collision bas
-		if (!collide && newBall.y <= elem.y + elem.height && this.posBall.y >= elem.y + elem.height) {
+		else if (!collide && newBall.y <= elem.y + elem.height && ball.pos.y >= elem.y + elem.height) {
 			intersect.y = elem.y + elem.height;
-			intersect.x = this.posBall.x + ((intersect.y - this.posBall.y) * (this.posBall.x - newBall.x) / (this.posBall.y - newBall.y));
-			if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width) {
-				collide = true
-				downCollide = true
-			}
+			intersect.x = ball.pos.x + ((intersect.y - ball.pos.y) * (ball.pos.x - newBall.x) / (ball.pos.y - newBall.y));
+			if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width)
+				collide = Collide.down
 		}
 
 		//Collision up
-		if (!collide && newBall.y >= elem.y && this.posBall.y <= elem.y) {
+		else if (!collide && newBall.y >= elem.y && ball.pos.y <= elem.y) {
 			intersect.y = elem.y;
-			intersect.x = this.posBall.x + ((intersect.y - this.posBall.y) * (this.posBall.x - newBall.x) / (this.posBall.y - newBall.y));
-			if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width) {
-				collide = true
-				upCollide = true
+			intersect.x = ball.pos.x + ((intersect.y - ball.pos.y) * (ball.pos.x - newBall.x) / (ball.pos.y - newBall.y));
+			if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width)
+				collide = Collide.up
+		}
+
+		newballSpeed = Math.sqrt(ball.velocity.x * ball.velocity.x + ball.velocity.y * ball.velocity.y); // A Ajuster avec momentum
+		if ((collide == Collide.left || collide == Collide.right) && momentum != 0) {
+			newballSpeed *= (1 + (momentum / 120) * ball.velocity.y)
+		}
+
+		//Calcul du changement de trajectoire de la balle, et update de sa nouvelle position
+		if (collide) {
+			if (collide == Collide.left || collide == Collide.right) {
+				relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
+				bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
+				ball.velocity.x = newballSpeed * ((collide == Collide.right) ? 1 : -1) * Math.cos(bounceAngle); // seul changement
+				ball.velocity.y = newballSpeed * -Math.sin(bounceAngle);
+				ballTravelAfterBounce = (newBall.y - intersect.y) / (newBall.y - ball.pos.y);
 			}
-		}
 
-		newballSpeed = Math.sqrt(this.velocityBall.x * this.velocityBall.x + this.velocityBall.y * this.velocityBall.y); // A Ajuster avec momentum
-		if ((leftCollide || rightCollide) && momentum != 0) {
-			newballSpeed *= (1 + (momentum / 120) * this.velocityBall.y)
-		}
-
-		if (collide && (leftCollide || rightCollide)) {
-			relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
-			bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
-			ballTravelLeft = (newBall.y - intersect.y) / (newBall.y - this.posBall.y);
-			this.velocityBall.x = newballSpeed * (rightCollide ? 1 : -1) * Math.cos(bounceAngle); // seul changement
-			this.velocityBall.y = newballSpeed * -Math.sin(bounceAngle);
-
-			newBall.x = intersect.x + (ballTravelLeft * newballSpeed * Math.cos(bounceAngle));
-			newBall.y = intersect.y + (ballTravelLeft * newballSpeed * Math.sin(bounceAngle));
-		}
-
-		else if (collide && (upCollide || downCollide)) {
-			relativeIntersectX = (elem.x + (elem.width / 2)) - intersect.x;
-			bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
-			ballTravelUp = (newBall.x - intersect.x) / (newBall.x - this.posBall.x);
-			this.velocityBall.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
-			this.velocityBall.y = newballSpeed * (downCollide ? 1 : -1) * Math.cos(bounceAngle);
-			newBall.x = intersect.x + (ballTravelUp * newballSpeed * Math.cos(bounceAngle));
-			newBall.y = intersect.y + (ballTravelUp * newballSpeed * Math.sin(bounceAngle));
+			else if (collide == Collide.up || collide == Collide.down) {
+				relativeIntersectX = (elem.x + (elem.width / 2)) - intersect.x;
+				bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
+				ball.velocity.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
+				ball.velocity.y = newballSpeed * ((collide == Collide.down) ? 1 : -1) * Math.cos(bounceAngle);
+				ballTravelAfterBounce = (newBall.x - intersect.x) / (newBall.x - ball.pos.x);
+			}
+			newBall.x = intersect.x + (ballTravelAfterBounce * newballSpeed * Math.cos(bounceAngle));
+			newBall.y = intersect.y + (ballTravelAfterBounce * newballSpeed * Math.sin(bounceAngle));
 		}
 	}
 
@@ -297,15 +287,17 @@ export class Game {
 		}
 
 		//Collision players
-		this.players.forEach((player, index)=> {this.handleCollision({
-			x: (index == 0) ? 0 : canvasWidth - player.paddleWidth,
-			y: player.pos,
-			width: player.paddleWidth,
-			height: player.paddleLength
-		}, newBall, player.momentum)})
+		this.players.forEach((player, index) => {
+			this.handleCollision({
+				x: (index == 0) ? 0 : canvasWidth - player.paddleWidth,
+				y: player.pos,
+				width: player.paddleWidth,
+				height: player.paddleLength
+			}, {pos: this.posBall, velocity: this.velocityBall}, newBall, player.momentum)
+		})
 
 		//Collision assets
-		this.assets.forEach((asset) => this.handleCollision(asset, newBall))
+		this.assets.forEach((asset) => this.handleCollision(asset,{pos: this.posBall, velocity: this.velocityBall} , newBall))
 
 		this.posBall = newBall;
 	}
