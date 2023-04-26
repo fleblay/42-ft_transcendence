@@ -15,6 +15,8 @@ import { Modal } from '@mui/material';
 
 import { UsernameDialog } from './UsernameDialog';
 import { UserDataProvider, UserDataContext } from '../userDataProvider/userDataProvider';
+import { SocialDistanceTwoTone } from '@mui/icons-material';
+import { SocketContext } from '../socket/SocketProvider';
 
 function fileToBlob(file: File) {
 	const blob = new Blob([file], { type: file.type });
@@ -30,7 +32,7 @@ export function UpdateProfil()
     const [dfa, setDfa] = useState<boolean>(false);
     const { userData , setUserData } = useContext(UserDataContext);
     const [responseFile, setResponseFile] = useState<string>('');
-    
+    const socket = useContext(SocketContext);
 
     useEffect(() => {
         if (userData?.dfa !== undefined)

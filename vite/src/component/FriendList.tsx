@@ -117,7 +117,7 @@ export function FriendList() {
 
 							return (
 								<React.Fragment key={friend.id}>
-									<UserInfoDisplay idPlayer={`${friend.id}`} itsme={false} relation={friend} setRelation={()=>{}}  />
+									<UserInfoDisplay idPlayer={`${friend.id}`} displayBlocked={false}  />
 									{/* <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
 
 										<Box sx={{ mr: '20px', ml: '20px' }}>

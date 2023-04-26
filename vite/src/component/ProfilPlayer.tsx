@@ -20,45 +20,21 @@ export function ProfilPlayer() {
 	const { customEmit, socket, customOn, customOff } = useContext(SocketContext);
 	const { userData, setUserData } = useContext(UserDataContext);
 	const auth = useAuthService();
-	const [relation, setRelation] = useState<Friend | null>(null);
 	const [itsMe, setItsMe] = useState<boolean>(false);
-	const [isBlocked, setIsBlocked] = useState<boolean>(false);
+
 
 
 	React.useEffect(() => {
 		console.log("idPlayer", idPlayer);
 		if (!auth.user) return;
-		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id) {
+		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id)
 			setItsMe(true);
-		}
-		else {
-			setItsMe(false);
-			if (idPlayer !== undefined) {
-				apiClient.get(`/api/users/friends/${idPlayer}`).then((response) => {
-					console.log("response friend:", response.data);
-					setRelation(response.data);
-				}).catch((error) => {
-					console.log(error);
 
-				});
-				apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
-					const blockList = response.data as Blocked[];
-					setIsBlocked(blockList.find((ban) => ban.id === parseInt(idPlayer)) !== undefined);
-				}).catch((error) => {
-					console.log(error);
-				}
-				);
-
-			}
-
-		}
-
-	}, [auth.user, idPlayer, userData])
-
+	}, [auth.user, idPlayer])
 
 
 	React.useEffect(() => {
-		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
+		apiClient.get(`/api/users/${idPlayer}`).then((response) => { 
 			console.log("response", response);
 			setUserData(response.data);
 			console.log("userData", userData);
@@ -67,7 +43,7 @@ export function ProfilPlayer() {
 		});
 	}, [idPlayer])
 
-	React.useEffect(() => {
+	/* React.useEffect(() => {
 		if (!socket) return;
 		customOn('page.player', (data: any) => {
 			console.log("data", data);
@@ -78,7 +54,7 @@ export function ProfilPlayer() {
 			customOff('page.player');
 		})
 	}, [socket, userData]);
-
+ */
 
 	if (!userData) return (<div>Loading data</div>);
 
@@ -97,7 +73,7 @@ export function ProfilPlayer() {
 							{userData?.username}
 						</Typography>
 					</AppBar>
-					<UserInfoDisplay idPlayer={idPlayer} relation={relation} setRelation={setRelation} itsme={itsMe} />
+					<UserInfoDisplay idPlayer={idPlayer} displayBlocked={true}/>
 					<UserAchivement />
 
 					<Box position="static" sx={{

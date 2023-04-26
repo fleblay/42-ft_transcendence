@@ -172,8 +172,25 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@SubscribeMessage('client.nav')
 	handleClientNav(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: {to :string, from : string }): void {
 		this.updateSocket(client, "clientNav");
+		console.log("data.to", data.to)
 		client.join(data.to);
 		client.leave(data.from);
 	}
+
+	@SubscribeMessage('client.component.join')
+	handleClientComponentJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: {subscription : string}): void 
+	{
+		this.updateSocket(client, "clien.component.join");
+		client.join(data.subscription);
+	}
+
+	@SubscribeMessage('client.component.leave')
+	handleClientComponentLeave(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: {unsubscibe : string}): void
+	{
+		console.log("leave", data.unsubscibe)
+		client.leave(data.unsubscibe);
+	}
+
+
 
 }

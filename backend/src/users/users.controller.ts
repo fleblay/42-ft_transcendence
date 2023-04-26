@@ -114,6 +114,13 @@ export class UsersController {
 		return await this.usersService.getBlockedUsersList(parseInt(id));
 	}
 
+	@UseGuards(ATGuard)
+	@Get('/getBlocked/:id')
+	async getBlockedUser(@CurrentUser() user: User, @Param("id") id: string) {
+		return await this.usersService.getBlocked(user, parseInt(id));
+	}
+
+
 
 	@UseGuards(ATGuard)
 	@Post('/addFriend/:id')

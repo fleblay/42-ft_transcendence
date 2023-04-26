@@ -47,6 +47,7 @@ export class GameService {
 			throw new NotFoundException('Game not found');
 		game.addUser(user, client);
 		//this.usersService.addConnectedUser(user.id)
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
 		return { gameId: game.gameId, gameInfo: game.generateGameInfo() };
 	}
 
@@ -78,6 +79,7 @@ export class GameService {
 	}
 
 	quitGame(userId: number, gameId: UUID) {
+		this.server.to(`/player/${userId}`).emit('page.player', {})
 		const game = this.gameCluster.playerQuit(gameId, userId);
 		if (game) {
 			const savedGame = game.generateSavedGameInfo();

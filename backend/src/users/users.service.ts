@@ -177,7 +177,6 @@ export class UsersService {
 
 		this.server.to(`/player/${user.id}`).emit('page.player', {})
 		this.server.to(`/player/${friendId}`).emit('page.player', {})
-
 		return newFriend;
 	}
 
@@ -210,6 +209,8 @@ export class UsersService {
 		friendRequest.status = 'accepted';
 		this.friendReqRepo.save(friendRequest);
 		this.unblockUser(user, friendId);
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${friendId}`).emit('page.player', {})
 		return this.generateFriend(user, friend, friendRequest);
 	}
 
@@ -220,6 +221,8 @@ export class UsersService {
 			return null;
 		}
 		this.friendReqRepo.softRemove(friendRequest);
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${friendId}`).emit('page.player', {})
 		return {
 			friendId: friendId,
 			status: 'declined'
@@ -233,6 +236,8 @@ export class UsersService {
 		}
 		this.removeFriend(user, blockedId);
 		user.blockedId.push(blockedId);
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${blockedId}`).emit('page.player', {})
 		return this.repo.save(user);
 	}
 
@@ -243,6 +248,8 @@ export class UsersService {
 			return;
 		}
 		user.blockedId.splice(index, 1);
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${blockedId}`).emit('page.player', {})
 		return this.repo.save(user);
 	}
 
@@ -277,6 +284,17 @@ export class UsersService {
 		if (!friend)
 			return null;
 		return this.generateFriend(user, friend, friendRequest);
+	}
+
+	async getBlocked(user: User, friendId: number): Promise <Blocked | null> {
+		if (!user)
+			throw new NotFoundException("User not found");
+		if (user.blockedId.includes(friendId))
+			return {
+				id: friendId,
+				username: (await this.findOne(friendId)).username
+			}
+		return null;
 	}
 
 	async getFriendsList(user: User, wantedStatus: FriendRequestStatus = 'accepted'): Promise<Friend[]> {
