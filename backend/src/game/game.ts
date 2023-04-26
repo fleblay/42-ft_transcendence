@@ -6,7 +6,7 @@ import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
 const victoryRounds = 5
-const paddleLength = 300
+const paddleLength = 550 // 550 for debug and remove reduce, 300 otherwise
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 2
@@ -189,9 +189,9 @@ export class Game {
 				this.countdown(5)
 				this.reduceInterval = setInterval(() => {
 					if (this.players[0].paddleLength > 70)
-						this.players[0].paddleLength -= 2
+						this.players[0].paddleLength -= 0 // 2 normal, 0 debug
 					if (this.players[1].paddleLength > 70)
-						this.players[1].paddleLength -= 2
+						this.players[1].paddleLength -= 0 // 2 normal, 0 debug
 				}, 500)
 			}
 		}

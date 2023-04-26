@@ -135,8 +135,13 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
-
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
+	const [canvasRatio, setCanvasRatio] = useState<number>(0.8)
+
+	useEffect(() => {
+		window.addEventListener("resize", () => setCanvasRatio(0.8 * window.innerWidth / canvasWidth))
+		return () => setCanvasRatio(0.8 * window.innerWidth / canvasWidth)
+	}, [])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -181,8 +186,6 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		if (!context2d) return;
 
 		context.current = context2d;
-		if (canvasRef.current)
-			canvasRef.current.style.border = '1px solid black'
 	}, []); // 1 seul call quand le return est fait
 
 	useEffect(() => {
@@ -194,56 +197,55 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		const ballcolor = "rgba(230, 190, 1, 1.0)"
 
 		// Clear canvas
-		context.current.clearRect(0, 0, canvasWidth, canvasHeight);
+		context.current.clearRect(0, 0, canvasWidth * canvasRatio, canvasHeight * canvasRatio);
 		context.current.fillStyle = "rgba(0, 0, 0, 1)";
-		context.current.fillRect(0, 0, canvasWidth, canvasHeight);
+		context.current.fillRect(0, 0, canvasWidth * canvasRatio, canvasHeight * canvasRatio);
 
 		// Player One
 		context.current.fillStyle = player1color
 		if (gameInfo.players[0])
-			context.current.fillRect(0, gameInfo.players[0].pos, gameInfo.players[0].paddleWidth, gameInfo.players[0].paddleLength);
+			context.current.fillRect(0, gameInfo.players[0].pos * canvasRatio, gameInfo.players[0].paddleWidth * canvasRatio, gameInfo.players[0].paddleLength * canvasRatio);
 		// Player Two
 		context.current.fillStyle = player2color
 		if (gameInfo.players[1])
-			context.current.fillRect(canvasWidth - gameInfo.players[1].paddleWidth, gameInfo.players[1].pos, gameInfo.players[1].paddleWidth, gameInfo.players[1].paddleLength);
+			context.current.fillRect((canvasWidth - gameInfo.players[1].paddleWidth) * canvasRatio, gameInfo.players[1].pos * canvasRatio, gameInfo.players[1].paddleWidth * canvasRatio, gameInfo.players[1].paddleLength * canvasRatio);
 
 		// Assets
 		context.current.fillStyle = assetcolor
 		if (gameInfo.assets.length > 0) {
 			gameInfo.assets.forEach((asset) => {
-				context.current?.fillRect(asset.x, asset.y, asset.width, asset.height);
+				context.current?.fillRect(asset.x * canvasRatio, asset.y * canvasRatio, asset.width * canvasRatio, asset.height * canvasRatio);
 			})
 		}
 
 		// center line
 		context.current.beginPath();
 		context.current.strokeStyle = "white";
-		context.current.moveTo(canvasWidth / 2, 0);
-		context.current.lineTo(canvasWidth / 2, canvasHeight);
+		context.current.moveTo(canvasWidth * canvasRatio / 2, 0);
+		context.current.lineTo(canvasWidth * canvasRatio / 2, canvasHeight * canvasRatio);
 		context.current.stroke();
 
 		// Ball
 		context.current.fillStyle = ballcolor
 		context.current.beginPath();
-		context.current.arc(gameInfo.posBall.x, gameInfo.posBall.y, ballSize, 0, 2 * Math.PI)
+		context.current.arc(gameInfo.posBall.x * canvasRatio, gameInfo.posBall.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
 		context.current.fill();
 
 
 		// Scores
-		context.current.font = "48px serif"
-		context.current.fillText(`${gameInfo.players[0].score}`, canvasWidth / 2 - 80, 80)
+		context.current.font = `${48 * canvasRatio}px serif`
+		context.current.fillText(`${gameInfo.players[0].score}`, (canvasWidth/ 2 - 80) * canvasRatio, 80 * canvasRatio)
 		if (gameInfo.players[1])
-			context.current.fillText(`${gameInfo.players[1].score}`, canvasWidth / 2 + 60, 80)
+			context.current.fillText(`${gameInfo.players[1].score}`, (canvasWidth/ 2 + 60) * canvasRatio, 80 * canvasRatio)
 
 		// Player Info
-		context.current.font = "20px serif"
+		context.current.font = `${20 * canvasRatio}px serif`
 		context.current.fillStyle = player1color
-		context.current.fillText(`${gameInfo.players[0].user.username}`, 5, 20)
-		context.current.font = "20px serif"
+		context.current.fillText(`${gameInfo.players[0].user.username}`, 5 * canvasRatio, 20 * canvasRatio)
 		context.current.fillStyle = player2color
 		if (gameInfo.players[1]) {
 			const player2username = gameInfo.players[1].user.username
-			context.current.fillText(player2username, canvasWidth - (5 + context.current.measureText(player2username).width), 20)
+			context.current.fillText(player2username, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2username).width), 20 * canvasRatio)
 		}
 
 	}, [gameInfo.players, gameInfo.posBall]);
@@ -280,7 +282,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		<div> status: {gameInfo?.status} </div>
 		<div> date: {gameInfo?.date.toString()} </div>
 		<div>
-			<canvas width={canvasWidth} height={canvasHeight} ref={canvasRef} />
+			<canvas width={canvasWidth * canvasRatio} height={canvasHeight * canvasRatio} style={{ border: "1px solid black", display: "block", marginLeft : "auto", marginRight: "auto" }} ref={canvasRef} />
 		</div>
 	</div>
 }
