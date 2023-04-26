@@ -135,7 +135,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
-	const [keyDown, setKeyDown] = useState({ up: false, down: false , shoot: false});
+	const [keyDown, setKeyDown] = useState({ up: false, down: false, shoot: false });
 	const [canvasRatio, setCanvasRatio] = useState<number>(0.7 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
 	const bottomRef = useRef<HTMLInputElement>(null)
@@ -152,11 +152,10 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 
 	useEffect(() => {
 		window.addEventListener("resize", handleResize)
-		if (bottomRef.current)
-			{
+		if (bottomRef.current) {
 			bottomRef.current.scrollIntoView({ behavior: "smooth" })
 			console.log("Going down")
-			}
+		}
 		return (() => {
 			window.removeEventListener("resize", handleResize)
 		})
@@ -181,13 +180,13 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		function handleKeyDown(e: KeyboardEvent) {
 			e.preventDefault();
 			if (e.key === 'ArrowUp' && keyDown.up === false) {
-				setKeyDown({ up: true, down: false , shoot: false})
+				setKeyDown({ up: true, down: false, shoot: false })
 			}
 			if (e.key === 'ArrowDown' && keyDown.down === false) {
-				setKeyDown({ up: false, down: true , shoot: false})
+				setKeyDown({ up: false, down: true, shoot: false })
 			}
 			if (e.key === ' ' && keyDown.shoot === false) {
-				setKeyDown({ up: false, down: false , shoot: true})
+				setKeyDown({ up: false, down: false, shoot: true })
 			}
 		}
 		function handleKeyUp(e: KeyboardEvent) {
@@ -195,10 +194,10 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 				setKeyDown({ up: false, down: false, shoot: false })
 			}
 			if (e.key === 'ArrowDown') {
-				setKeyDown({ up: false, down: false , shoot: false})
+				setKeyDown({ up: false, down: false, shoot: false })
 			}
 			if (e.key === ' ') {
-				setKeyDown({ up: false, down: false , shoot: false})
+				setKeyDown({ up: false, down: false, shoot: false })
 			}
 		}
 		window.addEventListener('keydown', handleKeyDown)
@@ -259,6 +258,13 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		context.current.arc(gameInfo.posBall.x * canvasRatio, gameInfo.posBall.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
 		context.current.fill();
 
+		// Shoot
+		context.current.fillStyle = ballcolor
+		if (gameInfo.shootP1.active) {
+			context.current.beginPath();
+			context.current.arc(gameInfo.shootP1.pos.x * canvasRatio, gameInfo.shootP1.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+			context.current.fill();
+		}
 
 		// Scores
 		context.current.font = `${48 * canvasRatio}px serif`

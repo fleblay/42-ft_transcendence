@@ -84,7 +84,7 @@ enum Collide { "none" = 0, "left", "right", "down", "up" }
 export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
-	private shootP1: projectile = { pos: { x: 0, y: 0 }, velocity: { x: 0, y: 0 }, active: false }
+	private shootP1: projectile = { pos: { x: 0, y: canvasHeight / 2 }, velocity: { x: 1, y: 0 }, active: false }
 	private intervalId: NodeJS.Timer
 	private reduceInterval: NodeJS.Timer
 	public players: Player[] = []
@@ -136,6 +136,7 @@ export class Game {
 					break
 				case ("Shoot"):
 					console.log("Shoot")
+					this.shootP1.active = true
 					break
 				default:
 			}
@@ -361,6 +362,8 @@ export class Game {
 
 			//Gestion de la collision des assets avec mouvement
 			this.updateBall({ pos: this.posBall, velocity: this.velocityBall })
+			if (this.shootP1.active)
+				this.updateBall(this.shootP1)
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
