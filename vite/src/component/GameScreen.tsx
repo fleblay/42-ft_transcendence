@@ -136,15 +136,30 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
 	const [keyDown, setKeyDown] = useState({ up: false, down: false });
-	const [canvasRatio, setCanvasRatio] = useState<number>(0.8)
+	const [canvasRatio, setCanvasRatio] = useState<number>(0.7 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
+	const bottomRef = useRef<HTMLInputElement>(null)
 
 	const handleClick = () => {
 		setDisplayInfo(!displayInfo)
 	}
+
+	const handleResize = () => {
+		setCanvasRatio(0.7 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
+		if (bottomRef.current)
+			bottomRef.current.scrollIntoView({ behavior: "smooth" })
+	}
+
 	useEffect(() => {
-		window.addEventListener("resize", () => setCanvasRatio(0.8 * window.innerWidth / canvasWidth))
-		return () => setCanvasRatio(0.8 * window.innerWidth / canvasWidth)
+		window.addEventListener("resize", handleResize)
+		if (bottomRef.current)
+			{
+			bottomRef.current.scrollIntoView({ behavior: "smooth" })
+			console.log("Going down")
+			}
+		return (() => {
+			window.removeEventListener("resize", handleResize)
+		})
 	}, [])
 
 	useEffect(() => {
@@ -275,8 +290,13 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 				</> : <></>}
 			</div>
 			<div>
-				<canvas width={canvasWidth * canvasRatio} height={canvasHeight * canvasRatio} style={{ border: "1px solid black", display: "block", marginLeft: "auto", marginRight: "auto" }} ref={canvasRef} />
+				<canvas width={canvasWidth * canvasRatio} height={canvasHeight * canvasRatio} style={{
+					border: "1px solid black", display: "block", marginLeft: "auto", marginRight: "auto"
+				}} ref={canvasRef} />
+			</div>
+			<div ref={bottomRef} style={{ height: "10px" }}>
 			</div>
 		</div>
 	)
 }
+
