@@ -24,6 +24,9 @@ export class User {
 	@Column({default : false})
 	dfa: boolean;
 
+	@Column()
+	dfaSecret: string;
+
 	@ManyToMany(() => SavedGame, (savedGame) => savedGame.players)
 	@JoinTable({})
 	savedGames: SavedGame[];

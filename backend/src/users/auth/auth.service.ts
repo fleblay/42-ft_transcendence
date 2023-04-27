@@ -9,6 +9,8 @@ import { RefreshToken } from '../../model/refresh-token.entity';
 import { Repository } from 'typeorm';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
+import {toDataURL} from 'qrcode'
+import {authenticator} from 'otplib'
 
 const scrypt = promisify(_scrypt);
 
@@ -25,6 +27,22 @@ export class AuthService {
 
 
 	constructor(@InjectRepository(RefreshToken) private repo: Repository<RefreshToken>, private usersService: UsersService, private jwtService: JwtService) { }
+
+	async generateQRCodeDataURL(user: User) : Promise<string> {
+		return toDataURL(authenticator.keyuri(
+			user.email,
+			"CYBER_PONG",
+			user.dfaSecret
+		))
+	}
+
+	turnOnDfa(userID: number): void {
+		this.usersService.update(userID, {dfa: true})
+	}
+
+	is2faCodeValid(dfaCode : string, user: User) {
+		return authenticator.verify({token: dfaCode, secret : user.dfaSecret})
+	}
 
 	async validateUser(email: string, pass: string): Promise<any> {
 		const user = await this.usersService.findOneByEmail(email);
@@ -74,6 +92,9 @@ export class AuthService {
 			throw new ForbiddenException('Password not match');
 		if (user.stud && checkStud)
 			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
+		if (user.dfa){
+
+		}
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
 		// console.log(`tokens are ${tokens.access_token}`);
@@ -98,7 +119,7 @@ export class AuthService {
 
 		dataUser.password = await this.hashPassword(dataUser.password);
 
-		const user = await this.usersService.create(dataUser);
+		const user = await this.usersService.create({...dataUser, dfaSecret : authenticator.generateSecret()});
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refresh_token);
 		// console.log(`tokens are access [${tokens.access_token}], refresh [${tokens.refresh_token}]`);

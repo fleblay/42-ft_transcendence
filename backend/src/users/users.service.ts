@@ -16,6 +16,7 @@ import { Server, Socket } from 'socket.io'
 import { FriendsService } from '../friends/friends.service';
 
 
+
 @Injectable()
 export class UsersService {
 
@@ -34,9 +35,9 @@ export class UsersService {
 	}
 
 
-	create(dataUser: CreateUserDto) {
+	create(dataUser: CreateUserDto & {dfaSecret: string}) {
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
-		const user = this.repo.create(dataUser);
+		const user = this.repo.create(dataUser)
 		console.log("save user :", user);
 		return this.repo.save(user);
 	}
@@ -75,8 +76,8 @@ export class UsersService {
 		return await this.repo.findOneBy({ email });
 	}
 
-	async update(id: number, dataUser: CreateUserDto) {
-		await this.repo.update(id, dataUser);
+	async update(id: number, partialUser: Partial<User>) {
+		await this.repo.update(id, partialUser);
 		return this.findOne(id);
 	}
 
@@ -201,12 +202,14 @@ export class UsersService {
 		return BlockedList;
 	}
 
-	async dfa(user: User): Promise<User> {
-
+	dfa(user: User): Promise<User> {
+		return this.update(user.id, {dfa: !user.dfa})
+		/*
 		if (user.dfa)
 			user.dfa = false;
 		else
 			user.dfa = true;
 		return this.repo.save(user);
+		*/
 	}
 }

@@ -1,4 +1,4 @@
-import { Controller, Request, Query, Redirect, Response } from '@nestjs/common';
+import { Controller, Request, Query, Redirect, Response, Body, HttpCode, UnauthorizedException} from '@nestjs/common';
 import { Response as ExpressResponse } from 'express'
 import { Get } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common';
@@ -6,6 +6,7 @@ import { ATGuard } from '../guard/access-token.guard';
 import { RTGuard } from '../guard/refresh-token.guard';
 import { AuthService } from './auth.service';
 import { Post } from '@nestjs/common';
+import {DfaCodeDto} from '../dtos/dfa-code.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -91,4 +92,14 @@ export class AuthController {
 		res.redirect(302, '/')
 	}
 
+	@Post('turn-on-2fa')
+	@HttpCode(200)
+	@UseGuards(ATGuard)
+	async turnDfaOn(@Request() req ,  @Body() {code} : DfaCodeDto) {
+		const isValidCode = this.authService.is2faCodeValid(code, req.currentUser)
+
+		if (!isValidCode)
+			throw new UnauthorizedException("I don't think so")
+		this.authService.turnOnDfa(req.currentUser.id)
+	}
 }

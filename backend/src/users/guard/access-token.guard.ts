@@ -7,6 +7,7 @@ import { AuthService } from '../auth/auth.service';
 import { Request } from 'express';
 import { HttpException } from '@nestjs/common';
 import jwt_decode from "jwt-decode";
+import {User} from '../../model/user.entity'
 
 
 @Injectable()
@@ -33,7 +34,7 @@ export class ATGuard implements CanActivate {
 			console.log("ATGuard: no user");
 			return false;
 		}
-		(request as any).currentUser  = user;
+		(request as Request & {currentUser: User}).currentUser  = user;
 		return true;
 	}
 }

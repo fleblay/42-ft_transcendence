@@ -116,8 +116,13 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Post('/toggle2fa')
-	async dfa(@CurrentUser() user: User) {
-		return await this.usersService.dfa(user);
+	toggleDfa(@CurrentUser() user: User) {
+		if (!user.dfa)
+			return this.authService.generateQRCodeDataURL(user);
+		else {
+			this.usersService.dfa(user)
+			return ("turned-off")
+		}
 	};
 
 	@Get('/:id')

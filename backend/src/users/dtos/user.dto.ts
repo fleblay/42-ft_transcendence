@@ -10,4 +10,7 @@ export class UserDto {
 
 	@Exclude()
 	blockedId: number[];
+
+	@Exclude()
+	dfaSecret: string;
 }
