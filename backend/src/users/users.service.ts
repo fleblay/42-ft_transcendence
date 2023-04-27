@@ -13,7 +13,7 @@ import { forwardRef } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { FriendRequest, FriendRequestStatus } from '../model/friend-request.entity';
 import { Server, Socket } from 'socket.io'
-import { FriendsService } from './friends.service';
+import { FriendsService } from '../friends/friends.service';
 
 
 @Injectable()
@@ -24,7 +24,6 @@ export class UsersService {
 	constructor(
 		@InjectRepository(User) private repo: Repository<User>,
 		@Inject(forwardRef(() => GameService)) private gameService: GameService,
-		@InjectRepository(FriendRequest) private friendReqRepo: Repository<FriendRequest>,
 		@Inject(forwardRef(() => FriendsService)) private friendsService: FriendsService
 	) {
 		//setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)

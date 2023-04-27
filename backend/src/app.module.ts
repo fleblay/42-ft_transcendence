@@ -12,6 +12,7 @@ import { SavedGame } from './model/saved-game.entity';
 import { RefreshToken } from './model/refresh-token.entity';
 import { AuthModule } from './users/auth/auth.module';
 import { FriendRequest } from './model/friend-request.entity';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
 	imports: [
@@ -34,7 +35,8 @@ import { FriendRequest } from './model/friend-request.entity';
 		UsersModule,
 		EventsModule,
 		GameModule,
-		AuthModule
+		AuthModule,
+		FriendsModule
 	],
 	controllers: [AppController],
 	providers: [AppService],

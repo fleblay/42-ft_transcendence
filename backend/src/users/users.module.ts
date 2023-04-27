@@ -7,21 +7,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { RefreshToken } from '../model/refresh-token.entity';
 import {GameModule} from '../game/game.module'
-import { FriendRequest } from 'src/model/friend-request.entity';
-import { FriendsService } from './friends.service';
+import { FriendsService } from '../friends/friends.service';
+import { FriendsModule } from 'src/friends/friends.module';
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([User, RefreshToken, FriendRequest]),
+		TypeOrmModule.forFeature([User, RefreshToken]),
 		JwtModule.register({
 			secret: 'secret', // not secure at all need to be changed in production  put in a .env file
 			signOptions: { expiresIn: '600s' },
 		}),
-		forwardRef(() => GameModule)
+		forwardRef(() => GameModule),
+		forwardRef(() => FriendsModule)
 	],
 	controllers: [UsersController],
-	providers: [AuthService, UsersService, FriendsService,],
-	exports: [AuthService, FriendsService, UsersService],
+	providers: [AuthService, UsersService],
+	exports: [AuthService, UsersService],
 })
 export class UsersModule { }
-//

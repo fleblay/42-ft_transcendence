@@ -16,8 +16,6 @@ import { SavedGame } from '../model/saved-game.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { FriendRequestStatus } from '../model/friend-request.entity';
-import { FriendsService } from './friends.service';
-
 
 @Controller('users')
 export class UsersController {
@@ -26,7 +24,6 @@ export class UsersController {
 		private authService: AuthService,
 		@Inject(forwardRef(() => GameService))
 		private gameService: GameService,
-		private friendsService: FriendsService
 	) { }
 
 	//@UseGuards(LocalAuthGuard)
@@ -93,24 +90,6 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
-	@Get('/friends')
-	getFriendsList(@CurrentUser() user: User, @Query('status') status: FriendRequestStatus) {
-		return this.friendsService.getFriendsList(user, status);
-	}
-
-	@UseGuards(ATGuard)
-	@Get('/friends/:id')
-	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
-		return this.friendsService.getFriend(user, parseInt(id));
-	}
-
-	@UseGuards(ATGuard)
-	@Post('/acceptFriend/:id')
-	async acceptFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.friendsService.acceptFriend(user, parseInt(id));
-	}
-
-	@UseGuards(ATGuard)
 	@Get('/blocked/:id')
 	async getBlockedUsersList(@Param("id") id: string) {
 		return await this.usersService.getBlockedUsersList(parseInt(id));
@@ -122,19 +101,6 @@ export class UsersController {
 		return await this.usersService.getBlocked(user, parseInt(id));
 	}
 
-
-
-	@UseGuards(ATGuard)
-	@Post('/addFriend/:id')
-	async addFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.friendsService.addFriend(user, parseInt(id));
-	}
-
-	@UseGuards(ATGuard)
-	@Post('/removeFriend/:id')
-	async removeFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.friendsService.removeFriend(user, parseInt(id));
-	}
 
 	@UseGuards(ATGuard)
 	@Post('/blockUser/:id')

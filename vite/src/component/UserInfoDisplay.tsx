@@ -16,7 +16,7 @@ import { useAuthService } from '../auth/AuthService';
 interface UserInfoDisplayProps {
 	idPlayer: string | undefined;
 	displayBlocked : boolean;
-	
+
 }
 
 export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayProps) {
@@ -31,7 +31,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 	const [displayUpdate, setDisplayUpdate] = useState<boolean>(false);
 
 	React.useEffect(() => {
-		apiClient.get(`/api/users/${idPlayer}`).then((response) => { 
+		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
 			console.log("response", response);
 			setUserData(response.data);
 			console.log("userData", userData);
@@ -49,7 +49,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 		else {
 			setItsMe(false);
 			if (idPlayer !== undefined) {
-				apiClient.get(`/api/users/friends/${idPlayer}`).then((response) => {
+				apiClient.get(`/api/friends/${idPlayer}`).then((response) => {
 					console.log("response friend:", response.data);
 					setRelation(response.data);
 				}).catch((error) => {
@@ -94,12 +94,12 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 
 	React.useEffect(() => {
 			return () => {
-				const room = `/player/${idPlayer}`;					
+				const room = `/player/${idPlayer}`;
 				setUnsubscribe(room);
 			  console.log("cleaned up");
 			};
 		  }, []);
-		
+
 	React.useEffect(() => {
 			if (!socket) return;
 			customOn('page.player', (data: any) => {
@@ -114,7 +114,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 
 
 	const handleAddFriend = () => {
-		apiClient.post(`/api/users/addFriend/${idPlayer}`).then((response) => {
+		apiClient.post(`/api/friends/add/${idPlayer}`).then((response) => {
 			console.log("reponseAddFriend", response.data);
 			if (response.data) {
 				setRelation(response.data);
@@ -125,7 +125,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 	}
 
 	const handleAcceptFriend = () => {
-		apiClient.post(`/api/users/acceptFriend/${idPlayer}`).then((response) => {
+		apiClient.post(`/api/friends/accept/${idPlayer}`).then((response) => {
 			console.log("reponseAcceptFriend", response.data);
 			if (response.data) {
 				setRelation(response.data);
@@ -136,7 +136,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 	}
 
 	const handleRemoveFriend = () => {
-		apiClient.post(`/api/users/removeFriend/${idPlayer}`).then((response) => {
+		apiClient.post(`/api/friends/remove/${idPlayer}`).then((response) => {
 			console.log("remove", response.data);
 			if (response.data) {
 				setRelation(null);
