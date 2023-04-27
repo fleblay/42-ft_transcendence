@@ -6,7 +6,7 @@ import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
 const victoryRounds = 5
-const paddleLength = 250 // 550 for debug and remove reduce, 300 otherwise
+const paddleLength = 300 // 550 for debug and remove reduce, 300 otherwise
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 2
@@ -14,6 +14,7 @@ const playerSpeed = 3
 const canvasHeight = 600
 const canvasWidth = 800
 const MaxBounceAngle = Math.PI / 12;
+const maxBounce = 3
 
 export type Pos2D = {
 
@@ -24,7 +25,8 @@ export type Pos2D = {
 export type projectile = {
 	pos: Pos2D,
 	velocity: Pos2D,
-	active: boolean
+	active: boolean,
+	maxBounce: number
 }
 
 export type GameSetting = {
@@ -104,7 +106,6 @@ export class Game {
 	}
 
 	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
-		//console.log("game input handle")
 		const foundPlayer = this.players.find(player => userId === player.user.id)
 		if (foundPlayer === null)
 			return
@@ -136,9 +137,8 @@ export class Game {
 					foundPlayer.timeLastMove = Date.now()
 					break
 				case ("Shoot"):
-					//		console.log("Shoot")
 					if (foundPlayer.shoot.active == false) {
-						foundPlayer.shoot.pos.x = (foundPlayer == this.players[0]) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1)
+						//foundPlayer.shoot.pos.x = (foundPlayer == this.players[0]) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1)
 						foundPlayer.shoot.active = true
 					}
 					break
@@ -201,6 +201,7 @@ export class Game {
 				shoot: {
 					pos: { x: (this.players.length == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
 					velocity: { x: (this.players.length == 0) ? 1 : -1, y: 0 },
+					maxBounce : 3,
 					active: false
 				},
 			})
@@ -212,9 +213,9 @@ export class Game {
 			if (this.players.length === 2) {
 				this.countdown(5)
 				this.reduceInterval = setInterval(() => {
-					if (this.players[0].paddleLength > 70)
+					if (this.players[0].paddleLength > 100)
 						this.players[0].paddleLength -= 0 // 2 normal, 0 debug
-					if (this.players[1].paddleLength > 70)
+					if (this.players[1].paddleLength > 100)
 						this.players[1].paddleLength -= 0 // 2 normal, 0 debug
 				}, 500)
 			}
@@ -275,13 +276,11 @@ export class Game {
 		//Calcul du changement de trajectoire de la balle, et update de sa nouvelle position
 		if (collide) {
 			if (bouncing) {
-				console.log('Bouncing')
 				if (collide == Collide.left || collide == Collide.right) {
 					relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
 					bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
 					ball.velocity.x = newballSpeed * ((collide == Collide.right) ? 1 : -1) * Math.cos(bounceAngle); // seul changement
 					ball.velocity.y = newballSpeed * -Math.sin(bounceAngle);
-					console.log("1Ater Bounce", newBall, ball.pos)
 					ballTravelAfterBounce = (newBall.y != ball.pos.y) ? (newBall.y - intersect.y) / (newBall.y - ball.pos.y) : 0
 				}
 
@@ -290,17 +289,14 @@ export class Game {
 					bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
 					ball.velocity.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
 					ball.velocity.y = newballSpeed * ((collide == Collide.down) ? 1 : -1) * Math.cos(bounceAngle);
-					console.log("2Ater Bounce", newBall, ball.pos)
 					ballTravelAfterBounce = (newBall.x != ball.pos.x) ? (newBall.x - intersect.x) / (newBall.x - ball.pos.x) : 0
 				}
 				newBall.x = intersect.x + (ballTravelAfterBounce * newballSpeed * Math.cos(bounceAngle));
 				newBall.y = intersect.y + (ballTravelAfterBounce * newballSpeed * Math.sin(bounceAngle));
-				console.log("Inside Boucing calculus", newBall.x , intersect.x, intersect.y , ballTravelAfterBounce, newballSpeed , Math.cos(bounceAngle))
 			}
 			else {
 				//mettre la pos de la balle a zero et set sa speed a 0
 			}
-			console.log("Inside handleCollision", newBall)
 			return true
 		}
 		else
@@ -332,13 +328,9 @@ export class Game {
 			}, ball, newBall, true, player.momentum)
 		})
 
-		if (!isNaN(newBall.x)) {
-			console.log(newBall.x)
-		}
-
 		//Collision assets
 		this.assets.forEach((asset) => {
-			collide = collide || this.handleCollision(asset, ball, newBall, true, 0)
+			collide = collide || this.handleCollision(asset, ball, newBall)
 		})
 
 		//Pointer Magic => cannot use ball.pos = newBall
@@ -381,14 +373,25 @@ export class Game {
 			this.updateBall({ pos: this.posBall, velocity: this.velocityBall })
 
 			//Projectiles
-			this.players.forEach((player) => {
+			this.players.forEach((player, index) => {
 				if (player.shoot.active)
 					if (this.updateBall(player.shoot)) {
-						//player.shoot.active = false  => pour desactiver balle after bounce
+						player.shoot.maxBounce--
 					}
-				if (player.shoot.pos.x <= 0 || player.shoot.pos.x >= canvasWidth)
+				if (index == 1 && player.shoot.pos.x <= 0) {
+					this.players[0].paddleLength *= (2 / 3)
+				}
+				else if (index == 0 && player.shoot.pos.x >= canvasWidth) {
+					this.players[1].paddleLength *= (2 / 3)
+				}
+				//Reset du shoot
+				if (player.shoot.pos.x <= 0 || player.shoot.pos.x >= canvasWidth || player.shoot.maxBounce == 0) {
 					player.shoot.active = false
-				console.log("shoot : ", player.shoot.active, player.shoot.pos.x, player.shoot.pos.y)
+					player.shoot.pos.x = (index == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1)
+					player.shoot.velocity.x = (index == 0) ? 1 : -1
+					player.shoot.velocity.y = 0
+					player.shoot.maxBounce = maxBounce
+				}
 			})
 
 			//Condition de marquage de point

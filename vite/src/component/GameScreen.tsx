@@ -231,12 +231,24 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 
 		// Player One
 		context.current.fillStyle = player1color
-		if (gameInfo.players[0])
+		if (gameInfo.players[0]) {
 			context.current.fillRect(0, gameInfo.players[0].pos * canvasRatio, gameInfo.players[0].paddleWidth * canvasRatio, gameInfo.players[0].paddleLength * canvasRatio);
+			if (gameInfo.players[0].shoot.active) {
+				context.current.beginPath();
+				context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+				context.current.fill();
+			}
+		}
 		// Player Two
 		context.current.fillStyle = player2color
-		if (gameInfo.players[1])
+		if (gameInfo.players[1]) {
 			context.current.fillRect((canvasWidth - gameInfo.players[1].paddleWidth) * canvasRatio, gameInfo.players[1].pos * canvasRatio, gameInfo.players[1].paddleWidth * canvasRatio, gameInfo.players[1].paddleLength * canvasRatio);
+			if (gameInfo.players[1].shoot.active) {
+				context.current.beginPath();
+				context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+				context.current.fill();
+			}
+		}
 
 		// Assets
 		context.current.fillStyle = assetcolor
@@ -258,21 +270,6 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		context.current.beginPath();
 		context.current.arc(gameInfo.posBall.x * canvasRatio, gameInfo.posBall.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
 		context.current.fill();
-
-		// Shoot P1
-		context.current.fillStyle = ballcolor
-		if (gameInfo.players[0] && gameInfo.players[0].shoot.active) {
-			context.current.beginPath();
-			context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
-			context.current.fill();
-		}
-
-		//Shoot P2
-		if (gameInfo.players[1] && gameInfo.players[1].shoot.active) {
-			context.current.beginPath();
-			context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
-			context.current.fill();
-		}
 
 		// Scores
 		context.current.font = `${48 * canvasRatio}px serif`
