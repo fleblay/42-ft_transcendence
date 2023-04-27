@@ -7,6 +7,10 @@ import { LoginUserDto } from '../dtos/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from '../../model/refresh-token.entity';
 import { Repository } from 'typeorm';
+import { randomBytes, scrypt as _scrypt } from 'crypto';
+import { promisify } from 'util';
+
+const scrypt = promisify(_scrypt);
 
 type Tokens = {
 	access_token: string;
@@ -62,7 +66,11 @@ export class AuthService {
 		const user = await this.usersService.findOneByEmail(dataUser.email);
 		if (!user)
 			throw new NotFoundException("User not existing");
-		if (user.password !== dataUser.password)
+
+		const [salt, storedHash] = user.password.split('.');
+		const hashedPassword = await this.hashPassword(dataUser.password, salt);
+
+		if (hashedPassword !== `${salt}.${storedHash}`)
 			throw new ForbiddenException('Password not match');
 		if (user.stud && checkStud)
 			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
@@ -82,12 +90,13 @@ export class AuthService {
 		return { access_token, refresh_token };
 	}
 
-
 	async register(dataUser: CreateUserDto) {
 		if (await this.usersService.findOneByEmail(dataUser.email))
 			throw new ForbiddenException('Email is not unique');
 		if (await this.usersService.findOneByUsername(dataUser.username))
 			throw new ForbiddenException('username is not unique');
+
+		dataUser.password = await this.hashPassword(dataUser.password);
 
 		const user = await this.usersService.create(dataUser);
 		const tokens = this.getTokens(user);
@@ -162,5 +171,14 @@ export class AuthService {
 	async deleteRefreshToken(refreshToken: string) {
 		const report = await this.repo.findOne({ where: { refreshToken } });
 		await this.repo.delete(report.id);
+	}
+
+	private async hashPassword(password: string, salt?: string) {
+		if (!salt)
+			salt = randomBytes(8).toString('hex');
+		const buf = (await scrypt(password, salt, 32)) as Buffer;
+
+		const hashedPassword = `${salt}.${buf.toString('hex')}`;
+		return hashedPassword;
 	}
 }
