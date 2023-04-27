@@ -22,6 +22,7 @@ export interface IPlayers {
 	timeLastMove: number,
 	paddleLength: number,
 	paddleWidth: number,
+	shoot: projectile,
 	score: number,
 	user: plainUser,
 	leaving: boolean,
@@ -45,7 +46,6 @@ export interface IgameInfo {
 	assets: IgameAsset[],
 	velocityBall: number,
 	posBall: Pos2D,
-	shootP1: projectile,
 	status: GameStatus,
 	date: Date,
 }

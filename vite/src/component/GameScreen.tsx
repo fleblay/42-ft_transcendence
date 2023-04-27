@@ -179,13 +179,14 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
 			e.preventDefault();
+			console.log(`>${e.key}<`)
 			if (e.key === 'ArrowUp' && keyDown.up === false) {
 				setKeyDown({ up: true, down: false, shoot: false })
 			}
 			if (e.key === 'ArrowDown' && keyDown.down === false) {
 				setKeyDown({ up: false, down: true, shoot: false })
 			}
-			if (e.key === ' ' && keyDown.shoot === false) {
+			if (e.key === 'ArrowRight' && keyDown.shoot === false) {
 				setKeyDown({ up: false, down: false, shoot: true })
 			}
 		}
@@ -196,7 +197,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			if (e.key === 'ArrowDown') {
 				setKeyDown({ up: false, down: false, shoot: false })
 			}
-			if (e.key === ' ') {
+			if (e.key === 'ArrowRight') {
 				setKeyDown({ up: false, down: false, shoot: false })
 			}
 		}
@@ -258,11 +259,18 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		context.current.arc(gameInfo.posBall.x * canvasRatio, gameInfo.posBall.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
 		context.current.fill();
 
-		// Shoot
+		// Shoot P1
 		context.current.fillStyle = ballcolor
-		if (gameInfo.shootP1.active) {
+		if (gameInfo.players[0] && gameInfo.players[0].shoot.active) {
 			context.current.beginPath();
-			context.current.arc(gameInfo.shootP1.pos.x * canvasRatio, gameInfo.shootP1.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+			context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+			context.current.fill();
+		}
+
+		//Shoot P2
+		if (gameInfo.players[1] && gameInfo.players[1].shoot.active) {
+			context.current.beginPath();
+			context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
 			context.current.fill();
 		}
 

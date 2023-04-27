@@ -50,6 +50,7 @@ export type Player = {
 	timeLastMove: number,
 	paddleLength: number,
 	paddleWidth: number,
+	shoot: projectile,
 	score: number,
 	user: User,
 	leaving: boolean,
@@ -68,7 +69,6 @@ export interface IgameInfo {
 	players: Partial<Player>[], // requiered partial to strip client for Players
 	assets: gameAsset[],
 	posBall: Pos2D,
-	shootP1: projectile,
 	velocityBall: number,
 	status: GameStatus,
 	date: Date
@@ -84,7 +84,6 @@ enum Collide { "none" = 0, "left", "right", "down", "up" }
 export class Game {
 	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
 	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
-	private shootP1: projectile = { pos: { x: 0, y: canvasHeight / 2 }, velocity: { x: 1, y: 0 }, active: false }
 	private intervalId: NodeJS.Timer
 	private reduceInterval: NodeJS.Timer
 	public players: Player[] = []
@@ -136,7 +135,7 @@ export class Game {
 					break
 				case ("Shoot"):
 					console.log("Shoot")
-					this.shootP1.active = true
+					foundPlayer.shoot.active = true
 					break
 				default:
 			}
@@ -160,7 +159,6 @@ export class Game {
 			players: partialPlayers, // instead of Player
 			assets: this.assets,
 			posBall: this.posBall,
-			shootP1: this.shootP1,
 			status: this.status,
 			velocityBall: Math.sqrt(Math.pow(this.velocityBall.x, 2) + Math.pow(this.velocityBall.y, 2)),
 			date: new Date()
@@ -194,7 +192,11 @@ export class Game {
 				score: 0,
 				user,
 				leaving: false,
-				clientId: client.id
+				clientId: client.id,
+				shoot: {
+					pos: { x: (this.players.length == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
+					velocity: { x: (this.players.length == 0) ? 1 : -1, y: 0 }, active: false
+				},
 			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1) {
@@ -362,8 +364,12 @@ export class Game {
 
 			//Gestion de la collision des assets avec mouvement
 			this.updateBall({ pos: this.posBall, velocity: this.velocityBall })
-			if (this.shootP1.active)
-				this.updateBall(this.shootP1)
+
+			//Projectiles
+			this.players.forEach((player)=> {
+			if (player.shoot.active)
+				this.updateBall(player.shoot)
+			})
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
