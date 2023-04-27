@@ -136,7 +136,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
 	const [keyDown, setKeyDown] = useState({ up: false, down: false, shoot: false });
-	const [canvasRatio, setCanvasRatio] = useState<number>(0.7 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
+	const [canvasRatio, setCanvasRatio] = useState<number>(0.9 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
 	const bottomRef = useRef<HTMLInputElement>(null)
 
@@ -145,7 +145,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 	}
 
 	const handleResize = () => {
-		setCanvasRatio(0.7 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
+		setCanvasRatio(0.9 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
 		if (bottomRef.current)
 			bottomRef.current.scrollIntoView({ behavior: "smooth" })
 	}
