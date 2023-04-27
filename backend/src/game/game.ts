@@ -201,7 +201,7 @@ export class Game {
 				shoot: {
 					pos: { x: (this.players.length == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
 					velocity: { x: (this.players.length == 0) ? 1 : -1, y: 0 },
-					maxBounce : 3,
+					maxBounce: 3,
 					active: false
 				},
 			})
@@ -372,27 +372,6 @@ export class Game {
 			//Gestion de la collision des assets avec mouvement
 			this.updateBall({ pos: this.posBall, velocity: this.velocityBall })
 
-			//Projectiles
-			this.players.forEach((player, index) => {
-				if (player.shoot.active)
-					if (this.updateBall(player.shoot)) {
-						player.shoot.maxBounce--
-					}
-				if (index == 1 && player.shoot.pos.x <= 0) {
-					this.players[0].paddleLength *= (2 / 3)
-				}
-				else if (index == 0 && player.shoot.pos.x >= canvasWidth) {
-					this.players[1].paddleLength *= (2 / 3)
-				}
-				//Reset du shoot
-				if (player.shoot.pos.x <= 0 || player.shoot.pos.x >= canvasWidth || player.shoot.maxBounce == 0) {
-					player.shoot.active = false
-					player.shoot.pos.x = (index == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1)
-					player.shoot.velocity.x = (index == 0) ? 1 : -1
-					player.shoot.velocity.y = 0
-					player.shoot.maxBounce = maxBounce
-				}
-			})
 
 			//Condition de marquage de point
 			if (this.posBall.x <= 0) {
@@ -419,6 +398,28 @@ export class Game {
 			clearInterval(this.intervalId)
 			clearInterval(this.reduceInterval)
 		}
+
+		//Projectiles
+		this.players.forEach((player, index) => {
+			if (player.shoot.active)
+				if (this.updateBall(player.shoot)) {
+					player.shoot.maxBounce--
+				}
+			if (index == 1 && player.shoot.pos.x <= 0) {
+				this.players[0].paddleLength *= (2 / 3)
+			}
+			else if (index == 0 && this.players.length > 1 && player.shoot.pos.x >= canvasWidth) {
+				this.players[1].paddleLength *= (2 / 3)
+			}
+			//Reset du shoot
+			if (player.shoot.pos.x <= 0 || player.shoot.pos.x >= canvasWidth || player.shoot.maxBounce == 0) {
+				player.shoot.active = false
+				player.shoot.pos.x = (index == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1)
+				player.shoot.velocity.x = (index == 0) ? 1 : -1
+				player.shoot.velocity.y = 0
+				player.shoot.maxBounce = maxBounce
+			}
+		})
 		//Envoi des infos
 		this.updateInfo(this.generateGameInfo());
 	}
