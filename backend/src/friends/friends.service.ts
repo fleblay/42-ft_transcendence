@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException, forwardRef } from "@nestjs/common";
-import { UsersService } from "./users.service";
+import { UsersService } from "../users/users.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FriendRequest, FriendRequestStatus } from "../model/friend-request.entity";
 import { Repository } from "typeorm";
@@ -11,7 +11,7 @@ import { GameService } from "../game/game.service";
 export class FriendsService {
 	constructor(
 		@Inject(forwardRef(() => UsersService)) private usersService: UsersService,
-		@Inject(forwardRef(() => GameService)) private gameService: GameService,
+		private gameService: GameService,
 		@InjectRepository(FriendRequest) private friendReqRepo: Repository<FriendRequest>
 	) {
 	}
@@ -156,5 +156,4 @@ export class FriendsService {
 			};
 		});
 	}
-
 }

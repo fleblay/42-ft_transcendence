@@ -16,7 +16,7 @@ import { SavedGame } from '../model/saved-game.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { FriendRequestStatus } from '../model/friend-request.entity';
-import { FriendsService } from './friends.service';
+import { FriendsService } from '../friends/friends.service';
 
 
 @Controller('users')
