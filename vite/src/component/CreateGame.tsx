@@ -152,7 +152,7 @@ export function CreateGame() {
 							onChange={(_, val) => setVictoryRounds(Array.isArray(val) ? val[0] : val)}
 						/>
 					</div>
-					<div>Paddle Reduce
+					<div>Paddle Reduce Speed
 						<Slider
 							aria-label="Paddle Reduce"
 							defaultValue={1}

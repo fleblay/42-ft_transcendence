@@ -33,6 +33,7 @@ export interface IPlayers {
 	paddleLength: number,
 	paddleWidth: number,
 	shoot: projectile,
+	amo: number
 	score: number,
 	user: plainUser,
 	leaving: boolean,

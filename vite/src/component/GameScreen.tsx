@@ -280,11 +280,11 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		// Player Info
 		context.current.font = `${20 * canvasRatio}px serif`
 		context.current.fillStyle = player1color
-		context.current.fillText(`${gameInfo.players[0].user.username}`, 5 * canvasRatio, 20 * canvasRatio)
+		context.current.fillText(`${gameInfo.players[0].user.username} : ${gameInfo.players[0].amo}`, 5 * canvasRatio, 20 * canvasRatio)
 		context.current.fillStyle = player2color
 		if (gameInfo.players[1]) {
-			const player2username = gameInfo.players[1].user.username
-			context.current.fillText(player2username, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2username).width), 20 * canvasRatio)
+			const player2info = `${gameInfo.players[1].user.username} : ${gameInfo.players[1].amo}`
+			context.current.fillText(player2info, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2info).width), 20 * canvasRatio)
 		}
 
 	}, [gameInfo.players, gameInfo.ball.pos]);

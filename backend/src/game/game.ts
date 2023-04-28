@@ -12,7 +12,7 @@ const playerSpeed = 3
 const canvasHeight = 600
 const canvasWidth = 800
 const MaxBounceAngle = Math.PI / 12;
-const maxBounce = 3
+const maxBounce = 10
 
 export type Pos2D = {
 
@@ -52,6 +52,7 @@ export type Player = {
 	paddleLength: number,
 	paddleWidth: number,
 	shoot: projectile,
+	amo: number,
 	score: number,
 	user: User,
 	leaving: boolean,
@@ -102,8 +103,8 @@ export class Game {
 	public readonly viewerRoom: string
 	public victoryRounds: number
 	public paddleLength: number
-	public paddleLengthMin :number
-	public paddleReduce : number
+	public paddleLengthMin: number
+	public paddleReduce: number
 
 	constructor(public gameId: UUID,
 		private server: Server,
@@ -171,7 +172,10 @@ export class Game {
 					foundPlayer.timeLastMove = Date.now()
 					break
 				case ("Shoot"):
-					this.options?.shoot && (foundPlayer.shoot.active = true)
+					if (this.options?.shoot && foundPlayer.amo > 0 && !foundPlayer.shoot.active) {
+						foundPlayer.shoot.active = true
+						foundPlayer.amo--
+					}
 					break
 				default:
 			}
@@ -228,7 +232,8 @@ export class Game {
 				user,
 				leaving: false,
 				clientId: client.id,
-				shoot: initShoot(this.players.length)
+				shoot: initShoot(this.players.length),
+				amo: this.options?.shoot && 3
 			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1) {
