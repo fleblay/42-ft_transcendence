@@ -16,7 +16,7 @@ function getCookieArray(): { key: string, value: string }[] {
 	return cookieArray as {key: string, value: string}[]
 }
 
-function getCookieValue(key: string) : string | null {
+export function getCookieValue(key: string) : string | null {
 	const foundCookie = getCookieArray().find((cookie: {key: string, value: string}) => cookie.key == key)
 	return (foundCookie ? foundCookie.value : null)
 }
