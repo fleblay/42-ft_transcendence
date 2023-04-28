@@ -14,28 +14,27 @@ import { CreateUserDto } from '../dtos/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
-	redirectURI = `http://${process.env.HOSTNAME}:8080/api/auth/42auth`
 
 	constructor(private authService: AuthService) { }
 
 	@Get('/refresh')
 	@UseGuards(RTGuard)
-	async refresh(@Request() req, @Response({passthrough : true}) res: ExpressResponse) {
+	async refresh(@Request() req, @Response({ passthrough: true }) res: ExpressResponse) {
 		//console.log('refresh');
 		// token dans X-Refresh-Token
 		const refreshToken = req.cookies['refresh_token'];
 		const tokens = await this.authService.refreshToken(refreshToken) as Tokens;
 		res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly : true, maxAge: 1000 * 60 * 60 * 24 * 7 });
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 });
 		return;
 	}
 
 	//@UseGuards(LocalAuthGuard)
 	@Post('/register')
-	async createUser(@Body() body: CreateUserDto, @Response({passthrough : true}) res: ExpressResponse) {
+	async createUser(@Body() body: CreateUserDto, @Response({ passthrough: true }) res: ExpressResponse) {
 		const tokens = await this.authService.register(body) as Tokens;
 		res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly : true, maxAge: 1000 * 60 * 60 * 24 * 7 });
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 });
 		return;
 	}
 
@@ -44,8 +43,8 @@ export class AuthController {
 
 		const tokens = await this.authService.login(body) as Tokens;
 		req.res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-		req.res.cookie('refresh_token', tokens.refreshToken, { httpOnly : true,  maxAge: 1000 * 60 * 60 * 24 * 7 });
-		return ;
+		req.res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 });
+		return;
 	};
 
 	@Get('/allTokens')
@@ -62,56 +61,16 @@ export class AuthController {
 		return this.authService.deleteRefreshToken(refreshToken);
 	}
 	@Get('/42externalauth')
-	redirectTo42Api(@Response({passthrough : true}) res: ExpressResponse) {
-		res.redirect(302, `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.API_CLIENT_ID}&redirect_uri=${encodeURI(this.redirectURI)}&response_type=code`)
+	redirectTo42Api(@Response({ passthrough: true }) res: ExpressResponse) {
+		res.redirect(302, `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.API_CLIENT_ID}&redirect_uri=${encodeURI(this.authService.redirectURI)}&response_type=code`)
 	}
 
 	@Get('/42auth')
-	async externalAuth(@Response({passthrough : true}) res: ExpressResponse, @Query() query: { code: string }) {
+	async externalAuth(@Response({ passthrough: true }) res: ExpressResponse, @Query() query: { code: string }) {
 
 		//Code received after user granted acces to our app visiting the link in this.redirectTo42Api
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
-
-		//Fetch a token of type grant_type
-		const formData = new FormData()
-		formData.append("grant_type", "authorization_code")
-		formData.append("client_id", `${process.env.API_CLIENT_ID}`)
-		formData.append("client_secret", `${process.env.API_CLIENT_SECRET}`)
-		formData.append("redirect_uri", this.redirectURI) // Where users will be sent after authentification (here...)
-		formData.append("code", query.code)
-
-		const tokenRequest = await fetch('https://api.intra.42.fr/oauth/token', {
-			method: "POST",
-			body: formData
-		}).then(response => response.json())
-		console.log("\x1b[32mResponse data is :\x1b[0m", tokenRequest)
-
-		//Fetch info about the received token
-		const tokenInfo = await fetch('https://api.intra.42.fr/oauth/token/info', {
-			headers: {
-				"Authorization": `Bearer ${tokenRequest.access_token}`
-			}
-		}).then(response => response.json())
-		console.log("\x1b[32mToken Info is :\x1b[0m", tokenInfo)
-
-		//Make request using that token
-		const { id: userId, email, login: username, image: imageURL, ...rest } = await fetch('https://api.intra.42.fr/v2/me', {
-			headers: {
-				"Authorization": `Bearer ${tokenRequest.access_token}`
-			}
-		}).then(response => response.json())
-
-		//Proof the token is valid
-		console.log(`
-			userID : ${userId}
-			userEmail : ${email}
-			userLogin : ${username}
-			imageURL : ${imageURL.link}
-					`)
-		console.log("Other keys", Object.keys(rest))
-
-		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
-		const tokens: Tokens = await this.authService.login42API({ stud: true, email, username: null, password: "42" })
+		const tokens = await this.authService.validate42Code(query.code)
 		res.cookie('access_token', `${tokens.accessToken}`)
 		res.cookie('refresh_token', `${tokens.refreshToken}`)
 		res.redirect(302, '/')

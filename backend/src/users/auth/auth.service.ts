@@ -9,15 +9,11 @@ import { RefreshToken } from '../../model/refresh-token.entity';
 import { Repository } from 'typeorm';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
-import {toDataURL} from 'qrcode'
-import {authenticator} from 'otplib'
+import { toDataURL } from 'qrcode'
+import { authenticator } from 'otplib'
+import { Tokens } from '../../type';
 
 const scrypt = promisify(_scrypt);
-
-type Tokens = {
- accessToken: string;
-	refresh_token: string;
-};
 
 const access_token_options = { expiresIn: '1m', secret: 'access' };
 const refresh_token_options = { expiresIn: '7d', secret: 'refresh' };
@@ -25,10 +21,11 @@ const refresh_token_options = { expiresIn: '7d', secret: 'refresh' };
 @Injectable()
 export class AuthService {
 
+	redirectURI = `http://${process.env.HOSTNAME}:8080/api/auth/42auth`
 
 	constructor(@InjectRepository(RefreshToken) private repo: Repository<RefreshToken>, private usersService: UsersService, private jwtService: JwtService) { }
 
-	async generateQRCodeDataURL(user: User) : Promise<string> {
+	async generateQRCodeDataURL(user: User): Promise<string> {
 		return toDataURL(authenticator.keyuri(
 			user.email,
 			"CYBER_PONG",
@@ -37,11 +34,11 @@ export class AuthService {
 	}
 
 	turnOnDfa(userID: number): void {
-		this.usersService.update(userID, {dfa: true})
+		this.usersService.update(userID, { dfa: true })
 	}
 
-	is2faCodeValid(dfaCode : string, user: User) {
-		return authenticator.verify({token: dfaCode, secret : user.dfaSecret})
+	is2faCodeValid(dfaCode: string, user: User) {
+		return authenticator.verify({ token: dfaCode, secret: user.dfaSecret })
 	}
 
 	async validateUser(email: string, pass: string): Promise<any> {
@@ -93,13 +90,13 @@ export class AuthService {
 			throw new ForbiddenException('Password not match');
 		if (user.stud && checkStud)
 			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
-		if (user.dfa){
+		if (user.dfa) {
 
 		}
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refreshToken);
 		// console.log(`tokens are ${tokens accessToken}`);
-		return tokens;
+		return tokens as Tokens;
 	}
 
 	getTokens(user: User) {
@@ -120,7 +117,7 @@ export class AuthService {
 
 		dataUser.password = await this.hashPassword(dataUser.password);
 
-		const user = await this.usersService.create({...dataUser, dfaSecret : authenticator.generateSecret()});
+		const user = await this.usersService.create({ ...dataUser, dfaSecret: authenticator.generateSecret() });
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refreshToken);
 		// console.log(`tokens are access [${tokens accessToken}], refresh [${tokens.refresh_token}]`);
@@ -132,6 +129,49 @@ export class AuthService {
 			return this.login(dataUser, false)
 		else
 			return this.register(dataUser)
+	}
+
+	async validate42Code(code: string): Promise<Tokens> {
+		//Fetch a token of type grant_type
+		const formData = new FormData()
+		formData.append("grant_type", "authorization_code")
+		formData.append("client_id", `${process.env.API_CLIENT_ID}`)
+		formData.append("client_secret", `${process.env.API_CLIENT_SECRET}`)
+		formData.append("redirect_uri", this.redirectURI) // Where users will be sent after authentification (here...)
+		formData.append("code", code)
+
+		const tokenRequest = await fetch('https://api.intra.42.fr/oauth/token', {
+			method: "POST",
+			body: formData
+		}).then(response => response.json())
+		console.log("\x1b[32mResponse data is :\x1b[0m", tokenRequest)
+
+		//Fetch info about the received token
+		const tokenInfo = await fetch('https://api.intra.42.fr/oauth/token/info', {
+			headers: {
+				"Authorization": `Bearer ${tokenRequest.access_token}`
+			}
+		}).then(response => response.json())
+		console.log("\x1b[32mToken Info is :\x1b[0m", tokenInfo)
+
+		//Make request using that token
+		const { id: userId, email, login: username, image: imageURL, ...rest } = await fetch('https://api.intra.42.fr/v2/me', {
+			headers: {
+				"Authorization": `Bearer ${tokenRequest.access_token}`
+			}
+		}).then(response => response.json())
+
+		//Proof the token is valid
+		console.log(`
+			userID : ${userId}
+			userEmail : ${email}
+			userLogin : ${username}
+			imageURL : ${imageURL.link}
+					`)
+		console.log("Other keys", Object.keys(rest))
+
+		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
+		return await this.login42API({ stud: true, email, username: null, password: "42" })
 	}
 
 	async saveRefreshToken(userId: number, refreshToken: string) {
