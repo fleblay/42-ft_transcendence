@@ -16,6 +16,7 @@ import { UsernameDialog } from './component/UsernameDialog'
 import { FriendList } from './component/FriendList'
 import { BlockedList } from './component/BlockedList';
 import { UserDataProvider } from './userDataProvider/userDataProvider';
+import { DfaForm } from './component/DfaForm';
 
 export interface Destinations {
 	name: string,
@@ -205,6 +206,7 @@ function App() {
 						</Route>
 						<Route path="/friends" element={<FriendList />} />
 						<Route path="/blocked" element={<BlockedList />} />
+						<Route path="/dfa" element= {<DfaForm></DfaForm>} />
 
 						<Route path='*' element={<div>404</div>} />
 					</Route>

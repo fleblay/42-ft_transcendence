@@ -15,12 +15,10 @@ export interface LoginData {
 export function LoginForm() {
 
 	let navigate = useNavigate();
-	let location = useLocation();
 	let auth = useAuthService();
 	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "No info yet...")
 
 
-	let from = location.state?.from?.pathname || "/";
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
