@@ -66,6 +66,14 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 			axios
 				.post("/api/auth/login", loginData)
 				.then(async (response) => {
+					if (response.data.needDfa) {
+						const code = prompt("Enter code");
+						if (code)
+							await axios.post("/api/auth/dfa", { code: code }).catch((error) => {
+							console.log(error);
+							reject(error);
+						});
+					}
 					await getUser()
 					resolve();
 				})
