@@ -7,6 +7,7 @@ import { Paper, Box, Typography, Grid } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthService } from "../auth/AuthService";
 import AuthCode from "react-auth-code-input";
+import './DfaForm.css'
 
 export interface LoginData {
     email: string;
@@ -58,7 +59,7 @@ export function DfaForm() {
                         <Grid container spacing={2} alignItems="center">
 
                             <Grid item xs={12}>
-                                <AuthCode allowedCharacters='numeric' onChange={handleOnChange} />
+                                <AuthCode inputClassName='dfa-input' allowedCharacters='numeric' onChange={handleOnChange} />
                             </Grid>
                             <Grid item xs={12}>
                                 <Button variant="contained" color="primary" type="submit" fullWidth sx={{ my: 2 }}>Submit</Button>
