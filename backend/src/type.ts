@@ -35,7 +35,8 @@ export type Blocked= {
 
 export type Tokens = {
 	accessToken: string,
-	refreshToken: string
+	refreshToken: string,
+	dfaToken?: string
 }
 
 

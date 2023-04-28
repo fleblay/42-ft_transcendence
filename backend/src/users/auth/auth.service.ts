@@ -17,6 +17,7 @@ const scrypt = promisify(_scrypt);
 
 const access_token_options = { expiresIn: '1m', secret: 'access' };
 const refresh_token_options = { expiresIn: '7d', secret: 'refresh' };
+const dfa_token_options = { expiresIn: '1h', secret: 'dfa_secret' };
 
 @Injectable()
 export class AuthService {
@@ -62,6 +63,16 @@ export class AuthService {
 		}
 	}
 
+	async validateDfaToken(dfaToken: string): Promise<User> | null {
+		try {
+			const jwtResponse = this.jwtService.verify(dfaToken, dfa_token_options) // compliant to security rules of year 3000
+			return this.usersService.findOne(jwtResponse.sub)
+		} catch (e) {
+			console.log(`Error in validate Dfa access is ${e}`)
+			return null
+		}
+	}
+
 	decodeToken(bearerToken: string): Promise<User> | null {
 		try {
 			// console.log(`Bearer token is ${bearerToken}`)
@@ -78,25 +89,29 @@ export class AuthService {
 		}
 	}
 
-	async login(dataUser: LoginUserDto, checkStud: boolean = true) {
+	async login(dataUser: LoginUserDto, checkStud: boolean = true): Promise<Partial<Tokens>> {
 		const user = await this.usersService.findOneByEmail(dataUser.email);
 		if (!user)
 			throw new NotFoundException("User not existing");
+
+		if (user.stud && checkStud)
+			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
 
 		const [salt, storedHash] = user.password.split('.');
 		const hashedPassword = await this.hashPassword(dataUser.password, salt);
 
 		if (hashedPassword !== `${salt}.${storedHash}`)
 			throw new ForbiddenException('Password not match');
-		if (user.stud && checkStud)
-			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
 		if (user.dfa) {
-
+			// return dfa token
+			const access_token_payload = { email: user.email, sub: user.id };
+			const accessToken = this.jwtService.sign(access_token_payload, dfa_token_options);
+			return { dfaToken: accessToken };
 		}
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refreshToken);
 		// console.log(`tokens are ${tokens accessToken}`);
-		return tokens as Tokens;
+		return tokens;
 	}
 
 	getTokens(user: User) {
@@ -106,7 +121,7 @@ export class AuthService {
 		const refresh_token_payload = { email: user.email, sub: user.id };
 		const refreshToken = this.jwtService.sign(refresh_token_payload, refresh_token_options);
 
-		return { accessToken, refreshToken };
+		return { accessToken, refreshToken } as Tokens;
 	}
 
 	async register(dataUser: CreateUserDto) {
@@ -131,7 +146,7 @@ export class AuthService {
 			return this.register(dataUser)
 	}
 
-	async validate42Code(code: string): Promise<Tokens> {
+	async validate42Code(code: string): Promise<Partial<Tokens>> {
 		//Fetch a token of type grant_type
 		const formData = new FormData()
 		formData.append("grant_type", "authorization_code")
