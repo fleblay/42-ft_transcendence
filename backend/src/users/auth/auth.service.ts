@@ -15,7 +15,7 @@ import {authenticator} from 'otplib'
 const scrypt = promisify(_scrypt);
 
 type Tokens = {
-	access_token: string;
+ accessToken: string;
 	refresh_token: string;
 };
 
@@ -96,19 +96,19 @@ export class AuthService {
 
 		}
 		const tokens = this.getTokens(user);
-		await this.saveRefreshToken(user.id, tokens.refresh_token);
-		// console.log(`tokens are ${tokens.access_token}`);
+		await this.saveRefreshToken(user.id, tokens.refreshToken);
+		// console.log(`tokens are ${tokens accessToken}`);
 		return tokens;
 	}
 
 	getTokens(user: User) {
 		const access_token_payload = { email: user.email, sub: user.id };
-		const access_token = this.jwtService.sign(access_token_payload, access_token_options);
+		const accessToken = this.jwtService.sign(access_token_payload, access_token_options);
 
 		const refresh_token_payload = { email: user.email, sub: user.id };
-		const refresh_token = this.jwtService.sign(refresh_token_payload, refresh_token_options);
+		const refreshToken = this.jwtService.sign(refresh_token_payload, refresh_token_options);
 
-		return { access_token, refresh_token };
+		return { accessToken, refreshToken };
 	}
 
 	async register(dataUser: CreateUserDto) {
@@ -121,8 +121,8 @@ export class AuthService {
 
 		const user = await this.usersService.create({...dataUser, dfaSecret : authenticator.generateSecret()});
 		const tokens = this.getTokens(user);
-		await this.saveRefreshToken(user.id, tokens.refresh_token);
-		// console.log(`tokens are access [${tokens.access_token}], refresh [${tokens.refresh_token}]`);
+		await this.saveRefreshToken(user.id, tokens.refreshToken);
+		// console.log(`tokens are access [${tokens accessToken}], refresh [${tokens.refresh_token}]`);
 		return tokens;
 	}
 
@@ -153,7 +153,7 @@ export class AuthService {
 			throw new ForbiddenException('Invalid refresh token');
 		}
 		const tokens = this.getTokens(user);
-		await this.updateRefreshToken(user.id, tokens.refresh_token);
+		await this.updateRefreshToken(user.id, tokens.refreshToken);
 		// console.log("tokens are ", tokens);
 		return tokens;
 	}

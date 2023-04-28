@@ -26,17 +26,6 @@ export class UsersController {
 		private gameService: GameService,
 	) { }
 
-	//@UseGuards(LocalAuthGuard)
-	@Post('/register')
-	async createUser(@Body() body: CreateUserDto) {
-		return await this.authService.register(body);
-	}
-
-	@Post('/login')
-	async login(@Body() body: LoginUserDto, @Request() req) {
-		return await this.authService.login(body);
-	};
-
 	@UseGuards(ATGuard)
 	@Get('/all')
 	async findAll(): Promise<UserInfo[]> {

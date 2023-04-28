@@ -33,3 +33,9 @@ export type Blocked= {
 	username: string
 }
 
+export type Tokens = {
+	accessToken: string,
+	refreshToken: string
+}
+
+

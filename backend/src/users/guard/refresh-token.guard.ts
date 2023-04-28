@@ -15,7 +15,8 @@ export class RTGuard implements CanActivate {
 	async canActivate(context: ExecutionContext) {
 		//console.log("RTGuard");
 		const request = context.switchToHttp().getRequest();
-		const refreshToken = request.get('X-Refresh-Token');
+		// besoin de vérifier que le refresh token est valide
+		const refreshToken = request.cookies['refresh_token'];
 		//console.log("refresh token:", refreshToken)
 		if (!refreshToken) {
 			return false;

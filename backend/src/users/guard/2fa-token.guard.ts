@@ -11,16 +11,16 @@ import {User} from '../../model/user.entity'
 
 
 @Injectable()
-export class ATGuard implements CanActivate {
+export class DfaGuard implements CanActivate {
 
     constructor(private authService: AuthService) {}
 
 	async canActivate(context: ExecutionContext){
 		const request = context.switchToHttp().getRequest() as Request;
 		//console.log("ATGuard: before replace", request.headers.authorization);
-        const bearerToken = request.cookies['access_token'];
+        const bearerToken = request.headers.authorization?.replace(/Bearer ?/, '');
 		//console.log("ATGuard: after replace", request.headers.authorization);
-		console.log ("bearer token", bearerToken)
+		//console.log ("bearer token", bearerToken)
 		if (!bearerToken) {
 			console.log("ATGuard: no bearer token");
 			return false;

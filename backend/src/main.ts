@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
-import * as passport from 'passport';
+import * as cookieParser from 'cookie-parser';
 
 // doc express-session: https://www.npmjs.com/package/express-session
 
@@ -15,8 +15,7 @@ async function bootstrap() {
 			cookie: { maxAge: 360000 } // 1 hour
 		})
 	);
-	app.use(passport.initialize()); // initialize passport
-	app.use(passport.session()); // persistent login sessions
+	app.use(cookieParser())
 	await app.listen(3000);
 }
 bootstrap();

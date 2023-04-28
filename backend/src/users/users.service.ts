@@ -204,12 +204,5 @@ export class UsersService {
 
 	dfa(user: User): Promise<User> {
 		return this.update(user.id, {dfa: !user.dfa})
-		/*
-		if (user.dfa)
-			user.dfa = false;
-		else
-			user.dfa = true;
-		return this.repo.save(user);
-		*/
 	}
 }
