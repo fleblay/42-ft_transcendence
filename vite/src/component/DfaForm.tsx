@@ -59,7 +59,11 @@ export function DfaForm() {
                         <Grid container spacing={2} alignItems="center">
 
                             <Grid item xs={12}>
+<<<<<<< HEAD
                                 <AuthCode allowedCharacters='numeric' inputClassName="otp-input" onChange={handleOnChange} />
+=======
+                                <AuthCode inputClassName='dfa-input' allowedCharacters='numeric' onChange={handleOnChange} />
+>>>>>>> b4e824a546f7b16708dcabc8053d3b6fe84146b1
                             </Grid>
                             <Grid item xs={12}>
                                 <Button variant="contained" color="primary" type="submit" fullWidth sx={{ my: 2 }}>Submit</Button>
