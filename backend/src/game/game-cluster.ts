@@ -107,7 +107,7 @@ export class GameCluster {
 		quitter.score = -42;
 		game.players.forEach(player => {
 			if (player.user.id !== quitter.user.id)
-				player.score = 5;
+				player.score = game.victoryRounds;
 		});
 	}
 
