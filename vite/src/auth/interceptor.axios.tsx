@@ -54,14 +54,14 @@ apiClient.interceptors.response.use(
 			if (!isResfreshing) {
 				isResfreshing = true;
 				return new Promise((resolve, reject) => {
-					axios.get('/api/auth/refresh', { headers: { 'X-Refresh-Token': getRefreshToken() } })
+					axios.get('/api/auth/refresh')
 						.then((response) => {
 							if (response.status === 200) {
 								console.log("Access token refreshed");
-								delAccessToken()
+							/* 	delAccessToken()
 								delRefreshToken()
 								saveToken(response.data);
-								originalRequest.headers.Authorization = `Bearer ${getAccessToken()}`;
+								originalRequest.headers.Authorization = `Bearer ${getAccessToken()}`; */
 								resolve(axios(originalRequest));
 								onRefreshed(getAccessToken());
 							}

@@ -20,7 +20,7 @@ export class ATGuard implements CanActivate {
 		//console.log("ATGuard: before replace", request.headers.authorization);
         const bearerToken = request.cookies['access_token'];
 		//console.log("ATGuard: after replace", request.headers.authorization);
-		console.log ("bearer token", bearerToken)
+		console.log ("access token", bearerToken)
 		if (!bearerToken) {
 			console.log("ATGuard: no bearer token");
 			return false;
