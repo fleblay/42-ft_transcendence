@@ -6,6 +6,7 @@ import axios from "axios";
 import { RegisterData } from "../component/RegisterForm";
 import { userToken } from "../types";
 import apiClient from "./interceptor.axios";
+import { useNavigate } from "react-router-dom";
 
 //0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
@@ -13,6 +14,7 @@ interface AuthContextType {
 	register: (user: RegisterData) => Promise<void>;
 	login: (user: LoginData) => Promise<void>;
 	logout: () => void;
+	getUser: () => Promise<void>;
 }
 
 //1.Definit la value passe pour tous les enfants du AuthContext.Provider
@@ -22,6 +24,7 @@ let AuthContext = React.createContext<AuthContextType>(null!);
 //3.Renvoie la balise AuthContext.Provider
 export function AuthService({ children }: { children: React.ReactNode }) {
 	let [user, setUser] = React.useState<any | null>(null);
+	const nav = useNavigate();
 
 	const getUser = async () => {
 		try {
@@ -66,13 +69,10 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 			axios
 				.post("/api/auth/login", loginData)
 				.then(async (response) => {
+					console.log('login response', response);
 					if (response.data.needDfa) {
-						const code = prompt("Enter code");
-						if (code)
-							await axios.post("/api/auth/validate-dfa", { code: code }).catch((error) => {
-							console.log(error);
-							reject(error);
-						});
+						nav("/dfa", { replace: true });
+						reject("needDfa");
 					}
 					await getUser()
 					resolve();
@@ -101,7 +101,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 				});
 		})
 	};
-	let value = { user, register, login, logout };
+	let value = { user, register, login, logout, getUser };
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

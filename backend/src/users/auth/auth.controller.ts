@@ -26,7 +26,7 @@ export class AuthController {
 		const refreshToken = req.cookies['refresh_token'];
 		const tokens = await this.authService.refreshToken(refreshToken) as Tokens;
 		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 * 1000});
 		return;
 	}
 
@@ -34,8 +34,8 @@ export class AuthController {
 	@Post('/register')
 	async createUser(@Body() body: CreateUserDto, @Response({ passthrough: true }) res: ExpressResponse) {
 		const tokens = await this.authService.register(body) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
+		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 * 1000});
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 * 1000});
 		return;
 	}
 
@@ -44,12 +44,12 @@ export class AuthController {
 
 		const tokens = await this.authService.login(body);
 		if (tokens.dfaToken) {
-			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: true, maxAge: 60 * 60 });
-			res.redirect(302, '/dfa')
+			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: true, maxAge: 60 * 60 * 1000 });
+			return { needDfa: true }
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
-			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
-			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
+			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 * 1000});
+			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 * 1000 });
 		}
 	};
 
@@ -113,8 +113,8 @@ export class AuthController {
 		const tokens = this.authService.getTokens(user);
 		if (tokens.accessToken && tokens.refreshToken) {
 			this.authService.saveRefreshToken(user.id, tokens.refreshToken);
-			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
-			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
+			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 * 1000});
+			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 * 1000});
 			res.cookie('dfa_token', '', { httpOnly: true, maxAge: 0 });
 		}
 	}

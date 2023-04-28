@@ -1,0 +1,16 @@
+.dfa-input {
+	width: 45px;
+	height: 45px;
+	padding: 0;
+	font-size: 24px;
+	text-align: center;
+	margin-right: 12px;
+	text-transform: uppercase;
+	color: #494949;
+	font-family: SF Pro Text, SF Pro Icons, Helvetica Neue, Helvetica, Arial,
+	  sans-serif;
+	border: 1px solid #d6d6d6;
+	border-radius: 4px;
+	background: #fff;
+	background-clip: padding-box;
+}
