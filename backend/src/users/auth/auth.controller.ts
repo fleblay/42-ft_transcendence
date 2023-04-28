@@ -24,8 +24,8 @@ export class AuthController {
 		// token dans X-Refresh-Token
 		const refreshToken = req.cookies['refresh_token'];
 		const tokens = await this.authService.refreshToken(refreshToken) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 });
+		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
 		return;
 	}
 
@@ -33,18 +33,24 @@ export class AuthController {
 	@Post('/register')
 	async createUser(@Body() body: CreateUserDto, @Response({ passthrough: true }) res: ExpressResponse) {
 		const tokens = await this.authService.register(body) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 });
+		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
 		return;
 	}
 
 	@Post('/login')
-	async login(@Body() body: LoginUserDto, @Request() req) {
+	async login(@Body() body: LoginUserDto, @Response({ passthrough: true }) res: ExpressResponse) {
 
-		const tokens = await this.authService.login(body) as Tokens;
-		req.res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7 });
-		req.res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 });
-		return;
+		const tokens = await this.authService.login(body);
+		if (tokens.dfaToken) {
+			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: true, maxAge: 60 * 60 });
+			return { needDfa: true }
+		}
+		else if (tokens.accessToken && tokens.refreshToken) {
+			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
+			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
+		}
+		return { needDfa: false };
 	};
 
 	@Get('/allTokens')
@@ -67,7 +73,8 @@ export class AuthController {
 
 	@Get('/42auth')
 	async externalAuth(@Response({ passthrough: true }) res: ExpressResponse, @Query() query: { code: string }) {
-
+		if (!query.code)
+			throw new UnauthorizedException("No code provided")
 		//Code received after user granted acces to our app visiting the link in this.redirectTo42Api
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
 		const tokens = await this.authService.validate42Code(query.code)
