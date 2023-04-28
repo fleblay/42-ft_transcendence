@@ -14,6 +14,12 @@ export type Pos2D = {
 	y: number
 }
 
+export type GameOptions = {
+	ballSpeed?: number,
+	shoot?: boolean,
+	obstacles?: boolean
+}
+
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
 export interface IPlayers {
@@ -26,26 +32,29 @@ export interface IPlayers {
 	score: number,
 	user: plainUser,
 	leaving: boolean,
+	color: string
 }
 
 export interface IgameAsset {
 	x: number,
 	y: number,
 	width: number,
-	height: number
+	height: number,
+	color: string
 }
 
 export type projectile = {
 	pos: Pos2D,
 	velocity: Pos2D,
-	active: boolean
+	active: boolean,
+	color: string,
+	maxBounce: number
 }
 
 export interface IgameInfo {
 	players: IPlayers[],
 	assets: IgameAsset[],
-	velocityBall: number,
-	posBall: Pos2D,
+	ball: projectile,
 	status: GameStatus,
 	date: Date,
 }
