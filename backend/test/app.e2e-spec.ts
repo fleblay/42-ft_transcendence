@@ -52,7 +52,7 @@ describe('AppController (e2e)', () => {
 			const username = 'admin' + Math.random();
 
 			const res = await request(app.getHttpServer())
-				.post('/users/register')
+				.post('/auth/register')
 				.send({ username, password: 'admin', email: Math.random() + 'admin@admin.com' })
 				.expect(201);
 			const accessToken = res.body.access_token;
@@ -73,7 +73,7 @@ describe('AppController (e2e)', () => {
 
 		it('[LOGIN] should return access token & refresh token ', async () => {
 			const res = await request(app.getHttpServer())
-				.post('/users/login')
+				.post('/auth/login')
 				.send({ email: 'admin1@admin.com', password: 'admin1' })
 				.expect(201);
 
@@ -95,7 +95,7 @@ describe('AppController (e2e)', () => {
 
 		it('[ACCESS TOKEN] should return 200', async () => {
 			const res = await request(app.getHttpServer())
-				.post('/users/login')
+				.post('/auth/login')
 				.send({ email: 'admin1@admin.com', password: 'admin1' })
 				.expect(201);
 
@@ -141,7 +141,7 @@ describe('AppController (e2e)', () => {
 
 		it('[REFRESH TOKEN] should return new access token & new refresh token', async () => {
 			const res1 = await request(app.getHttpServer())
-				.post('/users/login')
+				.post('/auth/login')
 				.send({ email: 'admin1@admin.com', password: 'admin1' })
 				.expect(201);
 

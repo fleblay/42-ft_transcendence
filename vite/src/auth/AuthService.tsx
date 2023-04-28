@@ -1,15 +1,11 @@
 import React, { useEffect } from "react";
 import { IUser, allRoutes } from "../App";
-import { AuthProvider } from "../auth";
 import { LoginData } from "../component/LoginForm";
 import { delAccessToken, delRefreshToken, getAccessToken, saveToken } from "../token/token";
 import axios from "axios";
 import { RegisterData } from "../component/RegisterForm";
 import { userToken } from "../types";
-import { useLocation, useNavigate } from "react-router-dom";
 import apiClient from "./interceptor.axios";
-import { Socket, io } from "socket.io-client";
-import { getRefreshToken } from "../token/token";
 
 //0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
@@ -53,7 +49,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	let register = async (registerData: RegisterData): Promise<void> => {
 		return new Promise((resolve, reject) => {
 			axios
-				.post("/api/users/register", registerData)
+				.post("/api/auth/register", registerData)
 				.then(async (response) => {
 					const userData = response.data as userToken;
 					saveToken(userData);
@@ -70,7 +66,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	let login = async (loginData: LoginData): Promise<void> => {
 		return new Promise((resolve, reject) => {
 			axios
-				.post("/api/users/login", loginData)
+				.post("/api/auth/login", loginData)
 				.then(async (response) => {
 					const userData = response.data as userToken;
 					console.log(userData);
@@ -91,7 +87,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	let logout = async (): Promise<void> => {
 		return new Promise((resolve, reject) => {
 			apiClient
-				.get("/api/auth/logout", { headers: { 'X-Refresh-Token': getRefreshToken() } } )
+				.get("/api/auth/logout")
 				.then(async (response) => {
 					setUser(null);
 					delAccessToken();
