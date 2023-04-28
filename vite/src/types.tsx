@@ -18,6 +18,10 @@ export type GameOptions = {
 	ballSpeed?: number,
 	shoot?: boolean,
 	obstacles?: boolean
+	paddleLength?: number,
+    paddleLengthMin?: number,
+    paddleReduce?: number,
+    victoryRounds?: number,
 }
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }

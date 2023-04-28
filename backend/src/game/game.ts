@@ -5,8 +5,6 @@ import { Server, Socket } from 'socket.io'
 import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
-const victoryRounds = 5
-const paddleLength = 300 // 550 for debug and remove reduce, 300 otherwise
 const paddleWidth = 5
 const ballSize = 5
 const ballSpeed = 2
@@ -32,7 +30,12 @@ export type projectile = {
 export type GameOptions = {
 	ballSpeed?: number,
 	shoot?: boolean,
-	obstacles?: boolean
+	obstacles?: boolean,
+
+	paddleLength?: number,
+	paddleLengthMin?: number,
+	paddleReduce?: number,
+	victoryRounds?: number,
 }
 
 interface gameAsset {
@@ -97,6 +100,10 @@ export class Game {
 	public status: GameStatus = GameStatus.waiting
 	public readonly playerRoom: string
 	public readonly viewerRoom: string
+	public victoryRounds: number
+	public paddleLength: number
+	public paddleLengthMin :number
+	public paddleReduce : number
 
 	constructor(public gameId: UUID,
 		private server: Server,
@@ -113,6 +120,12 @@ export class Game {
 				{ x: canvasWidth - 250 - 70, y: canvasHeight - 200 - 80, width: 70, height: 70 },
 			])
 		this.initBall(options?.ballSpeed || 1)
+
+		this.victoryRounds = options?.victoryRounds || 5
+		this.paddleLength = options?.paddleLength || 300
+		this.paddleLengthMin = options?.paddleLengthMin || 100
+		//Change because paddleReduce can be set to 0
+		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 1
 	}
 
 
@@ -206,10 +219,10 @@ export class Game {
 
 		if (this.players.length < 2) {
 			this.players.push({
-				pos: canvasHeight / 2 - paddleLength / 2,
+				pos: canvasHeight / 2 - this.paddleLength / 2,
 				momentum: 0,
 				timeLastMove: Date.now(),
-				paddleLength: paddleLength,
+				paddleLength: this.paddleLength,
 				paddleWidth: paddleWidth,
 				score: 0,
 				user,
@@ -226,8 +239,8 @@ export class Game {
 				this.countdown(5)
 				this.reduceInterval = setInterval(() => {
 					this.players.forEach((player) => {
-						if (player.paddleLength > 100)
-							player.paddleLength -= 2
+						if (player.paddleLength > this.paddleLengthMin)
+							player.paddleLength -= this.paddleReduce
 					})
 				}, 500)
 			}
@@ -371,7 +384,7 @@ export class Game {
 		this.initBall(this.options?.ballSpeed || 1)
 		this.players.forEach((player) => {
 			player.pos = canvasHeight / 2 - player.paddleLength / 2
-			player.paddleLength = paddleLength
+			player.paddleLength = this.paddleLength
 		})
 	}
 
@@ -393,8 +406,8 @@ export class Game {
 			}
 
 			//Condition fin de jeu
-			if (!this.players.every((player) => player.score < victoryRounds)) {
-				console.log(`Game ended with ${victoryRounds} round`)
+			if (!this.players.every((player) => player.score < this.victoryRounds)) {
+				console.log(`Game ended with ${this.victoryRounds} round`)
 				this.status = GameStatus.end
 			}
 			//Reset des momentum
