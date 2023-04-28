@@ -1,6 +1,6 @@
-import React, { createContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
-import { getCookieValue } from '../token/token'
+import { getAccessToken } from '../token/token'
 import { useAuthService } from '../auth/AuthService'
 import { RouterContext } from '../main'
 import apiClient from '../auth/interceptor.axios'
@@ -27,7 +27,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 	const listOn = React.useRef<string[]>([])
 
 	function customEmit(eventname: string, data: any, callback?: (res: any) => void): Socket | null {
-		const access_token = getCookieValue('access_token')
+		const access_token = getAccessToken()
 		if (!socket)
 			return null
 		if (!access_token) {
@@ -71,7 +71,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		if (socket === null) {
 			setSocket(io({
 				auth: {
-					token: getCookieValue('access_token'),
+					token: getAccessToken(),
 				}
 			}))
 			console.log("Socket Creation")

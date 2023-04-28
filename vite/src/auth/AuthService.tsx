@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { IUser, allRoutes } from "../App";
 import { LoginData } from "../component/LoginForm";
-import { delAccessToken, delRefreshToken, getAccessToken, saveToken } from "../token/token";
+import { delAccessToken, delRefreshToken, getAccessToken } from "../token/token";
 import axios from "axios";
 import { RegisterData } from "../component/RegisterForm";
 import { userToken } from "../types";
@@ -51,8 +51,6 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 			axios
 				.post("/api/auth/register", registerData)
 				.then(async (response) => {
-					const userData = response.data as userToken;
-					saveToken(userData);
 					await getUser()
 					resolve();
 				})
@@ -68,11 +66,6 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 			axios
 				.post("/api/auth/login", loginData)
 				.then(async (response) => {
-					const userData = response.data as userToken;
-					console.log(userData);
-					delAccessToken();
-					delRefreshToken();
-					saveToken(userData);
 					await getUser()
 					resolve();
 				})

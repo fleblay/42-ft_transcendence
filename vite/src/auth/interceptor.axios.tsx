@@ -1,5 +1,5 @@
 import axios, { AxiosHeaders } from 'axios';
-import { getAccessToken, saveToken, getRefreshToken, delAccessToken, delRefreshToken} from '../token/token';
+import { getAccessToken, getRefreshToken, delAccessToken, delRefreshToken} from '../token/token';
 
 
 let isResfreshing = false;
@@ -58,10 +58,6 @@ apiClient.interceptors.response.use(
 						.then((response) => {
 							if (response.status === 200) {
 								console.log("Access token refreshed");
-							/* 	delAccessToken()
-								delRefreshToken()
-								saveToken(response.data);
-								originalRequest.headers.Authorization = `Bearer ${getAccessToken()}`; */
 								resolve(axios(originalRequest));
 								onRefreshed(getAccessToken());
 							}

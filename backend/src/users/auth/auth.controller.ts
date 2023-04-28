@@ -112,8 +112,8 @@ export class AuthController {
 
 		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
 		const tokens: Tokens = await this.authService.login42API({ stud: true, email, username: null, password: "42" })
-		res.cookie('42API_access_token', `${tokens.accessToken}`)
-		res.cookie('42API_refresh_token', `${tokens.refreshToken}`)
+		res.cookie('access_token', `${tokens.accessToken}`)
+		res.cookie('refresh_token', `${tokens.refreshToken}`)
 		res.redirect(302, '/')
 	}
 

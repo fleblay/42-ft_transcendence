@@ -25,45 +25,19 @@ function removeCookie(key: string) : void {
 	document.cookie = `${key}=; expires = Thu, 01 Jan 1970 00:00:00 GMT`
 	}
 
-export function saveToken(token: userToken) {
-	localStorage.setItem("access_token", token.access_token);
-	if (token.refresh_token)
-		localStorage.setItem("refresh_token", token.refresh_token);
-}
-
 export function getAccessToken() {
 	//console.log('Begin getAccessToken')
-	const access_token_42 = getCookieValue("42API_access_token")
-	const access_token = localStorage.getItem("access_token")
-	if (access_token_42)
-	{
-		//console.log("Using 42 API acess token : ", access_token_42)
-		return access_token_42
-	}
-	else if (access_token)
-	{
-		//console.log("Using normal acess token : ", access_token)
-		return access_token
-	}
-	else
-	{
-		//console.log("Both token are falsy")
-		return null
-	}
+	return getCookieValue("access_token")
 }
 
 export function getRefreshToken() {
-	const refresh_token_42 = getCookieValue("42API_refresh_token")
-	//return localStorage.getItem("refresh_token");
-	return localStorage.getItem("refresh_token") || refresh_token_42;
+	return getCookieValue("refresh_token")
 }
 
 export function delAccessToken() {
-	localStorage.removeItem('access_token');
-	removeCookie('42API_access_token')
+	removeCookie('access_token')
 }
 
 export function delRefreshToken() {
-	localStorage.removeItem('refresh_token');
-	removeCookie('42API_refresh_token')
+	removeCookie('refresh_token')
 }
