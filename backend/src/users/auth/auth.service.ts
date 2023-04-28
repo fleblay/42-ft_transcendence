@@ -63,6 +63,16 @@ export class AuthService {
 		}
 	}
 
+	async validateDfaToken(dfaToken: string): Promise<User> | null {
+		try {
+			const jwtResponse = this.jwtService.verify(dfaToken, dfa_token_options) // compliant to security rules of year 3000
+			return this.usersService.findOne(jwtResponse.sub)
+		} catch (e) {
+			console.log(`Error in validate Dfa access is ${e}`)
+			return null
+		}
+	}
+
 	decodeToken(bearerToken: string): Promise<User> | null {
 		try {
 			// console.log(`Bearer token is ${bearerToken}`)

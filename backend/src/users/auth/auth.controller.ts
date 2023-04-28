@@ -10,6 +10,7 @@ import { DfaCodeDto } from '../dtos/dfa-code.dto'
 import { Tokens } from '../../type';
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { CreateUserDto } from '../dtos/create-user.dto';
+import { DfaGuard } from '../guard/2fa-token.guard';
 
 
 @Controller('auth')
@@ -44,13 +45,12 @@ export class AuthController {
 		const tokens = await this.authService.login(body);
 		if (tokens.dfaToken) {
 			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: true, maxAge: 60 * 60 });
-			return { needDfa: true }
+			res.redirect(302, '/dfa')
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
 			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
 			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
 		}
-		return { needDfa: false };
 	};
 
 	@Get('/allTokens')
@@ -78,9 +78,15 @@ export class AuthController {
 		//Code received after user granted acces to our app visiting the link in this.redirectTo42Api
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
 		const tokens = await this.authService.validate42Code(query.code)
-		res.cookie('access_token', `${tokens.accessToken}`)
-		res.cookie('refresh_token', `${tokens.refreshToken}`)
-		res.redirect(302, '/')
+		if (tokens.dfaToken) {
+			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: true, maxAge: 1000 * 60 * 60 });
+			res.redirect(302, '/dfa')
+		}
+		else if (tokens.accessToken && tokens.refreshToken) {
+			res.cookie('access_token', `${tokens.accessToken}`)
+			res.cookie('refresh_token', `${tokens.refreshToken}`)
+			res.redirect(302, '/')
+		}
 	}
 
 	@Post('turn-on-2fa')
@@ -92,5 +98,24 @@ export class AuthController {
 		if (!isValidCode)
 			throw new UnauthorizedException("I don't think so")
 		this.authService.turnOnDfa(req.currentUser.id)
+	}
+	@Post('validate-dfa')
+	@HttpCode(200)
+	@UseGuards(DfaGuard)
+	async validateDfa(@Body() { code }: DfaCodeDto, @Request() req, @Response({ passthrough: true }) res: ExpressResponse) {
+		// get user
+		const user = await this.authService.validateDfaToken(req.cookies['dfa_token'])
+		if (!user)
+			throw new UnauthorizedException("I don't think so")
+		const isValidCode = this.authService.is2faCodeValid(code, user)
+		if (!isValidCode)
+			throw new UnauthorizedException("I don't think so")
+		const tokens = this.authService.getTokens(user);
+		if (tokens.accessToken && tokens.refreshToken) {
+			this.authService.saveRefreshToken(user.id, tokens.refreshToken);
+			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
+			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
+			res.cookie('dfa_token', '', { httpOnly: true, maxAge: 0 });
+		}
 	}
 }
