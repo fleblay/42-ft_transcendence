@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SocketContext } from '../socket/SocketProvider';
 import { Update } from 'vite/types/hmrPayload';
-import { IgameInfo, GameStatus } from '../types';
+import { IgameInfo, GameStatus, GameOptions } from '../types';
 import { GameScreen } from './GameScreen';
 import { Box, Button, Checkbox, Container,  Step, StepLabel, Stepper } from '@mui/material';
 import axios from 'axios';
@@ -52,13 +52,12 @@ export function CreateGame() {
 
 	const [privateGame, setPrivateGame] = useState<boolean>(false);
 
-	function joinGames(game?: string) {
+	function joinGames(game?: string, options : GameOptions = {obstacles : true, shoot: true}) {
 		if (game) {
 			navigate(`/game/${game}`);
 		}
 		else {
-			//customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {map:'bob'}, ({ gameId }: { gameId: number }) => {
-			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {map:'bob'}, (gameId : string ) => {
+			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', {options}, (gameId : string ) => {
 				console.log("game created", gameId);
 				navigate(`/game/${gameId}`);
 				console.log("nav ok", gameId);

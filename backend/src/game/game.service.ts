@@ -11,6 +11,7 @@ import { PlayerInputDto } from '../events/dtos/player-input.dto'
 import { IgameInfo } from './game';
 import { SavedGame } from '../model/saved-game.entity';
 import { UserStatus } from '../type';
+import {GameOptions} from './game'
 
 
 @Injectable()
@@ -29,15 +30,15 @@ export class GameService {
 		this.gameCluster.setServer(server)
 	}
 
-	create(map: number): UUID {
-		let game = this.gameCluster.createGame(true);
+	create(options : GameOptions): UUID {
+		let game = this.gameCluster.createGame(true, options);
 		return game.id
 	}
 
-	findOrCreate(map: number): UUID {
+	findOrCreate(options: GameOptions): UUID {
 		let game = this.gameCluster.findAvailable()
 		if (game === null)
-			game = this.gameCluster.createGame();
+			game = this.gameCluster.createGame(false, options);
 		return game.id
 	}
 

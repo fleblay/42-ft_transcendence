@@ -26,24 +26,20 @@ export type projectile = {
 	pos: Pos2D,
 	velocity: Pos2D,
 	active: boolean,
-	maxBounce: number
+	maxBounce: number,
 }
 
-export type GameSetting = {
-	paddleLength: number,
-	paddleWidth: number,
-	ballSize: number,
-	ballSpeed: number,
-	playerSpeed: number,
-	canvasHeight: number,
-	canvasWidth: number,
+export type GameOptions = {
+	ballSpeed?: number,
+	shoot?: boolean,
+	obstacles?: boolean
 }
 
 interface gameAsset {
 	x: number,
 	y: number,
 	width: number,
-	height: number
+	height: number,
 }
 
 export type Player = {
@@ -56,7 +52,7 @@ export type Player = {
 	score: number,
 	user: User,
 	leaving: boolean,
-	clientId: SocketId
+	clientId: SocketId,
 }
 
 export type Viewer = {
@@ -70,8 +66,7 @@ export interface IgameInfo {
 
 	players: Partial<Player>[], // requiered partial to strip client for Players
 	assets: gameAsset[],
-	posBall: Pos2D,
-	velocityBall: number,
+	ball: projectile,
 	status: GameStatus,
 	date: Date
 }
@@ -83,26 +78,48 @@ interface PlayerInput {
 
 enum Collide { "none" = 0, "left", "right", "down", "up" }
 
+const initBall: projectile = {
+	pos: { x: canvasWidth / 2, y: canvasHeight / 2 },
+	velocity: { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) },
+	active: true,
+	maxBounce: Infinity
+}
+
+function initShoot(playerIndex: number): projectile {
+	return ({
+		pos: { x: (playerIndex == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
+		velocity: { x: (playerIndex == 0) ? 1 : -1, y: 0 },
+		maxBounce: maxBounce,
+		active: false,
+	})
+}
+
 export class Game {
-	private posBall: Pos2D = { x: canvasWidth / 2, y: canvasHeight / 2 }
-	private velocityBall: { x: number, y: number } = { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) }
+	private ball: projectile = initBall
+	private initballSpeed: number = 1
 	private intervalId: NodeJS.Timer
 	private reduceInterval: NodeJS.Timer
 	public players: Player[] = []
-	public assets: gameAsset[] = [
-		{ x: 100, y: 70, width: 70, height: 70 },
-		{ x: canvasWidth - 70 - 70, y: canvasHeight - 100 - 70, width: 70, height: 70 },
-		{ x: 250, y: 200, width: 70, height: 70 },
-		{ x: canvasWidth - 250 - 70, y: canvasHeight - 200 - 80, width: 70, height: 70 },
-	]
+	public assets: gameAsset[] = []
 	public viewers: Viewer[] = []
 	public status: GameStatus = GameStatus.waiting
 	public readonly playerRoom: string
 	public readonly viewerRoom: string
 
-	constructor(public gameId: UUID, private server: Server, public privateGame: boolean = false, private gameCluster: GameCluster) {
+	constructor(public gameId: UUID,
+		private server: Server,
+		public privateGame: boolean,
+		public options: GameOptions) {
+
 		this.playerRoom = gameId + ":player"
 		this.viewerRoom = gameId + ":viewer"
+		this.assets = (options?.obstacles) ?
+			[
+				{ x: 100, y: 70, width: 70, height: 70 },
+				{ x: canvasWidth - 70 - 70, y: canvasHeight - 100 - 70, width: 70, height: 70 },
+				{ x: 250, y: 200, width: 70, height: 70 },
+				{ x: canvasWidth - 250 - 70, y: canvasHeight - 200 - 80, width: 70, height: 70 },
+			] : []
 	}
 
 	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
@@ -137,10 +154,7 @@ export class Game {
 					foundPlayer.timeLastMove = Date.now()
 					break
 				case ("Shoot"):
-					if (foundPlayer.shoot.active == false) {
-						//foundPlayer.shoot.pos.x = (foundPlayer == this.players[0]) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1)
-						foundPlayer.shoot.active = true
-					}
+					foundPlayer.shoot.active = true
 					break
 				default:
 			}
@@ -163,9 +177,8 @@ export class Game {
 		return {
 			players: partialPlayers, // instead of Player
 			assets: this.assets,
-			posBall: this.posBall,
+			ball: this.ball,
 			status: this.status,
-			velocityBall: Math.sqrt(Math.pow(this.velocityBall.x, 2) + Math.pow(this.velocityBall.y, 2)),
 			date: new Date()
 		}
 	}
@@ -198,12 +211,7 @@ export class Game {
 				user,
 				leaving: false,
 				clientId: client.id,
-				shoot: {
-					pos: { x: (this.players.length == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
-					velocity: { x: (this.players.length == 0) ? 1 : -1, y: 0 },
-					maxBounce: 3,
-					active: false
-				},
+				shoot: initShoot(this.players.length)
 			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1) {
@@ -213,10 +221,10 @@ export class Game {
 			if (this.players.length === 2) {
 				this.countdown(5)
 				this.reduceInterval = setInterval(() => {
-					if (this.players[0].paddleLength > 100)
-						this.players[0].paddleLength -= 0 // 2 normal, 0 debug
-					if (this.players[1].paddleLength > 100)
-						this.players[1].paddleLength -= 0 // 2 normal, 0 debug
+					this.players.forEach((player) => {
+						if (player.paddleLength > 100)
+							player.paddleLength -= 2
+					})
 				}, 500)
 			}
 		}
@@ -356,11 +364,10 @@ export class Game {
 	resetBallAndPlayers() {
 		this.status = GameStatus.start
 		this.countdown(3)
-		this.posBall = { x: canvasWidth / 2, y: canvasHeight / 2 }
-		this.velocityBall = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
+		this.ball.pos = { x: canvasWidth / 2, y: canvasHeight / 2 }
+		this.ball.velocity = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
 		this.players.forEach((player) => {
 			player.pos = canvasHeight / 2 - player.paddleLength / 2
-			player.momentum = 0
 			player.paddleLength = paddleLength
 		})
 	}
@@ -370,21 +377,20 @@ export class Game {
 		if (this.status === GameStatus.playing) {
 
 			//Gestion de la collision des assets avec mouvement
-			this.updateBall({ pos: this.posBall, velocity: this.velocityBall })
-
+			this.updateBall(this.ball)
 
 			//Condition de marquage de point
-			if (this.posBall.x <= 0) {
+			if (this.ball.pos.x <= 0) {
 				this.players[1].score += 1
 				this.resetBallAndPlayers()
 			}
-			else if (this.posBall.x >= canvasWidth) {
+			else if (this.ball.pos.x >= canvasWidth) {
 				this.players[0].score += 1
 				this.resetBallAndPlayers()
 			}
 
 			//Condition fin de jeu
-			if (this.players[0].score == victoryRounds || this.players[1]?.score == victoryRounds) {
+			if (!this.players.every((player) => player.score < victoryRounds)) {
 				console.log(`Game ended with ${victoryRounds} round`)
 				this.status = GameStatus.end
 			}
@@ -412,13 +418,8 @@ export class Game {
 				this.players[1].paddleLength *= (2 / 3)
 			}
 			//Reset du shoot
-			if (player.shoot.pos.x <= 0 || player.shoot.pos.x >= canvasWidth || player.shoot.maxBounce == 0) {
-				player.shoot.active = false
-				player.shoot.pos.x = (index == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1)
-				player.shoot.velocity.x = (index == 0) ? 1 : -1
-				player.shoot.velocity.y = 0
-				player.shoot.maxBounce = maxBounce
-			}
+			if (player.shoot.pos.x <= 0 || player.shoot.pos.x >= canvasWidth || player.shoot.maxBounce == 0)
+				player.shoot = initShoot(index)
 		})
 		//Envoi des infos
 		this.updateInfo(this.generateGameInfo());

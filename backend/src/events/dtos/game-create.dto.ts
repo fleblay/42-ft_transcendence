@@ -1,7 +1,5 @@
-enum ListMap {
-	// ...
-}
+import {GameOptions} from '../../game/game'
 
 export interface GameCreateDto {
-	map?: ListMap
+	options?: GameOptions
 }

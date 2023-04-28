@@ -268,7 +268,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		// Ball
 		context.current.fillStyle = ballcolor
 		context.current.beginPath();
-		context.current.arc(gameInfo.posBall.x * canvasRatio, gameInfo.posBall.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+		context.current.arc(gameInfo.ball.pos.x * canvasRatio, gameInfo.ball.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
 		context.current.fill();
 
 		// Scores
@@ -287,7 +287,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			context.current.fillText(player2username, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2username).width), 20 * canvasRatio)
 		}
 
-	}, [gameInfo.players, gameInfo.posBall]);
+	}, [gameInfo.players, gameInfo.ball.pos]);
 
 	return (
 		<div>
@@ -295,9 +295,10 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			<div> {displayInfo ?
 				<>
 					<div> <h1>Game Info :</h1></div>
-					<div> Velocity :{gameInfo?.velocityBall.toPrecision(3)} </div>
-					<div> posBall x :{gameInfo?.posBall.x} </div>
-					<div> posBall y: {gameInfo?.posBall.y} </div>
+					<div> Velocity x :{(gameInfo?.ball.velocity.x)} </div>
+					<div> Velocity y :{(gameInfo?.ball.velocity.y)} </div>
+					<div> posBall x :{gameInfo?.ball.pos.x} </div>
+					<div> posBall y: {gameInfo?.ball.pos.y} </div>
 					<div> posP1: {gameInfo?.players[0].pos} </div>
 					<div> momentumP1: {gameInfo?.players[0].momentum} </div>
 					<div> paddleLengthP1: {gameInfo?.players[0].paddleLength} </div>

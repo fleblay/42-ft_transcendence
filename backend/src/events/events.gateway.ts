@@ -118,7 +118,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		console.log("New create event")
 		this.updateSocket(client, "gamecreate")
 		try {
-			const gameId = this.gameService.create(data.map)
+			const gameId = this.gameService.create(data.options)
 			//const gameId = this.gameService.create(data[0].map)
 			//console.log("Game id is : ", gameId);
 			return gameId
@@ -135,7 +135,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		try {
 			console.log('trying to find or create game', data)
 			//const gameId = this.gameService.findOrCreate(data[0].map)
-			const gameId = this.gameService.findOrCreate(data.map)
+			const gameId = this.gameService.findOrCreate(data.options)
 			console.log('After log', gameId)
 			//console.log("Game id is : ", gameId);
 			return gameId

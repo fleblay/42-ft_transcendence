@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Game, Player } from './game';
+import { Game, Player, GameOptions } from './game';
 import { v4 as uuidv4 } from 'uuid';
 import { SocketId, UUID, UserState, UserStatus } from '../type';
 import { Server, Socket } from 'socket.io'
@@ -31,8 +31,9 @@ export class GameCluster {
 		this.server = newserver
 	}
 
-	createGame(privateGame: boolean = false): Game {
-		const game = new Game(this.generateGameId(), this.server, privateGame, this);
+	createGame(privateGame: boolean = false, options : GameOptions = {}): Game {
+		const game = new Game(this.generateGameId(), this.server, privateGame, options);
+		//const game = new Game(this.generateGameId(), this.server, privateGame, options);
 		this.gamesMap.set(game.id, game);
 		return game;
 	};
