@@ -59,7 +59,7 @@ export function DfaForm() {
                         <Grid container spacing={2} alignItems="center">
 
                             <Grid item xs={12}>
-                                <AuthCode allowedCharacters='numeric' inputClassName="otp-input" onChange={handleOnChange} />
+                                <AuthCode allowedCharacters='numeric' inputClassName="dfa-input" onChange={handleOnChange} />
 
                             </Grid>
                             <Grid item xs={12}>

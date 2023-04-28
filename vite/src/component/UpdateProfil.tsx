@@ -1,6 +1,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Container, Switch, Typography } from '@mui/material';
+import { Button, Container, Grid, Switch, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
 import { FormEvent } from 'react';
 
@@ -17,6 +17,9 @@ import { UsernameDialog } from './UsernameDialog';
 import { UserDataProvider, UserDataContext } from '../userDataProvider/userDataProvider';
 import { SocialDistanceTwoTone } from '@mui/icons-material';
 import { SocketContext } from '../socket/SocketProvider';
+import AuthCode from 'react-auth-code-input';
+import './DfaForm.css'
+
 
 function fileToBlob(file: File) {
 	const blob = new Blob([file], { type: file.type });
@@ -32,7 +35,10 @@ export function UpdateProfil() {
 	const { userData, setUserData } = useContext(UserDataContext);
 	const [responseFile, setResponseFile] = useState<string>('');
 	const [base64Img, setBase64Img] = useState<string>('');
+	const [openDfa, setOpenDfa] = useState<boolean>(false);
 	const socket = useContext(SocketContext);
+	const [result, setResult] = useState<string>("");
+
 
 	useEffect(() => {
 		if (userData?.dfa !== undefined)
@@ -83,16 +89,28 @@ export function UpdateProfil() {
 
 	const handleOpenImg = () => setOpenImg(true);
 	const handleCloseImg = () => setOpenImg(false);
+	const handleOpenDfa = () => setOpenDfa(true);
+	const handleCloseDfa = () => setOpenDfa(false);
 
 
 	const handleAuthenticator = () => {
-		const code = prompt('Enter your 2FA code here :')
-		apiClient.post('/api/auth/turn-on-2fa', { code }).then(() => {
+		console.log("result", result);
+
+		apiClient.post('/api/auth/turn-on-2fa', { result }).then(() => {
+			console.log ("2fa turned on");
 			setDfa(true);
 		})
 	}
 
+	const handleOnChange = (res: string) => {
+		setResult(res);
+	};
+
+
 	const handle2FaChange = () => {
+		if (!dfa)
+			setOpenDfa(true);
+
 		apiClient.post(`/api/users/toggle2fa`).then((response) => {
 			if (response.data == 'turned-off') {
 				setDfa(false);
@@ -133,7 +151,7 @@ export function UpdateProfil() {
 						alignItems: 'center',
 					}}
 						style={{
-							backgroundColor: '#f0f0f0'
+							backgroundColor: '#ffffff'
 						}}>
 						<form onSubmit={handleSubmit}>
 							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Update avatar</Typography>
@@ -150,8 +168,40 @@ export function UpdateProfil() {
 			<FormGroup>
 				<FormControlLabel control={<Switch checked={dfa} onChange={handle2FaChange} />} label="Active 2fA" />
 			</FormGroup>
-			{base64Img.length ? <img src={base64Img} alt="QRCODE" /> : false}
-			{base64Img.length ? <button onClick={handleAuthenticator}>Give Authenticator Code</button> : <></>}
+			<Modal open={openDfa} onClose={handleCloseDfa} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+				<Container maxWidth="sm" className="centered-container" >
+					<Box sx={{
+						width: '100%',
+						border: '1px solid #D3C6C6',
+						boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+						borderRadius: '16px',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+					}}
+						style={{
+							backgroundColor: '#ffffff'
+						}}>
+						<form onSubmit={handleAuthenticator}>
+							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Give Authenticator Code</Typography>
+							<Divider />
+							<Grid container justifyContent="center" sx={{ flexGrow: 1, p: '2rem' }} >
+								<Grid item>
+									{base64Img.length ? <img src={base64Img} alt="QRCODE" /> : false}
+								</Grid>
+							</Grid>
+							<AuthCode allowedCharacters='numeric' inputClassName="dfa-input" onChange={handleOnChange} />
+							<Divider />
+							<Button variant="contained" type="submit" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>Submit</Button>
+							<Divider />
+							<div> {responseFile} </div>
+						</form>
+						<Button onClick={handleCloseDfa}>Close</Button>
+					</Box>
+				</Container>
+			</Modal>
+			{/* {base64Img.length ? <img src={base64Img} alt="QRCODE" /> : false}
+			{base64Img.length ? <button onClick={handleAuthenticator}>Give Authenticator Code</button> : <></>} */}
 		</React.Fragment>
 	)
 }
