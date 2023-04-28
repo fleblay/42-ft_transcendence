@@ -78,13 +78,6 @@ interface PlayerInput {
 
 enum Collide { "none" = 0, "left", "right", "down", "up" }
 
-const initBall: projectile = {
-	pos: { x: canvasWidth / 2, y: canvasHeight / 2 },
-	velocity: { x: (Math.random() > 0.5 ? 1 : -1), y: (Math.random() > 0.5 ? 1 : -1) },
-	active: true,
-	maxBounce: Infinity
-}
-
 function initShoot(playerIndex: number): projectile {
 	return ({
 		pos: { x: (playerIndex == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
@@ -95,8 +88,7 @@ function initShoot(playerIndex: number): projectile {
 }
 
 export class Game {
-	private ball: projectile = initBall
-	private initballSpeed: number = 1
+	private ball: projectile
 	private intervalId: NodeJS.Timer
 	private reduceInterval: NodeJS.Timer
 	public players: Player[] = []
@@ -113,14 +105,26 @@ export class Game {
 
 		this.playerRoom = gameId + ":player"
 		this.viewerRoom = gameId + ":viewer"
-		this.assets = (options?.obstacles) ?
+		options?.obstacles && (this.assets =
 			[
 				{ x: 100, y: 70, width: 70, height: 70 },
 				{ x: canvasWidth - 70 - 70, y: canvasHeight - 100 - 70, width: 70, height: 70 },
 				{ x: 250, y: 200, width: 70, height: 70 },
 				{ x: canvasWidth - 250 - 70, y: canvasHeight - 200 - 80, width: 70, height: 70 },
-			] : []
+			])
+		this.initBall(options?.ballSpeed || 1)
 	}
+
+
+	initBall(ballSpeed: number) {
+		this.ball = {
+			pos: { x: canvasWidth / 2, y: canvasHeight / 2 },
+			velocity: { x: (Math.random() > 0.5 ? 1 : -1) * ballSpeed, y: (Math.random() > 0.5 ? 1 : -1) * ballSpeed },
+			active: true,
+			maxBounce: Infinity
+		}
+	}
+
 
 	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
 		const foundPlayer = this.players.find(player => userId === player.user.id)
@@ -154,7 +158,7 @@ export class Game {
 					foundPlayer.timeLastMove = Date.now()
 					break
 				case ("Shoot"):
-					foundPlayer.shoot.active = true
+					this.options?.shoot && (foundPlayer.shoot.active = true)
 					break
 				default:
 			}
@@ -364,8 +368,7 @@ export class Game {
 	resetBallAndPlayers() {
 		this.status = GameStatus.start
 		this.countdown(3)
-		this.ball.pos = { x: canvasWidth / 2, y: canvasHeight / 2 }
-		this.ball.velocity = { x: (Math.random() > 0.5) ? 1 : -1, y: (Math.random() > 0.5) ? 1 : -1 }
+		this.initBall(this.options?.ballSpeed || 1)
 		this.players.forEach((player) => {
 			player.pos = canvasHeight / 2 - player.paddleLength / 2
 			player.paddleLength = paddleLength
