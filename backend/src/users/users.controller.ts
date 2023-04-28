@@ -55,11 +55,11 @@ export class UsersController {
 	@UseGuards(ATGuard)
 	@Get('/me')
 	@Serialize(UserDto)
-	getMe(@Headers('authorization') auth: string) {
-		if (!auth) {
-			throw new ForbiddenException('No token provided');
+	getMe(@Request() req) {
+		const token = req.cookies['access_token'];
+		if (!token) {
+			throw new ForbiddenException('User not found');
 		}
-		const token = auth.replace('Bearer ', '');
 		return this.authService.validateAccessToken(token);
 	}
 

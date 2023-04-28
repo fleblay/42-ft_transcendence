@@ -71,6 +71,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	async handleConnection(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
+		console.log("event gateway handleConnection", bearerToken);
 		const foundUser = await this.authService.validateAccessToken(bearerToken)
 
 		if (!foundUser)
