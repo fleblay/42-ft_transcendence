@@ -16,7 +16,7 @@ interface Iprops {
 }
 
 interface JoinGamesProps {
-	joinGames: (game?: string) => void;
+	joinGames: (options: GameOptions, game?: string) => void;
 }
 
 const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
@@ -35,7 +35,7 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 				{listGames.map((gameId) => {
 					return <div key={gameId}>
 						<button onClick={() => {
-							joinGames(gameId);
+							joinGames({}, gameId);
 						}}>Join game {gameId}
 						</button>{gameId}
 					</div>
@@ -51,8 +51,10 @@ export function CreateGame() {
 	const { customEmit } = React.useContext(SocketContext);
 
 	const [privateGame, setPrivateGame] = useState<boolean>(false);
+	const [obstacles, setObsctacles] = useState<boolean>(false);
+	const [shoot, setShoot] = useState<boolean>(false);
 
-	function joinGames(game?: string, options : GameOptions = {obstacles : true, shoot: true}) {
+	function joinGames(options : GameOptions, game ?: string) {
 		if (game) {
 			navigate(`/game/${game}`);
 		}
@@ -87,10 +89,14 @@ export function CreateGame() {
 
 					<span>Private</span>
 					<Checkbox onChange={(e) => { setPrivateGame(e.target.checked) }} />
+					<span>Obstacles</span>
+					<Checkbox onChange={(e) => { setObsctacles(e.target.checked) }} />
+					<span>Shoot</span>
+					<Checkbox onChange={(e) => { setShoot(e.target.checked) }} />
 
 					<Button variant='contained' onClick={() => {
 						setActiveStep(1);
-						joinGames()
+						joinGames({obstacles, shoot})
 					}}>
 						{privateGame ? "Create a private game" : "Join a game"}
 					</Button>
