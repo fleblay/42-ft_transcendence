@@ -39,6 +39,7 @@ export class AuthService {
 	}
 
 	is2faCodeValid(dfaCode: string, user: User) {
+		console.log("is2facodevalid")
 		return authenticator.verify({ token: dfaCode, secret: user.dfaSecret })
 	}
 
