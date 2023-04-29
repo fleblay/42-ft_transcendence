@@ -105,3 +105,8 @@ body {
 .game-info {
   margin-left: 20px;
 }
+
+.center-image {
+  display: block;
+  margin: auto;
+}
