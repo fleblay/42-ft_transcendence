@@ -25,18 +25,17 @@ enum LoadingStatus {
 interface IgameModuleProps {
 	setActiveStep: (step: number) => void;
 	width: number;
-	gameInfo: IgameInfo,
-	setGameInfo: (gameInfo: IgameInfo) => void;
+	setResult: (gameInfo: IgameInfo | null) => void;
 	bottomRef: React.RefObject<HTMLInputElement>;
 }
 
 
 
-export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottomRef }: IgameModuleProps) {
+export function GameModule({setActiveStep, width, setResult, bottomRef }: IgameModuleProps) {
 	const [loading, setLoading] = useState<LoadingStatus>(LoadingStatus.Loading);
 	const [joined, setJoined] = useState<boolean>(false);
 	const { socket, customEmit } = useContext(SocketContext);
-
+	const [gameInfo, setGameInfo] = useState<IgameInfo | null>(null);
 	const [countdown, setCountdown] = useState<number>(0);
 
 	const { idGame } = useParams<{ idGame: string }>();
@@ -58,19 +57,21 @@ export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottom
 				setGameInfo(response.gameInfo as IgameInfo);
 				setLoading(LoadingStatus.Loaded);
 			}
-
 		});
 	}, [joined]);
 
 	useEffect(() => {
+		if (!gameInfo)
+			return
 		console.log('gameInfo.status', gameInfo.status);
 		if (gameInfo.status === GameStatus.playing || gameInfo.status === GameStatus.start) {
 			setActiveStep(2);
 		}
 		if (gameInfo.status === GameStatus.end) {
 			setActiveStep(3);
+			setResult(gameInfo)
 		}
-	}, [gameInfo.status])
+	}, [gameInfo?.status])
 
 
 	useEffect(() => {
@@ -106,7 +107,7 @@ export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottom
 
 	// TODO: Crash, gameInfo is undefined. game.update est seulement dans gamescreen. game.join envoie un gameInfo pour init ?
 	if (loading === LoadingStatus.Loaded && idGame) {
-		if (gameInfo.status === GameStatus.waiting || gameInfo.status === GameStatus.playing || gameInfo.status === GameStatus.start) {
+		if (gameInfo?.status === GameStatus.waiting || gameInfo?.status === GameStatus.playing || gameInfo?.status === GameStatus.start) {
 			return (
 				<>
 					{

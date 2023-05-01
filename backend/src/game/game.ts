@@ -70,6 +70,7 @@ export type Viewer = {
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
 
+
 export interface IgameInfo {
 
 	players: Partial<Player>[], // requiered partial to strip client for Players
