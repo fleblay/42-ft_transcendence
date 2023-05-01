@@ -248,7 +248,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 			context.current.fillRect(0, gameInfo.players[0].pos * canvasRatio, gameInfo.players[0].paddleWidth * canvasRatio, gameInfo.players[0].paddleLength * canvasRatio);
 			if (gameInfo.players[0].shoot.active) {
 				context.current.beginPath();
-				context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+				context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, gameInfo.players[0].shoot.size * canvasRatio, 0, 2 * Math.PI)
 				context.current.fill();
 			}
 		}
@@ -258,7 +258,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 			context.current.fillRect((canvasWidth - gameInfo.players[1].paddleWidth) * canvasRatio, gameInfo.players[1].pos * canvasRatio, gameInfo.players[1].paddleWidth * canvasRatio, gameInfo.players[1].paddleLength * canvasRatio);
 			if (gameInfo.players[1].shoot.active) {
 				context.current.beginPath();
-				context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+				context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, gameInfo.players[0].shoot.size * canvasRatio, 0, 2 * Math.PI)
 				context.current.fill();
 			}
 		}
@@ -281,7 +281,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 		// Ball
 		context.current.fillStyle = ballcolor
 		context.current.beginPath();
-		context.current.arc(gameInfo.ball.pos.x * canvasRatio, gameInfo.ball.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+		context.current.arc(gameInfo.ball.pos.x * canvasRatio, gameInfo.ball.pos.y * canvasRatio, gameInfo.ball.size * canvasRatio, 0, 2 * Math.PI)
 		context.current.fill();
 
 		// Scores
@@ -293,15 +293,15 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 		// Player Info
 		context.current.font = `${20 * canvasRatio}px serif`
 		context.current.fillStyle = player1color
-		context.current.fillText(`${gameInfo.players[0].user.username}`, 5 * canvasRatio, 20 * canvasRatio)
+		context.current.fillText(`${gameInfo.players[0].user.username} : ${gameInfo.players[0].amo}`, 5 * canvasRatio, 20 * canvasRatio)
 		context.current.fillStyle = player2color
 		if (gameInfo.players[1]) {
-			const player2username = gameInfo.players[1].user.username
-			context.current.fillText(player2username, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2username).width), 20 * canvasRatio)
+			const player2info = `${gameInfo.players[1].user.username} : ${gameInfo.players[1].amo}`
+			context.current.fillText(player2info, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2info).width), 20 * canvasRatio)
 		}
 
 	}, [gameInfo.players, gameInfo.ball.pos]);
-
+	
 	return (
 		<div>
 			<button onClick={handleClick}>{(displayInfo) ? "Hide" : "Show" + " Info"}</button>
