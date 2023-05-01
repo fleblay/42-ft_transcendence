@@ -17,6 +17,7 @@ import { FriendList } from './component/FriendList'
 import { BlockedList } from './component/BlockedList';
 import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
+import { NewGamePage } from './component/NewGamePage';
 
 export interface Destinations {
 	name: string,
@@ -33,7 +34,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
 	{ name: "Friends", path: "/friends", public: false },
 	{ name: "Blocked", path: "/blocked", public: false },
-
+	{ name: "newGamePage", path: "/newgame", public: false},
 
 ]
 
@@ -97,10 +98,10 @@ function Header() {
 
 			<ul>
 				<li>
-					<Link to="/Game">Game Page</Link>
+					<Link to="/game">Game Page</Link>
 				</li>
 				<li>
-					<Link to="/Chat">Chat Page</Link>
+					<Link to="/chat">Chat Page</Link>
 				</li>
 			</ul>
 
@@ -182,6 +183,20 @@ function App() {
 								</RequireAuth>
 							} />
 						</Route>
+
+						<Route path="newgame/">
+							<Route path=":idGame" element={
+								<RequireAuth>
+									<NewGamePage />
+								</RequireAuth>
+							} />
+							<Route path="" element={
+								<RequireAuth>
+									<NewGamePage />
+								</RequireAuth>
+							} />
+						</Route>
+
 						<Route path='/public' element={<div>Public</div>} />
 						<Route
 							path="/chat"
