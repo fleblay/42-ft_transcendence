@@ -35,7 +35,7 @@ export function GamePage() {
         else if (!idGame) {
             setActiveStep(0);
         }
-        else (activeStep === 3)
+        else if (activeStep === 3)
         {
             setResult(gameInfo);
             setGameInfo({} as IgameInfo);

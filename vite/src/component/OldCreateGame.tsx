@@ -46,7 +46,7 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 	);
 }
 
-export function CreateGame() {
+export function OldCreateGame() {
 	const navigate = useNavigate();
 	const { customEmit } = React.useContext(SocketContext);
 

@@ -3,7 +3,7 @@ import { SocketContext } from '../socket/SocketProvider';
 import { IgameInfo, GameStatus } from "../types";
 import { useParams } from "react-router-dom";
 import { useAuthService } from '../auth/AuthService'
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, CssBaseline, Typography } from "@mui/material";
 
 interface Iprops {
 	gameInfo: IgameInfo,
@@ -161,7 +161,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
 	const [keyDown, setKeyDown] = useState({ up: false, down: false, shoot: false });
-	const [canvasRatio, setCanvasRatio] = useState<number>(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
+	const [canvasRatio, setCanvasRatio] = useState<number>(0.9 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
 
 	const handleClick = () => {
@@ -170,7 +170,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 
 	useEffect(() => {
 		console.log("width", width);
-		setCanvasRatio(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
+		setCanvasRatio(0.9 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
 	}, [width])
 
 
@@ -324,6 +324,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 				</> : <></>}
 			</div>
 			<div>
+				<CssBaseline/>
 				<canvas width={canvasWidth * canvasRatio} height={canvasHeight * canvasRatio} style={{
 					border: "1px solid black", display: "block", marginLeft: "auto", marginRight: "auto"
 				}} ref={canvasRef} />

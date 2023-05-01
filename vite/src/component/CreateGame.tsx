@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SocketContext } from '../socket/SocketProvider';
 import { Update } from 'vite/types/hmrPayload';
 import { IgameInfo, GameStatus, GameOptions } from '../types';
@@ -87,7 +87,7 @@ export function CreateGame() {
 
 	function joinGame(options: GameOptions, gameId?: string) {
 		if (gameId) {
-			navigate(`/newgame/${gameId}`);
+			navigate(`/game/${gameId}`);
 		}
 		else {
 			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', { options }, (gameId: string) => {
@@ -97,6 +97,12 @@ export function CreateGame() {
 			});
 		}
 	}
+	useEffect(() => {
+		console.log("createGame mounted");
+		return () => {
+			console.log("createGame unmounted");
+		}
+	}, []);
 
 	return (
 
