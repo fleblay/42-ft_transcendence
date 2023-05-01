@@ -11,7 +11,6 @@ interface Iprops {
 
 const canvasHeight = 600
 const canvasWidth = 800
-const ballSize = 5
 
 enum LoadingStatus {
 	Loading,
@@ -235,7 +234,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			context.current.fillRect(0, gameInfo.players[0].pos * canvasRatio, gameInfo.players[0].paddleWidth * canvasRatio, gameInfo.players[0].paddleLength * canvasRatio);
 			if (gameInfo.players[0].shoot.active) {
 				context.current.beginPath();
-				context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+				context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, gameInfo.players[0].shoot.size * canvasRatio, 0, 2 * Math.PI)
 				context.current.fill();
 			}
 		}
@@ -245,7 +244,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 			context.current.fillRect((canvasWidth - gameInfo.players[1].paddleWidth) * canvasRatio, gameInfo.players[1].pos * canvasRatio, gameInfo.players[1].paddleWidth * canvasRatio, gameInfo.players[1].paddleLength * canvasRatio);
 			if (gameInfo.players[1].shoot.active) {
 				context.current.beginPath();
-				context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+				context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, gameInfo.players[0].shoot.size * canvasRatio, 0, 2 * Math.PI)
 				context.current.fill();
 			}
 		}
@@ -268,7 +267,7 @@ export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
 		// Ball
 		context.current.fillStyle = ballcolor
 		context.current.beginPath();
-		context.current.arc(gameInfo.ball.pos.x * canvasRatio, gameInfo.ball.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+		context.current.arc(gameInfo.ball.pos.x * canvasRatio, gameInfo.ball.pos.y * canvasRatio, gameInfo.ball.size * canvasRatio, 0, 2 * Math.PI)
 		context.current.fill();
 
 		// Scores

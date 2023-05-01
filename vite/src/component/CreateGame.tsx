@@ -62,6 +62,8 @@ export function CreateGame() {
 	const [startAmo, setStartAmo] = useState<number>(3);
 	const [ballSize, setBallSize] = useState<number>(5);
 	const [playerSpeed, setPlayerSpeed] = useState<number>(3);
+	const [shootSpeed, setShootSpeed] = useState<number>(1);
+	const [shootSize, setShootSize] = useState<number>(5);
 
 	function handlePaddleLenChange(event: Event, val: number | number[], thumb: number) {
 		const minDist = 50
@@ -127,7 +129,7 @@ export function CreateGame() {
 					<Checkbox onChange={(e) => { setShoot(e.target.checked) }} />
 					<div>BallSpeed
 						<Slider
-							aria-label="Game Speed"
+							aria-label="Ball Speed"
 							defaultValue={1}
 							valueLabelDisplay="on"
 							step={0.1}
@@ -139,6 +141,22 @@ export function CreateGame() {
 								{ value: 2, label: "fast" }
 							]}
 							onChange={(_, val) => setballSpeed(Array.isArray(val) ? val[0] : val)}
+						/>
+					</div>
+					<div>ShootSpeed
+						<Slider
+							aria-label="Shoots Speed"
+							defaultValue={1}
+							valueLabelDisplay="on"
+							step={0.1}
+							min={0.1}
+							max={2}
+							marks={[
+								{ value: 0.1, label: "slow" },
+								{ value: 1, label: "normal" },
+								{ value: 2, label: "fast" }
+							]}
+							onChange={(_, val) => setShootSpeed(Array.isArray(val) ? val[0] : val)}
 						/>
 					</div>
 					<div>Victory
@@ -223,7 +241,7 @@ export function CreateGame() {
 							onChange={(_, val) => setStartAmo(Array.isArray(val) ? val[0] : val)}
 						/>
 					</div>
-					<div>Ball and Amo size
+					<div>Ball size
 						<Slider
 							aria-label="ball Size"
 							defaultValue={5}
@@ -237,6 +255,22 @@ export function CreateGame() {
 								{ value: 10, label: "10" }
 							]}
 							onChange={(_, val) => setBallSize(Array.isArray(val) ? val[0] : val)}
+						/>
+					</div>
+					<div>Shoot size
+						<Slider
+							aria-label="shoot Size"
+							defaultValue={5}
+							valueLabelDisplay="on"
+							step={1}
+							min={1}
+							max={10}
+							marks={[
+								{ value: 1, label: "1" },
+								{ value: 5, label: "5" },
+								{ value: 10, label: "10" }
+							]}
+							onChange={(_, val) => setShootSize(Array.isArray(val) ? val[0] : val)}
 						/>
 					</div>
 					<div>Player Speed
@@ -258,7 +292,7 @@ export function CreateGame() {
 
 					<Button variant='contained' onClick={() => {
 						setActiveStep(1);
-						joinGames({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed })
+						joinGames({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed })
 					}}>
 						{privateGame ? "Create a private game" : "Join a game"}
 					</Button>

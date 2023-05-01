@@ -20,6 +20,8 @@ export type projectile = {
 	velocity: Pos2D,
 	active: boolean,
 	maxBounce: number,
+	size: number,
+	speed: number
 }
 
 //Todo : speed pour projectiles et ball
@@ -32,11 +34,12 @@ export type GameOptions = {
 	paddleLengthMin?: number,
 	paddleReduce?: number,
 	victoryRounds?: number,
-
 	maxBounce?: number,
 	startAmo?: number,
 	ballSize?: number
 	playerSpeed?: number,
+	shootSize?: number
+	shootSpeed?: number
 }
 
 interface gameAsset {
@@ -99,10 +102,12 @@ export class Game {
 	public paddleLengthMin: number
 	public paddleReduce: number
 	public maxBounce: number
-	public ballSpeed: number
 	public startAmo: number
+	public ballSpeed: number
 	public ballSize: number
 	public playerSpeed: number
+	public shootSize: number
+	public shootSpeed: number
 
 	constructor(public gameId: UUID,
 		private server: Server,
@@ -130,6 +135,8 @@ export class Game {
 		this.startAmo = (options?.startAmo !== undefined) ? options.startAmo : 3
 		this.ballSize = options?.ballSize || 5
 		this.playerSpeed = options?.playerSpeed || 3
+		this.shootSize = options?.shootSize || 5
+		this.shootSpeed = options?.shootSpeed || 1
 
 		this.initBall()
 	}
@@ -139,8 +146,10 @@ export class Game {
 		this.ball = {
 			pos: { x: canvasWidth / 2, y: canvasHeight / 2 },
 			velocity: { x: (Math.random() > 0.5 ? 1 : -1) * this.ballSpeed, y: (Math.random() > 0.5 ? 1 : -1) * this.ballSpeed },
+			maxBounce: Infinity,
+			size : this.ballSize,
+			speed : this.ballSpeed,
 			active: true,
-			maxBounce: Infinity
 		}
 	}
 
@@ -149,6 +158,8 @@ export class Game {
 			pos: { x: (playerIndex == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
 			velocity: { x: (playerIndex == 0) ? 1 : -1, y: 0 },
 			maxBounce: this.maxBounce,
+			size : this.shootSize,
+			speed : this.shootSpeed,
 			active: false,
 		})
 	}
@@ -346,18 +357,18 @@ export class Game {
 			return false
 	}
 
-	private updateBall(ball: { pos: Pos2D, velocity: Pos2D }): boolean {
+	private updateBall(ball: { pos: Pos2D, velocity: Pos2D , speed: number, size: number}): boolean {
 		let collide = false
 		//Essai de position pour la nouvelle balle
 		let newBall: Pos2D = { ...ball.pos };
-		newBall.x += ball.velocity.x * this.ballSpeed
-		newBall.y += ball.velocity.y * this.ballSpeed
+		newBall.x += ball.velocity.x * ball.speed
+		newBall.y += ball.velocity.y * ball.speed
 
 		// Collision mur
-		if (newBall.y > canvasHeight - this.ballSize && ball.velocity.y > 0) {
+		if (newBall.y > canvasHeight - ball.size && ball.velocity.y > 0) {
 			ball.velocity.y *= -1
 		}
-		else if (newBall.y < this.ballSize && ball.velocity.y < 0) {
+		else if (newBall.y < ball.size && ball.velocity.y < 0) {
 			ball.velocity.y *= -1
 		}
 

@@ -27,6 +27,8 @@ export type GameOptions = {
 	startAmo?: number,
 	ballSize?: number
 	playerSpeed?: number,
+	shootSize?: number,
+	shootSpeed?: number
 }
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }
@@ -58,7 +60,9 @@ export type projectile = {
 	velocity: Pos2D,
 	active: boolean,
 	color: string,
-	maxBounce: number
+	maxBounce: number,
+	speed: number,
+	size: number
 }
 
 export interface IgameInfo {
