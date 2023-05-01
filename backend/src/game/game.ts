@@ -24,7 +24,6 @@ export type projectile = {
 	speed: number
 }
 
-//Todo : speed pour projectiles et ball
 //Todo : objet d'init
 export type GameOptions = {
 	ballSpeed?: number,
@@ -281,7 +280,8 @@ export class Game {
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
 	}
 
-	private handleCollision(elem: gameAsset, ball: { pos: Pos2D, velocity: Pos2D }, newBall: Pos2D, bouncing: boolean = true, momentum: number = 0): boolean {
+	//Todo : gere la taille de la balle !!!!
+	private handleCollision(elem: gameAsset, ball: { pos: Pos2D, velocity: Pos2D, size: number }, newBall: Pos2D, bouncing: boolean = true, momentum: number = 0): boolean {
 		let intersect: Pos2D = { x: 0, y: 0 }
 		let relativeIntersectY: number = 0
 		let relativeIntersectX: number = 0
@@ -292,33 +292,45 @@ export class Game {
 		let collide: Collide = Collide.none
 
 		//Collision droite
-		if (!collide && newBall.x <= elem.x + elem.width && ball.pos.x >= elem.x + elem.width) {
-			intersect.x = elem.x + elem.width;
+		//if (!collide && newBall.x <= elem.x + elem.width && ball.pos.x >= elem.x + elem.width) {
+		if (!collide && newBall.x <= elem.x + elem.width + ball.size && ball.pos.x >= elem.x + elem.width + ball.size) {
+			//intersect.x = elem.x + elem.width
+			intersect.x = elem.x + elem.width + ball.size;
 			intersect.y = ball.pos.y + ((intersect.x - ball.pos.x) * (ball.pos.y - newBall.y) / (ball.pos.x - newBall.x));
-			if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height)
+			//if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height)
+			if (intersect.y + ball.size >= elem.y && intersect.y - ball.size <= elem.y + elem.height)
 				collide = Collide.right
 		}
 		//Collision gauche
-		else if (!collide && newBall.x >= elem.x && ball.pos.x <= elem.x) {
-			intersect.x = elem.x
+		//else if (!collide && newBall.x >= elem.x && ball.pos.x <= elem.x) {
+		else if (!collide && newBall.x + ball.size >= elem.x && ball.pos.x  + ball.size <= elem.x) {
+			//intersect.x = elem.x
+			intersect.x = elem.x - ball.size
 			intersect.y = ball.pos.y + ((intersect.x - ball.pos.x) * (ball.pos.y - newBall.y) / (ball.pos.x - newBall.x));
-			if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height)
+			//if (intersect.y >= elem.y && intersect.y <= elem.y + elem.height)
+			if (intersect.y + ball.size >= elem.y && intersect.y - ball.size <= elem.y + elem.height)
 				collide = Collide.left
 		}
 
 		//Collision bas
-		else if (!collide && newBall.y <= elem.y + elem.height && ball.pos.y >= elem.y + elem.height) {
-			intersect.y = elem.y + elem.height;
+		//else if (!collide && newBall.y <= elem.y + elem.height && ball.pos.y >= elem.y + elem.height) {
+		else if (!collide && newBall.y <= elem.y + elem.height + ball.size && ball.pos.y >= elem.y + elem.height + ball.size) {
+			//intersect.y = elem.y + elem.height;
+			intersect.y = elem.y + elem.height + ball.size;
 			intersect.x = ball.pos.x + ((intersect.y - ball.pos.y) * (ball.pos.x - newBall.x) / (ball.pos.y - newBall.y));
-			if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width)
+			//if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width)
+			if (intersect.x + ball.size >= elem.x && intersect.x - ball.size <= elem.x + elem.width)
 				collide = Collide.down
 		}
 
 		//Collision up
-		else if (!collide && newBall.y >= elem.y && ball.pos.y <= elem.y) {
-			intersect.y = elem.y;
+		//else if (!collide && newBall.y >= elem.y && ball.pos.y <= elem.y) {
+		else if (!collide && newBall.y + ball.size >= elem.y && ball.pos.y  + ball.size <= elem.y) {
+			//intersect.y = elem.y;
+			intersect.y = elem.y - ball.size;
 			intersect.x = ball.pos.x + ((intersect.y - ball.pos.y) * (ball.pos.x - newBall.x) / (ball.pos.y - newBall.y));
-			if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width)
+			//if (intersect.x >= elem.x && intersect.x <= elem.x + elem.width)
+			if (intersect.x + ball.size >= elem.x && intersect.x - ball.size <= elem.x + elem.width)
 				collide = Collide.up
 		}
 
