@@ -3,7 +3,7 @@ import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
-import { CreateGame, OldCreateGame } from './component/OldCreateGame'
+import { OldCreateGame } from './component/OldCreateGame'
 import { ListUsers } from './component/ListUsers'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'

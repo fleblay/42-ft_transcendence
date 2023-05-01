@@ -23,8 +23,6 @@ export function GamePage() {
     const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
     const bottomRef = useRef<HTMLInputElement>(null);
     const [result , setResult] = useState<IgameInfo>({} as IgameInfo);
-
-    const location = useLocation();
 	const { idGame } = useParams();
 
     useEffect(() => {
@@ -105,7 +103,7 @@ export function GamePage() {
                     <GameFinishedScreen gameInfo={result}/>
                 }
             </Box>
-            <FinishGames />
+            //<FinishGames />
         </Container >
         </>
     );
