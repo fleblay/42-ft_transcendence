@@ -14,7 +14,6 @@ interface Iprops {
 
 const canvasHeight = 600
 const canvasWidth = 800
-const ballSize = 5
 
 enum LoadingStatus {
 	Loading,
@@ -105,7 +104,6 @@ export function GameModule({setActiveStep, width, setResult, bottomRef }: IgameM
 		);
 	}
 
-	// TODO: Crash, gameInfo is undefined. game.update est seulement dans gamescreen. game.join envoie un gameInfo pour init ?
 	if (loading === LoadingStatus.Loaded && idGame) {
 		if (gameInfo?.status === GameStatus.waiting || gameInfo?.status === GameStatus.playing || gameInfo?.status === GameStatus.start) {
 			return (
@@ -302,7 +300,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 		}
 
 	}, [gameInfo.players, gameInfo.ball.pos]);
-	
+
 	return (
 		<div>
 			<button onClick={handleClick}>{(displayInfo) ? "Hide" : "Show" + " Info"}</button>
