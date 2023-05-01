@@ -197,7 +197,6 @@ export function MuiAppBar() {
 
                 </Toolbar>
             </AppBar >
-            <div> {imgPath} </div>
         </React.Fragment>
 
     );

@@ -7,7 +7,7 @@ import { SavedGame } from '../model/saved-game.entity';
 const paddleWidth = 5
 const canvasHeight = 600
 const canvasWidth = 800
-const MaxBounceAngle = Math.PI / 12 //No more than Pi/2
+const BounceAngleLimiter = Math.PI / 12 //No more than Pi/2
 
 export type Pos2D = {
 
@@ -38,7 +38,8 @@ export type GameOptions = {
 	ballSize?: number
 	playerSpeed?: number,
 	shootSize?: number
-	shootSpeed?: number
+	shootSpeed?: number,
+	liftEffect?: number
 }
 
 interface gameAsset {
@@ -108,6 +109,7 @@ export class Game {
 	public playerSpeed: number
 	public shootSize: number
 	public shootSpeed: number
+	public liftEffect: number
 
 	constructor(public gameId: UUID,
 		private server: Server,
@@ -130,13 +132,13 @@ export class Game {
 		this.paddleLengthMin = options?.paddleLengthMin || 100
 		//Change because paddleReduce can be set to 0
 		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 1
-
-		this.maxBounce = (options?.maxBounce !== undefined) ? options.maxBounce : 3
+		this.maxBounce = (options?.maxBounce !== undefined) ? options.maxBounce : 5
 		this.startAmo = (options?.startAmo !== undefined) ? options.startAmo : 3
+		this.liftEffect = (options?.liftEffect !== undefined) ? options.liftEffect : 1
 		this.ballSize = options?.ballSize || 5
 		this.playerSpeed = options?.playerSpeed || 3
-		this.shootSize = options?.shootSize || 5
-		this.shootSpeed = options?.shootSpeed || 1
+		this.shootSize = options?.shootSize || 2
+		this.shootSpeed = options?.shootSpeed || 1.5
 
 		this.initBall()
 	}
@@ -147,8 +149,8 @@ export class Game {
 			pos: { x: canvasWidth / 2, y: canvasHeight / 2 },
 			velocity: { x: (Math.random() > 0.5 ? 1 : -1) * this.ballSpeed, y: (Math.random() > 0.5 ? 1 : -1) * this.ballSpeed },
 			maxBounce: Infinity,
-			size : this.ballSize,
-			speed : this.ballSpeed,
+			size: this.ballSize,
+			speed: this.ballSpeed,
 			active: true,
 		}
 	}
@@ -158,8 +160,8 @@ export class Game {
 			pos: { x: (playerIndex == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
 			velocity: { x: (playerIndex == 0) ? 1 : -1, y: 0 },
 			maxBounce: this.maxBounce,
-			size : this.shootSize,
-			speed : this.shootSpeed,
+			size: this.shootSize,
+			speed: this.shootSpeed,
 			active: false,
 		})
 	}
@@ -265,6 +267,7 @@ export class Game {
 				this.play()
 			}
 			if (this.players.length === 2) {
+				this.status = GameStatus.start
 				this.countdown(5)
 				this.reduceInterval = setInterval(() => {
 					this.players.forEach((player) => {
@@ -304,7 +307,7 @@ export class Game {
 		}
 		//Collision gauche
 		//else if (!collide && newBall.x >= elem.x && ball.pos.x <= elem.x) {
-		else if (!collide && newBall.x + ball.size >= elem.x && ball.pos.x  + ball.size <= elem.x) {
+		else if (!collide && newBall.x + ball.size >= elem.x && ball.pos.x + ball.size <= elem.x) {
 			//intersect.x = elem.x
 			intersect.x = elem.x - ball.size
 			intersect.y = ball.pos.y + ((intersect.x - ball.pos.x) * (ball.pos.y - newBall.y) / (ball.pos.x - newBall.x));
@@ -326,7 +329,7 @@ export class Game {
 
 		//Collision up
 		//else if (!collide && newBall.y >= elem.y && ball.pos.y <= elem.y) {
-		else if (!collide && newBall.y + ball.size >= elem.y && ball.pos.y  + ball.size <= elem.y) {
+		else if (!collide && newBall.y + ball.size >= elem.y && ball.pos.y + ball.size <= elem.y) {
 			//intersect.y = elem.y;
 			intersect.y = elem.y - ball.size;
 			intersect.x = ball.pos.x + ((intersect.y - ball.pos.y) * (ball.pos.x - newBall.x) / (ball.pos.y - newBall.y));
@@ -337,7 +340,7 @@ export class Game {
 
 		newballSpeed = Math.sqrt(ball.velocity.x * ball.velocity.x + ball.velocity.y * ball.velocity.y); // A Ajuster avec momentum
 		if ((collide == Collide.left || collide == Collide.right) && momentum != 0) {
-			newballSpeed *= (1 + (momentum / 120) * ball.velocity.y)
+			newballSpeed *= (1 + (momentum * this.liftEffect / 120) * ball.velocity.y)
 		}
 
 		//Calcul du changement de trajectoire de la balle, et update de sa nouvelle position
@@ -345,7 +348,7 @@ export class Game {
 			if (bouncing) {
 				if (collide == Collide.left || collide == Collide.right) {
 					relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
-					bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
+					bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - BounceAngleLimiter);
 					ball.velocity.x = newballSpeed * ((collide == Collide.right) ? 1 : -1) * Math.cos(bounceAngle); // seul changement
 					ball.velocity.y = newballSpeed * -Math.sin(bounceAngle);
 					ballTravelAfterBounce = (newBall.y != ball.pos.y) ? (newBall.y - intersect.y) / (newBall.y - ball.pos.y) : 0
@@ -353,7 +356,7 @@ export class Game {
 
 				else if (collide == Collide.up || collide == Collide.down) {
 					relativeIntersectX = (elem.x + (elem.width / 2)) - intersect.x;
-					bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
+					bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - BounceAngleLimiter);
 					ball.velocity.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
 					ball.velocity.y = newballSpeed * ((collide == Collide.down) ? 1 : -1) * Math.cos(bounceAngle);
 					ballTravelAfterBounce = (newBall.x != ball.pos.x) ? (newBall.x - intersect.x) / (newBall.x - ball.pos.x) : 0
@@ -370,7 +373,7 @@ export class Game {
 			return false
 	}
 
-	private updateBall(ball: { pos: Pos2D, velocity: Pos2D , speed: number, size: number}): boolean {
+	private updateBall(ball: { pos: Pos2D, velocity: Pos2D, speed: number, size: number }): boolean {
 		let collide = false
 		//Essai de position pour la nouvelle balle
 		let newBall: Pos2D = { ...ball.pos };
@@ -452,17 +455,18 @@ export class Game {
 				console.log(`Game ended with ${this.victoryRounds} round`)
 				this.status = GameStatus.end
 			}
-			//Reset des momentum
-			this.players.forEach((player) => {
-				if (Date.now() - player.timeLastMove > 150)
-					player.momentum = 0
-			})
 		}
 		if (this.status == GameStatus.end) {
 			clearInterval(this.intervalId)
 			clearInterval(this.reduceInterval)
 			clearInterval(this.infoInterval)
 		}
+
+		//Reset des momentum
+		this.players.forEach((player) => {
+			if (Date.now() - player.timeLastMove > 150)
+				player.momentum = 0
+		})
 
 		//Projectiles
 		this.players.forEach((player, index) => {

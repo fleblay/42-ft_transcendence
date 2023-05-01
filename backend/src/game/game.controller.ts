@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import {GameService} from './game.service'
+import { GameService } from './game.service'
 import { UUID, UserState } from '../type';
 import { ATGuard } from '../users/guard/access-token.guard';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
@@ -8,29 +8,28 @@ import { User } from '../model/user.entity';
 @Controller('game')
 export class GameController {
 
-	constructor(private gameService: GameService){}
+	constructor(private gameService: GameService) { }
 
 	@Get("/current")
-	getGames(){
-		return this.gameService.listAll()
+	getGames() {
+		return this.gameService.listAllCurrent()
 	}
 
 	@Get("/fake")
-	saveFakeGame(){
+	saveFakeGame() {
 		return this.gameService.saveFakeGame()
 	}
 
 
 	@Get("/userstate/:id")
-	getUserState(@Param('id') id: string) : UserState {
+	getUserState(@Param('id') id: string): UserState {
 		return this.gameService.userState(parseInt(id))
 	}
 
 	@Get("/usergames/:id")
-	getUserGames(@Param('id') id: string){
+	getUserGames(@Param('id') id: string) {
 		return this.gameService.getListGamesByUser(parseInt(id))
 	}
-
 
 	@UseGuards(ATGuard)
 	@Get("/quit/:gameId")
@@ -56,7 +55,7 @@ export class GameController {
 	@UseGuards(ATGuard)
 	@Get('/history/:id')
 	async getHistory(@Param('id') id: number) {
-	
+
 		const games = await this.gameService.getListGamesByUser(id);
 		//console.log('games: ', games);
 		return games;

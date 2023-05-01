@@ -93,12 +93,15 @@ export class AuthController {
 	@HttpCode(200)
 	@UseGuards(ATGuard)
 	async turnDfaOn(@Request() req, @Body() { code }: DfaCodeDto) {
-		const isValidCode = this.authService.is2faCodeValid(code, req.currentUser)
+		console.log('turnDfaOn', code)
 
+		const isValidCode = this.authService.is2faCodeValid(code, req.currentUser)
+		console.log('isValidCode', isValidCode)
 		if (!isValidCode)
 			throw new UnauthorizedException("I don't think so")
 		this.authService.turnOnDfa(req.currentUser.id)
 	}
+	
 	@Post('validate-dfa')
 	@HttpCode(200)
 	@UseGuards(DfaGuard)

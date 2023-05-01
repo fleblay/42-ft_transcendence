@@ -52,8 +52,8 @@ export class GameService {
 		return { gameId: game.gameId, gameInfo: game.generateGameInfo() };
 	}
 
-	listAll() {
-		return this.gameCluster.listAll()
+	listAllCurrent() {
+		return this.gameCluster.listAllCurrent()
 	}
 
 	findByClient(client: Socket) {
