@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { SocketContext } from '../socket/SocketProvider';
 import { Update } from 'vite/types/hmrPayload';
 import { IgameInfo, GameStatus, GameOptions } from '../types';
@@ -12,6 +12,7 @@ import { FinishGames } from './FinishGames';
 import { CreateGame } from './CreateGame';
 import { NewCreateGame } from './NewCreateGame';
 import { GameModule } from './NewGameScreen';
+import { GameFinishedScreen } from './NewResultGame';
 
 interface Iprops {
     startGameInfo: IgameInfo,
@@ -51,24 +52,53 @@ const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 
 export function NewGamePage() {
 
-    const steps = [{ label: 'Select game map' }, { label: 'Matchmaking' }, { label: 'Join game' }];
+    const steps = [{ label: 'Select game map' }, { label: 'Matchmaking' }, { label: 'Play game' }, { label: 'Result' }];
     const [activeStep, setActiveStep] = React.useState(0);
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
     const containerRef = useRef<HTMLDivElement>(null);
+    const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
+    const bottomRef = useRef<HTMLInputElement>(null);
+    const [result , setResult] = useState<IgameInfo>({} as IgameInfo);
+
     const location = useLocation();
 	const { idGame } = useParams();
 
-    React.useEffect(() => {
+    useEffect(() => {
         console.log("id", idGame);
-    
-        if (idGame) {
+        if (idGame && activeStep === 0 ) {
             setActiveStep(1);
+        }
+        else if (!idGame) {
+            setActiveStep(0);
+        }
+        else (activeStep === 3)
+        {
+            setResult(gameInfo);
+            setGameInfo({} as IgameInfo);
         }
 
       }, [activeStep, window.location.pathname]);
 
+      const handleResize = () => {
+        if (containerRef.current) {
+            const containerWidth = containerRef.current.offsetWidth;
+            const containerHeight = containerRef.current.offsetHeight;
+            setContainerSize({ width: containerWidth, height: containerHeight });
+        }
+    }
 
-    React.useEffect(() => {
+      useEffect(() => {
+		window.addEventListener("resize", handleResize)
+		if (bottomRef.current) {
+			bottomRef.current.scrollIntoView({ behavior: "smooth" })
+			console.log("Going down")
+		}
+		return (() => {
+			window.removeEventListener("resize", handleResize)
+		})
+	}, [])
+
+    useEffect(() => {
         console.log("id", idGame);
         console.log("window.location.pathname", window.location.pathname);
     
@@ -84,7 +114,7 @@ export function NewGamePage() {
 
     return (
         <>
-            <Container maxWidth="md" ref={containerRef}>
+            <Container maxWidth="lg" ref={containerRef}>
             <Box sx={{
                 width: '100%',
                 border: '1px solid #D3C6C6',
@@ -104,10 +134,12 @@ export function NewGamePage() {
                 {activeStep === 0 &&
                     <NewCreateGame setActiveStep={setActiveStep}/>
                 }
-                {activeStep === 1 &&
-                    <GameModule setActiveStep={setActiveStep} width={containerSize.width} />
+                {(activeStep === 1  || activeStep === 2) &&
+                    <GameModule setActiveStep={setActiveStep} width={containerSize.width} gameInfo={gameInfo} setGameInfo={setGameInfo} bottomRef={bottomRef} />
                 }
-
+                {activeStep === 3 &&
+                    <GameFinishedScreen gameInfo={result}/>
+                }
             </Box>
         </Container >
         </>

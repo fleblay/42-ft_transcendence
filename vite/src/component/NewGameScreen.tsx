@@ -3,10 +3,13 @@ import { SocketContext } from '../socket/SocketProvider';
 import { IgameInfo, GameStatus } from "../types";
 import { useParams } from "react-router-dom";
 import { useAuthService } from '../auth/AuthService'
+import { Box, CircularProgress, Typography } from "@mui/material";
 
 interface Iprops {
 	gameInfo: IgameInfo,
-	gameId: string
+	gameId: string,
+	bottomRef: React.RefObject<HTMLInputElement>;
+	width: number;
 }
 
 const canvasHeight = 600
@@ -20,21 +23,23 @@ enum LoadingStatus {
 }
 
 interface IgameModuleProps {
-    setActiveStep: (step: number) => void;
-    width: number;
+	setActiveStep: (step: number) => void;
+	width: number;
+	gameInfo: IgameInfo,
+	setGameInfo: (gameInfo: IgameInfo) => void;
+	bottomRef: React.RefObject<HTMLInputElement>;
 }
 
 
 
-export function GameModule( { setActiveStep, width }: IgameModuleProps) {
+export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottomRef }: IgameModuleProps) {
 	const [loading, setLoading] = useState<LoadingStatus>(LoadingStatus.Loading);
-	const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
 	const [joined, setJoined] = useState<boolean>(false);
 	const { socket, customEmit } = useContext(SocketContext);
 
 	const [countdown, setCountdown] = useState<number>(0);
 
-	const { idGame } = useParams();
+	const { idGame } = useParams<{ idGame: string }>();
 
 	useEffect(() => {
 		if (!joined) {
@@ -43,8 +48,9 @@ export function GameModule( { setActiveStep, width }: IgameModuleProps) {
 		}
 		customEmit('game.join', { gameId: idGame }, (stringResponse: string) => {
 			const response = JSON.parse(stringResponse)
+
 			if (response.error) {
-				console.log(response.error);
+				console.log('Game join got error:', response.error);
 				setLoading(LoadingStatus.Failed);
 			}
 			else {
@@ -52,8 +58,20 @@ export function GameModule( { setActiveStep, width }: IgameModuleProps) {
 				setGameInfo(response.gameInfo as IgameInfo);
 				setLoading(LoadingStatus.Loaded);
 			}
+
 		});
 	}, [joined]);
+
+	useEffect(() => {
+		console.log('gameInfo.status', gameInfo.status);
+		if (gameInfo.status === GameStatus.playing || gameInfo.status === GameStatus.start) {
+			setActiveStep(2);
+		}
+		if (gameInfo.status === GameStatus.end) {
+			setActiveStep(3);
+		}
+	}, [gameInfo.status])
+
 
 	useEffect(() => {
 		if (!idGame || !socket) {
@@ -77,8 +95,11 @@ export function GameModule( { setActiveStep, width }: IgameModuleProps) {
 
 	if (loading === LoadingStatus.Loading) {
 		return (
-			<div>
-				Loading...
+			<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
+
+				<Box sx={{ display: 'flex' }}>
+					<CircularProgress />
+				</Box>
 			</div>
 		);
 	}
@@ -90,9 +111,13 @@ export function GameModule( { setActiveStep, width }: IgameModuleProps) {
 				<>
 					{
 						gameInfo.status === GameStatus.waiting &&
-						<div>
-                            width = {width}
-							Waiting for players...
+						<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
+
+							<Box sx={{ display: 'flex' }}>
+								<CircularProgress />
+							</Box>
+							<Typography sx={{ pl: 2 }}>Waiting for players</Typography>
+
 						</div>
 					}
 					{countdown !== 0 &&
@@ -113,13 +138,13 @@ export function GameModule( { setActiveStep, width }: IgameModuleProps) {
 							</div>
 						</div>
 					}
-					<GameScreen gameInfo={gameInfo} gameId={idGame} />
+					<GameScreen gameInfo={gameInfo} gameId={idGame} bottomRef={bottomRef} width={width} />
 				</>
 			)
 		}
-		if (gameInfo.status === GameStatus.end) {
-			return <GameFinishedScreen gameInfo={gameInfo} />
-		}
+		// if (gameInfo.status === GameStatus.end) {
+		// 	return <GameFinishedScreen gameInfo={gameInfo} />
+		// }
 	}
 
 	return (
@@ -129,44 +154,25 @@ export function GameModule( { setActiveStep, width }: IgameModuleProps) {
 	);
 };
 
-function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
-	return (
-		<div>
-			<div>Game finished</div>
-			<div>Winner: {gameInfo.players.map((player, index) => <div key={index}>{player.score}</div>)}</div>
-		</div>
-	)
-}
 
-export function GameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
+
+export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
 	const [keyDown, setKeyDown] = useState({ up: false, down: false, shoot: false });
-	const [canvasRatio, setCanvasRatio] = useState<number>(0.9 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
+	const [canvasRatio, setCanvasRatio] = useState<number>(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
-	const bottomRef = useRef<HTMLInputElement>(null)
 
 	const handleClick = () => {
 		setDisplayInfo(!displayInfo)
 	}
 
-	const handleResize = () => {
-		setCanvasRatio(0.9 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
-		if (bottomRef.current)
-			bottomRef.current.scrollIntoView({ behavior: "smooth" })
-	}
-
 	useEffect(() => {
-		window.addEventListener("resize", handleResize)
-		if (bottomRef.current) {
-			bottomRef.current.scrollIntoView({ behavior: "smooth" })
-			console.log("Going down")
-		}
-		return (() => {
-			window.removeEventListener("resize", handleResize)
-		})
-	}, [])
+		console.log("width", width);
+		setCanvasRatio(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
+	}, [width])
+
 
 	useEffect(() => {
 		const interval = setInterval(() => {
