@@ -2,17 +2,12 @@ import { UUID, SocketId } from '../type';
 import { User } from '../model/user.entity'
 import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
-import { GameCluster } from './game-cluster';
 import { SavedGame } from '../model/saved-game.entity';
 
 const paddleWidth = 5
-const ballSize = 5
-const ballSpeed = 2
-const playerSpeed = 3
 const canvasHeight = 600
 const canvasWidth = 800
-const MaxBounceAngle = Math.PI / 12;
-const maxBounce = 10
+const MaxBounceAngle = Math.PI / 12 //No more than Pi/2
 
 export type Pos2D = {
 
@@ -27,15 +22,21 @@ export type projectile = {
 	maxBounce: number,
 }
 
+//Todo : speed pour projectiles et ball
+//Todo : objet d'init
 export type GameOptions = {
 	ballSpeed?: number,
 	shoot?: boolean,
 	obstacles?: boolean,
-
 	paddleLength?: number,
 	paddleLengthMin?: number,
 	paddleReduce?: number,
 	victoryRounds?: number,
+
+	maxBounce?: number,
+	startAmo?: number,
+	ballSize?: number
+	playerSpeed?: number,
 }
 
 interface gameAsset {
@@ -82,14 +83,6 @@ interface PlayerInput {
 
 enum Collide { "none" = 0, "left", "right", "down", "up" }
 
-function initShoot(playerIndex: number): projectile {
-	return ({
-		pos: { x: (playerIndex == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
-		velocity: { x: (playerIndex == 0) ? 1 : -1, y: 0 },
-		maxBounce: maxBounce,
-		active: false,
-	})
-}
 
 export class Game {
 	private ball: projectile
@@ -105,6 +98,11 @@ export class Game {
 	public paddleLength: number
 	public paddleLengthMin: number
 	public paddleReduce: number
+	public maxBounce: number
+	public ballSpeed: number
+	public startAmo: number
+	public ballSize: number
+	public playerSpeed: number
 
 	constructor(public gameId: UUID,
 		private server: Server,
@@ -120,25 +118,40 @@ export class Game {
 				{ x: 250, y: 200, width: 70, height: 70 },
 				{ x: canvasWidth - 250 - 70, y: canvasHeight - 200 - 80, width: 70, height: 70 },
 			])
-		this.initBall(options?.ballSpeed || 1)
 
+		this.ballSpeed = options?.ballSpeed || 1
 		this.victoryRounds = options?.victoryRounds || 5
 		this.paddleLength = options?.paddleLength || 300
 		this.paddleLengthMin = options?.paddleLengthMin || 100
 		//Change because paddleReduce can be set to 0
 		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 1
+
+		this.maxBounce = (options?.maxBounce !== undefined) ? options.maxBounce : 3
+		this.startAmo = (options?.startAmo !== undefined) ? options.startAmo : 3
+		this.ballSize = options?.ballSize || 5
+		this.playerSpeed = options?.playerSpeed || 3
+
+		this.initBall()
 	}
 
 
-	initBall(ballSpeed: number) {
+	initBall() {
 		this.ball = {
 			pos: { x: canvasWidth / 2, y: canvasHeight / 2 },
-			velocity: { x: (Math.random() > 0.5 ? 1 : -1) * ballSpeed, y: (Math.random() > 0.5 ? 1 : -1) * ballSpeed },
+			velocity: { x: (Math.random() > 0.5 ? 1 : -1) * this.ballSpeed, y: (Math.random() > 0.5 ? 1 : -1) * this.ballSpeed },
 			active: true,
 			maxBounce: Infinity
 		}
 	}
 
+	initShoot(playerIndex: number): projectile {
+		return ({
+			pos: { x: (playerIndex == 0) ? paddleWidth + 1 : canvasWidth - (paddleWidth + 1), y: canvasHeight / 2 },
+			velocity: { x: (playerIndex == 0) ? 1 : -1, y: 0 },
+			maxBounce: this.maxBounce,
+			active: false,
+		})
+	}
 
 	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
 		const foundPlayer = this.players.find(player => userId === player.user.id)
@@ -153,7 +166,7 @@ export class Game {
 					foundPlayer.momentum = (foundPlayer.momentum <= 0) ? foundPlayer.momentum - 1 : 0
 					if (foundPlayer.momentum <= -60)
 						foundPlayer.momentum = -60
-					foundPlayer.pos -= playerSpeed - (foundPlayer.momentum / 10)
+					foundPlayer.pos -= this.playerSpeed - (foundPlayer.momentum / 10)
 					foundPlayer.pos = Math.floor(foundPlayer.pos)
 					//Check collision mur
 					foundPlayer.pos = (foundPlayer.pos <= 0) ? 0 : foundPlayer.pos
@@ -164,7 +177,7 @@ export class Game {
 					foundPlayer.momentum = (foundPlayer.momentum >= 0) ? foundPlayer.momentum + 1 : 0
 					if (foundPlayer.momentum >= 60)
 						foundPlayer.momentum = 60
-					foundPlayer.pos += playerSpeed + (foundPlayer.momentum / 10)
+					foundPlayer.pos += this.playerSpeed + (foundPlayer.momentum / 10)
 					foundPlayer.pos = Math.floor(foundPlayer.pos)
 					//Check collision mur
 					foundPlayer.pos = (foundPlayer.pos >= canvasHeight - foundPlayer.paddleLength) ? canvasHeight - foundPlayer.paddleLength : foundPlayer.pos
@@ -232,8 +245,8 @@ export class Game {
 				user,
 				leaving: false,
 				clientId: client.id,
-				shoot: initShoot(this.players.length),
-				amo: this.options?.shoot && 3
+				shoot: this.initShoot(this.players.length),
+				amo: this.options?.shoot && this.startAmo
 			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1) {
@@ -337,14 +350,14 @@ export class Game {
 		let collide = false
 		//Essai de position pour la nouvelle balle
 		let newBall: Pos2D = { ...ball.pos };
-		newBall.x += ball.velocity.x * ballSpeed
-		newBall.y += ball.velocity.y * ballSpeed
+		newBall.x += ball.velocity.x * this.ballSpeed
+		newBall.y += ball.velocity.y * this.ballSpeed
 
 		// Collision mur
-		if (newBall.y > canvasHeight - ballSize && ball.velocity.y > 0) {
+		if (newBall.y > canvasHeight - this.ballSize && ball.velocity.y > 0) {
 			ball.velocity.y *= -1
 		}
-		else if (newBall.y < ballSize && ball.velocity.y < 0) {
+		else if (newBall.y < this.ballSize && ball.velocity.y < 0) {
 			ball.velocity.y *= -1
 		}
 
@@ -386,7 +399,7 @@ export class Game {
 	resetBallAndPlayers() {
 		this.status = GameStatus.start
 		this.countdown(3)
-		this.initBall(this.options?.ballSpeed || 1)
+		this.initBall()
 		this.players.forEach((player) => {
 			player.pos = canvasHeight / 2 - player.paddleLength / 2
 			player.paddleLength = this.paddleLength
@@ -440,7 +453,7 @@ export class Game {
 			}
 			//Reset du shoot
 			if (player.shoot.pos.x <= 0 || player.shoot.pos.x >= canvasWidth || player.shoot.maxBounce == 0)
-				player.shoot = initShoot(index)
+				player.shoot = this.initShoot(index)
 		})
 		//Envoi des infos
 		this.updateInfo(this.generateGameInfo());
