@@ -58,12 +58,12 @@ export function CreateGame() {
 	const [paddleReduce, setPaddleReduce] = useState<number>(1);
 	const [paddleLen, setPaddleLen] = useState<number[]>([100, 300])
 
-	const [maxBounce, setMaxBounce] = useState<number>(3);
+	const [maxBounce, setMaxBounce] = useState<number>(5);
 	const [startAmo, setStartAmo] = useState<number>(3);
 	const [ballSize, setBallSize] = useState<number>(5);
 	const [playerSpeed, setPlayerSpeed] = useState<number>(3);
-	const [shootSpeed, setShootSpeed] = useState<number>(1);
-	const [shootSize, setShootSize] = useState<number>(5);
+	const [shootSpeed, setShootSpeed] = useState<number>(1.5);
+	const [shootSize, setShootSize] = useState<number>(2);
 
 	function handlePaddleLenChange(event: Event, val: number | number[], thumb: number) {
 		const minDist = 50
