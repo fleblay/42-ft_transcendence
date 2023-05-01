@@ -179,7 +179,7 @@ export function CreateGame() {
 					</div>
 					<div>Paddle Length
 						<Slider
-							aria-label="Paddle Length"
+							//aria-label="Paddle Length"
 							value={paddleLen}
 							valueLabelDisplay="on"
 							step={10}

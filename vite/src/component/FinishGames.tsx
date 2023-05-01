@@ -14,17 +14,21 @@ interface SaveGame {
 	winner: Partial<UserInfo>;
 }
 
-
 export function FinishGames() {
 
 	const [listGames, setListGames] = useState<SaveGame[] | null>(null);
 	const [gamePage, setGamePage] = useState(0);
+
+	console.log("\x1b[32mICI\x1b[0m")
 
 	useEffect(() => {
 		apiClient.get(`/api/game/list/${gamePage}`).then((response) => {
 			console.log(response.data);
 			setListGames(response.data)
 		})
+			.catch(() => {
+				console.log("\x1b[32mError\x1b[0m")
+			})
 	}, [gamePage])
 
 	if (listGames === null) return <div>Loading...</div>
