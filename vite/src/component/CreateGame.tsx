@@ -124,9 +124,9 @@ export function CreateGame() {
 					<span>Private</span>
 					<Checkbox onChange={(e) => { setPrivateGame(e.target.checked) }} />
 					<span>Obstacles</span>
-					<Checkbox onChange={(e) => { setObsctacles(e.target.checked) }} />
+					<Checkbox defaultChecked onChange={(e) => { setObsctacles(e.target.checked) }} />
 					<span>Shoot</span>
-					<Checkbox onChange={(e) => { setShoot(e.target.checked) }} />
+					<Checkbox defaultChecked onChange={(e) => { setShoot(e.target.checked) }} />
 					<div>BallSpeed
 						<Slider
 							aria-label="Ball Speed"
@@ -146,14 +146,14 @@ export function CreateGame() {
 					<div>ShootSpeed
 						<Slider
 							aria-label="Shoots Speed"
-							defaultValue={1}
+							defaultValue={1.5}
 							valueLabelDisplay="on"
 							step={0.1}
 							min={0.1}
 							max={2}
 							marks={[
 								{ value: 0.1, label: "slow" },
-								{ value: 1, label: "normal" },
+								{ value: 1.5, label: "normal" },
 								{ value: 2, label: "fast" }
 							]}
 							onChange={(_, val) => setShootSpeed(Array.isArray(val) ? val[0] : val)}
@@ -212,7 +212,7 @@ export function CreateGame() {
 					<div>Max Bouncing of shoots
 						<Slider
 							aria-label="MaxBounce Rounds"
-							defaultValue={3}
+							defaultValue={5}
 							valueLabelDisplay="on"
 							step={1}
 							min={0}
@@ -260,7 +260,7 @@ export function CreateGame() {
 					<div>Shoot size
 						<Slider
 							aria-label="shoot Size"
-							defaultValue={5}
+							defaultValue={2}
 							valueLabelDisplay="on"
 							step={1}
 							min={1}

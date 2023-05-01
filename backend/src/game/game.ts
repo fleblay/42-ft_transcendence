@@ -131,12 +131,12 @@ export class Game {
 		//Change because paddleReduce can be set to 0
 		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 1
 
-		this.maxBounce = (options?.maxBounce !== undefined) ? options.maxBounce : 3
+		this.maxBounce = (options?.maxBounce !== undefined) ? options.maxBounce : 5
 		this.startAmo = (options?.startAmo !== undefined) ? options.startAmo : 3
 		this.ballSize = options?.ballSize || 5
 		this.playerSpeed = options?.playerSpeed || 3
-		this.shootSize = options?.shootSize || 5
-		this.shootSpeed = options?.shootSpeed || 1
+		this.shootSize = options?.shootSize || 2
+		this.shootSpeed = options?.shootSpeed || 1.5
 
 		this.initBall()
 	}
