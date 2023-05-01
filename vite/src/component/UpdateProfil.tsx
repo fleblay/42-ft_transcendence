@@ -163,7 +163,7 @@ export function UpdateProfil() {
 							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '2rem' }} > Update avatar</Typography>
 							<Divider />
 							<Button variant="contained" component="label" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }} >       {fileName ? fileName : '+ Upload file'} <input type="file" hidden onChange={handleChange} /> </Button>
-							<Button variant="outlined" onClick={handleAuthenticator} sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>Submit</Button>
+							<Button variant="outlined" type='submit' sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>Submit</Button>
 							<Divider />
 							<div> {responseFile} </div>
 						</form>
