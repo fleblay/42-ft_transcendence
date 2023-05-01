@@ -16,7 +16,4 @@ export class AppController {
 	getProtected(): string {
 		return "You are protected";
 	}
-	
-
-
 }

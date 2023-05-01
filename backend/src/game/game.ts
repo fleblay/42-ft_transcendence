@@ -90,6 +90,7 @@ export class Game {
 	private ball: projectile
 	private intervalId: NodeJS.Timer
 	private reduceInterval: NodeJS.Timer
+	private infoInterval: NodeJS.Timer
 	public players: Player[] = []
 	public assets: gameAsset[] = []
 	public viewers: Viewer[] = []
@@ -460,6 +461,7 @@ export class Game {
 		if (this.status == GameStatus.end) {
 			clearInterval(this.intervalId)
 			clearInterval(this.reduceInterval)
+			clearInterval(this.infoInterval)
 		}
 
 		//Projectiles
@@ -478,12 +480,12 @@ export class Game {
 			if (player.shoot.pos.x <= 0 || player.shoot.pos.x >= canvasWidth || player.shoot.maxBounce == 0)
 				player.shoot = this.initShoot(index)
 		})
-		//Envoi des infos
-		this.updateInfo(this.generateGameInfo());
 	}
 
 	play() {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 5)
+		//Envoi des infos
+		this.infoInterval = setInterval(() => { this.updateInfo(this.generateGameInfo()) }, 1000 / 60)
 	}
 
 	get id(): UUID {
