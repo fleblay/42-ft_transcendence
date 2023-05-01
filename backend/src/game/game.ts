@@ -7,7 +7,7 @@ import { SavedGame } from '../model/saved-game.entity';
 const paddleWidth = 5
 const canvasHeight = 600
 const canvasWidth = 800
-const MaxBounceAngle = Math.PI / 12 //No more than Pi/2
+const BounceAngleLimiter = Math.PI / 12 //No more than Pi/2
 
 export type Pos2D = {
 
@@ -348,7 +348,7 @@ export class Game {
 			if (bouncing) {
 				if (collide == Collide.left || collide == Collide.right) {
 					relativeIntersectY = (elem.y + (elem.height / 2)) - intersect.y;
-					bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - MaxBounceAngle);
+					bounceAngle = (relativeIntersectY / (elem.height / 2)) * (Math.PI / 2 - BounceAngleLimiter);
 					ball.velocity.x = newballSpeed * ((collide == Collide.right) ? 1 : -1) * Math.cos(bounceAngle); // seul changement
 					ball.velocity.y = newballSpeed * -Math.sin(bounceAngle);
 					ballTravelAfterBounce = (newBall.y != ball.pos.y) ? (newBall.y - intersect.y) / (newBall.y - ball.pos.y) : 0
@@ -356,7 +356,7 @@ export class Game {
 
 				else if (collide == Collide.up || collide == Collide.down) {
 					relativeIntersectX = (elem.x + (elem.width / 2)) - intersect.x;
-					bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - MaxBounceAngle);
+					bounceAngle = (relativeIntersectX / (elem.width / 2)) * (Math.PI / 2 - BounceAngleLimiter);
 					ball.velocity.x = newballSpeed * -Math.sin(bounceAngle); // seul changement
 					ball.velocity.y = newballSpeed * ((collide == Collide.down) ? 1 : -1) * Math.cos(bounceAngle);
 					ballTravelAfterBounce = (newBall.x != ball.pos.x) ? (newBall.x - intersect.x) / (newBall.x - ball.pos.x) : 0
