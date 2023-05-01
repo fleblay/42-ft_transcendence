@@ -72,7 +72,6 @@ export function GamePage() {
 		}
 	}, []);
 
-<<<<<<< HEAD
 	return (
 		<>
 			<Container maxWidth="lg" ref={containerRef}>
@@ -106,20 +105,4 @@ export function GamePage() {
 			</Container >
 		</>
 	);
-=======
-                {activeStep === 0 &&
-                    <CreateGame/>
-                }
-                {(activeStep === 1  || activeStep === 2) &&
-                    <GameModule setActiveStep={setActiveStep} width={containerSize.width} gameInfo={gameInfo} setGameInfo={setGameInfo} bottomRef={bottomRef} />
-                }
-                {activeStep === 3 &&
-                    <GameFinishedScreen gameInfo={result}/>
-                }
-            </Box>
-            //<FinishGames />
-        </Container >
-        </>
-    );
->>>>>>> 2972922812077b377bb143691ca4779172e601bb
 }
