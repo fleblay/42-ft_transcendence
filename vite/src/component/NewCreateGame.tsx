@@ -23,7 +23,6 @@ export function NewCreateGame({ setActiveStep }: ICreateGameProps) {
 	const [ballSpeed, setballSpeed] = useState<number>(1);
 
 	function joinGames(options: GameOptions, game?: string) {
-        setActiveStep(1);
 		if (game) {
 			navigate(`/newgame/${game}`);
 		}

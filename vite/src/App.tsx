@@ -98,10 +98,10 @@ function Header() {
 
 			<ul>
 				<li>
-					<Link to="/Game">Game Page</Link>
+					<Link to="/game">Game Page</Link>
 				</li>
 				<li>
-					<Link to="/Chat">Chat Page</Link>
+					<Link to="/chat">Chat Page</Link>
 				</li>
 			</ul>
 
