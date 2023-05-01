@@ -26,7 +26,7 @@ export class AuthController {
 		const refreshToken = req.cookies['refresh_token'];
 		const tokens = await this.authService.refreshToken(refreshToken) as Tokens;
 		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 * 1000});
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7});
 		return;
 	}
 
@@ -34,8 +34,8 @@ export class AuthController {
 	@Post('/register')
 	async createUser(@Body() body: CreateUserDto, @Response({ passthrough: true }) res: ExpressResponse) {
 		const tokens = await this.authService.register(body) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 * 1000});
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 * 1000});
+		res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7});
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7});
 		return;
 	}
 
@@ -48,8 +48,8 @@ export class AuthController {
 			return { needDfa: true }
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
-			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 * 1000});
-			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 * 1000 });
+			res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7});
+			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 });
 		}
 	};
 
@@ -93,12 +93,15 @@ export class AuthController {
 	@HttpCode(200)
 	@UseGuards(ATGuard)
 	async turnDfaOn(@Request() req, @Body() { code }: DfaCodeDto) {
-		const isValidCode = this.authService.is2faCodeValid(code, req.currentUser)
+		console.log('turnDfaOn', code)
 
+		const isValidCode = this.authService.is2faCodeValid(code, req.currentUser)
+		console.log('isValidCode', isValidCode)
 		if (!isValidCode)
 			throw new UnauthorizedException("I don't think so")
 		this.authService.turnOnDfa(req.currentUser.id)
 	}
+	
 	@Post('validate-dfa')
 	@HttpCode(200)
 	@UseGuards(DfaGuard)
@@ -113,8 +116,8 @@ export class AuthController {
 		const tokens = this.authService.getTokens(user);
 		if (tokens.accessToken && tokens.refreshToken) {
 			this.authService.saveRefreshToken(user.id, tokens.refreshToken);
-			res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 * 1000});
-			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 * 1000});
+			res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7});
+			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7});
 			res.cookie('dfa_token', '', { httpOnly: true, maxAge: 0 });
 		}
 	}

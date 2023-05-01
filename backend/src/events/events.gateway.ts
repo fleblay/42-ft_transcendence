@@ -159,7 +159,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			return JSON.stringify({ gameId, gameInfo });
 		}
 		catch (e) {
-			return e.message
+			return JSON.stringify({ error: e.message });
 		}
 	}
 

@@ -58,10 +58,11 @@ export class GameCluster {
 		return null;
 	}
 
-	listAll() {
+	listAllCurrent() {
 		const ar = []
-		this.gamesMap.forEach((key, value) => {
-			ar.push(JSON.stringify(value))
+		this.gamesMap.forEach((game, gameId) => {
+			if (game.status === GameStatus.playing || game.status === GameStatus.start)
+				ar.push(JSON.stringify(gameId))
 		})
 		return ar;
 	}
