@@ -220,7 +220,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 			window.removeEventListener('keydown', handleKeyDown)
 			window.removeEventListener('keyup', handleKeyUp)
 		}
-	}, [])
+	}, [keyDown])
 
 	useEffect(() => {
 		const context2d = canvasRef.current?.getContext('2d');
