@@ -19,37 +19,6 @@ interface Iprops {
     gameId: string
 }
 
-interface JoinGamesProps {
-    joinGames: (options: GameOptions, game?: string) => void;
-}
-
-const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
-    const [listGames, setListGames] = React.useState<string[]>([]);
-    const { socket } = React.useContext(SocketContext);
-
-    return (
-        <>
-            <button onClick={() => {
-                apiClient.get("/api/game/current").then((response) => {
-                    console.log(response.data);
-                    setListGames(response.data.map((gameId: string) => gameId.replace(/"/g, '')))
-                })
-            }}>Refresh list</button>
-            <div>
-                {listGames.map((gameId) => {
-                    return <div key={gameId}>
-                        <button onClick={() => {
-                            joinGames({}, gameId);
-                        }}>Join game {gameId}
-                        </button>{gameId}
-                    </div>
-                })
-                }
-            </div>
-        </>
-    );
-}
-
 export function NewGamePage() {
 
     const steps = [{ label: 'Select game map' }, { label: 'Matchmaking' }, { label: 'Play game' }, { label: 'Result' }];
@@ -141,6 +110,7 @@ export function NewGamePage() {
                     <GameFinishedScreen gameInfo={result}/>
                 }
             </Box>
+            <FinishGames />
         </Container >
         </>
     );
