@@ -28,7 +28,8 @@ export type GameOptions = {
 	ballSize?: number
 	playerSpeed?: number,
 	shootSize?: number,
-	shootSpeed?: number
+	shootSpeed?: number,
+	liftEffect?: number
 }
 
 export enum GameStatus { "waiting" = 1, "start", "playing", "end", "error" }

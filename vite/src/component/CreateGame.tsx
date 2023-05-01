@@ -64,6 +64,7 @@ export function CreateGame() {
 	const [playerSpeed, setPlayerSpeed] = useState<number>(3);
 	const [shootSpeed, setShootSpeed] = useState<number>(1.5);
 	const [shootSize, setShootSize] = useState<number>(2);
+	const [liftEffect, setLiftEffect] = useState<number>(1);
 
 	function handlePaddleLenChange(event: Event, val: number | number[], thumb: number) {
 		const minDist = 50
@@ -289,10 +290,26 @@ export function CreateGame() {
 							onChange={(_, val) => setPlayerSpeed(Array.isArray(val) ? val[0] : val)}
 						/>
 					</div>
+					<div>Lift Effect
+						<Slider
+							aria-label="Lift effect"
+							defaultValue={1}
+							valueLabelDisplay="on"
+							step={0.1}
+							min={0}
+							max={5}
+							marks={[
+								{ value: 0, label: "off" },
+								{ value: 1, label: "default" },
+								{ value: 5, label: "5" }
+							]}
+							onChange={(_, val) => setLiftEffect(Array.isArray(val) ? val[0] : val)}
+						/>
+					</div>
 
 					<Button variant='contained' onClick={() => {
 						setActiveStep(1);
-						joinGames({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed })
+						joinGames({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect})
 					}}>
 						{privateGame ? "Create a private game" : "Join a game"}
 					</Button>
