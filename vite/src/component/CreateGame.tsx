@@ -51,8 +51,8 @@ export function CreateGame() {
 	const { customEmit } = React.useContext(SocketContext);
 
 	const [privateGame, setPrivateGame] = useState<boolean>(false);
-	const [obstacles, setObsctacles] = useState<boolean>(false);
-	const [shoot, setShoot] = useState<boolean>(false);
+	const [obstacles, setObsctacles] = useState<boolean>(true);
+	const [shoot, setShoot] = useState<boolean>(true);
 	const [ballSpeed, setballSpeed] = useState<number>(1);
 	const [victoryRounds, setVictoryRounds] = useState<number>(5);
 	const [paddleReduce, setPaddleReduce] = useState<number>(1);
