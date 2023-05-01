@@ -459,6 +459,7 @@ export class Game {
 		if (this.status == GameStatus.end) {
 			clearInterval(this.intervalId)
 			clearInterval(this.reduceInterval)
+			this.updateInfo(this.generateGameInfo())
 			clearInterval(this.infoInterval)
 		}
 
@@ -488,7 +489,7 @@ export class Game {
 
 	play() {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 5)
-		//Envoi des infos
+		//Envoi des infosk
 		this.infoInterval = setInterval(() => { this.updateInfo(this.generateGameInfo()) }, 1000 / 60)
 	}
 
