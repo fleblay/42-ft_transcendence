@@ -3,11 +3,10 @@ import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
-import { CreateGame } from './component/CreateGame'
+import { CreateGame } from './component/OldCreateGame'
 import { ListUsers } from './component/ListUsers'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
-import { GamePage } from './component/GameScreen'
 import { SocketProvider } from './socket/SocketProvider'
 import { MuiAppBar } from './component/menu'
 import { ProfilPlayer } from './component/ProfilPlayer'
@@ -17,7 +16,7 @@ import { FriendList } from './component/FriendList'
 import { BlockedList } from './component/BlockedList';
 import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
-import { NewGamePage } from './component/NewGamePage';
+import { GamePage } from './component/GamePage';
 
 export interface Destinations {
 	name: string,
@@ -34,7 +33,6 @@ export const allRoutes: Destinations[] = [
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
 	{ name: "Friends", path: "/friends", public: false },
 	{ name: "Blocked", path: "/blocked", public: false },
-	{ name: "newGamePage", path: "/newgame", public: false},
 
 ]
 
@@ -179,23 +177,12 @@ function App() {
 							} />
 							<Route path="" element={
 								<RequireAuth>
-									<CreateGame />
+									<GamePage />
 								</RequireAuth>
 							} />
 						</Route>
 
-						<Route path="newgame/">
-							<Route path=":idGame" element={
-								<RequireAuth>
-									<NewGamePage />
-								</RequireAuth>
-							} />
-							<Route path="" element={
-								<RequireAuth>
-									<NewGamePage />
-								</RequireAuth>
-							} />
-						</Route>
+					
 
 						<Route path='/public' element={<div>Public</div>} />
 						<Route

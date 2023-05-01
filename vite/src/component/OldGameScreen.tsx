@@ -3,18 +3,14 @@ import { SocketContext } from '../socket/SocketProvider';
 import { IgameInfo, GameStatus } from "../types";
 import { useParams } from "react-router-dom";
 import { useAuthService } from '../auth/AuthService'
-import { Box, CircularProgress, Typography } from "@mui/material";
 
 interface Iprops {
 	gameInfo: IgameInfo,
-	gameId: string,
-	bottomRef: React.RefObject<HTMLInputElement>;
-	width: number;
+	gameId: string
 }
 
 const canvasHeight = 600
 const canvasWidth = 800
-const ballSize = 5
 
 enum LoadingStatus {
 	Loading,
@@ -22,24 +18,15 @@ enum LoadingStatus {
 	Failed
 }
 
-interface IgameModuleProps {
-	setActiveStep: (step: number) => void;
-	width: number;
-	gameInfo: IgameInfo,
-	setGameInfo: (gameInfo: IgameInfo) => void;
-	bottomRef: React.RefObject<HTMLInputElement>;
-}
-
-
-
-export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottomRef }: IgameModuleProps) {
+export function OldGamePage() {
 	const [loading, setLoading] = useState<LoadingStatus>(LoadingStatus.Loading);
+	const [gameInfo, setGameInfo] = useState<IgameInfo>({} as IgameInfo);
 	const [joined, setJoined] = useState<boolean>(false);
 	const { socket, customEmit } = useContext(SocketContext);
 
 	const [countdown, setCountdown] = useState<number>(0);
 
-	const { idGame } = useParams<{ idGame: string }>();
+	const { idGame } = useParams();
 
 	useEffect(() => {
 		if (!joined) {
@@ -48,9 +35,8 @@ export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottom
 		}
 		customEmit('game.join', { gameId: idGame }, (stringResponse: string) => {
 			const response = JSON.parse(stringResponse)
-
 			if (response.error) {
-				console.log('Game join got error:', response.error);
+				console.log(response.error);
 				setLoading(LoadingStatus.Failed);
 			}
 			else {
@@ -58,20 +44,8 @@ export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottom
 				setGameInfo(response.gameInfo as IgameInfo);
 				setLoading(LoadingStatus.Loaded);
 			}
-
 		});
 	}, [joined]);
-
-	useEffect(() => {
-		console.log('gameInfo.status', gameInfo.status);
-		if (gameInfo.status === GameStatus.playing || gameInfo.status === GameStatus.start) {
-			setActiveStep(2);
-		}
-		if (gameInfo.status === GameStatus.end) {
-			setActiveStep(3);
-		}
-	}, [gameInfo.status])
-
 
 	useEffect(() => {
 		if (!idGame || !socket) {
@@ -95,11 +69,8 @@ export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottom
 
 	if (loading === LoadingStatus.Loading) {
 		return (
-			<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
-
-				<Box sx={{ display: 'flex' }}>
-					<CircularProgress />
-				</Box>
+			<div>
+				Loading...
 			</div>
 		);
 	}
@@ -111,13 +82,8 @@ export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottom
 				<>
 					{
 						gameInfo.status === GameStatus.waiting &&
-						<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
-
-							<Box sx={{ display: 'flex' }}>
-								<CircularProgress />
-							</Box>
-							<Typography sx={{ pl: 2 }}>Waiting for players</Typography>
-
+						<div>
+							Waiting for players...
 						</div>
 					}
 					{countdown !== 0 &&
@@ -138,13 +104,13 @@ export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottom
 							</div>
 						</div>
 					}
-					<GameScreen gameInfo={gameInfo} gameId={idGame} bottomRef={bottomRef} width={width} />
+					<OldGameScreen gameInfo={gameInfo} gameId={idGame} />
 				</>
 			)
 		}
-		// if (gameInfo.status === GameStatus.end) {
-		// 	return <GameFinishedScreen gameInfo={gameInfo} />
-		// }
+		if (gameInfo.status === GameStatus.end) {
+			return <GameFinishedScreen gameInfo={gameInfo} />
+		}
 	}
 
 	return (
@@ -154,25 +120,45 @@ export function GameModule({ setActiveStep, width, setGameInfo, gameInfo, bottom
 	);
 };
 
+function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo }) {
+	return (
+		<div>
+			<div>Game finished</div>
+			<div>Winner: {gameInfo.players.map((player, index) => <div key={index}>{player.score}</div>)}</div>
+		</div>
+	)
+}
 
-
-export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.Element {
+export function OldGameScreen({ gameInfo, gameId }: Iprops): JSX.Element {
+	const auth = useAuthService()
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
 	const [keyDown, setKeyDown] = useState({ up: false, down: false, shoot: false });
-	const [canvasRatio, setCanvasRatio] = useState<number>(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
+	const [canvasRatio, setCanvasRatio] = useState<number>(0.9 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
+	const bottomRef = useRef<HTMLInputElement>(null)
 
 	const handleClick = () => {
 		setDisplayInfo(!displayInfo)
 	}
 
-	useEffect(() => {
-		console.log("width", width);
-		setCanvasRatio(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
-	}, [width])
+	const handleResize = () => {
+		setCanvasRatio(0.9 * Math.min(window.innerWidth / canvasWidth, window.innerHeight / canvasHeight))
+		if (bottomRef.current)
+			bottomRef.current.scrollIntoView({ behavior: "smooth" })
+	}
 
+	useEffect(() => {
+		window.addEventListener("resize", handleResize)
+		if (bottomRef.current) {
+			bottomRef.current.scrollIntoView({ behavior: "smooth" })
+			console.log("Going down")
+		}
+		return (() => {
+			window.removeEventListener("resize", handleResize)
+		})
+	}, [])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -248,7 +234,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 			context.current.fillRect(0, gameInfo.players[0].pos * canvasRatio, gameInfo.players[0].paddleWidth * canvasRatio, gameInfo.players[0].paddleLength * canvasRatio);
 			if (gameInfo.players[0].shoot.active) {
 				context.current.beginPath();
-				context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+				context.current.arc(gameInfo.players[0].shoot.pos.x * canvasRatio, gameInfo.players[0].shoot.pos.y * canvasRatio, gameInfo.players[0].shoot.size * canvasRatio, 0, 2 * Math.PI)
 				context.current.fill();
 			}
 		}
@@ -258,7 +244,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 			context.current.fillRect((canvasWidth - gameInfo.players[1].paddleWidth) * canvasRatio, gameInfo.players[1].pos * canvasRatio, gameInfo.players[1].paddleWidth * canvasRatio, gameInfo.players[1].paddleLength * canvasRatio);
 			if (gameInfo.players[1].shoot.active) {
 				context.current.beginPath();
-				context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+				context.current.arc(gameInfo.players[1].shoot.pos.x * canvasRatio, gameInfo.players[1].shoot.pos.y * canvasRatio, gameInfo.players[0].shoot.size * canvasRatio, 0, 2 * Math.PI)
 				context.current.fill();
 			}
 		}
@@ -281,7 +267,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 		// Ball
 		context.current.fillStyle = ballcolor
 		context.current.beginPath();
-		context.current.arc(gameInfo.ball.pos.x * canvasRatio, gameInfo.ball.pos.y * canvasRatio, ballSize * canvasRatio, 0, 2 * Math.PI)
+		context.current.arc(gameInfo.ball.pos.x * canvasRatio, gameInfo.ball.pos.y * canvasRatio, gameInfo.ball.size * canvasRatio, 0, 2 * Math.PI)
 		context.current.fill();
 
 		// Scores
@@ -293,11 +279,11 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 		// Player Info
 		context.current.font = `${20 * canvasRatio}px serif`
 		context.current.fillStyle = player1color
-		context.current.fillText(`${gameInfo.players[0].user.username}`, 5 * canvasRatio, 20 * canvasRatio)
+		context.current.fillText(`${gameInfo.players[0].user.username} : ${gameInfo.players[0].amo}`, 5 * canvasRatio, 20 * canvasRatio)
 		context.current.fillStyle = player2color
 		if (gameInfo.players[1]) {
-			const player2username = gameInfo.players[1].user.username
-			context.current.fillText(player2username, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2username).width), 20 * canvasRatio)
+			const player2info = `${gameInfo.players[1].user.username} : ${gameInfo.players[1].amo}`
+			context.current.fillText(player2info, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2info).width), 20 * canvasRatio)
 		}
 
 	}, [gameInfo.players, gameInfo.ball.pos]);

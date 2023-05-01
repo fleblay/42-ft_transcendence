@@ -1,25 +1,20 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { SocketContext } from '../socket/SocketProvider';
-import { Update } from 'vite/types/hmrPayload';
-import { IgameInfo, GameStatus, GameOptions } from '../types';
-import { GamePage, GameScreen } from './GameScreen';
-import { Box, Button, Checkbox, Container, Slider, Step, StepLabel, Stepper } from '@mui/material';
-import axios from 'axios';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import apiClient from '../auth/interceptor.axios';
-import { useAuthService } from '../auth/AuthService';
+
+import { IgameInfo } from '../types';
+import { Box, Container, Step, StepLabel, Stepper } from '@mui/material';
+import { useLocation,  useParams } from 'react-router-dom';
+
 import { FinishGames } from './FinishGames';
 import { CreateGame } from './CreateGame';
-import { NewCreateGame } from './NewCreateGame';
-import { GameModule } from './NewGameScreen';
-import { GameFinishedScreen } from './NewResultGame';
+import { GameModule } from './GameScreen';
+import { GameFinishedScreen } from './ResultGame';
 
 interface Iprops {
     startGameInfo: IgameInfo,
     gameId: string
 }
 
-export function NewGamePage() {
+export function GamePage() {
 
     const steps = [{ label: 'Select game map' }, { label: 'Matchmaking' }, { label: 'Play game' }, { label: 'Result' }];
     const [activeStep, setActiveStep] = React.useState(0);
@@ -101,7 +96,7 @@ export function NewGamePage() {
                 </Stepper>
 
                 {activeStep === 0 &&
-                    <NewCreateGame setActiveStep={setActiveStep}/>
+                    <CreateGame/>
                 }
                 {(activeStep === 1  || activeStep === 2) &&
                     <GameModule setActiveStep={setActiveStep} width={containerSize.width} gameInfo={gameInfo} setGameInfo={setGameInfo} bottomRef={bottomRef} />

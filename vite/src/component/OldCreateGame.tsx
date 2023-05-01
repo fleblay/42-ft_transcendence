@@ -2,17 +2,24 @@ import React, { useState } from 'react';
 import { SocketContext } from '../socket/SocketProvider';
 import { Update } from 'vite/types/hmrPayload';
 import { IgameInfo, GameStatus, GameOptions } from '../types';
+import {OldGameScreen } from './OldGameScreen';
 import { Box, Button, Checkbox, Container, Slider, Step, StepLabel, Stepper } from '@mui/material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../auth/interceptor.axios';
+import { useAuthService } from '../auth/AuthService';
+import { FinishGames } from './FinishGames';
 
-
-interface ListCurrentGamesProps {
-	joinGame: (options: GameOptions, game?: string) => void;
+interface Iprops {
+	startGameInfo: IgameInfo,
+	gameId: string
 }
 
-const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) => {
+interface JoinGamesProps {
+	joinGames: (options: GameOptions, game?: string) => void;
+}
+
+const JoinGames: React.FunctionComponent<JoinGamesProps> = ({ joinGames }) => {
 	const [listGames, setListGames] = React.useState<string[]>([]);
 	const { socket } = React.useContext(SocketContext);
 
@@ -26,20 +33,18 @@ const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) => {
 			}}>Refresh list</button>
 			<div>
 				{listGames.map((gameId) => {
-					return (
-						<div key={gameId}>
-							<button onClick={() => {
-								joinGame({}, gameId);
-							}}>Join game {gameId}
-							</button>{gameId}
-						</div>
-					)
-				})}
+					return <div key={gameId}>
+						<button onClick={() => {
+							joinGames({}, gameId);
+						}}>Join game {gameId}
+						</button>{gameId}
+					</div>
+				})
+				}
 			</div>
 		</>
 	);
 }
-
 
 export function CreateGame() {
 	const navigate = useNavigate();
@@ -84,10 +89,9 @@ export function CreateGame() {
 		}
 	}
 
-
-	function joinGame(options: GameOptions, gameId?: string) {
-		if (gameId) {
-			navigate(`/newgame/${gameId}`);
+	function joinGames(options: GameOptions, game?: string) {
+		if (game) {
+			navigate(`/game/${game}`);
 		}
 		else {
 			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', { options }, (gameId: string) => {
@@ -97,11 +101,28 @@ export function CreateGame() {
 			});
 		}
 	}
-
+	const steps = [{ label: 'Select game map' }, { label: 'Matchmaking' }, { label: 'Join game' }];
+	const [activeStep, setActiveStep] = React.useState(0);
 	return (
-
 		<>
-				<span>Private</span>
+			<Container maxWidth="md">
+				<Box sx={{
+					width: '100%',
+					border: '1px solid #D3C6C6',
+					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+					borderRadius: '16px',
+					p: '2rem',
+					bgcolor: 'background.paper',
+				}}>
+					<Stepper activeStep={activeStep} alternativeLabel>
+						{steps.map((step) => (
+							<Step key={step.label}>
+								<StepLabel>{step.label}</StepLabel>
+							</Step>
+						))}
+					</Stepper>
+
+					<span>Private</span>
 					<Checkbox onChange={(e) => { setPrivateGame(e.target.checked) }} />
 					<span>Obstacles</span>
 					<Checkbox defaultChecked onChange={(e) => { setObsctacles(e.target.checked) }} />
@@ -285,12 +306,17 @@ export function CreateGame() {
 							onChange={(_, val) => setLiftEffect(Array.isArray(val) ? val[0] : val)}
 						/>
 					</div>
-			<Button variant='contained' onClick={() => {
-				joinGame({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect})
-			}}>
-				{privateGame ? "Create a private game" : "Join a game"}
-			</Button>
-			<ListCurrentGames joinGame={joinGame} />
+
+					<Button variant='contained' onClick={() => {
+						setActiveStep(1);
+						joinGames({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect})
+					}}>
+						{privateGame ? "Create a private game" : "Join a game"}
+					</Button>
+				</Box>
+				<JoinGames joinGames={joinGames} />
+				<FinishGames />
+			</Container>
 		</>
 	);
 }
