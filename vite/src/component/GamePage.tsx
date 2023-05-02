@@ -95,7 +95,13 @@ export function GamePage() {
 						<CreateGame />
 					}
 					{(activeStep === 1 || activeStep === 2) &&
+						<Box position="static" sx={{
+							height: 'auto', display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'center',
+						}}>
 						<GameModule setActiveStep={setActiveStep} width={containerSize.width} setResult={setResult} bottomRef={bottomRef} />
+					</Box>
 					}
 					{activeStep === 3 &&
 						<GameFinishedScreen gameInfo={result} />

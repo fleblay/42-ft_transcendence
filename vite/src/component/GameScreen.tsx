@@ -97,9 +97,9 @@ export function GameModule({setActiveStep, width, setResult, bottomRef }: IgameM
 		return (
 			<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
 
-				<Box sx={{ display: 'flex' }}>
-					<CircularProgress />
-				</Box>
+			<Box sx={{ display: 'flex' }}>
+			  <CircularProgress />
+			</Box>
 			</div>
 		);
 	}
