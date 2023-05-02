@@ -5,6 +5,7 @@ import { ChannelsListDebug, MyChannelsList } from './ChannelsList';
 import { MessageArea } from './MessageArea';
 import { SocketContext } from '../socket/SocketProvider';
 import { useParams } from 'react-router-dom';
+import { ChannelUsers } from './ChannelUsers';
 
 
 type chatTabsValue = 'Channels' | 'My channels' | 'Direct Messages';
@@ -117,41 +118,38 @@ export function ChatPage() {
     const myChannels = () => {
         return (
             <>
-            <Grid container spacing={3}>
-                        <Grid item xs={2}>
-                            <Typography textAlign={'center'}> Channels</Typography>
-                        </Grid>
-                        <Grid item xs={8}>
-                            <Typography textAlign={'center'}> {channelId} </Typography>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Typography textAlign={'center'}> User</Typography>
-                        </Grid>
+                <Grid container spacing={3}>
+                    <Grid item xs={2}>
+                        <Typography textAlign={'center'}> Channels</Typography>
                     </Grid>
-                    <Divider />
-                    <Grid container spacing={3}>
-                        <Grid item xs={2}>
-                            <MyChannelsList channels={channels} />
-                        </Grid>
-                        <Grid item xs={8}>
-                            {channelId ? <MessageArea channelId={channelId}/> : null}
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Typography textAlign={'center'}> List User</Typography>
-                        </Grid>
+                    <Grid item xs={8}>
+                        <Typography textAlign={'center'}> {channelId} </Typography>
                     </Grid>
-                    <Divider />
-                    <Grid container spacing={3}>
-                        <Grid item xs={2}>
-                            <Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
-                        </Grid>
-                        <Grid item xs={8}>
+                    <Grid item xs={2}>
+                        <Typography textAlign={'center'}> User</Typography>
+                    </Grid>
+                </Grid>
+                <Divider />
+                <Grid container spacing={3}>
+                    <Grid item xs={2}>
+                        <MyChannelsList channels={channels} />
+                    </Grid>
+                    <Grid item xs={8}>
+                        {channelId ? <MessageArea channelId={channelId} /> : null}
+                    </Grid>
+                    <Grid item xs={2}>
+                        {channelId ? <ChannelUsers channelId={channelId} /> : null}
+                    </Grid>
+                </Grid>
+                <Divider />
+                <Grid container spacing={3}>
+                    <Grid item xs={2}>
+                    </Grid>
+                    <Grid item xs={8}>
                         <TextField id="outlined-basic-email" label="Type Something" onChange={handleOnChange} fullWidth />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Button variant="contained" color="primary" onClick={sendMessage}> send </Button>
-                        </Grid>
                     </Grid>
+
+                </Grid>
             </>
         )
     }
@@ -177,9 +175,14 @@ export function ChatPage() {
                     {tabs === 'Channels' ? <ChannelsListDebug channels={channels} /> : null}
 
                     {tabs === 'My channels' ? myChannels() : null}
-                    
-                    <Button variant="contained" color="primary" onClick={updateChannel}>Update Channel </Button>
-                    <ChannelsListDebug channels={channels} />
+                    <Grid container spacing={3} sx={{mt:"20px"}}>
+                        <Grid item xs={4}>
+                            <Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Button variant="contained" color="primary" onClick={updateChannel}>Update Channel </Button>
+                        </Grid>
+                    </Grid>
                 </Box>
             </Container >
         </>
