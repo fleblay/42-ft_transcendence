@@ -41,12 +41,13 @@ export class ChatController {
 
 	// TODO: Limit the number of messages to 50
 	// NOTE: Offset is message id or number?
+	@UseGuards(ATGuard)
 	@Get('channels/:id/messages')
-	getMessages(@Param('id') id: string, @Query('offset') offset: string): Promise<Message[]> {
+	getMessages(@CurrentUser() user: User, @Param('id') id: string, @Query('offset') offset: string): Promise<Message[]> {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
 			throw new BadRequestException('Invalid channel id');
-		return this.chatService.getMessages(channelId, parseInt(offset) || 0);
+		return this.chatService.getMessages(user, channelId, parseInt(offset) || 0);
 	}
 
 	@Post('channels/:id/messages')

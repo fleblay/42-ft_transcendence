@@ -53,9 +53,9 @@ export class ChatService {
 		})
 	}
 
-	async newMessage(owner: User, channelId: number, messageData: NewMessageDto) {
-		const member = await this.membersRepo.findOne({
-			where: { user: { id: owner.id }, channel: { id: channelId } },
+	private getMemberOfChannel(user: User, channelId: number): Promise<Member> {
+		return this.membersRepo.findOne({
+			where: { user: { id: user.id }, channel: { id: channelId } },
 			relations: ['channel', 'user'],
 			select: {
 				id: true,
@@ -72,14 +72,21 @@ export class ChatService {
 				}
 			},
 		});
+	}
+	private userIsAllowed(member: Member, ignore: { banned?: boolean, kicked?: boolean, mute?: boolean } = {}): boolean {
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
-		if (member.banned)
+		if (ignore.banned !== true && member.banned)
 			throw new BadRequestException('You are banned from this channel');
-		if (member.kicked)
+		if (ignore.kicked !== true && member.kicked)
 			throw new BadRequestException('You are kicked from this channel');
-		if (member.muteTime && member.muteTime > new Date())
+		if (ignore.mute !== true && member.muteTime && member.muteTime > new Date())
 			throw new BadRequestException('You are muted from this channel');
+		return true;
+	}
+	async newMessage(owner: User, channelId: number, messageData: NewMessageDto) {
+		const member = await this.getMemberOfChannel(owner, channelId);
+		this.userIsAllowed(member);
 		const newMessage = this.messagesRepo.create({
 			channel: member.channel,
 			owner: member,
@@ -90,11 +97,9 @@ export class ChatService {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.newMessage', messageData);
 	}
 
-	async getMessages(channelId: number, offset: number = 0): Promise<Message[]> {
-		const channel = await this.channelsRepo.findOneBy({ id: channelId });
-		if (!channel)
-			throw new NotFoundException('Channel not found');
-		// TODO: Limit the number of messages to 50
+	async getMessages(user: User, channelId: number, offset: number = 0): Promise<Message[]> {
+		const member = await this.getMemberOfChannel(user, channelId);
+		this.userIsAllowed(member, { mute: true });
 		const messages = await this.messagesRepo.find({
 			where: {
 				channel: {
