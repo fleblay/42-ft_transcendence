@@ -94,4 +94,27 @@ export class ChatService {
 		});
 		return messages;
 	}
+
+	async getChannelMembers(channelId: number): Promise<Member[]>
+	{
+		const members = await this.membersRepo.find({
+			where: {
+				channel: {
+					id: channelId,
+				},
+			},
+			relations: {
+				user: true,
+			},
+			select: {
+				id: true,
+				role: true,
+				user: { id: true, username: true },
+			},
+		});
+		return members;
+	}
+		
+
+	
 }
