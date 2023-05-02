@@ -5,6 +5,11 @@ import { NewMessageDto } from './dto/new-message.dto';
 @Controller('chat')
 export class ChatController {
 
+	// NOTE: DEBUG PURPOSES ONLY !
+	@Get('/channels/ALL')
+	getAll() {
+		return [];
+	}
 	// Return all channels public and protected
 	@Get('/channels/public')
 	getAllPublic() {

@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "./channel.entity";
 import { Message } from "./message.entity";
 import { User } from "./user.entity";
@@ -16,4 +16,18 @@ export class Member {
 
 	@OneToMany(() => Message, message => message.owner)
 	messages: Message[];
+
+	@ManyToOne(() => Message)
+	lastRead: Message;
+
+	@Column({ nullable: true, default: null })
+	muteTime: Date | null;
+
+	@Column({ default: false })
+	banned: boolean;
+
+	@Column({ default: false })
+	kicked: boolean;
+
+
 }
