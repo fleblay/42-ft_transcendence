@@ -8,6 +8,7 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../model/user.entity';
 import { UsersService } from '../users/users.service';
 import { Member } from '../model/member.entity';
+import { Message } from 'src/model/message.entity';
 
 @Controller('chat')
 export class ChatController {

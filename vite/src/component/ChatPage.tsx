@@ -6,6 +6,8 @@ import { MessageArea } from './MessageArea';
 import { SocketContext } from '../socket/SocketProvider';
 import { useParams } from 'react-router-dom';
 import { ChannelUsers } from './ChannelUsers';
+import SendIcon from '@mui/icons-material/Send';
+
 
 
 type chatTabsValue = 'Channels' | 'My channels' | 'Direct Messages';
@@ -142,11 +144,14 @@ export function ChatPage() {
                     </Grid>
                 </Grid>
                 <Divider />
-                <Grid container spacing={3}>
+                <Grid container spacing={3} sx={{mt: "20px"}}>
                     <Grid item xs={2}>
                     </Grid>
                     <Grid item xs={8}>
                         <TextField id="outlined-basic-email" label="Type Something" onChange={handleOnChange} fullWidth />
+                    </Grid>
+                    <Grid item xs={2}>
+                        <Button variant="contained" onClick={sendMessage} endIcon={<SendIcon />}>Send</Button>
                     </Grid>
 
                 </Grid>
@@ -175,7 +180,7 @@ export function ChatPage() {
                     {tabs === 'Channels' ? <ChannelsListDebug channels={channels} /> : null}
 
                     {tabs === 'My channels' ? myChannels() : null}
-                    <Grid container spacing={3} sx={{mt:"20px"}}>
+                    <Grid container spacing={3} sx={{ mt: "20px" }}>
                         <Grid item xs={4}>
                             <Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
                         </Grid>
