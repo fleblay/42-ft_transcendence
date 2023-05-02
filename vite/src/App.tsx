@@ -18,6 +18,7 @@ import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
 import { GamePage } from './component/GamePage';
 import { OldGamePage } from './component/OldGameScreen';
+import { ChatPage } from './component/ChatPage';
 
 export interface Destinations {
 	name: string,
@@ -190,9 +191,7 @@ function App() {
 							path="/chat"
 							element={
 								<RequireAuth>
-									<>
-										<label>w</label>
-									</>
+									<ChatPage/>
 								</RequireAuth>
 							}
 						/>
@@ -210,6 +209,7 @@ function App() {
 						<Route path="/friends" element={<FriendList />} />
 						<Route path="/blocked" element={<BlockedList />} />
 						<Route path="/dfa" element= {<DfaForm></DfaForm>} />
+
 
 						<Route path='*' element={<div>404</div>} />
 					</Route>
