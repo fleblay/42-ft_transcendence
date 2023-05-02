@@ -2,6 +2,7 @@
 import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { SavedGame } from './saved-game.entity';
 import { FriendRequest } from './friend-request.entity';
+import { Member } from './member.entity';
 
 @Entity()
 export class User {
@@ -36,14 +37,15 @@ export class User {
 	wonGames: SavedGame[];
 
 	@OneToMany(() => FriendRequest , (friendRequest) => friendRequest.sender)
-	@JoinTable({})	
+	@JoinTable({})
 	sentRequests: FriendRequest[];
 
 	@OneToMany(() => FriendRequest , (friendRequest) => friendRequest.receiver)
 	@JoinTable({})
 	receivedRequests: FriendRequest[];
 
-
+	@OneToMany(() => Member, (member) => member.user)
+	members: Member[];
 /* 	@AfterInsert()
 	logInsert() {
 		console.log(`insert User with id ${this.id}`);
