@@ -12,8 +12,8 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthService } from '../auth/AuthService';
 
-const pages = ['Game', 'Leaderboard', 'Chat', 'About'];
-const menu = ['My profil', 'friends', 'blocked', 'Logout', 'all refresh token'];
+const pages = ['game', 'leaderboard', 'chat', 'about'];
+const menu = ['my profil', 'friends', 'blocked', 'logout', 'all refresh token'];
 
 export function MuiAppBar() {
 

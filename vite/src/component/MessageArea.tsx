@@ -1,0 +1,41 @@
+import { Grid, List, ListItem, ListItemText, makeStyles } from "@mui/material";
+
+
+export function MessageArea() {
+
+    return (
+<List>
+    <ListItem key="1">
+        <Grid container>
+            <Grid item xs={12}>
+                <ListItemText primary="Hey man, What's up ?"></ListItemText>
+            </Grid>
+            <Grid item xs={12}>
+                <ListItemText secondary="09:30"></ListItemText>
+            </Grid>
+        </Grid>
+    </ListItem>
+    <ListItem key="2">
+        <Grid container>
+            <Grid item xs={12}>
+                <ListItemText primary="Hey, Iam Good! What about you ?"></ListItemText>
+            </Grid>
+            <Grid item xs={12}>
+                <ListItemText secondary="09:31"></ListItemText>
+            </Grid>
+        </Grid>
+    </ListItem>
+    <ListItem key="3">
+        <Grid container>
+            <Grid item xs={12}>
+                <ListItemText primary="Cool. i am good, let's catch up!"></ListItemText>
+            </Grid>
+            <Grid item xs={12}>
+                <ListItemText secondary="10:30"></ListItemText>
+            </Grid>
+        </Grid>
+    </ListItem>
+</List>
+
+    ); 
+}
