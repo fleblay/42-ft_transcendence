@@ -52,8 +52,8 @@ export class UsersController {
 		return this.usersService.isConnected(parseInt(id));
 	}
 
-	@UseGuards(ATGuard)
 	@Get('/me')
+	@UseGuards(ATGuard)
 	@Serialize(UserDto)
 	getMe(@Request() req) {
 		const token = req.cookies['access_token'];
@@ -63,8 +63,8 @@ export class UsersController {
 		return this.authService.validateAccessToken(token);
 	}
 
-	@UseGuards(ATGuard)
 	@Patch('/me')
+	@UseGuards(ATGuard)
 	@Serialize(UserDto)
 	changeUsername(@CurrentUser() user: User, @Body() body: { username: string }) {
 		return this.usersService.changeUsername(user, body.username);
@@ -74,33 +74,32 @@ export class UsersController {
 	@UseGuards(FileSizeGuard)
 	@Post('/uploadAvatar')
 	@UseInterceptors(FileInterceptor('image'))
-	async uploadAvatar(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File) {
-		return await this.usersService.uploadAvatar(user, file);
+	uploadAvatar(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File) {
+		this.usersService.uploadAvatar(user, file);
 	}
 
 	@UseGuards(ATGuard)
 	@Get('/blocked/:id')
-	async getBlockedUsersList(@Param("id") id: string) {
-		return await this.usersService.getBlockedUsersList(parseInt(id));
+	getBlockedUsersList(@Param("id") id: string) {
+		return this.usersService.getBlockedUsersList(parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
 	@Get('/getBlocked/:id')
-	async getBlockedUser(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.usersService.getBlocked(user, parseInt(id));
+	getBlockedUser(@CurrentUser() user: User, @Param("id") id: string) {
+		return this.usersService.getBlocked(user, parseInt(id));
 	}
-
 
 	@UseGuards(ATGuard)
 	@Post('/blockUser/:id')
-	async block(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.usersService.blockUser(user, parseInt(id));
+	block(@CurrentUser() user: User, @Param("id") id: string) {
+		this.usersService.blockUser(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/unblockUser/:id')
-	async unblock(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.usersService.unblockUser(user, parseInt(id));
+	unblock(@CurrentUser() user: User, @Param("id") id: string) {
+		this.usersService.unblockUser(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
@@ -113,6 +112,14 @@ export class UsersController {
 			return ("turned-off")
 		}
 	};
+
+	// TODO: In user controller return all channels that user is in
+	@Get('/channels')
+	@UseGuards(ATGuard)
+	getChannels(@CurrentUser() user: User) {
+		return 'users/ channels'
+		return []
+	}
 
 	@Get('/:id')
 	async findOne(@Param("id") id: string): Promise<UserInfo> {

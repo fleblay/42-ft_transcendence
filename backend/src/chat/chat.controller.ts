@@ -14,6 +14,7 @@ export class ChatController {
 
 	@Post('channels')
 	createChannel(@Body() body: CreateChannelDto) {
+		return `createChannel ${JSON.stringify(body)}`
 		return {};
 	}
 
@@ -27,13 +28,14 @@ export class ChatController {
 
 	@Post('channels/:id/messages')
 	createMessage(@Param('id') id: string, @Body() body: NewMessageDto) {
-		return `createMessage ${id} ${body}`
+		return `createMessage ${id} ${JSON.stringify(body)}`
 		return {};
 	}
 
-	// NOTE: id is a string, dont forget to convert it to number
-	@Get('channels/:id')
-	getChannel(@Param('id') id: string) {
+	// NOTE: Return password if user is owner and return all members
+	@Get('channels/:id/info')
+	getChannelInfo(@Param('id') id: string) {
+		return `getChannelInfo ${id}`
 		return {};
 	}
 }
