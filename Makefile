@@ -17,7 +17,7 @@ docker:
 detach: build
 	docker-compose up --no-build -d
 
-follow:
+follow: detach
 	docker-compose logs -f
 
 build: .env.template backend/Dockerfile

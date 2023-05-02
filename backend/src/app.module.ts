@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, ValidationPipe } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +13,11 @@ import { RefreshToken } from './model/refresh-token.entity';
 import { AuthModule } from './users/auth/auth.module';
 import { FriendRequest } from './model/friend-request.entity';
 import { FriendsModule } from './friends/friends.module';
+import { ChatModule } from './chat/chat.module';
+import { APP_PIPE } from '@nestjs/core';
+import { Member } from './model/member.entity';
+import { Message } from './model/message.entity';
+import { Channel } from './model/channel.entity';
 
 @Module({
 	imports: [
@@ -29,20 +34,37 @@ import { FriendsModule } from './friends/friends.module';
 				username: config.get<string>("POSTGRES_USER"),
 				password: config.get<string>("POSTGRES_PASSWORD"),
 				synchronize: true,
-				entities:[User, SavedGame, RefreshToken, FriendRequest]
+				entities: [
+					User,
+					SavedGame,
+					RefreshToken,
+					FriendRequest,
+					Member,
+					Message,
+					Channel
+				]
 			})
 		}),
 		UsersModule,
 		EventsModule,
 		GameModule,
 		AuthModule,
-		FriendsModule
+		FriendsModule,
+		ChatModule
 	],
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [
+		AppService,
+		{
+			provide: APP_PIPE,
+			useValue: new ValidationPipe({
+				whitelist: true,
+			}),
+		}
+	],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-	  consumer.apply(LogMiddleware).forRoutes('*');
+		consumer.apply(LogMiddleware).forRoutes('*');
 	}
 }

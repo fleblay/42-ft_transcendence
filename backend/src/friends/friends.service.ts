@@ -6,14 +6,20 @@ import { Repository } from "typeorm";
 import { User } from "../model/user.entity";
 import { Friend } from "../type";
 import { GameService } from "../game/game.service";
+import { Server } from 'socket.io'
 
 @Injectable()
 export class FriendsService {
+	private server: Server;
 	constructor(
 		@Inject(forwardRef(() => UsersService)) private usersService: UsersService,
 		private gameService: GameService,
 		@InjectRepository(FriendRequest) private friendReqRepo: Repository<FriendRequest>
 	) {
+	}
+
+	setWsServer(server: Server) {
+		this.server = server;
 	}
 
 	async addFriend(user: User, friendId: number) {
@@ -41,8 +47,8 @@ export class FriendsService {
 		this.usersService.unblockUser(user, friendId);
 		const newFriend = this.generateFriend(user, friend, newRequest);
 
-		// this.server.to(`/player/${user.id}`).emit('page.player', {})
-		// this.server.to(`/player/${friendId}`).emit('page.player', {})
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${friendId}`).emit('page.player', {})
 		return newFriend;
 	}
 
@@ -75,8 +81,8 @@ export class FriendsService {
 		friendRequest.status = 'accepted';
 		this.friendReqRepo.save(friendRequest);
 		this.usersService.unblockUser(user, friendId);
-		// this.server.to(`/player/${user.id}`).emit('page.player', {})
-		// this.server.to(`/player/${friendId}`).emit('page.player', {})
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${friendId}`).emit('page.player', {})
 		return this.generateFriend(user, friend, friendRequest);
 	}
 
@@ -87,8 +93,8 @@ export class FriendsService {
 			return null;
 		}
 		this.friendReqRepo.softRemove(friendRequest);
-		// this.server.to(`/player/${user.id}`).emit('page.player', {})
-		// this.server.to(`/player/${friendId}`).emit('page.player', {})
+		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${friendId}`).emit('page.player', {})
 		return {
 			friendId: friendId,
 			status: 'declined'
@@ -113,7 +119,13 @@ export class FriendsService {
 				{ sender: { id: friend.id }, receiver: { id: user.id }, status },
 				{ receiver: { id: friend.id }, sender: { id: user.id }, status },
 			],
-			relations: { sender: true, receiver: true }
+			relations: { sender: true, receiver: true },
+			select: {
+				id: true,
+				status: true,
+				sender: { id: true, username: true },
+				receiver: { id: true, username: true }
+			}
 		});
 		return friendRequest;
 	}

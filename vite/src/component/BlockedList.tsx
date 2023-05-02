@@ -10,30 +10,30 @@ import { useNavigate } from 'react-router-dom';
 
 export function BlockedList() {
 	//send a post with image
-	const [blockedList, setBlockedList] = useState<Blocked[]| null>(null);
+	const [blockedList, setBlockedList] = useState<Blocked[] | null>(null);
 	const auth = useAuthService();
-    const navigate = useNavigate();
-	
+	const navigate = useNavigate();
+
 	React.useEffect(() => {
 		console.log('useEffect');
 		console.log(auth.user);
 		if (!auth.user) return;
 		apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
 			setBlockedList(response.data);
-		console.log('blockedlist');
-		console.log(response.data);
+			console.log('blockedlist');
+			console.log(response.data);
 		});
 
 	}, [auth.user]);
 
-    const handleUnblockUser = (idPlayer : number) => {
+	const handleUnblockUser = (idPlayer: number) => {
 		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
-            if (!auth.user) return;
-            apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
-                setBlockedList(response.data);
-            console.log('blockedlist');
-            console.log(response.data);
-            });
+			if (!auth.user) return;
+			apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
+				setBlockedList(response.data);
+				console.log('blockedlist');
+				console.log(response.data);
+			});
 			console.log(response);
 		}).catch((error) => {
 			console.log(error);
@@ -64,33 +64,34 @@ export function BlockedList() {
 							return (
 								<React.Fragment>
 
-								<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
+									<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
 
-								<Box sx={{ mr: '20px', ml: '20px' }}>
-									<Avatar src={imgPath} style={{ width: '80px', height: '80px' }} />
-								</Box>
-								<Box sx={{
-									display: 'flex',
-									flexDirection: 'column',
-									alignItems: 'flex-start',
-								}}
-								>
-									<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-	
-										<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px'}} sx={{ flexGrow: 1, mr: '10px' }}>
-											{blocked?.username}
-										</Typography>
+										<Box sx={{ mr: '20px', ml: '20px' }}>
+											<Avatar src={imgPath} style={{ width: '80px', height: '80px' }} />
+										</Box>
+										<Box sx={{
+											display: 'flex',
+											flexDirection: 'column',
+											alignItems: 'flex-start',
+										}}
+										>
+											<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+
+												<Typography variant="h5" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, mr: '10px' }}>
+													{blocked?.username}
+												</Typography>
+											</div>
+										</Box>
+										<Button variant="outlined" color="error" sx={{ ml: 'auto', mr: 3, mt: 2, mb: 2 }} onClick={() => handleUnblockUser(blocked.id)} >unblock </Button>
 									</div>
-								</Box>
-								<Button variant="outlined" color="error" sx={{ ml: 'auto', mr: 3, mt: 2, mb: 2 }} onClick={()=>handleUnblockUser(blocked.id)} >unblock </Button>
-							</div>
-							<Divider />
-							</React.Fragment>
-							)})}
+									<Divider />
+								</React.Fragment>
+							)
+						})}
 					</Box>
 
 				</Box>
-		</Container>
+			</Container>
 		</React.Fragment>
 	)
 }

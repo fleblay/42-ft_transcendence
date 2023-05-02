@@ -15,13 +15,13 @@ import { useAuthService } from '../auth/AuthService';
 
 interface UserInfoDisplayProps {
 	idPlayer: string | undefined;
-	displayBlocked : boolean;
+	displayBlocked: boolean;
 
 }
 
 export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayProps) {
 
-	const [ userData, setUserData ] = useState<UserInfo | null>(null);
+	const [userData, setUserData] = useState<UserInfo | null>(null);
 	const imgPath = `/avatars/${idPlayer}.png`;
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 	const { customEmit, socket, customOn, customOff, setSubscription, setUnsubscribe } = useContext(SocketContext);
@@ -89,28 +89,24 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 	React.useEffect(() => {
 		console.log("idPlayer", idPlayer);
 		const room = `/player/${idPlayer}`;
-			setSubscription(room);
+		setSubscription(room);
+		return () => {
+			setUnsubscribe(room);
+			console.log("cleaned up");
+		};
 	}, []);
 
 	React.useEffect(() => {
-			return () => {
-				const room = `/player/${idPlayer}`;
-				setUnsubscribe(room);
-			  console.log("cleaned up");
-			};
-		  }, []);
-
-	React.useEffect(() => {
-			if (!socket) return;
-			customOn('page.player', (data: any) => {
-				console.log("data", data);
-				if (userData)
-					setUserData({ ...userData, ...data });
-			})
-			return (() => {
-				customOff('page.player');
-			})
-		}, [socket, userData]);
+		if (!socket) return;
+		customOn('page.player', (data: any) => {
+			console.log("data", data);
+			if (userData)
+				setUserData({ ...userData, ...data });
+		})
+		return (() => {
+			customOff('page.player');
+		})
+	}, [socket, userData]);
 
 
 	const handleAddFriend = () => {

@@ -127,3 +127,16 @@ export type Blocked = {
 	username: string
 }
 
+export type Channel = {
+	id: number,
+	name: string,
+	private : boolean,
+	password?: string
+}
+
+export type Message = {
+	id: number,
+	owner: string,
+	content: string,
+	date: string,
+}

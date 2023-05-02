@@ -7,8 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { RefreshToken } from '../model/refresh-token.entity';
 import {GameModule} from '../game/game.module'
-import { FriendsService } from '../friends/friends.service';
 import { FriendsModule } from 'src/friends/friends.module';
+import { ChatModule } from '../chat/chat.module';
 
 @Module({
 	imports: [
@@ -18,10 +18,12 @@ import { FriendsModule } from 'src/friends/friends.module';
 			signOptions: { expiresIn: '600s' },
 		}),
 		forwardRef(() => GameModule),
-		forwardRef(() => FriendsModule)
+		forwardRef(() => FriendsModule),
+		forwardRef(() => ChatModule),
 	],
 	controllers: [UsersController],
 	providers: [AuthService, UsersService],
 	exports: [AuthService, UsersService],
 })
 export class UsersModule { }
+//
