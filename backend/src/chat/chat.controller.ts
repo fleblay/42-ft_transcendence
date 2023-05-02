@@ -18,9 +18,9 @@ export class ChatController {
 	) { }
 
 	// NOTE: DEBUG PURPOSES ONLY !
-	@Get('/channels/ALL')
+	@Get('/channels/all')
 	getAll() {
-		return [];
+		return this.chatService.getAllChannels()
 	}
 	// Return all channels public and protected
 	@Get('/channels/public')

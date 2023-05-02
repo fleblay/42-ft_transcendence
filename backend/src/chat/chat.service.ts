@@ -168,7 +168,8 @@ export class ChatService {
 		});
 		return members;
 	}
-		
 
-	
+	getAllChannels(): Promise<Channel[]> {
+		return this.channelsRepo.find();
+	}
 }
