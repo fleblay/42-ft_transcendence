@@ -25,20 +25,31 @@ export class ChatService {
 		this.wsServer = server;
 	}
 
-	async createChannel(user : User, data : CreateChannelDto) : Promise<void> {
+	async createChannel(data : CreateChannelDto) : Promise<number> {
 		if (data.private && data.password)
-			throw new BadRequestException("Private channel creation data provide a password")
+			throw new BadRequestException("createChannel : Private channel creation data provide a password")
 
 		const channel : Channel = await this.channelsRepo.save({
 			name: data.name,
 			private: data.private,
 			password : data.password,
 		})
+		return channel.id
 
-		const owner : Member = await this.membersRepo.save({
+	}
+
+	async joinChannel(user : User, channelId: number, options ?: {owner ?: boolean, password ?: string}) : Promise<void> {
+		const channel = await this.channelsRepo.findOne({where : {id : channelId}})
+			if (!channel)
+				throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
+			if (channel.password && (!options?.password || options.password != channel.password))
+				throw new BadRequestException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
+
+		const joiner : Member = await this.membersRepo.save({
 			user,
 			channel,
 			messages : [],
+			role: (options?.owner) ? "owner" : "regular"
 		})
 	}
 

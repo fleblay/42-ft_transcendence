@@ -133,3 +133,10 @@ export type Channel = {
 	private : boolean,
 	password?: string
 }
+
+export type Message = {
+	id: number,
+	owner: string,
+	content: string,
+	date: string,
+}

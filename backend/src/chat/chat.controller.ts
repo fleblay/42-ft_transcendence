@@ -22,12 +22,13 @@ export class ChatController {
 	@Get('/channels/public')
 	getAllPublic() {
 		return 'getAllPublic';
-		return [];
 	}
 
+	@UseGuards(ATGuard)
 	@Post('channels')
-	createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto) : void {
-		this.chatService.createChannel(user, body)
+	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto) : Promise<void> {
+		const channelId : number = await this.chatService.createChannel(body)
+		this.chatService.joinChannel(user, channelId)
 	}
 
 	// TODO: Limit the number of messages to 50
