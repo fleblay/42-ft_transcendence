@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "./channel.entity";
 import { Member } from "./member.entity";
 
@@ -13,8 +13,8 @@ export class Message {
 	@ManyToOne(() => Member, member => member.messages)
 	owner: Member
 
-	@Column({ default: new Date() })
-	date: Date;
+	@CreateDateColumn()
+	createdAt: Date;
 
 	@Column({ nullable: true})
 	gameId: string | null;
