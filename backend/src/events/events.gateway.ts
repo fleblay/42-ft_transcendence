@@ -22,6 +22,8 @@ import { AuthService } from '../users/auth/auth.service';
 import { IgameInfo } from '../game/game';
 import { UsersService } from '../users/users.service'
 import { instrument } from '@socket.io/admin-ui';
+import { FriendsService } from '../friends/friends.service';
+import { ChatService } from '../chat/chat.service';
 
 type SocketInfo = {
 	id: string,
@@ -45,7 +47,13 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@WebSocketServer() server: Server
 	private connectedSockets: SocketInfo[] = []
 
-	constructor(private gameService: GameService, private authService: AuthService, private userServices: UsersService) {
+	constructor(
+		private gameService: GameService,
+		private authService: AuthService,
+		private usersServices: UsersService,
+		private friendsService: FriendsService,
+		private chatService: ChatService
+	) {
 		setInterval(() => {
 			const info = this.connectedSockets.map((e) => {
 				return e.username
@@ -63,7 +71,9 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	afterInit(server: Server) {
 		this.gameService.setWsServer(server)
-		this.userServices.setWsServer(server)
+		this.usersServices.setWsServer(server)
+		this.friendsService.setWsServer(server)
+		this.chatService.setWsServer(server)
 		instrument(this.server, {
 			auth: false
 		})
@@ -78,7 +88,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			return
 		console.log("New Connection User:", foundUser.username)
 		this.connectedSockets.push({ id: socket.id, username: foundUser.username, userId: foundUser.id, actions: ["connection"] })
-		this.userServices.addConnectedUser(foundUser.id)
+		this.usersServices.addConnectedUser(foundUser.id)
 		this.server.to(`/player/${foundUser.id}`).emit('page.player', {
 			connected: true
 		})
@@ -91,7 +101,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 		if (foundUser) {
 			console.log("Disconnect User:", foundUser.username)
-			this.userServices.disconnect(foundUser.id)
+			this.usersServices.disconnect(foundUser.id)
 
 			this.server.to(`/player/${foundUser.id}`).emit('page.player', {
 				connected: false
@@ -179,7 +189,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	@SubscribeMessage('client.component.join')
-	handleClientComponentJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: {subscription : string}): void 
+	handleClientComponentJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: {subscription : string}): void
 	{
 		this.updateSocket(client, "clien.component.join");
 		client.join(data.subscription);

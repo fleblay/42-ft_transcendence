@@ -112,7 +112,8 @@ export class Game {
 	public shootSpeed: number
 	public liftEffect: number
 
-	constructor(public gameId: UUID,
+	constructor(
+		public gameId: UUID,
 		private server: Server,
 		public privateGame: boolean,
 		public options: GameOptions) {

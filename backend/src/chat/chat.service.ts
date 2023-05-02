@@ -5,9 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../model/channel.entity';
 import { Message } from '../model/message.entity';
 import { UsersService } from '../users/users.service';
-
+import { Server } from 'socket.io'
 @Injectable()
 export class ChatService {
+
+	private wsServer: Server;
 	constructor (
 		@InjectRepository(Member) private membersRepo: Repository<Member>,
 		@InjectRepository(Channel) private channelsRepo: Repository<Channel>,
@@ -15,4 +17,7 @@ export class ChatService {
 		@Inject(forwardRef(() => UsersService)) private usersService: UsersService,
 	) { }
 
+	setWsServer(server: Server) {
+		this.wsServer = server;
+	}
 }
