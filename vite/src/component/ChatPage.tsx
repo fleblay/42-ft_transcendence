@@ -1,12 +1,35 @@
-import { AppBar, Box, Button, Container, Divider, Grid, Typography } from '@mui/material';
-import React, { useRef, useState, useEffect } from 'react';
+import { AppBar, Box, Button, Container, Divider, Fab, Grid, TextField, Typography } from '@mui/material';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import apiClient from '../auth/interceptor.axios';
-import { ChannelsList } from './ChannelsList';
+import { ChannelsList, ChannelsListDebug } from './ChannelsList';
+import { MessageArea } from './MessageArea';
+import { SocketContext } from '../socket/SocketProvider';
+import { useParams } from 'react-router-dom';
 
 
 export function ChatPage() {
 
     const [channels, setChannels] = useState<any[]>([]);
+    const [messageToSend, setMessageToSend] = useState<string>("");
+
+
+    const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setMessageToSend(event.target.value);
+    };
+
+
+	const { setSubscription, setUnsubscribe } = useContext(SocketContext);
+
+	const { channelId } = useParams();
+
+	React.useEffect(() => {
+		const room = `/chat/${channelId}`;
+		setSubscription(room);
+		return () => {
+			setUnsubscribe(room);
+			console.log("cleaned up");
+		};
+	}, []);
 
     useEffect(() => {
         apiClient.get(`/api/chat/channels`).then((response) => {
@@ -43,6 +66,18 @@ export function ChatPage() {
         );
     }
 
+    const sendMessage = () => {
+        console.log("sendMessage");
+        console.log("messageToSend", messageToSend);
+        apiClient.post(`/api/chat/channels/${channels[0].id}/messages`, { content: messageToSend }).then((response) => {
+            console.log("response", response);
+        }
+        ).catch((error) => {
+            console.log(error);
+        }
+        );
+    };
+
     const joinChannel = () => {
         console.log("joinChannel");
     };
@@ -65,21 +100,42 @@ export function ChatPage() {
                         </Typography>
                     </AppBar>
                     <Grid container spacing={3}>
-                        <Grid item xs="auto">
-                            <Typography> Channels</Typography>
+                        <Grid item xs={2}>
+                            <Typography textAlign={'center'}> Channels</Typography>
                         </Grid>
-                        <Grid item xs={6}>
-                        <Typography> Channels Name</Typography>
+                        <Grid item xs={8}>
+                            <Typography textAlign={'center'}> Channels Name</Typography>
                         </Grid>
-                        <Grid item xs>
-                        <Typography> User</Typography>
+                        <Grid item xs={2}>
+                            <Typography textAlign={'center'}> User</Typography>
                         </Grid>
                     </Grid>
                     <Divider />
-
-                    <Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
+                    <Grid container spacing={3}>
+                        <Grid item xs={2}>
+                            <ChannelsList channels={channels} />
+                        </Grid>
+                        <Grid item xs={8}>
+                            <MessageArea />
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Typography textAlign={'center'}> List User</Typography>
+                        </Grid>
+                    </Grid>
+                    <Divider />
+                    <Grid container spacing={3}>
+                        <Grid item xs={2}>
+                            <Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
+                        </Grid>
+                        <Grid item xs={8}>
+                        <TextField id="outlined-basic-email" label="Type Something" onChange={handleOnChange} fullWidth />
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Button variant="contained" color="primary" onClick={sendMessage}> send </Button>
+                        </Grid>
+                    </Grid>
                     <Button variant="contained" color="primary" onClick={updateChannel}>Update Channel </Button>
-                    <ChannelsList channels={channels} />
+                    <ChannelsListDebug channels={channels} />
                 </Box>
             </Container >
         </>

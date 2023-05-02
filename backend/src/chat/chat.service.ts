@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef, BadRequestException} from '@nestjs/common';
+import { Inject, Injectable, forwardRef, BadRequestException, NotFoundException} from '@nestjs/common';
 import { Member } from '../model/member.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,12 +8,13 @@ import { UsersService } from '../users/users.service';
 import { Server } from 'socket.io'
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { User } from '../model/user.entity';
+import { NewMessageDto } from './dto/new-message.dto';
 
 @Injectable()
 export class ChatService {
 
 	private wsServer: Server;
-	constructor (
+	constructor(
 		@InjectRepository(Member) private membersRepo: Repository<Member>,
 		@InjectRepository(Channel) private channelsRepo: Repository<Channel>,
 		@InjectRepository(Message) private messagesRepo: Repository<Message>,
@@ -39,5 +40,19 @@ export class ChatService {
 			channel,
 			messages : [],
 		})
+	}
+
+	async newMessage(owner: User, channelId: number, messageData: NewMessageDto) {
+		const channel = await this.channelsRepo.findOneBy({ id: channelId });
+		if (!channel)
+			throw new NotFoundException('Channel not found');
+		const newMessage = this.messagesRepo.create({
+			channel,
+			owner,
+			gameId: messageData.gameId,
+			content: messageData.content
+		});
+		await this.messagesRepo.save(newMessage);
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.newMessage', messageData);
 	}
 }

@@ -179,7 +179,7 @@ function App() {
 							} />
 							<Route path="" element={
 								<RequireAuth>
-									<GamePage/>
+									<GamePage />
 								</RequireAuth>
 							} />
 						</Route>
@@ -187,14 +187,13 @@ function App() {
 
 
 						<Route path='/public' element={<div>Public</div>} />
-						<Route
-							path="/chat"
-							element={
+						<Route path="chat/:channelId?" element={
 								<RequireAuth>
-									<ChatPage/>
+									<ChatPage />
 								</RequireAuth>
-							}
-						/>
+							} />
+					
+
 						<Route path="/Login" element={<LoginForm />} />
 						<Route path="/Register" element={<RegisterForm />} />
 						<Route path="/leaderboard" element={<><ListUsers /> <br /> <FakeGames /></>} />
@@ -208,7 +207,7 @@ function App() {
 						</Route>
 						<Route path="/friends" element={<FriendList />} />
 						<Route path="/blocked" element={<BlockedList />} />
-						<Route path="/dfa" element= {<DfaForm></DfaForm>} />
+						<Route path="/dfa" element={<DfaForm></DfaForm>} />
 
 
 						<Route path='*' element={<div>404</div>} />
