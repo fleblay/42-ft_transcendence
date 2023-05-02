@@ -10,57 +10,62 @@ import { Channel, UserInfo } from "../types";
 
 
 
-export function ChannelsList( { channels }: { channels : Channel[] }) {
+export function MyChannelsList({ channels }: { channels: Channel[] }) {
 	const navigate = useNavigate();
 
-    const rows = channels.map((channel : Channel) => {
-        return {
-            channelId: channel.channelId,
-            channelName: channel.channelName,
-            private : channel.private,
-            password : channel.password,
-        }
-    });
-
-	const mooveToChannel = (channelId : number) => {
-		navigate(`/chat/${channelId}`);
+	const rows = channels.map((channel: Channel) => {
+		return {
+			channelId: channel.channelId,
+			channelName: channel.channelName,
+			private: channel.private,
+			password: channel.password,
 		}
+	});
+
+	const mooveToChannel = (channelId: number) => {
+		navigate(`/chat/${channelId}`);
+	}
 
 
 
 	return (
-			<nav aria-label="secondary mailbox folders">
-        <List>
-		{rows?.map((row) => (
-							<ListItem disablePadding>
-							<ListItemButton onClick={()=>mooveToChannel(row.channelId) }>
-							  <ListItemText primary={row.channelName} />
-							</ListItemButton>
-						  </ListItem>
-                        )
-                        )}
-		</List>
-      </nav>
+		<nav aria-label="secondary mailbox folders">
+			<List>
+				{rows?.map((row) => (
+					<ListItem disablePadding>
+						<ListItemButton onClick={() => mooveToChannel(row.channelId)}>
+							<ListItemText primary={row.channelName} />
+						</ListItemButton>
+					</ListItem>
+				)
+				)}
+			</List>
+		</nav>
 	);
 }
 
 
-export function ChannelsListDebug( { channels }: { channels : Channel[] }) {
+export function ChannelsListDebug({ channels }: { channels: Channel[] }) {
 
-    const rows = channels.map((channel : Channel) => {
-        return {
-            channelId: channel.channelId,
-            channelName: channel.channelName,
-            private : channel.private,
-            password : channel.password,
-        }
-    });
+	const rows = channels.map((channel: Channel) => {
+		return {
+			channelId: channel.channelId,
+			channelName: channel.channelName,
+			private: channel.private,
+			password: channel.password,
+		}
+	});
+	const joinChannel = (channelId: number) => {
+		apiClient.post(`/api/chat/channels/${channelId}/join`).then((response) => {
+			console.log("response", response);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}
+
 
 
 	return (
-
-
-		
 		<div>
 
 			<TableContainer component={Paper}>
@@ -74,21 +79,22 @@ export function ChannelsListDebug( { channels }: { channels : Channel[] }) {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-                    {rows?.map((row) => (
+						{rows?.map((row) => (
 							<TableRow
 								key={row.channelId}
 								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 							>
-								
+
 								<TableCell align="right">{row.channelName}</TableCell>
 								<TableCell align="right">{row.private}</TableCell>
 								<TableCell align="right">{row.password}</TableCell>
+								<TableCell align="right"><Button onClick={() => joinChannel(row.channelId)}> Join</Button></TableCell>
 							</TableRow>
-                        )
-                        )}
+						)
+						)}
 					</TableBody>
 				</Table>
-    </TableContainer>
+			</TableContainer>
 		</div>
 	);
 }
