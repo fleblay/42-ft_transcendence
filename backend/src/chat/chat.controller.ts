@@ -1,9 +1,14 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { NewMessageDto } from './dto/new-message.dto';
+import { ChatService } from './chat.service';
 
 @Controller('chat')
 export class ChatController {
+
+	constructor(
+		private chatService: ChatService
+	) { }
 
 	// NOTE: DEBUG PURPOSES ONLY !
 	@Get('/channels/ALL')
