@@ -29,5 +29,7 @@ export class Member {
 	@Column({ default: false })
 	kicked: boolean;
 
+	@Column({ default: "regular" })
+	role: "owner" | "admin" | "regular"
 
 }
