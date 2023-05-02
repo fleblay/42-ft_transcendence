@@ -6,6 +6,7 @@ import { Channel } from '../model/channel.entity';
 import { Message } from '../model/message.entity';
 import { UsersService } from '../users/users.service';
 import { Server } from 'socket.io'
+import { NewMessageDto } from './dto/new-message.dto';
 @Injectable()
 export class ChatService {
 
@@ -19,5 +20,9 @@ export class ChatService {
 
 	setWsServer(server: Server) {
 		this.wsServer = server;
+	}
+
+	newMessage(channelId: number, messageData: NewMessageDto) {
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.newMessage', messageData);
 	}
 }
