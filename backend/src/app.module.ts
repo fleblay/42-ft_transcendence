@@ -15,6 +15,9 @@ import { FriendRequest } from './model/friend-request.entity';
 import { FriendsModule } from './friends/friends.module';
 import { ChatModule } from './chat/chat.module';
 import { APP_PIPE } from '@nestjs/core';
+import { Member } from './model/member.entity';
+import { Message } from './model/message.entity';
+import { Channel } from './model/channel.entity';
 
 @Module({
 	imports: [
@@ -31,7 +34,15 @@ import { APP_PIPE } from '@nestjs/core';
 				username: config.get<string>("POSTGRES_USER"),
 				password: config.get<string>("POSTGRES_PASSWORD"),
 				synchronize: true,
-				entities:[User, SavedGame, RefreshToken, FriendRequest]
+				entities: [
+					User,
+					SavedGame,
+					RefreshToken,
+					FriendRequest,
+					Member,
+					Message,
+					Channel
+				]
 			})
 		}),
 		UsersModule,
@@ -54,6 +65,6 @@ import { APP_PIPE } from '@nestjs/core';
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-	  consumer.apply(LogMiddleware).forRoutes('*');
+		consumer.apply(LogMiddleware).forRoutes('*');
 	}
 }
