@@ -1,41 +1,45 @@
 import { Grid, List, ListItem, ListItemText, makeStyles } from "@mui/material";
+import { Message } from "../types";
+import { useEffect, useState } from "react";
+import apiClient from "../auth/interceptor.axios";
+
+interface MessageAreaProps {
+    channelId: string;
+}
 
 
-export function MessageArea() {
+export function MessageArea({ channelId }: MessageAreaProps) {
+
+    const [messages, setMessages] = useState<Message[] | null>(null);;
+
+    useEffect(() => {
+        apiClient.get(`/api/chat/channels/${channelId}/messages`).then((response) => {
+            console.log("response", response);
+            //setMessages(response.data);
+        }).catch((error) => {
+            console.log(error);
+        });
+    }, []);
+
+
 
     return (
-<List>
-    <ListItem key="1">
-        <Grid container>
-            <Grid item xs={12}>
-                <ListItemText primary="Hey man, What's up ?"></ListItemText>
-            </Grid>
-            <Grid item xs={12}>
-                <ListItemText secondary="09:30"></ListItemText>
-            </Grid>
-        </Grid>
-    </ListItem>
-    <ListItem key="2">
-        <Grid container>
-            <Grid item xs={12}>
-                <ListItemText primary="Hey, Iam Good! What about you ?"></ListItemText>
-            </Grid>
-            <Grid item xs={12}>
-                <ListItemText secondary="09:31"></ListItemText>
-            </Grid>
-        </Grid>
-    </ListItem>
-    <ListItem key="3">
-        <Grid container>
-            <Grid item xs={12}>
-                <ListItemText primary="Cool. i am good, let's catch up!"></ListItemText>
-            </Grid>
-            <Grid item xs={12}>
-                <ListItemText secondary="10:30"></ListItemText>
-            </Grid>
-        </Grid>
-    </ListItem>
-</List>
+        <List>
+            { messages && messages.map((message: Message) => {
+                return (
+                    <ListItem key={message.id}>
+                        <Grid container>
+                            <Grid item xs={12}>
+                                <ListItemText primary={message.date}></ListItemText>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <ListItemText secondary={message.content}></ListItemText>
+                            </Grid>
+                        </Grid>
+                    </ListItem>
+                )
+            })}
+        </List>
 
-    ); 
+    );
 }
