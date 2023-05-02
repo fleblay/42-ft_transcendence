@@ -2,6 +2,8 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { NewMessageDto } from './dto/new-message.dto';
 import { ChatService } from './chat.service';
+import { CurrentUser } from '../users/decorators/current-user.decorator'
+import { User } from '../model/user.entity';
 
 @Controller('chat')
 export class ChatController {
@@ -23,9 +25,8 @@ export class ChatController {
 	}
 
 	@Post('channels')
-	createChannel(@Body() body: CreateChannelDto) {
-		return `createChannel ${JSON.stringify(body)}`
-		return {};
+	createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto) : void {
+		this.chatService.createChannel(user, body)
 	}
 
 	// TODO: Limit the number of messages to 50
