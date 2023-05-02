@@ -1,9 +1,32 @@
-import { Box, Button, Container } from '@mui/material';
+import { AppBar, Box, Button, Container, Typography } from '@mui/material';
 import React, { useRef, useState, useEffect } from 'react';
 import apiClient from '../auth/interceptor.axios';
+import { ChannelsList } from './ChannelsList';
 
 
 export function ChatPage() {
+
+    const [channels, setChannels] = useState<any[]>([]);
+
+    useEffect(() => {
+        apiClient.get(`/api/chat/channels`).then((response) => {
+            console.log("response", response);
+            setChannels(response.data);
+        }).catch((error) => {
+            console.log(error);
+        });
+    }, []);
+
+    const updateChannel = () => {
+        console.log("updateChannel");
+        apiClient.get(`/api/chat/channels`).then((response) => {
+            console.log("response", response);
+            setChannels(response.data);
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+
 
     const createChannel = () => {
         console.log("createChannel");
@@ -23,7 +46,7 @@ export function ChatPage() {
     const joinChannel = () => {
         console.log("joinChannel");
     };
-    
+
 
 	return (
 		<>
@@ -36,8 +59,16 @@ export function ChatPage() {
 					p: '2rem',
 					bgcolor: 'background.paper',
 				}}>
+                    <AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
+							Chat
+						</Typography>
+					</AppBar>
 
                 <Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
+                <Button variant="contained" color="primary" onClick={updateChannel}>Update Channel </Button>
+                <ChannelsList channels={channels} />
+            
 
 				</Box>
 			</Container >
