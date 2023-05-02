@@ -32,7 +32,7 @@ export class ChatController {
 	@Post('channels/create')
 	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto): Promise<void> {
 		const channelId: number = await this.chatService.createChannel(body)
-		this.chatService.joinChannel(user, channelId, { owner: true, password: body.password })
+		await this.chatService.joinChannel(user, channelId, { owner: true, password: body.password })
 	}
 
 	@UseGuards(ATGuard)
@@ -41,7 +41,7 @@ export class ChatController {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
 			throw new BadRequestException('Invalid channel id');
-		this.chatService.joinChannel(user, channelId, { password: body.password, targetUser: body.username })
+		await this.chatService.joinChannel(user, channelId, { password: body.password, targetUser: body.username })
 	}
 
 	// TODO: Limit the number of messages to 50
@@ -57,11 +57,11 @@ export class ChatController {
 
 	@Post('channels/:id/messages')
 	@UseGuards(ATGuard)
-	createMessage(@CurrentUser() user: User, @Param('id') id: string, @Body() body: NewMessageDto): void {
+	async createMessage(@CurrentUser() user: User, @Param('id') id: string, @Body() body: NewMessageDto): Promise<void> {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
 			throw new BadRequestException('Invalid channel id');
-		this.chatService.newMessage(user, channelId, body);
+		await this.chatService.newMessage(user, channelId, body);
 	}
 	// NOTE: Return password if user is owner and return all members
 	@Get('channels/:id/info')
@@ -75,7 +75,11 @@ export class ChatController {
 	@Get('channels/:id/members')
 	async getChannelMembers(@Param('id') id: string) {
 		let members = await this.chatService.getChannelMembers(parseInt(id));
-		return members.map(async (member: Member) => ({...member, isConnected: await this.userService.isConnected(member.user.id)}));
+		return members.map((member: Member) =>
+		({
+			...member,
+			isConnected: this.userService.isConnected(member.user.id)
+		}));
 	}
 
 }

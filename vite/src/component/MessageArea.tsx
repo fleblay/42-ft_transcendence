@@ -15,7 +15,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
     useEffect(() => {
         apiClient.get(`/api/chat/channels/${channelId}/messages`).then((response) => {
             console.log("response", response);
-            //setMessages(response.data);
+            setMessages(response.data);
         }).catch((error) => {
             console.log(error);
         });

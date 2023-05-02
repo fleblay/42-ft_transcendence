@@ -23,7 +23,7 @@ export function ChannelUsers({ channelId }: { channelId: string }) {
 
 
 	useEffect(() => {
-		apiClient.get(`/channels/${channelId}/members`).then((response) => {
+		apiClient.get(`/api/chat/channels/${channelId}/members`).then((response) => {
 			setRows(response.data);
 		}).catch((error) => {
 			console.log(error);
