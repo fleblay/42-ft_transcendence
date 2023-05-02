@@ -179,4 +179,10 @@ export class ChatService {
 			}
 		})
 	}
+
+	getChannelInfo(channelId: number): Promise<Channel> {
+		return this.channelsRepo.findOne({
+			where: { id: channelId }
+		})
+	}
 }

@@ -63,8 +63,10 @@ export class ChatController {
 	// NOTE: Return password if user is owner and return all members
 	@Get('channels/:id/info')
 	getChannelInfo(@Param('id') id: string) {
-		return `getChannelInfo ${id}`
-		return {};
+		const channelId = parseInt(id);
+		if (isNaN(channelId))
+			throw new BadRequestException('Invalid channel id');
+		return this.chatService.getChannelInfo(channelId)
 	}
 
 	@Get('channels/:id/members')
