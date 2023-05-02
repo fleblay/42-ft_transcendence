@@ -7,6 +7,10 @@ export class JoinChannelDto {
 
 	@IsOptional()
 	@IsString()
+	username?: string
+
+	@IsOptional()
+	@IsString()
 	password?: string
 }
 
