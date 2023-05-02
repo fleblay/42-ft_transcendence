@@ -1,12 +1,27 @@
 import { AppBar, Box, Button, Container, Divider, Grid, Typography } from '@mui/material';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import apiClient from '../auth/interceptor.axios';
 import { ChannelsList } from './ChannelsList';
+import { SocketContext } from '../socket/SocketProvider';
+import { useParams } from 'react-router-dom';
 
 
 export function ChatPage() {
 
     const [channels, setChannels] = useState<any[]>([]);
+
+	const { setSubscription, setUnsubscribe } = useContext(SocketContext);
+
+	const { channelId } = useParams();
+
+	React.useEffect(() => {
+		const room = `/chat/${channelId}`;
+		setSubscription(room);
+		return () => {
+			setUnsubscribe(room);
+			console.log("cleaned up");
+		};
+	}, []);
 
     useEffect(() => {
         apiClient.get(`/api/chat/channels`).then((response) => {
