@@ -65,7 +65,6 @@ export class ChatService {
 				muteTime: true,
 				channel: {
 					id: true,
-					members: true,
 				},
 				user: {
 					id: true,
