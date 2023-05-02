@@ -25,7 +25,7 @@ export class ChatController {
 	// Return all channels public and protected
 	@Get('/channels/public')
 	getAllPublic() {
-		return 'getAllPublic';
+		return this.chatService.getAllPublicChannels()
 	}
 
 	@UseGuards(ATGuard)

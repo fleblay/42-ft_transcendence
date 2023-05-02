@@ -149,8 +149,7 @@ export class ChatService {
 		return messages;
 	}
 
-	async getChannelMembers(channelId: number): Promise<Member[]>
-	{
+	async getChannelMembers(channelId: number): Promise<Member[]> {
 		const members = await this.membersRepo.find({
 			where: {
 				channel: {
@@ -171,5 +170,13 @@ export class ChatService {
 
 	getAllChannels(): Promise<Channel[]> {
 		return this.channelsRepo.find();
+	}
+
+	getAllPublicChannels(): Promise<Channel[]> {
+		return this.channelsRepo.find({
+			where: {
+				private: false
+			}
+		})
 	}
 }
