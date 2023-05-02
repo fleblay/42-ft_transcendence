@@ -36,7 +36,7 @@ export class ChatController {
 	@UseGuards(ATGuard)
 	@Post('channel/join')
 	async joinChannel(@CurrentUser() user: User, @Body() body: JoinChannelDto): Promise<void> {
-		this.chatService.joinChannel(user, body.id, { password: body.password })
+		this.chatService.joinChannel(user, body.id, { password: body.password, targetUser: body.username })
 	}
 
 	// TODO: Limit the number of messages to 50
