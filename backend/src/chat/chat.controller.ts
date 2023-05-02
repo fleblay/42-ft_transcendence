@@ -6,6 +6,7 @@ import { ChatService } from './chat.service';
 import { ATGuard } from '../users/guard/access-token.guard';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../model/user.entity';
+import { Message } from '../model/message.entity';
 
 @Controller('chat')
 export class ChatController {
@@ -41,7 +42,7 @@ export class ChatController {
 	// TODO: Limit the number of messages to 50
 	// NOTE: Offset is message id or number?
 	@Get('channels/:id/messages')
-	getMessages(@Param('id') id: string, @Query('offset') offset: string) {
+	getMessages(@Param('id') id: string, @Query('offset') offset: string): Promise<Message[]> {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
 			throw new BadRequestException('Invalid channel id');
@@ -50,13 +51,11 @@ export class ChatController {
 
 	@Post('channels/:id/messages')
 	@UseGuards(ATGuard)
-	createMessage(@CurrentUser() user: User, @Param('id') id: string, @Body() body: NewMessageDto) {
+	createMessage(@CurrentUser() user: User, @Param('id') id: string, @Body() body: NewMessageDto): void {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
 			throw new BadRequestException('Invalid channel id');
 		this.chatService.newMessage(user, channelId, body);
-		return `createMessage ${id} ${JSON.stringify(body)}`
-		return {};
 	}
 	// NOTE: Return password if user is owner and return all members
 	@Get('channels/:id/info')
