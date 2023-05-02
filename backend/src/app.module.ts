@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, ValidationPipe } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -14,6 +14,7 @@ import { AuthModule } from './users/auth/auth.module';
 import { FriendRequest } from './model/friend-request.entity';
 import { FriendsModule } from './friends/friends.module';
 import { ChatModule } from './chat/chat.module';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
 	imports: [
@@ -41,7 +42,15 @@ import { ChatModule } from './chat/chat.module';
 		ChatModule
 	],
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [
+		AppService,
+		{
+			provide: APP_PIPE,
+			useValue: new ValidationPipe({
+				whitelist: true,
+			}),
+		}
+	],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
