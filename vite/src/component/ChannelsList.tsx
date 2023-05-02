@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../auth/interceptor.axios";
-import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link } from "@mui/material";
-import { Link as LinkRouter } from "react-router-dom";
+import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { TablePagination } from "@mui/material";
 
 import CircularProgress from '@mui/material/CircularProgress';
@@ -11,6 +11,7 @@ import { Channel, UserInfo } from "../types";
 
 
 export function ChannelsList( { channels }: { channels : Channel[] }) {
+	const navigate = useNavigate();
 
     const rows = channels.map((channel : Channel) => {
         return {
@@ -21,37 +22,25 @@ export function ChannelsList( { channels }: { channels : Channel[] }) {
         }
     });
 
+	const mooveToChannel = (channelId : number) => {
+		navigate(`/chat/${channelId}`);
+		}
+
+
 
 	return (
-		<div>
-
-			<TableContainer component={Paper}>
-				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-					<TableHead>
-						<TableRow>
-							<TableCell align="left">channelId</TableCell>
-							<TableCell align="right">ChannelName</TableCell>
-							<TableCell align="right">Private</TableCell>
-							<TableCell align="right">Password</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-                    {rows?.map((row) => (
-							<TableRow
-								key={row.channelId}
-								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-							>
-								
-								<TableCell align="right">{row.channelName}</TableCell>
-								<TableCell align="right">{row.private}</TableCell>
-								<TableCell align="right">{row.password}</TableCell>
-							</TableRow>
+			<nav aria-label="secondary mailbox folders">
+        <List>
+		{rows?.map((row) => (
+							<ListItem disablePadding>
+							<ListItemButton onClick={()=>mooveToChannel(row.channelId) }>
+							  <ListItemText primary={row.channelName} />
+							</ListItemButton>
+						  </ListItem>
                         )
                         )}
-					</TableBody>
-				</Table>
-    </TableContainer>
-		</div>
+		</List>
+      </nav>
 	);
 }
 
@@ -69,6 +58,9 @@ export function ChannelsListDebug( { channels }: { channels : Channel[] }) {
 
 
 	return (
+
+
+		
 		<div>
 
 			<TableContainer component={Paper}>

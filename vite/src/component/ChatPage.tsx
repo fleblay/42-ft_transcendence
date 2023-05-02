@@ -23,6 +23,7 @@ export function ChatPage() {
 	const { channelId } = useParams();
 
 	React.useEffect(() => {
+        if (!channelId) return;
 		const room = `/chat/${channelId}`;
 		setSubscription(room);
 		return () => {
@@ -116,7 +117,7 @@ export function ChatPage() {
                             <ChannelsList channels={channels} />
                         </Grid>
                         <Grid item xs={8}>
-                            <MessageArea />
+                            {channelId ? <MessageArea channelId={channelId}/> : null}
                         </Grid>
                         <Grid item xs={2}>
                             <Typography textAlign={'center'}> List User</Typography>
