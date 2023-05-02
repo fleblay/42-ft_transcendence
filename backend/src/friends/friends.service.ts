@@ -113,7 +113,13 @@ export class FriendsService {
 				{ sender: { id: friend.id }, receiver: { id: user.id }, status },
 				{ receiver: { id: friend.id }, sender: { id: user.id }, status },
 			],
-			relations: { sender: true, receiver: true }
+			relations: { sender: true, receiver: true },
+			select: {
+				id: true,
+				status: true,
+				sender: { id: true, username: true },
+				receiver: { id: true, username: true }
+			}
 		});
 		return friendRequest;
 	}
