@@ -67,8 +67,8 @@ export function ChatPage() {
     }, []);
 
     useEffect(() => {
-        apiClient.get(`/api/chat/channels`).then((response) => {
-            console.log("response", response);
+        apiClient.get(`/api/chat/channels/all`).then((response) => {
+            console.log("response all channels", response);
             setChannels(response.data);
         }).catch((error) => {
             console.log(error);
@@ -77,7 +77,7 @@ export function ChatPage() {
 
     const updateChannel = () => {
         console.log("updateChannel");
-        apiClient.get(`/api/chat/channels`).then((response) => {
+        apiClient.get(`/api/chat/channels/all`).then((response) => {
             console.log("response", response);
             setChannels(response.data);
         }).catch((error) => {
@@ -90,10 +90,10 @@ export function ChatPage() {
         console.log("createChannel");
         const channelParams = {
             name: "test",
-            type: "private",
+            private: false,
             password: "test"
         }
-        apiClient.post(`/api/chat/channels`, channelParams).then((response) => {
+        apiClient.post(`/api/chat/channels/create`, channelParams).then((response) => {
             console.log("response", response);
         }).catch((error) => {
             console.log(error);
@@ -111,10 +111,6 @@ export function ChatPage() {
             console.log(error);
         }
         );
-    };
-
-    const joinChannel = () => {
-        console.log("joinChannel");
     };
 
     const myChannels = () => {

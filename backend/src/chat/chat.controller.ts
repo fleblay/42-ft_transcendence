@@ -29,16 +29,19 @@ export class ChatController {
 	}
 
 	@UseGuards(ATGuard)
-	@Post('channel/create')
+	@Post('channels/create')
 	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto): Promise<void> {
 		const channelId: number = await this.chatService.createChannel(body)
 		this.chatService.joinChannel(user, channelId, { owner: true, password: body.password })
 	}
 
 	@UseGuards(ATGuard)
-	@Post('channel/join')
-	async joinChannel(@CurrentUser() user: User, @Body() body: JoinChannelDto): Promise<void> {
-		this.chatService.joinChannel(user, body.id, { password: body.password, targetUser: body.username })
+	@Post('channels/:id/join')
+	async joinChannel(@CurrentUser() user: User, @Param('id') id : string, @Body() body: JoinChannelDto): Promise<void> {
+		const channelId = parseInt(id);
+		if (isNaN(channelId))
+			throw new BadRequestException('Invalid channel id');
+		this.chatService.joinChannel(user, channelId, { password: body.password, targetUser: body.username })
 	}
 
 	// TODO: Limit the number of messages to 50
