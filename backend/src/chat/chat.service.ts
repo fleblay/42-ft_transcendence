@@ -89,7 +89,7 @@ export class ChatService {
 				gameId: true,
 				content: true,
 				createdAt: true,
-				owner: { id: true, user: { id: true, username: true } },
+				owner: { user: { id: true, username: true } },
 			},
 		});
 		return messages;
