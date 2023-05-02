@@ -54,12 +54,36 @@ export class ChatService {
 	}
 
 	async newMessage(owner: User, channelId: number, messageData: NewMessageDto) {
-		const channel = await this.channelsRepo.findOneBy({ id: channelId });
-		if (!channel)
-			throw new NotFoundException('Channel not found');
+		const member = await this.membersRepo.findOne({
+			where: { user: { id: owner.id }, channel: { id: channelId } },
+			relations: ['channel', 'user'],
+			select: {
+				id: true,
+				role: true,
+				banned: true,
+				kicked: true,
+				muteTime: true,
+				channel: {
+					id: true,
+					members: true,
+				},
+				user: {
+					id: true,
+					username: true,
+				}
+			},
+		});
+		if (!member)
+			throw new NotFoundException('Member not found, the channel may have been deleted');
+		if (member.banned)
+			throw new BadRequestException('You are banned from this channel');
+		if (member.kicked)
+			throw new BadRequestException('You are kicked from this channel');
+		if (member.muteTime && member.muteTime > new Date())
+			throw new BadRequestException('You are muted from this channel');
 		const newMessage = this.messagesRepo.create({
-			channel,
-			owner,
+			channel: member.channel,
+			owner: member,
 			gameId: messageData.gameId,
 			content: messageData.content
 		});
