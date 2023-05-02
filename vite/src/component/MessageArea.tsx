@@ -1,7 +1,8 @@
 import { Grid, List, ListItem, ListItemText, makeStyles } from "@mui/material";
 import { Message } from "../types";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import apiClient from "../auth/interceptor.axios";
+import { SocketContext } from "../socket/SocketProvider";
 
 interface MessageAreaProps {
     channelId: string;
@@ -10,7 +11,9 @@ interface MessageAreaProps {
 
 export function MessageArea({ channelId }: MessageAreaProps) {
 
-    const [messages, setMessages] = useState<Message[] | null>(null);;
+    const [messages, setMessages] = useState<Message[] | null>(null);
+
+	const { customOn, customOff, setSubscription, setUnsubscribe } = useContext(SocketContext);
 
     useEffect(() => {
         apiClient.get(`/api/chat/channels/${channelId}/messages`).then((response) => {
@@ -21,6 +24,21 @@ export function MessageArea({ channelId }: MessageAreaProps) {
         });
     }, []);
 
+	useEffect(() => {
+		function onNewMessage(message: Message) {
+			console.log("onNewMessage", message);
+			setMessages((messages) => {
+				if (messages === null) return [message];
+				return [...messages, message];
+			});
+		}
+		setSubscription(`/chat/${channelId}`);
+		customOn("chat.message.new", onNewMessage);
+		return () => {
+			setUnsubscribe(`/chat/${channelId}`);
+			customOff("chat.message.new", onNewMessage);
+		};
+	}, []);
 
 
     return (
