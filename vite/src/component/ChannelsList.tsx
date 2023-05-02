@@ -7,16 +7,18 @@ import { TablePagination } from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { Channel, UserInfo } from "../types";
+import { useAuthService } from "../auth/AuthService";
 
 
 
 export function MyChannelsList({ channels }: { channels: Channel[] }) {
 	const navigate = useNavigate();
+	const auth = useAuthService();
 
 	const rows = channels.map((channel: Channel) => {
 		return {
-			channelId: channel.channelId,
-			channelName: channel.channelName,
+			channelId: channel.id,
+			channelName: channel.name,
 			private: channel.private,
 			password: channel.password,
 		}
@@ -49,13 +51,14 @@ export function ChannelsListDebug({ channels }: { channels: Channel[] }) {
 
 	const rows = channels.map((channel: Channel) => {
 		return {
-			channelId: channel.channelId,
-			channelName: channel.channelName,
+			channelId: channel.id,
+			channelName: channel.name,
 			private: channel.private,
 			password: channel.password,
 		}
 	});
 	const joinChannel = (channelId: number) => {
+	
 		apiClient.post(`/api/chat/channels/${channelId}/join`).then((response) => {
 			console.log("response", response);
 		}).catch((error) => {

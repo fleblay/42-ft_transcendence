@@ -128,8 +128,8 @@ export type Blocked = {
 }
 
 export type Channel = {
-	channelId: number,
-	channelName: string,
+	id: number,
+	name: string,
 	private : boolean,
 	password?: string
 }
