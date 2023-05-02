@@ -44,28 +44,31 @@ export class ChatService {
 			relations: { members: { user: true } },
 			select: { id: true, private: true, members: { role: true, banned: true, kicked: true, user: { id: true } } }
 		})
-		let addedUser: User = user
-		if (options?.targetUser) {
-			try {
-				addedUser = await this.usersService.findOneByUsername(options.targetUser)
-			} catch (e) {
-				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
-			}
-		}
 		if (!channel)
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
 		if (channel.password && (!options?.password || options.password != channel.password))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
 		if (channel.private && channel.members.find((member) => (member.user.id == user.id) && ((member.role == "owner") || (member.role == "admin"))))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
-		if (channel.members.find((member) => (member.user.id == addedUser.id) && member.banned))
-			throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is banned from the channel`)
-		if (channel.members.find((member) => (member.user.id == addedUser.id) && !member.banned && !member.kicked))
-			throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is already in the channel`)
-		if (channel.members.find((member) => (member.user.id == addedUser.id) && member.kicked)) {
-			const kickedMember = channel.members.find((member) => member.user.id == addedUser.id)
-			kickedMember.kicked = false
-			this.membersRepo.save(kickedMember)
+
+		let addedUser: User = user
+		if (options?.targetUser) {
+			addedUser = await this.usersService.findOneByUsername(options.targetUser)
+			if (!addedUser)
+				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
+		}
+
+		const member = channel.members.find((member) => (member.user.id == addedUser.id))
+		if (member) {
+			if (member.banned)
+				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is banned from the channel`)
+			if (!member.kicked)
+				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is already in the channel`)
+			else {
+				member.kicked = false
+				this.membersRepo.save(member)
+				return
+			}
 		}
 
 		const joiner: Member = await this.membersRepo.save({
