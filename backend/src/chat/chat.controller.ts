@@ -5,12 +5,14 @@ import { ChatService } from './chat.service';
 import { ATGuard } from '../users/guard/access-token.guard';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../model/user.entity';
+import { UsersService } from '../users/users.service';
+import { Member } from 'src/model/member.entity';
 
 @Controller('chat')
 export class ChatController {
 
 	constructor(
-		private chatService: ChatService
+		private chatService: ChatService, private userService: UsersService
 	) { }
 
 	// NOTE: DEBUG PURPOSES ONLY !
@@ -58,4 +60,11 @@ export class ChatController {
 		return `getChannelInfo ${id}`
 		return {};
 	}
+
+	@Get('channels/:id/members')
+	async getChannelMembers(@Param('id') id: string) {
+		let members = await this.chatService.getChannelMembers(parseInt(id));
+		return members.map(async (member: Member) => ({...member, isConnected: await this.userService.isConnected(member.user.id)}));
+	}
+
 }
