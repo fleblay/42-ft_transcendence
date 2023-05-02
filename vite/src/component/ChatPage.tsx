@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Container, Typography } from '@mui/material';
+import { AppBar, Box, Button, Container, Divider, Grid, Typography } from '@mui/material';
 import React, { useRef, useState, useEffect } from 'react';
 import apiClient from '../auth/interceptor.axios';
 import { ChannelsList } from './ChannelsList';
@@ -32,7 +32,7 @@ export function ChatPage() {
         console.log("createChannel");
         const channelParams = {
             name: "test",
-            type : "private",
+            type: "private",
             password: "test"
         }
         apiClient.post(`/api/chat/channels`, channelParams).then((response) => {
@@ -48,30 +48,40 @@ export function ChatPage() {
     };
 
 
-	return (
-		<>
-			<Container maxWidth="lg">
-				<Box sx={{
-					width: '100%',
-					border: '1px solid #D3C6C6',
-					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-					borderRadius: '16px',
-					p: '2rem',
-					bgcolor: 'background.paper',
-				}}>
+    return (
+        <>
+            <Container maxWidth="lg">
+                <Box sx={{
+                    width: '100%',
+                    border: '1px solid #D3C6C6',
+                    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                    borderRadius: '16px',
+                    p: '2rem',
+                    bgcolor: 'background.paper',
+                }}>
                     <AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
-						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
-							Chat
-						</Typography>
-					</AppBar>
+                        <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
+                            Chat
+                        </Typography>
+                    </AppBar>
+                    <Grid container spacing={3}>
+                        <Grid item xs="auto">
+                            <Typography> Channels</Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                        <Typography> Channels Name</Typography>
+                        </Grid>
+                        <Grid item xs>
+                        <Typography> User</Typography>
+                        </Grid>
+                    </Grid>
+                    <Divider />
 
-                <Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
-                <Button variant="contained" color="primary" onClick={updateChannel}>Update Channel </Button>
-                <ChannelsList channels={channels} />
-            
-
-				</Box>
-			</Container >
-		</>
-	);
+                    <Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
+                    <Button variant="contained" color="primary" onClick={updateChannel}>Update Channel </Button>
+                    <ChannelsList channels={channels} />
+                </Box>
+            </Container >
+        </>
+    );
 }
