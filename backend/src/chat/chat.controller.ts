@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { JoinChannelDto } from './dto/join-channel.dto';
 import { NewMessageDto } from './dto/new-message.dto';
 import { ChatService } from './chat.service';
 import { ATGuard } from '../users/guard/access-token.guard';
@@ -25,10 +26,16 @@ export class ChatController {
 	}
 
 	@UseGuards(ATGuard)
-	@Post('channels')
-	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto) : Promise<void> {
-		const channelId : number = await this.chatService.createChannel(body)
-		this.chatService.joinChannel(user, channelId)
+	@Post('channel/create')
+	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto): Promise<void> {
+		const channelId: number = await this.chatService.createChannel(body)
+		this.chatService.joinChannel(user, channelId, { owner: true, password: body.password })
+	}
+
+	@UseGuards(ATGuard)
+	@Post('channel/join')
+	async joinChannel(@CurrentUser() user: User, @Body() body: JoinChannelDto): Promise<void> {
+		this.chatService.joinChannel(user, body.id, { password: body.password })
 	}
 
 	// TODO: Limit the number of messages to 50
@@ -49,7 +56,6 @@ export class ChatController {
 		return `createMessage ${id} ${JSON.stringify(body)}`
 		return {};
 	}
-
 	// NOTE: Return password if user is owner and return all members
 	@Get('channels/:id/info')
 	getChannelInfo(@Param('id') id: string) {
