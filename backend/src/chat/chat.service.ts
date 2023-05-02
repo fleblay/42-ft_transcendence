@@ -55,4 +55,32 @@ export class ChatService {
 		await this.messagesRepo.save(newMessage);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.newMessage', messageData);
 	}
+
+	async getMessages(channelId: number, offset: number = 0): Promise<Message[]> {
+		const channel = await this.channelsRepo.findOneBy({ id: channelId });
+		if (!channel)
+			throw new NotFoundException('Channel not found');
+		// TODO: Limit the number of messages to 50
+		const messages = await this.messagesRepo.find({
+			where: {
+				channel: {
+					id: channelId,
+				},
+			},
+			order: {
+				createdAt: 'DESC',
+			},
+			relations: {
+				owner: { user: true }
+			},
+			select: {
+				id: true,
+				gameId: true,
+				content: true,
+				createdAt: true,
+				owner: { id: true, user: { id: true, username: true } },
+			},
+		});
+		return messages;
+	}
 }

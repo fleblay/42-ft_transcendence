@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { NewMessageDto } from './dto/new-message.dto';
 import { ChatService } from './chat.service';
@@ -34,8 +34,10 @@ export class ChatController {
 	// NOTE: Offset is message id or number?
 	@Get('channels/:id/messages')
 	getMessages(@Param('id') id: string, @Query('offset') offset: string) {
-		return `getMessages ${id} ${offset}`
-		return {};
+		const channelId = parseInt(id);
+		if (isNaN(channelId))
+			throw new BadRequestException('Invalid channel id');
+		return this.chatService.getMessages(channelId, parseInt(offset) || 0);
 	}
 
 	@Post('channels/:id/messages')
@@ -43,7 +45,7 @@ export class ChatController {
 	createMessage(@CurrentUser() user: User, @Param('id') id: string, @Body() body: NewMessageDto) {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
-			throw new Error('Invalid channel id');
+			throw new BadRequestException('Invalid channel id');
 		this.chatService.newMessage(user, channelId, body);
 		return `createMessage ${id} ${JSON.stringify(body)}`
 		return {};
