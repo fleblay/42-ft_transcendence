@@ -13,6 +13,7 @@ import { RefreshToken } from './model/refresh-token.entity';
 import { AuthModule } from './users/auth/auth.module';
 import { FriendRequest } from './model/friend-request.entity';
 import { FriendsModule } from './friends/friends.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
 	imports: [
@@ -36,7 +37,8 @@ import { FriendsModule } from './friends/friends.module';
 		EventsModule,
 		GameModule,
 		AuthModule,
-		FriendsModule
+		FriendsModule,
+		ChatModule
 	],
 	controllers: [AppController],
 	providers: [AppService],
