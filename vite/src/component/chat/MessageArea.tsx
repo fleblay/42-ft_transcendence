@@ -1,8 +1,8 @@
 import { Grid, List, ListItem, ListItemText, makeStyles } from "@mui/material";
-import { Message } from "../types";
+import { Message } from "../../types";
 import { useContext, useEffect, useState } from "react";
-import apiClient from "../auth/interceptor.axios";
-import { SocketContext } from "../socket/SocketProvider";
+import apiClient from "../../auth/interceptor.axios";
+import { SocketContext } from "../../socket/SocketProvider";
 
 interface MessageAreaProps {
     channelId: string;
@@ -22,7 +22,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
             console.log(error);
         });
     }, []);
-
+//
 	useEffect(() => {
 		function onNewMessage(message: Message) {
 			console.log("onNewMessage", message);

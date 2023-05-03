@@ -18,7 +18,7 @@ import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
 import { GamePage } from './component/GamePage';
 import { OldGamePage } from './component/OldGameScreen';
-import { ChatPage } from './component/ChatPage';
+import { ChatPage } from './component/chat/ChatPage';
 
 export interface Destinations {
 	name: string,

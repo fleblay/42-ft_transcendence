@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import apiClient from "../auth/interceptor.axios";
+import apiClient from "../../auth/interceptor.axios";
 import { Avatar, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 
-import { Channel } from "../types";
+import { Channel } from "../../types";
 
 type Member = {
 	id: string;

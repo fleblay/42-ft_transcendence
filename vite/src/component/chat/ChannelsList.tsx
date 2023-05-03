@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import apiClient from "../auth/interceptor.axios";
+import apiClient from "../../auth/interceptor.axios";
 import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { TablePagination } from "@mui/material";
 
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { Channel, UserInfo } from "../types";
-import { useAuthService } from "../auth/AuthService";
+import { Channel, UserInfo } from "../../types";
+import { useAuthService } from "../../auth/AuthService";
 
 
 
@@ -27,8 +27,6 @@ export function MyChannelsList({ channels }: { channels: Channel[] }) {
 	const mooveToChannel = (channelId: number) => {
 		navigate(`/chat/${channelId}`);
 	}
-
-
 
 	return (
 		<nav aria-label="secondary mailbox folders">
