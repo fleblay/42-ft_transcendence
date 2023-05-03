@@ -40,7 +40,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 			console.log('List of events on', listOn.current)
 			console.log('List of subscriptions', subscription)
 		}
-		const intervalId = setInterval(displayListEvent, 1000)
+		const intervalId = setInterval(displayListEvent, 5000)
 		return () => clearInterval(intervalId)
 	}, [listOn.current, subscription])
 
