@@ -10,33 +10,11 @@ import SendIcon from '@mui/icons-material/Send';
 import { Channel } from '../../types'
 
 
-type chatTabsValue = 'Channels' | 'My channels';
-interface chatTabsProps {
-	value: chatTabsValue;
-	setValue: React.Dispatch<React.SetStateAction<chatTabsValue>>;
-}
-
-function ChatTabs({ value, setValue }: chatTabsProps) {
-
-	const handleChange = (event: React.SyntheticEvent, newValue: chatTabsValue) => {
-		setValue(newValue);
-	};
-	return (
-		<Box sx={{ borderBottom: 1, borderColor: 'divider' }} display="flex" flexDirection={'column'} alignItems={'center'} justifyContent={'center'}>
-			<Tabs value={value} onChange={handleChange} aria-label="icon label tabs example">
-				<Tab value={'Channels'} label="Channels" />
-				<Tab value={'My channels'} label="My channels" />
-			</Tabs>
-		</Box>
-	);
-}
-
 
 export function ChatPage() {
 
 	const [channels, setChannels] = useState<Channel[]>([]);
 	const [messageToSend, setMessageToSend] = useState<string>("");
-	const [tabs, setTabs] = useState<'Channels' | 'My channels' >('Channels');
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
 
@@ -47,9 +25,6 @@ export function ChatPage() {
 
 	useEffect(() => {
 		console.log('changing chat', channelId)
-		if (tabs === 'Channels' && channelId) {
-			setTabs('My channels');
-		}
 		return addSubscription(`/chat/${channelId || ''}`);
 	}, [channelId]);
 
@@ -81,7 +56,7 @@ export function ChatPage() {
 	const createChannel = () => {
 		console.log("createChannel");
 		const channelParams = {
-			name: "test",
+			name: "test" + Math.floor(Math.random() * 1000),
 			private: false,
 			password: "test"
 		}
@@ -103,7 +78,7 @@ export function ChatPage() {
 		});
 	};
 
-	const myChannels = () => {
+	const MyChannels = () => {
 		return (
 			<>
 				<Grid container spacing={3}>
@@ -145,7 +120,6 @@ export function ChatPage() {
 					</Grid>
 					<Grid item xs={2}>
 						<Button variant="contained" onClick={sendMessage} endIcon={<SendIcon />}>Send</Button>
-						<Button variant="contained" onClick={sendMessage} endIcon={<SendIcon />}>game</Button>
 
 					</Grid>	
 				</Grid>
@@ -156,7 +130,7 @@ export function ChatPage() {
 	return (
 		<>
 
-			<Container maxWidth="lg">
+			<Container maxWidth="xl">
 			<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 							Chat
@@ -172,11 +146,8 @@ export function ChatPage() {
 				}}>
 
 
-					<ChatTabs value={tabs} setValue={setTabs} />
+					{ MyChannels()}
 
-					{tabs === 'Channels' ? <ChannelsListDebug channels={channels} /> : null}
-
-					{tabs === 'My channels' ? myChannels() : null}
 					<Grid container spacing={3} sx={{ mt: "20px" }}>
 						<Grid item xs={4}>
 							<Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
