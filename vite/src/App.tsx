@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import axios from "axios";
@@ -7,7 +7,7 @@ import { OldCreateGame } from './component/OldCreateGame'
 import { ListUsers } from './component/ListUsers'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
-import { SocketProvider } from './socket/SocketProvider'
+import { SocketContext, SocketProvider } from './socket/SocketProvider'
 import { MuiAppBar } from './component/menu'
 import { ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
@@ -70,6 +70,7 @@ function AuthStatus() {
 function RequireAuth({ children }: { children: JSX.Element }) {
 	let auth = useAuthService();
 	let location = useLocation();
+	const {socket} = useContext(SocketContext)
 
 	if (!auth.user) {
 		// Redirect them to the /login page, but save the current location they were
@@ -86,7 +87,11 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 			<UsernameDialog />
 		)
 	}
-
+	if (!socket || !socket.connected) {
+		return (
+			<p>Connecting to server...</p>
+		)
+	}
 	return children;
 }
 
@@ -182,8 +187,6 @@ function App() {
 								</RequireAuth>
 							} />
 						</Route>
-
-
 
 						<Route path='/public' element={<div>Public</div>} />
 						<Route path="chat/:channelId?" element={
