@@ -67,7 +67,6 @@ function AuthStatus() {
 	);
 }
 
-
 function RequireAuth({ children }: { children: JSX.Element }) {
 	let auth = useAuthService();
 	let location = useLocation();
@@ -188,28 +187,40 @@ function App() {
 
 						<Route path='/public' element={<div>Public</div>} />
 						<Route path="chat/:channelId?" element={
-								<RequireAuth>
-									<ChatPage />
-								</RequireAuth>
-							} />
-					
-
+							<RequireAuth>
+								<ChatPage />
+							</RequireAuth>
+						} />
 						<Route path="/Login" element={<LoginForm />} />
 						<Route path="/Register" element={<RegisterForm />} />
-						<Route path="/leaderboard" element={<><ListUsers /> <br /> <FakeGames /></>} />
+						<Route path="/leaderboard" element={
+							<>
+								<ListUsers />
+								<br />
+								<FakeGames />
+							</>
+						} />
 						<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
 						<Route path="/player/">
 							<Route path=":idPlayer" element={
-								<UserDataProvider>
-									<ProfilPlayer />
-								</UserDataProvider>
+								<RequireAuth>
+									<UserDataProvider>
+										<ProfilPlayer />
+									</UserDataProvider>
+								</RequireAuth>
 							} />
 						</Route>
-						<Route path="/friends" element={<FriendList />} />
-						<Route path="/blocked" element={<BlockedList />} />
-						<Route path="/dfa" element={<DfaForm></DfaForm>} />
-
-
+						<Route path="/friends" element={
+							<RequireAuth>
+								<FriendList />
+							</RequireAuth>
+						} />
+						<Route path="/blocked" element={
+							<RequireAuth>
+								<BlockedList />
+							</RequireAuth>
+						} />
+						<Route path="/dfa" element={<DfaForm />} />
 						<Route path='*' element={<div>404</div>} />
 					</Route>
 				</Routes>
