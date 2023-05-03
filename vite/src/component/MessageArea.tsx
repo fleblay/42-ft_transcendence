@@ -8,7 +8,6 @@ interface MessageAreaProps {
     channelId: string;
 }
 
-
 export function MessageArea({ channelId }: MessageAreaProps) {
 
     const [messages, setMessages] = useState<Message[] | null>(null);
@@ -16,9 +15,9 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 	const { customOn, customOff, setSubscription, setUnsubscribe } = useContext(SocketContext);
 
     useEffect(() => {
-        apiClient.get(`/api/chat/channels/${channelId}/messages`).then((response) => {
-            console.log("response", response);
-            setMessages(response.data);
+        apiClient.get(`/api/chat/channels/${channelId}/messages`).then(({data} : {data: Message[]}) => {
+            console.log(`channels/${channelId}/messages`, data);
+            setMessages(data);
         }).catch((error) => {
             console.log(error);
         });
