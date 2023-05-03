@@ -41,6 +41,7 @@ export function ChatPage() {
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
 
+
 	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setMessageToSend(event.target.value);
 	};

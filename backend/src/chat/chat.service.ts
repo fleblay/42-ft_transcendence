@@ -122,7 +122,7 @@ export class ChatService {
 			throw new BadRequestException('You are banned from this channel');
 		if (ignore.kicked !== true && member.kicked)
 			throw new BadRequestException('You are kicked from this channel');
-		if (ignore.mute !== true && member.muteTime && member.muteTime > new Date())
+		if (ignore.mute !== true && member.muteTime && new Date(member.muteTime) > new Date())
 			throw new BadRequestException('You are muted from this channel');
 		return true;
 	}
