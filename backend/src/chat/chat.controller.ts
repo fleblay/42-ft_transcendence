@@ -10,8 +10,11 @@ import { UsersService } from '../users/users.service';
 import { Member } from '../model/member.entity';
 import { Channel } from '../model/channel.entity';
 import { Message } from 'src/model/message.entity';
+import { ChangeChannelDto } from './dto/change-channel.dto';
+import { ModifyMemberDto } from './dto/modify-member.dto';
 
 @Controller('chat')
+@UseGuards(ATGuard)
 export class ChatController {
 
 	constructor(
@@ -20,25 +23,28 @@ export class ChatController {
 
 	// NOTE: DEBUG PURPOSES ONLY !
 	@Get('/channels/all')
-	getAll() : Promise<Channel[]> {
+	getAll(): Promise<Channel[]> {
 		return this.chatService.getAllChannels()
 	}
 	// Return all channels public and protected
+// NOTE: A TESTER
 	@Get('/channels/public')
-	getAllPublic() : Promise<Channel[]> {
+	getAllPublic(): Promise<Channel[]> {
 		return this.chatService.getAllPublicChannels()
 	}
-
-	@UseGuards(ATGuard)
+	
+	// NOTE: A TESTER	
+	// to: /chat emit :chat.new.channel
 	@Post('channels/create')
 	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto): Promise<void> {
 		const channelId: number = await this.chatService.createChannel(body)
 		await this.chatService.joinChannel(user, channelId, { owner: true, password: body.password })
 	}
 
-	@UseGuards(ATGuard)
+	// NOTE: A TESTER
+	// to: /chat/${channelId} emit :chat.join.channel
 	@Post('channels/:id/join')
-	async joinChannel(@CurrentUser() user: User, @Param('id') id : string, @Body() body: JoinChannelDto): Promise<void> {
+	async joinChannel(@CurrentUser() user: User, @Param('id') id: string, @Body() body: JoinChannelDto): Promise<void> {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
 			throw new BadRequestException('Invalid channel id');
@@ -47,7 +53,8 @@ export class ChatController {
 
 	// TODO: Limit the number of messages to 50
 	// NOTE: Offset is message id or number?
-	@UseGuards(ATGuard)
+	// a tester
+	// NOTE: A TESTER
 	@Get('channels/:id/messages')
 	getMessages(@CurrentUser() user: User, @Param('id') id: string, @Query('offset') offset: string): Promise<Message[]> {
 		const channelId = parseInt(id);
@@ -56,8 +63,9 @@ export class ChatController {
 		return this.chatService.getMessages(user, channelId, parseInt(offset) || 0);
 	}
 
+	// NOTE: A TESTER
+	// to: /chat/${channelId} emit :chat.new.message
 	@Post('channels/:id/messages')
-	@UseGuards(ATGuard)
 	async createMessage(@CurrentUser() user: User, @Param('id') id: string, @Body() body: NewMessageDto): Promise<void> {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
@@ -73,6 +81,7 @@ export class ChatController {
 		return this.chatService.getChannelInfo(channelId)
 	}
 
+	// NOTE: A TESTER
 	@Get('channels/:id/members')
 	async getChannelMembers(@Param('id') id: string) {
 		let members = await this.chatService.getChannelMembers(parseInt(id));
@@ -82,5 +91,24 @@ export class ChatController {
 			isConnected: this.userService.isConnected(member.user.id)
 		}));
 	}
+
+	// to: /chat/${channelId} emit :chat.modify.members
+	@Post('channels/:id/members/:playerId')
+	async modifyMembers(@Param('id') id: string, @Param('playerId') playerId : string, @Body() body: ModifyMemberDto): Promise<void>  {
+		return
+	}
+
+	// to: /chat/${channelId} emit :chat.leave.members
+	@Post('channels/:id/leave')
+	async leaveChannel(@CurrentUser() user: User, @Param('id') id: string): Promise<void> {
+		return
+	}
+
+	//to: /chat/${channelId} emit :chat.modify.channel
+	@Post('channels/:id/info')
+	async modifyChannel(@Param('id') id: string, @Body() body: ChangeChannelDto) : Promise<void> {
+		return
+	}
+
 
 }

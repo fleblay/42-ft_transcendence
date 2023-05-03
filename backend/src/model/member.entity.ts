@@ -20,8 +20,8 @@ export class Member {
 	@ManyToOne(() => Message)
 	lastRead: Message;
 
-	@Column({ nullable: true, default: null })
-	muteTime: Date | null;
+	@Column({ nullable: true, default: new Date('28/07/2021 07:00') })
+	muteTime: Date ;
 
 	@Column({ default: false })
 	banned: boolean;
