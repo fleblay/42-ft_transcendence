@@ -47,6 +47,9 @@ export function ChatPage() {
 
 	useEffect(() => {
 		console.log('changing chat', channelId)
+		if (tabs === 'Channels' && channelId) {
+			setTabs('My channels');
+		}
 		return addSubscription(`/chat/${channelId || ''}`);
 	}, [channelId]);
 
@@ -152,7 +155,7 @@ export function ChatPage() {
 
 	return (
 		<>
-		
+
 			<Container maxWidth="lg">
 			<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
@@ -167,8 +170,8 @@ export function ChatPage() {
 					p: '2rem',
 					bgcolor: 'background.paper',
 				}}>
-						
-					
+
+
 					<ChatTabs value={tabs} setValue={setTabs} />
 
 					{tabs === 'Channels' ? <ChannelsListDebug channels={channels} /> : null}
