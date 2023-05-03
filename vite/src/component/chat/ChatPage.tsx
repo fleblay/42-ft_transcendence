@@ -38,8 +38,9 @@ export function ChatPage() {
 	const [channels, setChannels] = useState<Channel[]>([]);
 	const [messageToSend, setMessageToSend] = useState<string>("");
 	const [tabs, setTabs] = useState<'Channels' | 'My channels' | 'Direct Messages'>('Channels');
-	const { setSubscription, setUnsubscribe } = useContext(SocketContext);
+	const { setSubscription, setUnsubscribe, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
+
 
 	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setMessageToSend(event.target.value);
@@ -57,6 +58,7 @@ export function ChatPage() {
 
 	useEffect(() => {
 		updateChannel()
+	}, []);
 
 	useEffect(() => {
 		function onNewChannel(data: Channel) {
