@@ -19,6 +19,7 @@ import { DfaForm } from './component/DfaForm';
 import { GamePage } from './component/GamePage';
 import { OldGamePage } from './component/OldGameScreen';
 import { ChatPage } from './component/chat/ChatPage';
+import ChatMenu from './component/chat/ChatMenu';
 
 export interface Destinations {
 	name: string,
@@ -191,7 +192,10 @@ function App() {
 						<Route path='/public' element={<div>Public</div>} />
 						<Route path="chat/:channelId?" element={
 							<RequireAuth>
-								<ChatPage />
+								<>
+									<ChatMenu />
+									<ChatPage />
+								</>
 							</RequireAuth>
 						} />
 						<Route path="/Login" element={<LoginForm />} />
