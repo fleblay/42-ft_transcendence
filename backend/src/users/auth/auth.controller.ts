@@ -27,7 +27,7 @@ export class AuthController {
 		const tokens = await this.authService.refreshToken(refreshToken) as Tokens;
 		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
 		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7});
-		return;
+		return { ok: true };
 	}
 
 	//@UseGuards(LocalAuthGuard)
@@ -101,7 +101,7 @@ export class AuthController {
 			throw new UnauthorizedException("I don't think so")
 		this.authService.turnOnDfa(req.currentUser.id)
 	}
-	
+
 	@Post('validate-dfa')
 	@HttpCode(200)
 	@UseGuards(DfaGuard)
