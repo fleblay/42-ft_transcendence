@@ -92,15 +92,13 @@ export function ChatPage() {
 	}
 
 	const sendMessage = () => {
-		console.log("sendMessage");
 		console.log("messageToSend", messageToSend);
 		apiClient.post(`/api/chat/channels/${channels[0].id}/messages`, { content: messageToSend }).then((response) => {
 			console.log(`send message to ${channels[0].id}`, response);
-		}
-		).catch((error) => {
+			setMessageToSend("");
+		}).catch((error) => {
 			console.log(error);
-		}
-		);
+		});
 	};
 
 	const myChannels = () => {
@@ -134,7 +132,14 @@ export function ChatPage() {
 					<Grid item xs={2}>
 					</Grid>
 					<Grid item xs={8}>
-						<TextField id="outlined-basic-email" label="Type Something" onChange={handleOnChange} fullWidth />
+						<TextField id="outlined-basic-email" label="Type Something" value={messageToSend} onChange={handleOnChange} fullWidth
+							onKeyDown={(ev) => {
+								if (ev.key === 'Enter') {
+									ev.preventDefault();
+									sendMessage();
+								}
+							}}
+						/>
 					</Grid>
 					<Grid item xs={2}>
 						<Button variant="contained" onClick={sendMessage} endIcon={<SendIcon />}>Send</Button>
