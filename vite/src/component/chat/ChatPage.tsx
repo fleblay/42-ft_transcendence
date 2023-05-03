@@ -26,7 +26,6 @@ function ChatTabs({ value, setValue }: chatTabsProps) {
 			<Tabs value={value} onChange={handleChange} aria-label="icon label tabs example">
 				<Tab value={'Channels'} label="Channels" />
 				<Tab value={'My channels'} label="My channels" />
-				<Tab value={'Direct Messages'} label="Direct Messages" />
 			</Tabs>
 		</Box>
 	);
@@ -143,8 +142,9 @@ export function ChatPage() {
 					</Grid>
 					<Grid item xs={2}>
 						<Button variant="contained" onClick={sendMessage} endIcon={<SendIcon />}>Send</Button>
-					</Grid>
+						<Button variant="contained" onClick={sendMessage} endIcon={<SendIcon />}>game</Button>
 
+					</Grid>	
 				</Grid>
 			</>
 		)
