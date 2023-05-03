@@ -128,14 +128,14 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
 		if (sub === "") return;
 		console.log(`Subscribing to ${sub}`)
-		customEmit('client.component.join', { sub })
+		customEmit('client.component.join', { subscription: sub })
 		setSubscription(newSubscription => {
 			if (newSubscription.includes(sub)) return newSubscription;
 			return [...newSubscription, sub]
 		})
 		return () => {
 			console.log(`Unsubscribing to ${sub}`)
-			customEmit('client.component.leave', { unsub: sub })
+			customEmit('client.component.leave', { unsubscription: sub })
 			setSubscription((newSubscription) => newSubscription.filter((sub) => sub !== sub))
 		}
 	}

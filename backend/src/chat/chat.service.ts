@@ -136,7 +136,7 @@ export class ChatService {
 			content: messageData.content
 		});
 		await this.messagesRepo.save(newMessage);
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', {newMessage});
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
 	}
 
 	async getMessages(user: User, channelId: number, offset: number = 0): Promise<Message[]> {
