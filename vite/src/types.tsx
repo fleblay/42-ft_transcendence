@@ -130,7 +130,7 @@ export type Blocked = {
 export type Channel = {
 	id: number,
 	name: string,
-	private : boolean,
+	private: boolean,
 	password?: string
 }
 
@@ -145,7 +145,7 @@ export type Member = {
 	id: string;
 	isConnected: boolean;
 	role: string;
-	user : { id: string; username: string; };
+	user: { id: string; username: string; };
 };
 
 
