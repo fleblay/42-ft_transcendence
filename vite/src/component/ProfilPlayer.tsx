@@ -5,19 +5,16 @@ import apiClient from '../auth/interceptor.axios';
 import { Box } from '@mui/system';
 import { useParams } from 'react-router-dom';
 import { GameHistory } from './GameHistory';
-import { SocketContext } from '../socket/SocketProvider';
 import { UserDataContext } from '../userDataProvider/userDataProvider';
 import { UserInfoDisplay } from './UserInfoDisplay';
 import { UserAchivement } from './UserAchievment';
 import { useAuthService } from '../auth/AuthService';
-import { Blocked, Friend } from '../types';
 import { FriendList } from './FriendList';
 
 
 export function ProfilPlayer() {
 	//send a post with image
 	const { idPlayer } = useParams<{ idPlayer: string }>();
-	const { customEmit, socket, customOn, customOff } = useContext(SocketContext);
 	const { userData, setUserData } = useContext(UserDataContext);
 	const auth = useAuthService();
 	const [itsMe, setItsMe] = useState<boolean>(false);
@@ -34,7 +31,7 @@ export function ProfilPlayer() {
 
 
 	React.useEffect(() => {
-		apiClient.get(`/api/users/${idPlayer}`).then((response) => { 
+		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
 			console.log("response", response);
 			setUserData(response.data);
 			console.log("userData", userData);
