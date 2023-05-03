@@ -46,8 +46,9 @@ export class ChatService {
 			private: data.private,
 			password: data.password,
 		})
+		if (!channel.private)
+			this.wsServer.to('/chat/').emit('newChannel', { id: channel.id, name: channel.name, protected: !!channel.password })
 		return channel.id
-
 	}
 
 	async joinChannel(user: User, channelId: number, options?: { owner?: boolean, password?: string, targetUser?: string }): Promise<void> {
@@ -89,6 +90,7 @@ export class ChatService {
 			messages: [],
 			role: (options?.owner) ? "owner" : "regular"
 		})
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { id: joiner.user.id, username: joiner.user.username, role: joiner.role });
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member> {
