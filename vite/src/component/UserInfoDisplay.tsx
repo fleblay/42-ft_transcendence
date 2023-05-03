@@ -24,7 +24,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 	const [userData, setUserData] = useState<UserInfo | null>(null);
 	const imgPath = `/avatars/${idPlayer}.png`;
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
-	const { customEmit, socket, customOn, customOff, setSubscription, setUnsubscribe } = useContext(SocketContext);
+	const { customEmit, socket, customOn, customOff, addSubscription } = useContext(SocketContext);
 	const [relation, setRelation] = useState<Friend | null>(null);
 	const auth = useAuthService();
 	const [itsMe, setItsMe] = useState<boolean>(false);
@@ -87,14 +87,9 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 
 
 	React.useEffect(() => {
-		console.log("idPlayer", idPlayer);
 		const room = `/player/${idPlayer}`;
-		setSubscription(room);
-		return () => {
-			setUnsubscribe(room);
-			console.log("cleaned up");
-		};
-	}, []);
+		return addSubscription(room);
+	}, [idPlayer]);
 
 	React.useEffect(() => {
 		if (!socket) return;

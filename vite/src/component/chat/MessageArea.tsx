@@ -12,7 +12,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 
     const [messages, setMessages] = useState<Message[] | null>(null);
 
-	const { customOn, customOff, setSubscription, setUnsubscribe } = useContext(SocketContext);
+	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 
     useEffect(() => {
         apiClient.get(`/api/chat/channels/${channelId}/messages`).then(({data} : {data: Message[]}) => {
@@ -22,7 +22,11 @@ export function MessageArea({ channelId }: MessageAreaProps) {
             console.log(error);
         });
     }, []);
-//
+
+	useEffect(() => {
+		return addSubscription(`/chat/${channelId}`);
+	}, [channelId]);
+
 	useEffect(() => {
 		function onNewMessage(message: Message) {
 			console.log("onNewMessage", message);
@@ -31,13 +35,13 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 				return [...messages, message];
 			});
 		}
-		setSubscription(`/chat/${channelId}`);
+
 		customOn("chat.message.new", onNewMessage);
 		return () => {
-			setUnsubscribe(`/chat/${channelId}`);
 			customOff("chat.message.new", onNewMessage);
 		};
-	}, []);
+	}, [messages])
+
 
 
     return (

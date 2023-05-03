@@ -10,8 +10,7 @@ export interface SocketContextType {
 	customEmit: (eventname: string, data: any, callback?: (response: any) => void) => Socket | null
 	customOn: (eventName: string, callback: (data: any) => void) => Socket | null
 	customOff: (eventName: string, callback?: (data: any) => void) => Socket | null
-	setSubscription: (sub: string) => void
-	setUnsubscribe: (unsub: string) => void
+	addSubscription: (sub: string) => (() => void) | void
 }
 export let SocketContext = React.createContext<SocketContextType>(null!)
 
@@ -21,8 +20,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 	const auth = useAuthService()
 	const [socket, setSocket] = React.useState<Socket | null>(null);
 	const nav = React.useContext(RouterContext)
-	const [subscription, setSubscription] = useState<string>("");
-	const [unsubscribe, setUnsubscribe] = useState<string>("");
+	const [subscription, setSubscription] = useState<string[]>([]);
 
 	const listOn = React.useRef<string[]>([])
 
@@ -40,10 +38,11 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		function displayListEvent() {
 			console.log('List of events on', listOn.current)
+			console.log('List of subscriptions', subscription)
 		}
-		const intervalId = setInterval(displayListEvent, 5000)
+		const intervalId = setInterval(displayListEvent, 1000)
 		return () => clearInterval(intervalId)
-	}, [listOn.current])
+	}, [listOn.current, subscription])
 
 	function customOn(eventName: string, callback: (data: any) => void) {
 		if (!socket) return null;
@@ -124,21 +123,23 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		}
 	}, [nav, auth.user, socket]) */
 
-	React.useEffect(() => {
-		if (socket && auth.user) {
-			console.log('client component join', {subscription})
-			customEmit('client.component.join', { subscription})
+	function addSubscription(sub: string) {
+		if (!socket?.connected) return;
+
+		if (sub === "") return;
+		console.log(`Subscribing to ${sub}`)
+		customEmit('client.component.join', { sub })
+		setSubscription(newSubscription => {
+			if (newSubscription.includes(sub)) return newSubscription;
+			return [...newSubscription, sub]
+		})
+		return () => {
+			console.log(`Unsubscribing to ${sub}`)
+			customEmit('client.component.leave', { unsub: sub })
+			setSubscription((newSubscription) => newSubscription.filter((sub) => sub !== sub))
 		}
-	}, [auth.user, socket, subscription])
+	}
 
-	React.useEffect(() => {
-		if (socket && auth.user) {
-			console.log('client component leave', {unsubscribe})
-			customEmit('client.component.leave', { unsubscribe})
-		}
-	}, [auth.user, socket, unsubscribe])
-
-
-	const value = { customEmit, socket: socket, customOn, customOff, setSubscription, setUnsubscribe }
+	const value = { customEmit, socket: socket, customOn, customOff, addSubscription }
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
 }
