@@ -51,7 +51,7 @@ export function MuiAppBar() {
 			auth.logout();
 			return;
 		}
-        if (page === 'My profil') {
+        if (page === 'my profil') {
             const path = `/player/${auth.user?.id}`;
             navigate(path);
             return;

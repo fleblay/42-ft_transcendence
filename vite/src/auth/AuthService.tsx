@@ -40,12 +40,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		if (!user && !allRoutes.find((el) => el.path === location.pathname)?.public) {
-			if (getAccessToken())
-				getUser()
-			else {
-				console.log("Not connected, no token");
-				// navigate("/login", { replace: true });
-			}
+			getUser()
 		}
 	}, [])
 
