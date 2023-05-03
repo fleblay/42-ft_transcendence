@@ -117,14 +117,14 @@ export function ChatPage() {
         return (
             <>
                 <Grid container spacing={3}>
-                    <Grid item xs={2}>
+                    <Grid item xs={3}>
                         <Typography textAlign={'center'}> Channels</Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                         <Typography textAlign={'center'}> {channelId} </Typography>
                     </Grid>
-                    <Grid item xs={2}>
-                        <Typography textAlign={'center'}> User</Typography>
+                    <Grid item xs={3}>
+                        <Typography textAlign={'center'}>Member</Typography>
                     </Grid>
                 </Grid>
                 <Divider />

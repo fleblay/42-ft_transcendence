@@ -160,8 +160,8 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
 	const [keyDown, setKeyDown] = useState({ up: false, down: false, shoot: false });
-	const [canvasRatio, setCanvasRatio] = useState<number>(0.9 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
-	const [displayInfo, setDisplayInfo] = useState<boolean>(false)
+	const [canvasRatio, setCanvasRatio] = useState<number>(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
+	const [displayInfo, setDisplayInfo] = useState<boolean>(false);
 
 	const handleClick = () => {
 		setDisplayInfo(!displayInfo)
@@ -169,7 +169,9 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 
 	useEffect(() => {
 		console.log("width", width);
-		setCanvasRatio(0.9 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
+		setCanvasRatio(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
+		if (bottomRef.current)
+			bottomRef.current.scrollIntoView({ behavior: "smooth" })
 	}, [width])
 
 

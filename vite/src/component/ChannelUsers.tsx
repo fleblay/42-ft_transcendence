@@ -77,3 +77,4 @@ export function ChannelUsers({ channelId }: { channelId: string }) {
 		</nav>
 	);
 }
+
