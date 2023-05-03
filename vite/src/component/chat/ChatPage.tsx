@@ -10,7 +10,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { Channel } from '../../types'
 
 
-type chatTabsValue = 'Channels' | 'My channels' | 'Direct Messages';
+type chatTabsValue = 'Channels' | 'My channels';
 interface chatTabsProps {
 	value: chatTabsValue;
 	setValue: React.Dispatch<React.SetStateAction<chatTabsValue>>;
@@ -37,7 +37,7 @@ export function ChatPage() {
 
 	const [channels, setChannels] = useState<Channel[]>([]);
 	const [messageToSend, setMessageToSend] = useState<string>("");
-	const [tabs, setTabs] = useState<'Channels' | 'My channels' | 'Direct Messages'>('Channels');
+	const [tabs, setTabs] = useState<'Channels' | 'My channels' >('Channels');
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
 
@@ -147,20 +147,23 @@ export function ChatPage() {
 
 	return (
 		<>
+		
 			<Container maxWidth="lg">
-				<Box sx={{
-					width: '100%',
-					border: '1px solid #D3C6C6',
-					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-					borderRadius: '16px',
-					p: '2rem',
-					bgcolor: 'background.paper',
-				}}>
-					<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+			<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 							Chat
 						</Typography>
 					</AppBar>
+				<Box sx={{
+					width: '100%',
+					border: '1px solid #D3C6C6',
+					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+					borderRadius: '0 0 16px 16px',
+					p: '2rem',
+					bgcolor: 'background.paper',
+				}}>
+						
+					
 					<ChatTabs value={tabs} setValue={setTabs} />
 
 					{tabs === 'Channels' ? <ChannelsListDebug channels={channels} /> : null}
