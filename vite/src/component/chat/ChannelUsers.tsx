@@ -3,14 +3,7 @@ import apiClient from "../../auth/interceptor.axios";
 import { Avatar, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 
-import { Channel } from "../../types";
-
-type Member = {
-	id: string;
-	username: string;
-	isConnected: boolean;
-	role: string;
-};
+import { Channel, Member } from "../../types";
 
 
 
@@ -24,6 +17,7 @@ export function ChannelUsers({ channelId }: { channelId: string }) {
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then((response) => {
+			console.log("member", response.data);
 			setRows(response.data);
 		}).catch((error) => {
 			console.log(error);
@@ -31,7 +25,7 @@ export function ChannelUsers({ channelId }: { channelId: string }) {
 	}, [channelId]);
 
 	useEffect(() => {
-		setAdmin(rows.filter((row) => row.role === "admin") || null);
+		setAdmin(rows.filter((row) => row.role === "admin" || row.role === "owner") || null);
 		setMember(rows.filter((row) => row.role === "regular") || null);
 	}, [rows]);
 
@@ -42,16 +36,16 @@ export function ChannelUsers({ channelId }: { channelId: string }) {
 		<nav aria-label="secondary mailbox folders">
 			<Typography variant="h6" component="div" gutterBottom> Admin </Typography>
 			<List>
-				{admin?.map((row) => (
-					<ListItem disablePadding alignItems="flex-start">
+				{admin?.map((admin) => (
+					<ListItem key={admin.id} disablePadding alignItems="flex-start">
 						<ListItemAvatar>
-							<Avatar alt={row.username} src={`/avatars/${row.id}.png`} />
+							<Avatar alt={admin.user.username} src={`/avatars/${admin.id}.png`} style={{width: '15px', height: '15px'}} />
 						</ListItemAvatar>
 						<ListItemButton >
-							<ListItemText primary={row.username} />
+							<ListItemText primary={admin.user.username} />
 						</ListItemButton>
 						<ListItemAvatar>
-							<Avatar sx={{ bgcolor: row.isConnected ? 'green' : 'red' }} style={{ width: '5px', height: '5px' }} />
+							<Avatar sx={{ bgcolor: admin.isConnected ? 'green' : 'red' }} style={{ width: '10px', height: '10px' }} />
 						</ListItemAvatar>
 					</ListItem>
 				)
@@ -59,16 +53,16 @@ export function ChannelUsers({ channelId }: { channelId: string }) {
 			</List>
 			<Typography variant="h6" component="div" gutterBottom> Regular </Typography>
 			<List>
-				{member?.map((row) => (
-					<ListItem disablePadding alignItems="flex-start">
+				{member?.map((member) => (
+					<ListItem key={member.id} disablePadding alignItems="flex-start">
 						<ListItemAvatar>
-							<Avatar alt={row.username} src={`/avatars/${row.id}.png`} />
+							<Avatar alt={member.user.username} src={`/avatars/${member.id}.png`}  style={{width: '15px', height: '15px'}}/>
 						</ListItemAvatar>
 						<ListItemButton >
-							<ListItemText primary={row.username} />
+							<ListItemText primary={member.user.username} />
 						</ListItemButton>
 						<ListItemAvatar>
-							<Avatar sx={{ bgcolor: row.isConnected ? 'green' : 'red' }} style={{ width: '5px', height: '5px' }} />
+							<Avatar sx={{ bgcolor: member.isConnected ? 'green' : 'red' }} style={{ width: '10px', height: '10px' }} />
 						</ListItemAvatar>
 					</ListItem>
 				)
