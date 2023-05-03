@@ -91,9 +91,9 @@ export type plainUser = {
 	id: number,
 	username: string,
 	email: string,
-	password?: string, // To be removed in DTO in back
 	stud: boolean,
-	dfa: boolean
+	dfa: boolean,
+	blockedId: number[],
 }
 
 export type UserInfo = plainUser & {

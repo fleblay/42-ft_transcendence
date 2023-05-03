@@ -7,6 +7,9 @@ export default defineConfig({
 	base: '/',
 	plugins: [
 		react(),
+		checker({
+			typescript: true
+		})
 	],
 	server: {
 		/*

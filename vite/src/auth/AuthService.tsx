@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
-import { IUser, allRoutes } from "../App";
+import { allRoutes } from "../App";
 import { LoginData } from "../component/LoginForm";
 import { delAccessToken, delRefreshToken, getAccessToken } from "../token/token";
 import axios from "axios";
 import { RegisterData } from "../component/RegisterForm";
-import { userToken } from "../types";
+import { plainUser, userToken } from "../types";
 import apiClient from "./interceptor.axios";
 import { useNavigate } from "react-router-dom";
 
 //0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
-	user: IUser | null;
+	user: plainUser | null;
 	register: (user: RegisterData) => Promise<void>;
 	login: (user: LoginData) => Promise<void>;
 	logout: () => void;

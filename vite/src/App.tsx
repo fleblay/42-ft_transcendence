@@ -39,13 +39,6 @@ export const allRoutes: Destinations[] = [
 
 ]
 
-export interface IUser {
-	username: string,
-	email: string,
-	id: number
-}
-
-
 function AuthStatus() {
 	let auth = useAuthService();
 	let navigate = useNavigate();

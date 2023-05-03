@@ -6,11 +6,5 @@ export class UserDto {
 	password: string;
 
 	@Exclude()
-	friendsId: number[];
-
-	@Exclude()
-	blockedId: number[];
-
-	@Exclude()
 	dfaSecret: string;
 }
