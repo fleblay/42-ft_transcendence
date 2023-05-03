@@ -25,6 +25,18 @@ export class ChatService {
 		this.wsServer = server;
 	}
 
+	getAllChannels(): Promise<Channel[]> {
+		return this.channelsRepo.find();
+	}
+
+	getAllPublicChannels(): Promise<Channel[]> {
+		return this.channelsRepo.find({
+			where: {
+				private: false
+			}
+		})
+	}
+
 	async createChannel(data: CreateChannelDto): Promise<number> {
 		if (data.private && data.password)
 			throw new BadRequestException("createChannel : Private channel creation data provide a password")
@@ -168,17 +180,6 @@ export class ChatService {
 		return members;
 	}
 
-	getAllChannels(): Promise<Channel[]> {
-		return this.channelsRepo.find();
-	}
-
-	getAllPublicChannels(): Promise<Channel[]> {
-		return this.channelsRepo.find({
-			where: {
-				private: false
-			}
-		})
-	}
 
 	getChannelInfo(channelId: number): Promise<Channel> {
 		return this.channelsRepo.findOne({

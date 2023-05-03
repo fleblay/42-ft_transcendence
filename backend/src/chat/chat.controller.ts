@@ -8,6 +8,7 @@ import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../model/user.entity';
 import { UsersService } from '../users/users.service';
 import { Member } from '../model/member.entity';
+import { Channel } from '../model/channel.entity';
 import { Message } from 'src/model/message.entity';
 
 @Controller('chat')
@@ -19,12 +20,12 @@ export class ChatController {
 
 	// NOTE: DEBUG PURPOSES ONLY !
 	@Get('/channels/all')
-	getAll() {
+	getAll() : Promise<Channel[]> {
 		return this.chatService.getAllChannels()
 	}
 	// Return all channels public and protected
 	@Get('/channels/public')
-	getAllPublic() {
+	getAllPublic() : Promise<Channel[]> {
 		return this.chatService.getAllPublicChannels()
 	}
 
