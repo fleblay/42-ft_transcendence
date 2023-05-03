@@ -5,16 +5,14 @@ import { getAccessToken, getRefreshToken, delAccessToken, delRefreshToken} from 
 let isResfreshing = false;
 let subscribers = [] as any;
 
-function onRefreshed(token: string | null) {
-	if (!token)
-		return;
-	subscribers.map((cb: any) => cb(token));
+function onRefreshed() {
+	subscribers.map((cb: any) => cb());
   }
-  
+
 function subscribeTokenRefresh(cb : any) {
 	subscribers.push(cb);
   }
-  
+
 
 
 type DecodeToken = {
@@ -59,7 +57,7 @@ apiClient.interceptors.response.use(
 							if (response.status === 200) {
 								console.log("Access token refreshed");
 								resolve(axios(originalRequest));
-								onRefreshed(getAccessToken());
+								onRefreshed();
 							}
 						})
 						.catch((error) => {
@@ -75,8 +73,7 @@ apiClient.interceptors.response.use(
 			}
 
 			const retryOriginalRequest = new Promise((resolve) => {
-				subscribeTokenRefresh((token: string) => {
-					originalRequest.headers.Authorization = `Bearer ${token}`;
+				subscribeTokenRefresh(() => {
 					resolve(axios(originalRequest));
 				});
 			}
@@ -89,7 +86,7 @@ apiClient.interceptors.response.use(
 	}
 );
 
-  
+
 
 
 export default apiClient;

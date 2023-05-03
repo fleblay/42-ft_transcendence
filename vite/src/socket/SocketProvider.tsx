@@ -59,23 +59,31 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		return socket.off(eventName, listener)
 	}
 
-	const onConnect = React.useCallback(() => {
-		console.log('Connected to socket')
-		customEmit('ping', { message: "This is my first ping" }, (response: any) => {
-			console.log(response)
-		})
-	}, [socket])
+	// const onConnect = React.useCallback(() => {
+	// 	console.log('Connected to socket')
+	// 	customEmit('ping', { message: "This is my first ping" }, (response: any) => {
+	// 		console.log(response)
+	// 	})
+	// }, [socket])
 
 	React.useEffect(() => {
 		if (!auth.user) return;
 		if (socket === null) {
-			setSocket(io({
+			const temporarySocket = io({
 				auth: {
 					token: getAccessToken(),
 				}
-			}))
+			})
+			function onConnect() {
+				console.log('Connected to socket')
+				setSocket(temporarySocket)
+			}
 			console.log("Socket Creation")
-			return;
+
+			temporarySocket.on('connect', onConnect);
+			return () => {
+				temporarySocket.off('connect', onConnect);
+			}
 		}
 
 		function onMessage(data: any) {
@@ -85,12 +93,10 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		function onDisconnect() {
 			console.log('Disconnected from socket')
 		}
-		socket.on('connect', onConnect);
 		socket.on('disconnect', onDisconnect);
 		socket.on('message', onMessage)
 		return () => {
 			if (!socket) return;
-			socket.off('connect', onConnect);
 			socket.off('message', onMessage);
 			socket.off('disconnect', onDisconnect);
 			if (socket.connected) {

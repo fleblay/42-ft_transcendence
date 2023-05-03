@@ -57,6 +57,16 @@ export function ChatPage() {
 
 	useEffect(() => {
 		updateChannel()
+
+	useEffect(() => {
+		function onNewChannel(data: Channel) {
+			console.log('newChannel', data);
+			setChannels((channels) => [...channels, data]);
+		}
+		customOn('newChannel', onNewChannel);
+		return () => {
+			customOff('newChannel', onNewChannel);
+		};
 	}, []);
 
 	const updateChannel = () => {
