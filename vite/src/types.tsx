@@ -140,3 +140,12 @@ export type Message = {
 	content: string,
 	date: string,
 }
+
+export type Member = {
+	id: string;
+	isConnected: boolean;
+	role: string;
+	user : { id: string; username: string; };
+};
+
+

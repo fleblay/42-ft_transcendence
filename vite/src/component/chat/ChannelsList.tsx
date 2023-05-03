@@ -15,14 +15,6 @@ export function MyChannelsList({ channels }: { channels: Channel[] }) {
 	const navigate = useNavigate();
 	const auth = useAuthService();
 
-	const rows = channels.map((channel: Channel) => {
-		return {
-			channelId: channel.id,
-			channelName: channel.name,
-			private: channel.private,
-			password: channel.password,
-		}
-	});
 
 	const mooveToChannel = (channelId: number) => {
 		navigate(`/chat/${channelId}`);
@@ -31,10 +23,10 @@ export function MyChannelsList({ channels }: { channels: Channel[] }) {
 	return (
 		<nav aria-label="secondary mailbox folders">
 			<List>
-				{rows?.map((row) => (
-					<ListItem disablePadding>
-						<ListItemButton onClick={() => mooveToChannel(row.channelId)}>
-							<ListItemText primary={row.channelName} />
+				{channels?.map((channel) => (
+					<ListItem key={channel.id} disablePadding>
+						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
+							<ListItemText primary={channel.name} />
 						</ListItemButton>
 					</ListItem>
 				)
