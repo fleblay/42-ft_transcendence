@@ -66,14 +66,14 @@ export class ChatService {
 		if (channel.private && channel.members.find((member) => (member.user.id == user.id) && ((member.role == "owner") || (member.role == "admin"))))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
 
-		let addedUser: User = user
+		let addedUser: User | null = user
 		if (options?.targetUser) {
 			addedUser = await this.usersService.findOneByUsername(options.targetUser)
 			if (!addedUser)
 				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
 		}
 
-		const member = channel.members.find((member) => (member.user.id == addedUser.id))
+		const member = channel.members.find((member) => (member.user.id == addedUser!.id))
 		if (member) {
 			if (member.banned)
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is banned from the channel`)
@@ -95,7 +95,7 @@ export class ChatService {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { id: joiner.user.id, username: joiner.user.username, role: joiner.role });
 	}
 
-	private getMemberOfChannel(user: User, channelId: number): Promise<Member> {
+	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
 		return this.membersRepo.findOne({
 			where: { user: { id: user.id }, channel: { id: channelId } },
 			relations: ['channel', 'user'],
@@ -115,9 +115,7 @@ export class ChatService {
 			},
 		});
 	}
-	private userIsAllowed(member: Member, ignore: { banned?: boolean, kicked?: boolean, mute?: boolean } = {}): boolean {
-		if (!member)
-			throw new NotFoundException('Member not found, the channel may have been deleted');
+	private memberIsAllowed(member: Member, ignore: { banned?: boolean, kicked?: boolean, mute?: boolean } = {}): boolean {
 		if (ignore.banned !== true && member.banned)
 			throw new BadRequestException('You are banned from this channel');
 		if (ignore.kicked !== true && member.kicked)
@@ -126,9 +124,18 @@ export class ChatService {
 			throw new BadRequestException('You are muted from this channel');
 		return true;
 	}
+	private memberHasRole(member: Member, role: string): boolean {
+		if (!member)
+			throw new NotFoundException('Member not found, the channel may have been deleted');
+		if (member.role != role)
+			throw new BadRequestException(`You must be ${role} to do this`);
+		return true;
+	}
 	async newMessage(owner: User, channelId: number, messageData: NewMessageDto) {
 		const member = await this.getMemberOfChannel(owner, channelId);
-		this.userIsAllowed(member);
+		if (!member)
+			throw new NotFoundException('Member not found, the channel may have been deleted');
+		this.memberIsAllowed(member);
 		const newMessage = this.messagesRepo.create({
 			channel: member.channel,
 			owner: member,
@@ -141,7 +148,9 @@ export class ChatService {
 
 	async getMessages(user: User, channelId: number, offset: number = 0): Promise<Message[]> {
 		const member = await this.getMemberOfChannel(user, channelId);
-		this.userIsAllowed(member, { mute: true });
+		if (!member)
+			throw new NotFoundException('Member not found, the channel may have been deleted');
+		this.memberIsAllowed(member, { mute: true });
 		const messages = await this.messagesRepo.find({
 			where: {
 				channel: {
@@ -185,9 +194,19 @@ export class ChatService {
 	}
 
 
-	getChannelInfo(channelId: number): Promise<Channel> {
+	async getChannelInfo(user: User, channelId: number): Promise<Channel | null> {
+		const member = await this.getMemberOfChannel(user, channelId);
+		if (!member)
+			throw new NotFoundException('Member not found, the channel may have been deleted');
+		this.memberHasRole(member, 'owner');
 		return this.channelsRepo.findOne({
-			where: { id: channelId }
+			where: { id: channelId },
+			select: {
+				id: true,
+				name: true,
+				password: true,
+				private: true,
+			}
 		})
 	}
 }

@@ -1,5 +1,5 @@
 import { Controller, Request, Query, Redirect, Response, Body, HttpCode, UnauthorizedException } from '@nestjs/common';
-import { Response as ExpressResponse } from 'express'
+import { Response as ExpressResponse, Request as ExpressRequest } from 'express'
 import { Get } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common';
 import { ATGuard } from '../guard/access-token.guard';
@@ -11,6 +11,8 @@ import { Tokens } from '../../type';
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { DfaGuard } from '../guard/2fa-token.guard';
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { User } from 'src/model/user.entity';
 
 
 @Controller('auth')
@@ -20,7 +22,7 @@ export class AuthController {
 
 	@Get('/refresh')
 	@UseGuards(RTGuard)
-	async refresh(@Request() req, @Response({ passthrough: true }) res: ExpressResponse) {
+	async refresh(@Request() req: ExpressRequest, @Response({ passthrough: true }) res: ExpressResponse) {
 		//console.log('refresh');
 		// token dans X-Refresh-Token
 		const refreshToken = req.cookies['refresh_token'];
@@ -61,7 +63,7 @@ export class AuthController {
 
 	@Get('/logout')
 	@UseGuards(ATGuard)
-	async logout(@Request() req) {
+	async logout(@Request() req: ExpressRequest) {
 		//console.log('logout');
 		const refreshToken = req.cookies['refresh_token'];
 		return this.authService.deleteRefreshToken(refreshToken);
@@ -92,20 +94,20 @@ export class AuthController {
 	@Post('turn-on-2fa')
 	@HttpCode(200)
 	@UseGuards(ATGuard)
-	async turnDfaOn(@Request() req, @Body() { code }: DfaCodeDto) {
+	async turnDfaOn(@CurrentUser() user: User, @Request() req: ExpressRequest, @Body() { code }: DfaCodeDto) {
 		console.log('turnDfaOn', code)
 
-		const isValidCode = this.authService.is2faCodeValid(code, req.currentUser)
+		const isValidCode = this.authService.is2faCodeValid(code, user)
 		console.log('isValidCode', isValidCode)
 		if (!isValidCode)
 			throw new UnauthorizedException("I don't think so")
-		this.authService.turnOnDfa(req.currentUser.id)
+		this.authService.turnOnDfa(user.id)
 	}
 
 	@Post('validate-dfa')
 	@HttpCode(200)
 	@UseGuards(DfaGuard)
-	async validateDfa(@Body() { code }: DfaCodeDto, @Request() req, @Response({ passthrough: true }) res: ExpressResponse) {
+	async validateDfa(@Body() { code }: DfaCodeDto, @Request() req: ExpressRequest, @Response({ passthrough: true }) res: ExpressResponse) {
 		// get user
 		const user = await this.authService.validateDfaToken(req.cookies['dfa_token'])
 		if (!user)

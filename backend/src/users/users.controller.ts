@@ -16,6 +16,7 @@ import { SavedGame } from '../model/saved-game.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { FriendRequestStatus } from '../model/friend-request.entity';
+import { Request as ExpressRequest } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -55,7 +56,7 @@ export class UsersController {
 	@Get('/me')
 	@UseGuards(ATGuard)
 	@Serialize(UserDto)
-	getMe(@Request() req) {
+	getMe(@Request() req: ExpressRequest) {
 		const token = req.cookies['access_token'];
 		if (!token) {
 			throw new ForbiddenException('User not found');

@@ -74,11 +74,11 @@ export class ChatController {
 	}
 	// NOTE: Return password if user is owner and return all members
 	@Get('channels/:id/info')
-	getChannelInfo(@Param('id') id: string) {
+	getChannelInfo(@CurrentUser() user: User, @Param('id') id: string) {
 		const channelId = parseInt(id);
 		if (isNaN(channelId))
 			throw new BadRequestException('Invalid channel id');
-		return this.chatService.getChannelInfo(channelId)
+		return this.chatService.getChannelInfo(user, channelId)
 	}
 
 	// NOTE: A TESTER
@@ -92,19 +92,25 @@ export class ChatController {
 		}));
 	}
 
-	// to: /chat/${channelId} emit :chat.modify.members
+	// IF KICK
+	// to: /chat/${channelId} emit :chat.leave.members -> leaver.id
+	// ELSE
+	// to: /chat/${channelId} emit :chat.modify.members -> { playerId, username, role, isMuted, isBanned }
+	// john
 	@Post('channels/:id/members/:playerId')
 	async modifyMembers(@Param('id') id: string, @Param('playerId') playerId : string, @Body() body: ModifyMemberDto): Promise<void>  {
 		return
 	}
 
-	// to: /chat/${channelId} emit :chat.leave.members
+	// to: /chat/${channelId} emit :chat.leave.members -> leaver.id
+	// john
 	@Post('channels/:id/leave')
 	async leaveChannel(@CurrentUser() user: User, @Param('id') id: string): Promise<void> {
 		return
 	}
 
-	//to: /chat/${channelId} emit :chat.modify.channel
+	//to: /chat/${channelId} emit :chat.modify.channel -> { name, hasPassword }
+	// john
 	@Post('channels/:id/info')
 	async modifyChannel(@Param('id') id: string, @Body() body: ChangeChannelDto) : Promise<void> {
 		return

@@ -5,7 +5,7 @@ import { ChannelsListDebug, MyChannelsList } from './ChannelsList';
 import { MessageArea } from './MessageArea';
 import { SocketContext } from '../../socket/SocketProvider';
 import { useParams } from 'react-router-dom';
-import { ChannelUsers } from './ChannelUsers';
+import { MemberList } from './ChannelMemberList';
 import SendIcon from '@mui/icons-material/Send';
 import { Channel } from '../../types'
 
@@ -126,7 +126,7 @@ export function ChatPage() {
 						{channelId ? <MessageArea channelId={channelId} /> : null}
 					</Grid>
 					<Grid item xs={2}>
-						{channelId ? <ChannelUsers channelId={channelId} /> : null}
+						{channelId ? <MemberList channelId={channelId} /> : null}
 					</Grid>
 				</Grid>
 				<Divider />

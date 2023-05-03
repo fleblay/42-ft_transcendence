@@ -11,7 +11,7 @@ import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { toDataURL } from 'qrcode'
 import { authenticator } from 'otplib'
-import { Tokens } from '../../type';
+import { Login42User, Tokens } from '../../type';
 
 const scrypt = promisify(_scrypt);
 
@@ -52,7 +52,7 @@ export class AuthService {
 		return null;
 	}
 
-	async validateAccessToken(bearerToken: string): Promise<User> | null {
+	async validateAccessToken(bearerToken: string): Promise<User | null> {
 		try {
 			console.log(`Bearer token in validate access token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.verify(bearerToken, access_token_options) // compliant to security rules of year 3000
@@ -64,7 +64,7 @@ export class AuthService {
 		}
 	}
 
-	async validateDfaToken(dfaToken: string): Promise<User> | null {
+	async validateDfaToken(dfaToken: string): Promise<User | null> {
 		try {
 			const jwtResponse = this.jwtService.verify(dfaToken, dfa_token_options) // compliant to security rules of year 3000
 			return this.usersService.findOne(jwtResponse.sub)
@@ -74,7 +74,7 @@ export class AuthService {
 		}
 	}
 
-	decodeToken(bearerToken: string): Promise<User> | null {
+	decodeToken(bearerToken: string): Promise<User | null> | null{
 		try {
 			// console.log(`Bearer token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.decode(bearerToken);
@@ -126,6 +126,8 @@ export class AuthService {
 	}
 
 	async register(dataUser: CreateUserDto) {
+		if (dataUser.email.endsWith('@student.42.fr'))
+			throw new ForbiddenException('You can\'t register with a 42 email');
 		if (await this.usersService.findOneByEmail(dataUser.email))
 			throw new ForbiddenException('Email is not unique');
 		if (await this.usersService.findOneByUsername(dataUser.username))
@@ -140,11 +142,16 @@ export class AuthService {
 		return tokens;
 	}
 
-	async login42API(dataUser: CreateUserDto) {
+	async login42API(dataUser: Login42User) {
 		if (await this.usersService.findOneByEmail(dataUser.email))
 			return this.login(dataUser, false)
-		else
-			return this.register(dataUser)
+		else {
+			const user = await this.usersService.create({ ...dataUser, dfaSecret: authenticator.generateSecret() });
+			const tokens = this.getTokens(user);
+			await this.saveRefreshToken(user.id, tokens.refreshToken);
+			return tokens
+		}
+			
 	}
 
 	async validate42Code(code: string): Promise<Partial<Tokens>> {
@@ -248,6 +255,7 @@ export class AuthService {
 
 	async deleteRefreshToken(refreshToken: string) {
 		const report = await this.repo.findOne({ where: { refreshToken } });
+		if (!report) return;
 		await this.repo.delete(report.id);
 	}
 

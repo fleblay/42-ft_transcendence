@@ -39,4 +39,9 @@ export type Tokens = {
 	dfaToken?: string
 }
 
-
+export interface Login42User {
+	email: string;
+	username: string | null;
+	password: string
+	stud: boolean;
+}

@@ -37,7 +37,7 @@ export class UsersService {
 	}
 
 
-	create(dataUser: CreateUserDto & {dfaSecret: string}) {
+	create(dataUser: Partial<User>) {
 		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
 		const user = this.repo.create(dataUser)
 		console.log("save user :", user);
@@ -97,7 +97,7 @@ export class UsersService {
 
 	addConnectedUser(id: number) {
 		if (this.isConnected(id))
-			this.connectedUsers.get(id).push("online")
+			this.connectedUsers.get(id)?.push("online")
 		else
 			this.connectedUsers.set(id, ["online"])
 	}
@@ -108,14 +108,14 @@ export class UsersService {
 			this.addConnectedUser(id);
 
 		if (oldStatus) {
-			const index = this.connectedUsers.get(id).indexOf(oldStatus);
-			if (index > -1) {
-				this.connectedUsers.get(id).splice(index, 1);
+			const index = this.connectedUsers.get(id)?.indexOf(oldStatus);
+			if (index && index > -1) {
+				this.connectedUsers.get(id)?.splice(index, 1);
 			}
 		}
 		if (newStatus)
-			this.connectedUsers.get(id).push(newStatus)
-		if (this.connectedUsers.get(id).length == 0)
+			this.connectedUsers.get(id)?.push(newStatus)
+		if (this.connectedUsers.get(id)?.length == 0)
 			this.connectedUsers.delete(id)
 	}
 
@@ -183,11 +183,15 @@ export class UsersService {
 	async getBlocked(user: User, friendId: number): Promise <Blocked | null> {
 		if (!user)
 			throw new NotFoundException("User not found");
-		if (user.blockedId.includes(friendId))
+		if (user.blockedId.includes(friendId)) {
+			const friend = await this.findOne(friendId);
+			if (!friend || !friend.username)
+				return null;
 			return {
 				id: friendId,
-				username: (await this.findOne(friendId)).username
+				username: friend.username
 			}
+		}
 		return null;
 	}
 
@@ -204,7 +208,7 @@ export class UsersService {
 		return BlockedList;
 	}
 
-	dfa(user: User): Promise<User> {
+	dfa(user: User): Promise<User | null> {
 		return this.update(user.id, {dfa: !user.dfa})
 	}
 }

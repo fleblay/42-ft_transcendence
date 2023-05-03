@@ -7,7 +7,7 @@ import { Channel, Member } from "../../types";
 
 
 
-export function ChannelUsers({ channelId }: { channelId: string }) {
+export function MemberList({ channelId }: { channelId: string }) {
 	const [rows, setRows] = useState<Member[]>([]);
 	const [admin, setAdmin] = useState<Member[] | null>(null);
 	const [member, setMember] = useState<Member[] | null>(null);
