@@ -2,17 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../model/user.entity'
-import { CreateUserDto } from './dtos/create-user.dto';
 import { UserStatus, Blocked } from '../type';
 import * as sharp from 'sharp';
 import { In } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { Friend } from '../type';
 import { GameService } from '../game/game.service';
 import { forwardRef } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
-import { FriendRequest, FriendRequestStatus } from '../model/friend-request.entity';
-import { Server, Socket } from 'socket.io'
+import { Server } from 'socket.io'
 import { FriendsService } from '../friends/friends.service';
 import { ChatService } from '../chat/chat.service';
 
@@ -37,8 +34,7 @@ export class UsersService {
 	}
 
 
-	//Todo : a changer ! Affreux !
-	create(dataUser: Partial<User> | {username : any , email: string, dfaSecret : string}) {
+	create(dataUser: Partial<User>) {
 		//console.log(`create user ${dataUser?.username} : ${dataUser?.email} : ${dataUser?.password}`);
 		const user = this.repo.create(dataUser)
 		console.log("save user :", user);
