@@ -58,13 +58,12 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 					} else {
 						acc.push([message]);
 					}
-					console.log(lastMessage.owner.user, message.owner.user);
 					return acc;
 				}, []).map((messages: Message[], i: number) => {
 					return (
 						<ChatMsg
 							key={i}
-							side={messages[0].id === user?.id ? 'right' : 'left'}
+							side={messages[0].owner.user.id === user?.id ? 'right' : 'left'}
 							avatar={`/avatars/${messages[0].owner.user.id}.png`}
 							messages={messages.map((message) => message.content)}
 							username={messages[0].owner.user.username}

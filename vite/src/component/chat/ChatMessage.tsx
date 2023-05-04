@@ -18,9 +18,9 @@ export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username }) 
 		<Grid
 			container
 			spacing={2}
-			justifySelf={side === 'right' ? 'flex-end' : 'flex-start'}
+			justifyContent={side === 'right' ? 'flex-end' : 'flex-start'}
 		>
-			{/* side === 'left' && */(
+			{ side === 'left' && (
 				<Grid item>
 					<Avatar
 						src={avatar}
@@ -30,7 +30,7 @@ export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username }) 
 			<Grid item xs={8}>
 				{/* text containing username in grey color and little size */}
 
-				{/* side === 'left' && */ (
+				{side === 'left' && (
 					<Typography
 						align={'left'}
 						variant={'caption'}
@@ -40,7 +40,22 @@ export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username }) 
 					</Typography>
 				)}
 				{messages.map((msg: string, i: number) => (
-					<div key={i}>
+					<div key={i}
+						style={{
+							backgroundColor: side === 'left' ? '#e0e0e0' : '#2196f3',
+							color: side === 'left' ? '#000' : '#fff',
+							borderRadius: 5,
+							padding: 10,
+							marginBottom: 5,
+							marginTop: 5,
+							maxWidth: '80%',
+							wordWrap: 'break-word',
+							textAlign: side === 'left' ? 'left' : 'right',
+							marginLeft: side === 'left' ? 0 : 'auto',
+							marginRight: side === 'left' ? 'auto' : 0,
+
+						}}
+						>
 						<Typography
 							align={'left'}
 						>
