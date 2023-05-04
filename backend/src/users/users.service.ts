@@ -37,8 +37,9 @@ export class UsersService {
 	}
 
 
-	create(dataUser: Partial<User>) {
-		console.log(`create user ${dataUser.username} : ${dataUser.email} : ${dataUser.password}`);
+	//Todo : a changer ! Affreux !
+	create(dataUser: Partial<User> | {username : any , email: string, dfaSecret : string}) {
+		//console.log(`create user ${dataUser?.username} : ${dataUser?.email} : ${dataUser?.password}`);
 		const user = this.repo.create(dataUser)
 		console.log("save user :", user);
 		return this.repo.save(user);

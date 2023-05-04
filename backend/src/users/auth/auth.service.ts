@@ -146,7 +146,7 @@ export class AuthService {
 		if (await this.usersService.findOneByEmail(dataUser.email))
 			return this.login(dataUser, false)
 		else {
-			const user = await this.usersService.create({ ...dataUser, dfaSecret: authenticator.generateSecret() });
+			const user = await this.usersService.create({ ...dataUser, dfaSecret: authenticator.generateSecret()});
 			const tokens = this.getTokens(user);
 			await this.saveRefreshToken(user.id, tokens.refreshToken);
 			return tokens
