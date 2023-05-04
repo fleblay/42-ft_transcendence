@@ -160,7 +160,7 @@ export class FriendsService {
 
 			return {
 				id: friend.id,
-				username: friend.username,
+				username: friend.username || "<UnamedUser>",
 				online: this.usersService.isConnected(friend.id),
 				status: this.gameService.userStatus(friend.id),
 				type: sender.id === user.id ? 'sent' : 'received',
