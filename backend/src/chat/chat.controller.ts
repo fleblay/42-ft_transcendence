@@ -83,7 +83,7 @@ export class ChatController {
 
 	// NOTE: A TESTER
 	@Get('channels/:id/members')
-	async getChannelMembers(@Param('id') id: string) {
+	async getChannelMembers(@Param('id') id: string) : Promise<Member[]>{
 		let members = await this.chatService.getChannelMembers(parseInt(id));
 		return members.map((member: Member) =>
 		({

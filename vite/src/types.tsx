@@ -142,10 +142,13 @@ export type Message = {
 }
 
 export type Member = {
-	id: string;
-	isConnected: boolean;
+	id: number;
 	role: string;
-	user: { id: string; username: string; };
+	user: { id: number, username: string; };
+	isConnected: boolean;
+	muteTime: string,
+	banned: boolean,
+	kicked: boolean
 };
 
 

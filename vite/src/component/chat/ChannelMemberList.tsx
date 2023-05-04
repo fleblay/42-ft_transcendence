@@ -5,20 +5,15 @@ import { Link as LinkRouter, useNavigate } from "react-router-dom";
 
 import { Channel, Member } from "../../types";
 
-
-
 export function MemberList({ channelId }: { channelId: string }) {
 	const [rows, setRows] = useState<Member[]>([]);
-	const [admin, setAdmin] = useState<Member[] | null>(null);
-	const [member, setMember] = useState<Member[] | null>(null);
-
-
-
+	const [admin, setAdmin] = useState<Member[]>([]);
+	const [member, setMember] = useState<Member[]>([]);
 
 	useEffect(() => {
-		apiClient.get(`/api/chat/channels/${channelId}/members`).then((response) => {
-			console.log("member", response.data);
-			setRows(response.data);
+		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({data}: {data: Member[]}) => {
+			console.log("member", data);
+			setRows(data);
 		}).catch((error) => {
 			console.log(error);
 		});
