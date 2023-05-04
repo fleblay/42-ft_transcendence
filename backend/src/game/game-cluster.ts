@@ -59,7 +59,7 @@ export class GameCluster {
 	}
 
 	listAllCurrent() {
-		const ar = []
+		const ar : string [] = []
 		this.gamesMap.forEach((game, gameId) => {
 			if (game.status === GameStatus.playing || game.status === GameStatus.start)
 				ar.push(JSON.stringify(gameId))
@@ -89,9 +89,9 @@ export class GameCluster {
 		return { states, gameIds }
 	}
 
-	private getClientFromSocketId(socketId: SocketId): Socket {
+	private getClientFromSocketId(socketId: SocketId): Socket | null {
 		const sockets = this.server.sockets.sockets;
-		return sockets.get(socketId);
+		return (sockets.get(socketId) || null);
 	}
 
 	/**
@@ -127,16 +127,17 @@ export class GameCluster {
 	playerQuit(gameId: UUID, userId: number): Game | null {
 		const game = this.gamesMap.get(gameId);
 
-		if (!game) return;
+		if (!game) return null;
 		//if (!game.players) return;
  
 		const player = game.players.find(player => player.user.id === userId);
 		const viewer = game.viewers.find(viewer => viewer.user.id === userId);
-		if (!(player || viewer) || (player && viewer)) {
+		const userToFind = player || viewer
+		if (!userToFind || (player && viewer)) {
 			console.error("playerQuit: player and viewer not found or both found");
 			return null;
 		}
-		const client = this.getClientFromSocketId(player?.clientId || viewer?.clientId);
+		const client = this.getClientFromSocketId(userToFind.clientId);
 
 		if (!client) {
 			console.warn("\x1b[31mMISSING CLIENT\x1b[0m")
