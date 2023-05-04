@@ -3,25 +3,28 @@ import { Message } from "../../types";
 import { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { SocketContext } from "../../socket/SocketProvider";
+import { ChatMsg } from "./ChatMessage";
+import { useAuthService } from "../../auth/AuthService";
 
 interface MessageAreaProps {
-    channelId: string;
+	channelId: string;
 }
 
 export function MessageArea({ channelId }: MessageAreaProps) {
+	const {user} = useAuthService()
 
-    const [messages, setMessages] = useState<Message[] | null>(null);
+	const [messages, setMessages] = useState<Message[]>([]);
 
 	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 
-    useEffect(() => {
-        apiClient.get(`/api/chat/channels/${channelId}/messages`).then(({data} : {data: Message[]}) => {
-            console.log(`channels/${channelId}/messages`, data);
-            setMessages(data);
-        }).catch((error) => {
-            console.log(error);
-        });
-    }, []);
+	useEffect(() => {
+		apiClient.get(`/api/chat/channels/${channelId}/messages`).then(({ data }: { data: Message[] }) => {
+			console.log(`channels/${channelId}/messages`, data);
+			setMessages(data);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}, [channelId]);
 
 	useEffect(() => {
 		return addSubscription(`/chat/${channelId}`);
@@ -31,7 +34,6 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		function onNewMessage(message: Message) {
 			console.log("onNewMessage", message);
 			setMessages((messages) => {
-				if (messages === null) return [message];
 				return [...messages, message];
 			});
 		}
@@ -42,25 +44,34 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		};
 	}, [messages])
 
-
-
-    return (
-        <List>
-            { messages && messages.map((message: Message) => {
-                return (
-                    <ListItem key={message.id}>
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <ListItemText primary={message.date}></ListItemText>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <ListItemText secondary={message.content}></ListItemText>
-                            </Grid>
-                        </Grid>
-                    </ListItem>
-                )
-            })}
-        </List>
-
-    );
+	// merge message in one array if it's the same user into array of array of message
+	return (
+		<List>
+			{
+				messages.reduce((acc: Message[][], message: Message) => {
+					if (acc.length === 0) {
+						return [[message]];
+					}
+					const lastMessage = acc[acc.length - 1][0];
+					if (lastMessage.owner.user.id === message.owner.user.id) {
+						acc[acc.length - 1].push(message);
+					} else {
+						acc.push([message]);
+					}
+					console.log(lastMessage.owner.user, message.owner.user);
+					return acc;
+				}, []).map((messages: Message[], i: number) => {
+					return (
+						<ChatMsg
+							key={i}
+							side={messages[0].id === user?.id ? 'right' : 'left'}
+							avatar={`/avatars/${messages[0].owner.user.id}.png`}
+							messages={messages.map((message) => message.content)}
+							username={messages[0].owner.user.username}
+						/>
+					);
+				})
+			}
+		</List>
+	)
 }

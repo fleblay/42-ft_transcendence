@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { Request } from "express";
 import * as multer from "multer";
 
 @Injectable()
@@ -9,10 +10,10 @@ export class FileSizeGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest() as Request;
 
-        const fileSizeBytes = request.headers.get("content-length") || Infinity ;
+        const fileSizeBytes = request.headers["content-length"] || Infinity;
         if (!fileSizeBytes) {
             return false;
         }
         return +fileSizeBytes <= this.MAX_FILE_SIZE_BYTES;
     }
-    }
+}

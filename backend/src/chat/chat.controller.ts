@@ -32,8 +32,8 @@ export class ChatController {
 	getAllPublic(): Promise<Channel[]> {
 		return this.chatService.getAllPublicChannels()
 	}
-	
-	// NOTE: A TESTER	
+
+	// NOTE: A TESTER
 	// to: /chat emit :chat.new.channel
 	@Post('channels/create')
 	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto): Promise<void> {
