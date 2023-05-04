@@ -41,7 +41,7 @@ export type Tokens = {
 
 export interface Login42User {
 	email: string;
-	username: string | null;
+	username?: string;
 	password: string
 	stud: boolean;
 }

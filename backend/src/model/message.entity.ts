@@ -17,7 +17,7 @@ export class Message {
 	createdAt: Date;
 
 	@Column({ nullable: true})
-	gameId: string;
+	gameId?: string;
 
 	@Column()
 	content: string;
