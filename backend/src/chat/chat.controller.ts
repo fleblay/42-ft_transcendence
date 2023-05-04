@@ -98,7 +98,14 @@ export class ChatController {
 	// to: /chat/${channelId} emit :chat.modify.members -> { playerId, username, role, isMuted, isBanned }
 	// john
 	@Post('channels/:id/members/:playerId')
-	async modifyMembers(@Param('id') id: string, @Param('playerId') playerId : string, @Body() body: ModifyMemberDto): Promise<void>  {
+	async modifyMembers(@CurrentUser() user: User, @Param('id') id: string, @Param('playerId') playerId : string, @Body() body: ModifyMemberDto): Promise<void>  {
+		const channelId = parseInt(id);
+		if (isNaN(channelId))
+			throw new BadRequestException('Invalid channel id');
+		const targetId = parseInt(playerId);
+		if (isNaN(targetId))
+			throw new BadRequestException('Invalid player id');
+		await this.chatService.modifyMembers(user, channelId, targetId, body);
 		return
 	}
 
@@ -112,7 +119,11 @@ export class ChatController {
 	//to: /chat/${channelId} emit :chat.modify.channel -> { name, hasPassword }
 	// john
 	@Post('channels/:id/info')
-	async modifyChannel(@Param('id') id: string, @Body() body: ChangeChannelDto) : Promise<void> {
+	async modifyChannel(@CurrentUser() user : User, @Param('id') id: string, @Body() body: ChangeChannelDto) : Promise<void> {
+		const channelId = parseInt(id);
+		if (isNaN(channelId))
+			throw new BadRequestException('Invalid channel id');
+		await this.chatService.modifyChannel(user, channelId, body);
 		return
 	}
 

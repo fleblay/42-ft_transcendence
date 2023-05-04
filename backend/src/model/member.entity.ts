@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "./channel.entity";
 import { Message } from "./message.entity";
 import { User } from "./user.entity";
@@ -32,4 +32,6 @@ export class Member {
 	@Column({ default: "regular" })
 	role: "owner" | "admin" | "regular"
 
+	@DeleteDateColumn()
+	deletedAt: Date;
 }
