@@ -9,6 +9,8 @@ import { Server } from 'socket.io'
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { User } from '../model/user.entity';
 import { NewMessageDto } from './dto/new-message.dto';
+import { ModifyMemberDto } from './dto/modify-member.dto';
+import { ChangeChannelDto } from './dto/change-channel.dto';
 
 
 
@@ -209,4 +211,100 @@ export class ChatService {
 			}
 		})
 	}
+
+	private checkModifyPermissions(requestingMember : Member, modifyMember : Member, options : ModifyMemberDto) {
+
+		if (requestingMember.role === 'regular')
+			throw new BadRequestException('You must be owner or admin to do this');
+		if (modifyMember.role === 'owner')
+			throw new BadRequestException('You can\'t modify owner');
+		if (modifyMember.role === 'admin' && requestingMember.role !== 'owner')
+			throw new BadRequestException('You can\'t modify admin, only owner can do this');
+		if (options.role && options.role === 'owner' && requestingMember.role !== 'owner')
+			throw new BadRequestException('You can\'t set owner, only owner can do this');
+	}
+
+
+	async modifyMembers(user: User, channelId: number, memberId: number, options: ModifyMemberDto) {
+
+		const requestingMember = await this.getMemberOfChannel(user, channelId);
+		if (!requestingMember)
+			throw new NotFoundException('Request member not found');
+		const channel = await this.channelsRepo.findOne({
+			where: { id: channelId },
+			relations: ['members'],
+			select: {
+				id: true,
+				members: {
+					id: true,
+					role: true,
+					banned: true,
+					kicked: true,
+					muteTime: true,
+					user: {
+						id: true,
+					}
+				}
+			}
+		});
+		if (!channel)
+			throw new NotFoundException('Channel not found');
+		const modifyMember = channel.members.find((member) => (member.id == memberId))
+		if (!modifyMember)
+			throw new NotFoundException('Member not found');
+		this.checkModifyPermissions(requestingMember, modifyMember, options);
+		if (options.role) {
+			if (modifyMember.role == options.role)
+				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.role}`)
+			modifyMember.role = options.role
+		}
+		if (options.ban) {
+			if (modifyMember.banned == options.ban)
+				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.ban ? 'banned' : 'unbanned'}}`)
+			modifyMember.banned = options.ban
+		}
+		if (options.kick) {
+			if (modifyMember.kicked == options.kick)
+				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.kick ? 'kicked' : 'unkicked'}`)
+			modifyMember.kicked = options.kick
+		}
+		if (options.mute) {
+			if (new Date(modifyMember.muteTime) > new Date(options.mute))
+				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.mute ? 'muted' : 'unmuted'}`)
+			modifyMember.muteTime = options.mute
+		}
+		await this.membersRepo.save(modifyMember)
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', { modifyMember });
+	}
+
+	async modifyChannel(user: User, channelId: number, changeChannelData: ChangeChannelDto) {
+		const requestingMember = await this.getMemberOfChannel(user, channelId);
+		if (!requestingMember)
+			throw new NotFoundException('Member not found, the channel may have been deleted');
+		this.memberHasRole(requestingMember, 'owner');
+		const channel = await this.channelsRepo.findOne({
+			where: { id: channelId },
+			select: {
+				id: true,
+				name: true,
+				password: true,
+				private: true,
+			}
+		});
+		if (!channel)
+			throw new NotFoundException('Channel not found');
+		if (changeChannelData.name && changeChannelData.name === channel.name)
+			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is already named ${changeChannelData.name}`)
+		if (changeChannelData.password && changeChannelData.password === channel.password)
+			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is already passworded ${changeChannelData.password}`)
+		if (changeChannelData.name)
+			channel.name = changeChannelData.name
+		if (changeChannelData.password)
+			channel.password = changeChannelData.password
+		await this.channelsRepo.save(channel)
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });
+	}
+
 }
+
+
