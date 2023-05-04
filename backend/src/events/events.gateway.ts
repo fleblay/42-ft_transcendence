@@ -87,7 +87,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		if (!foundUser)
 			return
 		console.log("New Connection User:", foundUser.username)
-		this.connectedSockets.push({ id: socket.id, username: foundUser.username, userId: foundUser.id, actions: ["connection"] })
+		this.connectedSockets.push({ id: socket.id, username: foundUser.username || "<UnamedUser>", userId: foundUser.id, actions: ["connection"] })
 		this.usersServices.addConnectedUser(foundUser.id)
 		this.server.to(`/player/${foundUser.id}`).emit('page.player', {
 			connected: true
@@ -201,7 +201,4 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		console.log("leave", data.unsubscibe)
 		client.leave(data.unsubscibe);
 	}
-
-
-
 }
