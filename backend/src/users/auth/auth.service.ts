@@ -151,7 +151,7 @@ export class AuthService {
 			await this.saveRefreshToken(user.id, tokens.refreshToken);
 			return tokens
 		}
-			
+
 	}
 
 	async validate42Code(code: string): Promise<Partial<Tokens>> {
@@ -194,7 +194,7 @@ export class AuthService {
 		console.log("Other keys", Object.keys(rest))
 
 		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
-		return await this.login42API({ stud: true, email, username: null, password: "42" })
+		return await this.login42API({ stud: true, email, password: "42" })
 	}
 
 	async saveRefreshToken(userId: number, refreshToken: string) {
