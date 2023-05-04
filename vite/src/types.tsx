@@ -134,21 +134,24 @@ export type Channel = {
 	password?: string
 }
 
+export type PlainMember = {
+	id: number;
+	role: string;
+	user: { id: number, username: string; };
+	muteTime: string,
+	banned: boolean,
+	kicked: boolean
+};
+
 export type Message = {
 	id: number,
-	owner: string,
+	owner: PlainMember,
 	content: string,
 	date: string,
 }
 
-export type Member = {
-	id: number;
-	role: string;
-	user: { id: number, username: string; };
+export type Member = PlainMember & {
 	isConnected: boolean;
-	muteTime: string,
-	banned: boolean,
-	kicked: boolean
 };
 
 

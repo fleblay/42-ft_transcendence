@@ -158,7 +158,7 @@ export class ChatService {
 				},
 			},
 			order: {
-				createdAt: 'DESC',
+				createdAt: 'ASC',
 			},
 			relations: {
 				owner: { user: true }
@@ -168,7 +168,7 @@ export class ChatService {
 				gameId: true,
 				content: true,
 				createdAt: true,
-				owner: { user: { id: true, username: true } },
+				owner: { user: { id: true, username: true }, role: true, banned: true, kicked: true, muteTime: true },
 			},
 		});
 		return messages;
