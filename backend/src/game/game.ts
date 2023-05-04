@@ -56,7 +56,7 @@ export type Player = {
 	paddleLength: number,
 	paddleWidth: number,
 	shoot: projectile,
-	amo: number,
+	ammo: number,
 	score: number,
 	user: User,
 	leaving: boolean,
@@ -104,7 +104,7 @@ export class Game {
 	public paddleLengthMin: number
 	public paddleReduce: number
 	public maxBounce: number
-	public startAmo: number
+	public startAmmo: number
 	public ballSpeed: number
 	public ballSize: number
 	public playerSpeed: number
@@ -135,7 +135,7 @@ export class Game {
 		//Change because paddleReduce can be set to 0
 		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 1
 		this.maxBounce = (options?.maxBounce !== undefined) ? options.maxBounce : 5
-		this.startAmo = (options?.startAmo !== undefined) ? options.startAmo : 3
+		this.startAmmo = (options?.startAmo !== undefined) ? options.startAmo : 3
 		this.liftEffect = (options?.liftEffect !== undefined) ? options.liftEffect : 1
 		this.ballSize = options?.ballSize || 5
 		this.playerSpeed = options?.playerSpeed || 3
@@ -170,7 +170,7 @@ export class Game {
 
 	applyPlayerInput(userId: User["id"], input: Partial<PlayerInput>) {
 		const foundPlayer = this.players.find(player => userId === player.user.id)
-		if (foundPlayer === null)
+		if (!foundPlayer)
 			return
 		if (input.move !== undefined) {
 			//console.log(`Input is ${input.move}`)
@@ -200,9 +200,9 @@ export class Game {
 					foundPlayer.timeLastMove = Date.now()
 					break
 				case ("Shoot"):
-					if (this.options?.shoot && foundPlayer.amo > 0 && !foundPlayer.shoot.active) {
+					if (this.options?.shoot && foundPlayer.ammo > 0 && !foundPlayer.shoot.active) {
 						foundPlayer.shoot.active = true
-						foundPlayer.amo--
+						foundPlayer.ammo--
 					}
 					break
 				default:
@@ -261,7 +261,7 @@ export class Game {
 				leaving: false,
 				clientId: client.id,
 				shoot: this.initShoot(this.players.length),
-				amo: this.options?.shoot && this.startAmo
+				ammo: this.options?.shoot ? this.startAmmo : 0
 			})
 			client.join(this.playerRoom)
 			if (this.players.length === 1) {

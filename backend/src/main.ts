@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as session from 'express-session';
+const session = require('express-session');
 import * as cookieParser from 'cookie-parser';
 
 // doc express-session: https://www.npmjs.com/package/express-session
