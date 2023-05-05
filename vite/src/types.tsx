@@ -132,6 +132,7 @@ export type Channel = {
 	name: string,
 	private: boolean,
 	hasPassword: boolean,
+	members: Member[],
 }
 
 export type PlainMember = {
@@ -148,6 +149,7 @@ export type Message = {
 	owner: PlainMember,
 	content: string,
 	date: string,
+	gameId: string,
 }
 
 export type Member = PlainMember & {

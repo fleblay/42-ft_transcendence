@@ -4,9 +4,12 @@ import cx from 'clsx';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
+import { Message } from '../../types';
+import { Button } from '@mui/material';
+import { Link as LinkRouter } from "react-router-dom";
 
 interface ChatMsgProps {
-	messages: string[];
+	messages: Message[];
 	side: 'left' | 'right';
 	avatar: string;
 	username: string;
@@ -38,37 +41,44 @@ export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username }) 
 						{username}
 					</Typography>
 				)}
-				{messages.map((msg: string, index: number) => {
+				{messages.map((msg: Message, index: number) => {
 					const borderStyle = side === 'left' ? {
-						borderTopLeftRadius: index === 0 ? 10 : 5,
-						borderBottomLeftRadius: index === messages.length - 1 ? 10 : 5,
+						borderTopLeftRadius: index === 0 ? 15 : 5,
+						borderBottomLeftRadius: index === messages.length - 1 ? 15 : 5,
 					} : {
-						borderTopRightRadius: index === 0 ? 10 : 5,
-						borderBottomRightRadius: index === messages.length - 1 ? 10 : 5,
+						borderTopRightRadius: index === 0 ? 15 : 5,
+						borderBottomRightRadius: index === messages.length - 1 ? 15 : 5,
 					};
 					return (
 						<div key={index}
 							style={{
 								backgroundColor: side === 'left' ? '#e0e0e0' : 'rgb(62, 74, 142)',
 								color: side === 'left' ? '#000' : '#fff',
-								borderRadius: 10,
+								borderRadius: 15,
 								padding: 10,
 								marginBottom: 5,
 								marginTop: 5,
 								maxWidth: '80%',
 								wordWrap: 'break-word',
-								textAlign: side === 'left' ? 'left' : 'right',
 								marginLeft: side === 'left' ? 0 : 'auto',
 								marginRight: side === 'left' ? 'auto' : 0,
 								...borderStyle
-
 							}}
 						>
-							<Typography
-								align={'left'}
-							>
-								{msg}
-							</Typography>
+							<>
+								<Typography
+									align={'left'}
+								>
+									{msg.content}
+								</Typography>
+								{msg.gameId &&
+									<Button
+										variant='contained'
+										color='success'
+										component={LinkRouter} to={`/game/${msg.gameId}`}
+									>Join Game</Button>
+								}
+							</>
 						</div>
 					)
 				})}

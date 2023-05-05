@@ -34,9 +34,10 @@ export class ChatService implements OnModuleInit {
 		if (!generalChannel) {
 			const channelId = await this.createChannel({ name: "general", private: false })
 			await this.joinChannel(adminUser, channelId, { owner: true })
-			this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
-			this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
-			this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
+			console.log("creating general channel", channelId)
+			await this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
+			await this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
+			await this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
 		}
 	}
 
@@ -110,7 +111,7 @@ export class ChatService implements OnModuleInit {
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is already in the channel`)
 			else {
 				member.left = false
-				this.membersRepo.save(member)
+				await this.membersRepo.save(member)
 				return
 			}
 		}
@@ -121,8 +122,8 @@ export class ChatService implements OnModuleInit {
 			role: (options?.owner) ? "owner" : "regular"
 		})
 		channel.members.push(joiner)
-		this.channelsRepo.save(channel)
-		this.membersRepo.save(joiner)
+		await this.channelsRepo.save(channel)
+		await this.membersRepo.save(joiner)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { id: joiner.user.id, username: joiner.user.username, role: joiner.role });
 	}
 
@@ -240,7 +241,7 @@ export class ChatService implements OnModuleInit {
 		})
 	}
 
-	private checkModifyPermissions(requestingMember : Member, modifyMember : Member, options : ModifyMemberDto) {
+	private checkModifyPermissions(requestingMember: Member, modifyMember: Member, options: ModifyMemberDto) {
 
 		if (requestingMember.role === 'regular')
 			throw new BadRequestException('You must be owner or admin to do this');
@@ -341,7 +342,7 @@ export class ChatService implements OnModuleInit {
 		await this.membersRepo.save(member);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { id: member.user.id });
 	}
-	
+
 	// TODO: return boolean hasPassword
 	getMyChannels(user: User): Promise<Channel[]> {
 		return this.channelsRepo.find({
@@ -353,7 +354,7 @@ export class ChatService implements OnModuleInit {
 					left: false,
 				},
 			},
-			relations: ['members'],
+			relations: ['members', 'members.user'],
 			select: {
 				id: true,
 				name: true,
@@ -361,6 +362,7 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
+					user: { id: true, username: true },
 				},
 			},
 		});

@@ -21,4 +21,7 @@ export class Channel {
 
 	@OneToMany(() => Member, member => member.channel)
 	members: Member[];
+
+	@Column({ default: false })
+	directMessage: boolean;
 }
