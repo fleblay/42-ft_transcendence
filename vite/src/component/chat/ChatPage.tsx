@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
 import { Channel } from '../../types'
 import ChatMenu from './ChatMenu';
-import ChannelBrowser from './ChannelBrowse';
+import {ChannelBrowser} from './ChannelBrowse';
 
 
 
