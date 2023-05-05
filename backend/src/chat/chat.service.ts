@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, forwardRef, BadRequestException, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { Member } from '../model/member.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,7 +15,7 @@ import { ChangeChannelDto } from './dto/change-channel.dto';
 
 
 @Injectable()
-export class ChatService {
+export class ChatService implements OnModuleInit {
 
 	private wsServer: Server;
 	constructor(
@@ -24,6 +24,21 @@ export class ChatService {
 		@InjectRepository(Message) private messagesRepo: Repository<Message>,
 		@Inject(forwardRef(() => UsersService)) private usersService: UsersService,
 	) { }
+
+	async onModuleInit() {
+		const adminUser = await this.usersService.findOneByUsername("admin")
+		if (!adminUser) {
+			return;
+		}
+		const generalChannel = await this.channelsRepo.findOne({ where: { name: "general" } })
+		if (!generalChannel) {
+			const channelId = await this.createChannel({ name: "general", private: false })
+			await this.joinChannel(adminUser, channelId, { owner: true })
+			this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
+			this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
+			this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
+		}
+	}
 
 	setWsServer(server: Server) {
 		this.wsServer = server;
