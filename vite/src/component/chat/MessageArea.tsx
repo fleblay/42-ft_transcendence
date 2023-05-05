@@ -6,6 +6,8 @@ import { SocketContext } from "../../socket/SocketProvider";
 import { ChatMsg } from "./ChatMessage";
 import { useAuthService } from "../../auth/AuthService";
 import SendIcon from '@mui/icons-material/Send';
+import SportsTennisIcon from '@mui/icons-material/SportsTennis';
+import { useNavigate } from "react-router-dom";
 
 interface MessageAreaProps {
 	channelId: string;
@@ -13,11 +15,13 @@ interface MessageAreaProps {
 
 export function MessageArea({ channelId }: MessageAreaProps) {
 	const { user } = useAuthService()
+	const { customEmit, customOn, customOff, addSubscription } = useContext(SocketContext);
+
+	const navigate = useNavigate();
 
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [messageToSend, setMessageToSend] = useState<string>("");
 
-	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/messages`).then(({ data }: { data: Message[] }) => {
@@ -51,14 +55,28 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 	};
 
 	const sendMessage = () => {
-		console.log("messageToSend", messageToSend);
+		if (messageToSend.trim().length === 0) return;
 		apiClient.post(`/api/chat/channels/${channelId}/messages`, { content: messageToSend }).then((response) => {
-			console.log(`send message to ${channelId}`, response);
 			setMessageToSend("");
 		}).catch((error) => {
 			console.log(error);
 		});
 	};
+
+	const sendGameMessage = async () => {
+		let message = "Let's play a game of pong!"
+		if (messageToSend.trim().length !== 0)
+			message = messageToSend;
+
+		customEmit('game.create', { }, (gameId: string) => {
+			apiClient.post(`/api/chat/channels/${channelId}/messages`, { content: message, gameId }).then((response) => {
+				setMessageToSend("");
+			}).catch((error) => {
+				console.log(error);
+			});
+			navigate(`/game/${gameId}`);
+		});
+	}
 
 	return (
 		<>
@@ -81,7 +99,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 								key={i}
 								side={messages[0].owner.user.id === user?.id ? 'right' : 'left'}
 								avatar={`/avatars/${messages[0].owner.user.id}.png`}
-								messages={messages.map((message) => message.content)}
+								messages={messages}
 								username={messages[0].owner.user.username}
 							/>
 						);
@@ -96,17 +114,17 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 					'& > :not(style)': { m: 1 },
 				}}
 			>
-					<TextField id="outlined-basic-email" label="Type Something" value={messageToSend} onChange={handleOnChange}
-						onKeyDown={(ev) => {
-							if (ev.key === 'Enter') {
-								ev.preventDefault();
-								sendMessage();
-							}
-						}}
-					/>
-					<Button variant="contained" onClick={sendMessage} endIcon={<SendIcon />}>Send</Button>
+				<TextField id="outlined-basic-email" label="Type Something" value={messageToSend} onChange={handleOnChange} fullWidth
+					onKeyDown={(ev) => {
+						if (ev.key === 'Enter') {
+							ev.preventDefault();
+							sendMessage();
+						}
+					}}
+				/>
+				<Button variant="contained" onClick={sendGameMessage}><SportsTennisIcon /></Button>
+				<Button variant="contained" onClick={sendMessage}><SendIcon /></Button>
 			</Box>
 		</>
-
 	)
 }

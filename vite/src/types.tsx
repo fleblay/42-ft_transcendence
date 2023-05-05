@@ -149,6 +149,7 @@ export type Message = {
 	owner: PlainMember,
 	content: string,
 	date: string,
+	gameId: string,
 }
 
 export type Member = PlainMember & {
