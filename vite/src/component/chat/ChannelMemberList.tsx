@@ -5,6 +5,7 @@ import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { Channel, Member } from "../../types";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { useAuthService } from '../../auth/AuthService'
 
 type memberList = {
 	admins: Member[],
@@ -20,7 +21,9 @@ const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regular
 
 
 export function MemberList({ channelId }: { channelId: string }) {
+	const auth = useAuthService()
 	const [memberList, setMemberList] = useState<memberList>(emptyMemberList);
+	const me = React.useRef<Member | null>(null)
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
@@ -37,6 +40,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 					&& !newMemberList.muted.includes(member))
 			})
 			setMemberList(newMemberList)
+			if (auth.user)
+				me.current = data.find((member) => member.user.id == auth.user!.id) || null
+			console.log("Je suis : ", me.current)
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -46,6 +52,25 @@ export function MemberList({ channelId }: { channelId: string }) {
 		const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 		const open = Boolean(anchorEl);
 		const navigate = useNavigate()
+		const [myRights, setMyRights] = React.useState<string[]>([]);
+
+		useEffect(() => {
+			if (!me.current)
+				return
+			switch (me.current.role) {
+				case "regular":
+					setMyRights([""])
+					break
+				case "owner":
+					setMyRights(["ban", "kick", "mute", "change"])
+					break
+				case "admin":
+					member.role == "regular" && setMyRights(["ban", "kick", "mute"])
+					member.role == "admin" && setMyRights(["ban", "kick", "mute"])
+					member.role == "owner" && setMyRights([""])
+					break
+			}
+		}, [me.current])
 
 		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 			setAnchorEl(event.currentTarget);
@@ -98,10 +123,10 @@ export function MemberList({ channelId }: { channelId: string }) {
 						'aria-labelledby': 'basic-button',
 					}}
 				>
-					<MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role`}</MenuItem>
-					<MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>
-					<MenuItem onClick={handleClickBan}>{`Ban ${member.user.username}`}</MenuItem>
-					<MenuItem onClick={handleClickMute}>{`Mute ${member.user.username}`}</MenuItem>
+					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role`}</MenuItem>}
+					{myRights.includes("kick") && <MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>}
+					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`Ban ${member.user.username}`}</MenuItem>}
+					{myRights.includes("mute") && <MenuItem onClick={handleClickMute}>{`Mute ${member.user.username}`}</MenuItem>}
 					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
 				</Menu>
 			</div>
@@ -127,7 +152,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 							<Avatar alt="User Photo" src={`/avatars/${member.id}.png`} />
 						</Badge>
 						<ListItemText primary={member.user.username} />
-						<GenerateMemberActionList member={member}/>
+						<GenerateMemberActionList member={member} />
 					</ListItem>
 				)
 				)}
