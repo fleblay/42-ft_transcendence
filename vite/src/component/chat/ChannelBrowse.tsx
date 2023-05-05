@@ -1,9 +1,10 @@
-import { Avatar, AvatarGroup, Badge, List, ListItem, ListItemButton, ListItemText } from "@mui/material"
+import { Button, List, ListItem, ListItemText, Theme } from "@mui/material"
 import { FC, useContext, useEffect, useState } from "react"
-import { Channel, Member } from "../../types"
+import { Channel } from "../../types"
 import { useNavigate } from "react-router-dom"
 import apiClient from "../../auth/interceptor.axios"
 import { SocketContext } from "../../socket/SocketProvider"
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 interface ChannelMap { [id: number]: Channel };
 
@@ -16,6 +17,7 @@ export const ChannelBrowser: FC = () => {
 	useEffect(() => {
 		return addSubscription(`/chat/public`);
 	}, []);
+
 
 
 	useEffect(() => {
@@ -45,13 +47,10 @@ export const ChannelBrowser: FC = () => {
 		});
 	}, []);
 
-
-	const moveToChannel = (channelId: number) => {
-		navigate(`/chat/${channelId}`);
-	}
 	const joinChannel = (channelId: number) => {
 		apiClient.post(`/api/chat/channels/${channelId}/join`).then((response) => {
 			console.log("joinChannel", response);
+			navigate(`/chat/${channelId}`);
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -59,19 +58,35 @@ export const ChannelBrowser: FC = () => {
 
 	return (
 		<List>
-			{Object.values(publicChannels).map((channel: Channel) => (
-				<ListItem key={channel.id} sx={{ pl: 4 }}>
-					<ListItemButton onClick={() => moveToChannel(channel.id)}>
-						<Badge badgeContent={0} color="primary">
-							<ListItemText primary={channel.name} />
-						</Badge>
-						<AvatarGroup sx={{ ml: 'auto' }} total={channel.members?.length}>
-							{channel?.members?.map((member: Member) => (
-								<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
-							))}
-						</AvatarGroup>
-					</ListItemButton>
-					<ListItemButton onClick={() => joinChannel(channel.id)}>Join</ListItemButton>
+			{Object.values(publicChannels).map((channel: Channel, index, array) => (
+				<ListItem key={channel.id} sx={{
+					paddingTop: 0,
+					paddingBottom: 0,
+					'&:hover': {
+						bgcolor: (theme: Theme) => theme.palette.grey[200],
+						'> button': {
+							visibility: 'visible'
+						}
+					},
+					borderBottom: array.length - 1 === index ? 1 : 0,
+					borderTop: 1,
+					borderColor: (theme: Theme) => theme.palette.grey[300],
+					'> button': {
+						visibility: 'hidden'
+					}
+				}}>
+					{channel.hasPassword &&
+						<LockOutlinedIcon
+							sx={{
+								color: (theme: Theme) => theme.palette.grey[500],
+								marginRight: 1
+							}}
+						/>}
+					<ListItemText
+						primary={channel.name}
+						secondary={`${channel.members?.length} members`}
+					/>
+					<Button onClick={() => joinChannel(channel.id)} variant='contained' color='success'>Join</Button>
 				</ListItem>
 			))}
 		</List>
