@@ -40,14 +40,19 @@ export function MyChannelsList() {
 
 	return (
 		<nav aria-label="secondary mailbox folders">
-			<List component="div" disablePadding>
+			<List component="div" disablePadding   sx={{
+        width: '100%',
+        position: 'relative',
+        overflow: 'auto',
+        maxHeight: 300,
+      }}>
 				{MyChannelsList?.map((channel: Channel) => (
 					<ListItem key={channel.id} sx={{ pl: 4 }} >
 						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
 							<Badge badgeContent={0} color="primary">
 							<ListItemText primary={channel.name} />
 							</Badge>
-							<AvatarGroup sx={{ml :'auto'}} total={channel.members.length}>
+							<AvatarGroup sx={{ml :'auto'}} total={channel.members?.length}>
 								{channel?.members?.map((member: Member) => (
 									<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
 								))}

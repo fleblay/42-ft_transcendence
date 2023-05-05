@@ -87,7 +87,7 @@ export function ChatPage() {
 	return (
 		<>
 
-			<Container maxWidth="xl">
+			<Container maxWidth="xl" sx={{maxHeight: '100px', minHeight: '100px'}}>
 				<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 						Chat
@@ -100,6 +100,8 @@ export function ChatPage() {
 					borderRadius: '0 0 16px 16px',
 					p: '2rem',
 					bgcolor: 'background.paper',
+					maxHeight: 'calc(100vh - 80px)',
+					overflowY: 'scroll'
 				}}>
 
 
