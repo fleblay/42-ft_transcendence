@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { Channel, Member } from "../../types";
@@ -42,12 +42,78 @@ export function MemberList({ channelId }: { channelId: string }) {
 		});
 	}, [channelId]);
 
+	function GenerateMemberActionList({ member }: { member: Member }): JSX.Element {
+		const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+		const open = Boolean(anchorEl);
+		const navigate = useNavigate()
+
+		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+			setAnchorEl(event.currentTarget);
+		};
+
+		const handleClose = () => {
+			setAnchorEl(null);
+		};
+
+		const handleClickProfile = () => {
+			navigate(`/player/${member.id}`);
+		};
+
+		const handleClickKick = () => {
+			setAnchorEl(null);
+		};
+
+		const handleClickBan = () => {
+			setAnchorEl(null);
+		};
+
+		const handleClickMute = () => {
+			setAnchorEl(null);
+		};
+
+		const handleClickChangeRole = () => {
+			setAnchorEl(null);
+		};
+
+		return (
+			<div>
+				<Button
+					id="basic-button"
+					aria-controls={open ? 'basic-menu' : undefined}
+					aria-haspopup="true"
+					aria-expanded={open ? 'true' : undefined}
+					onClick={handleClick}
+				>
+					<ListItemIcon>
+						<MoreHorizIcon />
+					</ListItemIcon>
+				</Button>
+
+				<Menu
+					id="basic-menu"
+					anchorEl={anchorEl}
+					open={open}
+					onClose={handleClose}
+					MenuListProps={{
+						'aria-labelledby': 'basic-button',
+					}}
+				>
+					<MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role`}</MenuItem>
+					<MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>
+					<MenuItem onClick={handleClickBan}>{`Ban ${member.user.username}`}</MenuItem>
+					<MenuItem onClick={handleClickMute}>{`Mute ${member.user.username}`}</MenuItem>
+					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
+				</Menu>
+			</div>
+		);
+	}
+
 	function GenerateMemberGroup({ groupname, groupMembers }: { groupname: string, groupMembers: Member[] }): JSX.Element {
 		return (<>
-			<Typography variant="h6" component="div" gutterBottom>{groupname}</Typography>
+			<Typography variant="h5" component="div" gutterBottom>{groupname}</Typography>
 			<List>
 				{groupMembers.map((member) => (
-					<ListItem key={member.id}>
+					<ListItem key={member.id} alignItems="flex-start">
 						<Badge
 							overlap="circular"
 							anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -61,11 +127,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 							<Avatar alt="User Photo" src={`/avatars/${member.id}.png`} />
 						</Badge>
 						<ListItemText primary={member.user.username} />
-						<ListItemButton >
-							<ListItemIcon>
-								<MoreHorizIcon />
-							</ListItemIcon>
-						</ListItemButton>
+						<GenerateMemberActionList member={member}/>
 					</ListItem>
 				)
 				)}
