@@ -34,9 +34,10 @@ export class ChatService implements OnModuleInit {
 		if (!generalChannel) {
 			const channelId = await this.createChannel({ name: "general", private: false })
 			await this.joinChannel(adminUser, channelId, { owner: true })
-			this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
-			this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
-			this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
+			console.log("creating general channel", channelId)
+			await this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
+			await this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
+			await this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
 		}
 	}
 
@@ -353,7 +354,7 @@ export class ChatService implements OnModuleInit {
 					left: false,
 				},
 			},
-			relations: ['members'],
+			relations: ['members', 'members.user'],
 			select: {
 				id: true,
 				name: true,
@@ -361,6 +362,7 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
+					user: { id: true, username: true },
 				},
 			},
 		});
