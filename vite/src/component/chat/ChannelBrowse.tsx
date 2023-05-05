@@ -75,19 +75,15 @@ export const ChannelBrowser: FC = () => {
 						visibility: 'hidden'
 					}
 				}}>
+					{channel.hasPassword &&
+						<LockOutlinedIcon
+							sx={{
+								color: (theme: Theme) => theme.palette.grey[500],
+								marginRight: 1
+							}}
+						/>}
 					<ListItemText
-						primary={
-							<>
-								{channel.hasPassword &&
-									<LockOutlinedIcon
-										sx={{
-											transform: 'scale(0.9) translateY(25%)',
-											color: (theme: Theme) => theme.palette.grey[500]
-										}}
-									/>}
-								{channel.name}
-							</>
-						}
+						primary={channel.name}
 						secondary={`${channel.members?.length} members`}
 					/>
 					<Button onClick={() => joinChannel(channel.id)} variant='contained' color='success'>Join</Button>
