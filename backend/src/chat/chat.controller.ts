@@ -29,14 +29,22 @@ export class ChatController {
 	// Return all channels public and protected
 // NOTE: A TESTER
 	@Get('/channels/public')
-	getAllPublic(): Promise<Channel[]> {
-		return this.chatService.getAllPublicChannels()
+	async getAllPublic() {
+		const publicChannels = await this.chatService.getAllPublicChannels()
+		return publicChannels.map((channel: Channel) => ({
+			...channel,
+			password: undefined,
+			hasPassword: channel.password.length !== 0
+		}));
 	}
 
 	@Get('/channels/my')
-	async getMyChannels(@CurrentUser() user: User): Promise<Channel[]> {
+	async getMyChannels(@CurrentUser() user: User){
 		const channels = await this.chatService.getMyChannels(user);
-		return channels;
+		return channels.map((channel: Channel) => ({
+			...channel,
+			password: undefined,
+			hasPassword: channel.password.length !== 0}));
 	}
 
 
