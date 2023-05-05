@@ -166,7 +166,7 @@ export function MenuBar() {
 							<IconButton sx={{ paddingTop: 0, paddingBottom: 0 }}>
 								<Avatar alt={auth.user?.username} src={imgPath} />
 							</IconButton>
-							my profil
+							{auth.user?.username}
 						</Button>
 						<Menu
 							sx={{ mt: '45px' }}
