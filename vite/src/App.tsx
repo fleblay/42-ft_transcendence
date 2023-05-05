@@ -8,7 +8,7 @@ import { ListUsers } from './component/ListUsers'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { SocketContext, SocketProvider } from './socket/SocketProvider'
-import { MuiAppBar } from './component/menu'
+import { MenuBar } from './component/Menu'
 import { ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
 import { UsernameDialog } from './component/UsernameDialog'
@@ -163,7 +163,7 @@ function App() {
 		<AuthService>
 			<SocketProvider>
 				<RequireAuth>
-					<MuiAppBar />
+					<MenuBar />
 				</RequireAuth>
 
 				<Routes>

@@ -1,4 +1,4 @@
-import { Box, Button, Grid, List, ListItem, ListItemText, TextField, makeStyles } from "@mui/material";
+import { Box, Button, Divider, Grid, List, ListItem, ListItemText, TextField, makeStyles } from "@mui/material";
 import { Message } from "../../types";
 import { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
@@ -80,7 +80,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 
 	return (
 		<>
-			<List>
+			<List sx={{ height: '50vh', overflow: 'auto' }}>
 				{
 					messages.reduce((acc: Message[][], message: Message) => {
 						if (acc.length === 0) {
@@ -106,6 +106,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 					})
 				}
 			</List>
+			<Divider />
 			<Box
 				sx={{
 					width: '100%',
