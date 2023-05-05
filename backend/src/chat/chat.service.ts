@@ -59,7 +59,7 @@ export class ChatService {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, members: { role: true, banned: true, kicked: true, user: { id: true } } }
+			select: { id: true, private: true, members: { role: true, banned: true, left: true, user: { id: true } } }
 		})
 		if (!channel)
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
@@ -79,10 +79,10 @@ export class ChatService {
 		if (member) {
 			if (member.banned)
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is banned from the channel`)
-			if (!member.kicked)
+			if (!member.left)
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is already in the channel`)
 			else {
-				member.kicked = false
+				member.left = false
 				this.membersRepo.save(member)
 				return
 			}
@@ -105,7 +105,7 @@ export class ChatService {
 				id: true,
 				role: true,
 				banned: true,
-				kicked: true,
+				left: true,
 				muteTime: true,
 				channel: {
 					id: true,
@@ -117,10 +117,10 @@ export class ChatService {
 			},
 		});
 	}
-	private memberIsAllowed(member: Member, ignore: { banned?: boolean, kicked?: boolean, mute?: boolean } = {}): boolean {
+	private memberIsAllowed(member: Member, ignore: { banned?: boolean, left?: boolean, mute?: boolean } = {}): boolean {
 		if (ignore.banned !== true && member.banned)
 			throw new BadRequestException('You are banned from this channel');
-		if (ignore.kicked !== true && member.kicked)
+		if (ignore.left !== true && member.left)
 			throw new BadRequestException('You are kicked from this channel');
 		if (ignore.mute !== true && member.muteTime && new Date(member.muteTime) > new Date())
 			throw new BadRequestException('You are muted from this channel');
@@ -170,7 +170,7 @@ export class ChatService {
 				gameId: true,
 				content: true,
 				createdAt: true,
-				owner: { user: { id: true, username: true }, role: true, banned: true, kicked: true, muteTime: true },
+				owner: { user: { id: true, username: true }, role: true, banned: true, left: true, muteTime: true },
 			},
 		});
 		return messages;
@@ -239,7 +239,7 @@ export class ChatService {
 					id: true,
 					role: true,
 					banned: true,
-					kicked: true,
+					left: true,
 					muteTime: true,
 					user: {
 						id: true,
@@ -264,9 +264,9 @@ export class ChatService {
 			modifyMember.banned = options.ban
 		}
 		if (options.kick) {
-			if (modifyMember.kicked == options.kick)
+			if (modifyMember.left == options.kick)
 				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.kick ? 'kicked' : 'unkicked'}`)
-			modifyMember.kicked = options.kick
+			modifyMember.left = options.kick
 		}
 		if (options.mute) {
 			if (new Date(modifyMember.muteTime) > new Date(options.mute))
@@ -303,6 +303,15 @@ export class ChatService {
 			channel.password = changeChannelData.password
 		await this.channelsRepo.save(channel)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });
+	}
+
+	async leaveChannel(user: User, channelId: number) {
+		const member = await this.getMemberOfChannel(user, channelId);
+		if (!member)
+			throw new NotFoundException('Member not found, the channel may have been deleted');
+		member.left = true;
+		await this.membersRepo.save(member);
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { id: member.user.id });
 	}
 
 }

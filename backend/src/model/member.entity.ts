@@ -27,7 +27,7 @@ export class Member {
 	banned: boolean;
 
 	@Column({ default: false })
-	kicked: boolean;
+	left: boolean;
 
 	@Column({ default: "regular" })
 	role: "owner" | "admin" | "regular"

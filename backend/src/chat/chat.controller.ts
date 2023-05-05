@@ -113,7 +113,7 @@ export class ChatController {
 	// john
 	@Post('channels/:id/leave')
 	async leaveChannel(@CurrentUser() user: User, @Param('id') id: string): Promise<void> {
-		return
+		this.chatService.leaveChannel(user, parseInt(id));
 	}
 
 	//to: /chat/${channelId} emit :chat.modify.channel -> { name, hasPassword }
@@ -124,7 +124,6 @@ export class ChatController {
 		if (isNaN(channelId))
 			throw new BadRequestException('Invalid channel id');
 		await this.chatService.modifyChannel(user, channelId, body);
-		return
 	}
 
 
