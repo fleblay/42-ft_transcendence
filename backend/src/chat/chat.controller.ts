@@ -33,6 +33,13 @@ export class ChatController {
 		return this.chatService.getAllPublicChannels()
 	}
 
+	@Get('/channels/my')
+	async getMyChannels(@CurrentUser() user: User): Promise<Channel[]> {
+		const channels = await this.chatService.getMyChannels(user);
+		return channels;
+	}
+
+
 	// NOTE: A TESTER
 	// to: /chat emit :chat.new.channel
 	@Post('channels/create')
@@ -125,6 +132,7 @@ export class ChatController {
 			throw new BadRequestException('Invalid channel id');
 		await this.chatService.modifyChannel(user, channelId, body);
 	}
+
 
 
 }

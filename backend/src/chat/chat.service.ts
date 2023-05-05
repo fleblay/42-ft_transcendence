@@ -334,6 +334,28 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { id: member.user.id });
 	}
 
+	async getMyChannels(user: User): Promise<Channel[]> {
+		return await this.channelsRepo.find({
+			where: {
+				members: {
+					user: {
+						id: user.id,
+					},
+				},
+			},
+			relations: ['members'],
+			select: {
+				id: true,
+				name: true,
+				private: true,
+				password: true,
+				members: {
+					id: true,
+				},
+			},
+		});
+	}
+
 }
 
 
