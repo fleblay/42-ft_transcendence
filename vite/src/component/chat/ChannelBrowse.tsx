@@ -40,7 +40,7 @@ export const ChannelBrowser: FC = () => {
 	}, [publicChannels])
 
 	useEffect(() => {
-		apiClient.get(`/api/chat/channels/my`).then((response) => {
+		apiClient.get(`/api/chat/channels/public`).then((response) => {
 
 			let result: ChannelMap = response.data.reduce((map: ChannelMap, obj: Channel) => {
 				map[obj.id] = obj;
