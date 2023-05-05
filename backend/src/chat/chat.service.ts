@@ -54,6 +54,11 @@ export class ChatService implements OnModuleInit {
 			where: {
 				private: false
 			},
+			relations: {
+				members: {
+					user: true
+				}
+			},
 			select: {
 				id: true,
 				name: true,
