@@ -6,7 +6,6 @@ import { MessageArea } from './MessageArea';
 import { SocketContext } from '../../socket/SocketProvider';
 import { useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
-import SendIcon from '@mui/icons-material/Send';
 import { Channel } from '../../types'
 
 
@@ -14,14 +13,8 @@ import { Channel } from '../../types'
 export function ChatPage() {
 
 	const [channels, setChannels] = useState<Channel[]>([]);
-	const [messageToSend, setMessageToSend] = useState<string>("");
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
-
-
-	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setMessageToSend(event.target.value);
-	};
 
 	useEffect(() => {
 		console.log('changing chat', channelId)
@@ -68,16 +61,6 @@ export function ChatPage() {
 		);
 	}
 
-	const sendMessage = () => {
-		console.log("messageToSend", messageToSend);
-		apiClient.post(`/api/chat/channels/${channels[0].id}/messages`, { content: messageToSend }).then((response) => {
-			console.log(`send message to ${channels[0].id}`, response);
-			setMessageToSend("");
-		}).catch((error) => {
-			console.log(error);
-		});
-	};
-
 	const MyChannels = () => {
 		return (
 			<>
@@ -108,20 +91,6 @@ export function ChatPage() {
 				<Grid container spacing={3} sx={{ mt: "20px" }}>
 					<Grid item xs={2}>
 					</Grid>
-					<Grid item xs={8}>
-						<TextField id="outlined-basic-email" label="Type Something" value={messageToSend} onChange={handleOnChange} fullWidth
-							onKeyDown={(ev) => {
-								if (ev.key === 'Enter') {
-									ev.preventDefault();
-									sendMessage();
-								}
-							}}
-						/>
-					</Grid>
-					<Grid item xs={2}>
-						<Button variant="contained" onClick={sendMessage} endIcon={<SendIcon />}>Send</Button>
-
-					</Grid>	
 				</Grid>
 			</>
 		)

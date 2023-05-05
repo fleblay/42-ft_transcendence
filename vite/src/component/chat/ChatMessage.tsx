@@ -13,7 +13,6 @@ interface ChatMsgProps {
 }
 
 export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username }) => {
-	console.log(side)
 	return (
 		<Grid
 			container
