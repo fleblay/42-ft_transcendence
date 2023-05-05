@@ -135,7 +135,7 @@ export class AuthService {
 
 		dataUser.password = await this.hashPassword(dataUser.password);
 
-		const user = await this.usersService.create({ ...dataUser, dfaSecret: authenticator.generateSecret() });
+		const user = await this.usersService.create(dataUser);
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refreshToken);
 		// console.log(`tokens are access [${tokens accessToken}], refresh [${tokens.refresh_token}]`);
@@ -146,7 +146,7 @@ export class AuthService {
 		if (await this.usersService.findOneByEmail(dataUser.email))
 			return this.login(dataUser, false)
 		else {
-			const user = await this.usersService.create({ ...dataUser, dfaSecret: authenticator.generateSecret()});
+			const user = await this.usersService.create(dataUser);
 			const tokens = this.getTokens(user);
 			await this.saveRefreshToken(user.id, tokens.refreshToken);
 			return tokens

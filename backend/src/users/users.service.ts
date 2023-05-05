@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../model/user.entity'
@@ -12,11 +12,12 @@ import { Inject } from '@nestjs/common';
 import { Server } from 'socket.io'
 import { FriendsService } from '../friends/friends.service';
 import { ChatService } from '../chat/chat.service';
+import { authenticator } from 'otplib';
 
 
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
 
 	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
 	private server : Server;
@@ -33,10 +34,21 @@ export class UsersService {
 		this.server = server;
 	}
 
+	async onModuleInit() {
+		const adminUser = await this.repo.findOne({ where: { username: "admin" } })
+		if (!adminUser) {
+			console.log("creating admin user")
+			const admin = this.create({
+				username: "admin",
+				email: "admin@42.fr",
+				password: process.env.RANDOM_NUMBER1,
+			})
+		}
+	}
 
 	create(dataUser: Partial<User>) {
 		//console.log(`create user ${dataUser?.username} : ${dataUser?.email} : ${dataUser?.password}`);
-		const user = this.repo.create(dataUser)
+		const user = this.repo.create({ ...dataUser, dfaSecret: authenticator.generateSecret()})
 		console.log("save user :", user);
 		return this.repo.save(user);
 	}
