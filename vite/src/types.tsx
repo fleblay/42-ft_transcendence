@@ -142,7 +142,7 @@ export type PlainMember = {
 	user: { id: number, username: string; };
 	muteTime: string,
 	banned: boolean,
-	kicked: boolean
+	left: boolean
 };
 
 export type Message = {

@@ -39,7 +39,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 			newMemberList.regulars = data.filter((member) => {
 				return (!newMemberList.admins.includes(member)
 					&& !newMemberList.banned.includes(member)
-					&& !newMemberList.muted.includes(member))
+					&& !newMemberList.muted.includes(member)
+					&& !member.left)
 			})
 			setMemberList(newMemberList)
 			if (auth.user)
