@@ -9,7 +9,7 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 
 import Menu, { MenuProps } from '@mui/material/Menu';
@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../auth/interceptor.axios';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { MyChannelsList } from './ChannelsList';
+
 
 export function BasicMenu() {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -143,12 +144,13 @@ export default function ChatMenu() {
 				{roomsMenu ? <ExpandLess /> : <ExpandMore />}
 			</ListItemButton>
 			<Collapse in={roomsMenu} timeout="auto">
-				<MyChannelsList/>
+
+						<MyChannelsList/>
 			</Collapse>
 
 			<ListItemButton onClick={() => setFriendMenu(!friendMenu)}>
 				<ListItemIcon>
-					<PeopleAltOutlinedIcon/>
+					<PeopleAltOutlinedIcon />
 				</ListItemIcon>
 				<ListItemText primary="Friends" />
 				{friendMenu ? <ExpandLess /> : <ExpandMore />}
