@@ -9,6 +9,15 @@ import Box from '@mui/material/Box';
 import { Channel, UserInfo } from "../../types";
 import { useAuthService } from "../../auth/AuthService";
 
+const joinChannel = (channelId: number) => {
+	apiClient.post(`/api/chat/channels/${channelId}/join`).then((response) => {
+		console.log("joinChannel", response);
+	}).catch((error) => {
+		console.log(error);
+	});
+}
+
+
 
 
 export function MyChannelsList({ channels }: { channels: Channel[] }) {
@@ -28,6 +37,7 @@ export function MyChannelsList({ channels }: { channels: Channel[] }) {
 						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
 							<ListItemText primary={channel.name} />
 						</ListItemButton>
+						<ListItemButton onClick={() => { joinChannel(channel.id); mooveToChannel(channel.id) }}>Join</ListItemButton>
 					</ListItem>
 				)
 				)}
@@ -47,15 +57,6 @@ export function ChannelsListDebug({ channels }: { channels: Channel[] }) {
 			password: channel.password,
 		}
 	});
-	const joinChannel = (channelId: number) => {
-	
-		apiClient.post(`/api/chat/channels/${channelId}/join`).then((response) => {
-			console.log("response", response);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
 
 
 	return (

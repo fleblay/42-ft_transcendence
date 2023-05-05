@@ -12,7 +12,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({data}: {data: Member[]}) => {
-			console.log("member", data);
+			console.log("memberlist fetched : ", data);
 			setRows(data);
 		}).catch((error) => {
 			console.log(error);
@@ -20,12 +20,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 	}, [channelId]);
 
 	useEffect(() => {
-		setAdmin(rows.filter((row) => row.role === "admin" || row.role === "owner") || null);
-		setMember(rows.filter((row) => row.role === "regular") || null);
+		setAdmin(rows.filter((row) => row.role === "admin" || row.role === "owner"));
+		setMember(rows.filter((row) => row.role === "regular"));
 	}, [rows]);
-
-
-
 
 	return (
 		<nav aria-label="secondary mailbox folders">

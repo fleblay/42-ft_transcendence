@@ -73,10 +73,15 @@ export class ChatService {
 			addedUser = await this.usersService.findOneByUsername(options.targetUser)
 			if (!addedUser)
 				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
+			console.log("There is a target User", addedUser)
 		}
 
+		console.log("channel Members:", channel.members)
+		console.log("channel :", channel)
 		const member = channel.members.find((member) => (member.user.id == addedUser!.id))
+		console.log("Member searched in channel:", member)
 		if (member) {
+			console.log("Member found", member)
 			if (member.banned)
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is banned from the channel`)
 			if (!member.kicked)
@@ -87,7 +92,7 @@ export class ChatService {
 				return
 			}
 		}
-
+		console.log("Member not found :",member, "adding user :", addedUser)
 		const joiner: Member = await this.membersRepo.save({
 			user: addedUser,
 			channel,
