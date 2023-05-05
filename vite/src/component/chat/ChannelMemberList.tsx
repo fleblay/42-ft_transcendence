@@ -14,6 +14,7 @@ type memberList = {
 
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
+
 export function MemberList({ channelId }: { channelId: string }) {
 	const [memberList, setMemberList] = useState<memberList>(emptyMemberList);
 
@@ -37,41 +38,34 @@ export function MemberList({ channelId }: { channelId: string }) {
 		});
 	}, [channelId]);
 
+	function GenerateMemberGroup({ groupname, groupMembers }: { groupname: string, groupMembers: Member[] }): JSX.Element {
+		return (<>
+			<Typography variant="h6" component="div" gutterBottom>{groupname}</Typography>
+			<List>
+				{groupMembers.map((member) => (
+					<ListItem key={member.id} disablePadding alignItems="flex-start">
+						<ListItemAvatar>
+							<Avatar alt={member.user.username} src={`/avatars/${member.id}.png`} style={{ width: '15px', height: '15px' }} />
+						</ListItemAvatar>
+						<ListItemButton >
+							<ListItemText primary={member.user.username} />
+						</ListItemButton>
+						<ListItemAvatar>
+							<Avatar sx={{ bgcolor: member.isConnected ? 'green' : 'red' }} style={{ width: '10px', height: '10px' }} />
+						</ListItemAvatar>
+					</ListItem>
+				)
+				)}
+			</List>
+		</>)
+	}
+
 	return (
 		<nav aria-label="secondary mailbox folders">
-			<Typography variant="h6" component="div" gutterBottom> Admin </Typography>
-			<List>
-				{memberList.admins.map((admin) => (
-					<ListItem key={admin.id} disablePadding alignItems="flex-start">
-						<ListItemAvatar>
-							<Avatar alt={admin.user.username} src={`/avatars/${admin.id}.png`} style={{ width: '15px', height: '15px' }} />
-						</ListItemAvatar>
-						<ListItemButton >
-							<ListItemText primary={admin.user.username} />
-						</ListItemButton>
-						<ListItemAvatar>
-							<Avatar sx={{ bgcolor: admin.isConnected ? 'green' : 'red' }} style={{ width: '10px', height: '10px' }} />
-						</ListItemAvatar>
-					</ListItem>
-				)
-				)}
-			</List>
-			<List>
-				{memberList.regulars.map((regular) => (
-					<ListItem key={regular.id} disablePadding alignItems="flex-start">
-						<ListItemAvatar>
-							<Avatar alt={regular.user.username} src={`/avatars/${regular.id}.png`} style={{ width: '15px', height: '15px' }} />
-						</ListItemAvatar>
-						<ListItemButton >
-							<ListItemText primary={regular.user.username} />
-						</ListItemButton>
-						<ListItemAvatar>
-							<Avatar sx={{ bgcolor: regular.isConnected ? 'green' : 'red' }} style={{ width: '10px', height: '10px' }} />
-						</ListItemAvatar>
-					</ListItem>
-				)
-				)}
-			</List>
+			<GenerateMemberGroup groupname={"Admin"} groupMembers={memberList.admins} />
+			<GenerateMemberGroup groupname={"Users"} groupMembers={memberList.regulars} />
+			<GenerateMemberGroup groupname={"Muted"} groupMembers={memberList.muted} />
+			<GenerateMemberGroup groupname={"Banned"} groupMembers={memberList.banned} />
 		</nav>
 	);
 }

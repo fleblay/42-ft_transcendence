@@ -17,9 +17,6 @@ const joinChannel = (channelId: number) => {
 	});
 }
 
-
-
-
 export function MyChannelsList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
@@ -27,7 +24,7 @@ export function MyChannelsList() {
 
 
 	useEffect(() => {
-		apiClient.get(`/api/chat/channels/my`).then((response) => {
+		apiClient.get(`/api/chat/channels/public`).then((response) => {
 			console.log("MyChannelsList", response);
 			setMyChannelsList(response.data);
 		}).catch((error) => {
@@ -43,18 +40,18 @@ export function MyChannelsList() {
 
 	return (
 		<nav aria-label="secondary mailbox folders">
-				<List component="div" disablePadding>
-				{MyChannelsList?.map((channel : Channel) => (
+			<List component="div" disablePadding>
+				{MyChannelsList?.map((channel: Channel) => (
 					<ListItem key={channel.id} sx={{ pl: 4 }} >
-						<ListItemButton  onClick={() => mooveToChannel(channel.id)}>
+						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
 							<ListItemText primary={channel.name} />
-							<AvatarGroup total={channel.members.length}>
+							<AvatarGroup total={channel.members?.length}>
 								{channel?.members?.map((member: Member) => (
 									<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
 								))}
 							</AvatarGroup>
-
 						</ListItemButton>
+							<ListItemButton onClick={() => joinChannel(channel.id)}>Join</ListItemButton>
 					</ListItem>
 				)
 				)}
