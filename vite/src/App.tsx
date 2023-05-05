@@ -8,7 +8,7 @@ import { ListUsers } from './component/ListUsers'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { SocketContext, SocketProvider } from './socket/SocketProvider'
-import { MuiAppBar } from './component/menu'
+import { MenuBar } from './component/Menu'
 import { ProfilPlayer } from './component/ProfilPlayer'
 import { AllRefreshToken } from './component/TokenView'
 import { UsernameDialog } from './component/UsernameDialog'
@@ -28,38 +28,15 @@ export interface Destinations {
 }
 
 export const allRoutes: Destinations[] = [
-	{ name: "Register", path: "/Register", public: true },
-	{ name: "Login", path: "/Login", public: true },
+	{ name: "Register", path: "/register", public: true },
+	{ name: "Login", path: "/login", public: true },
 	{ name: "Chat", path: "/chat", public: false },
 	{ name: "Game", path: "/game", public: false },
 	{ name: "Leaderboard", path: "/leaderboard", public: false },
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
 	{ name: "Friends", path: "/friends", public: false },
 	{ name: "Blocked", path: "/blocked", public: false },
-
 ]
-
-function AuthStatus() {
-	let auth = useAuthService();
-	let navigate = useNavigate();
-
-	if (!auth.user) {
-		return <p>You are not logged in.</p>;
-	}
-
-	return (
-		<p>
-			Welcome {auth.user.username}!{" "}
-			<button
-				onClick={() => {
-					auth.logout();
-				}}
-			>
-				Sign out
-			</button>
-		</p>
-	);
-}
 
 function RequireAuth({ children }: { children: JSX.Element }) {
 	let auth = useAuthService();
@@ -87,25 +64,6 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 		)
 	}
 	return children;
-}
-
-function Header() {
-	return (
-		<div>
-			<AuthStatus />
-
-			<ul>
-				<li>
-					<Link to="/game">Game Page</Link>
-				</li>
-				<li>
-					<Link to="/chat">Chat Page</Link>
-				</li>
-			</ul>
-
-			<Outlet />
-		</div>
-	);
 }
 
 function Destinations() {
@@ -163,11 +121,11 @@ function App() {
 		<AuthService>
 			<SocketProvider>
 				<RequireAuth>
-					<MuiAppBar />
+					<MenuBar />
 				</RequireAuth>
 
 				<Routes>
-					<Route element={<div> <Destinations /> <Header /> </div>}>
+					<Route>
 						<Route path="/" element={<Navigate to='/game' replace />} />
 						<Route path="game/">
 							<Route path=":idGame" element={

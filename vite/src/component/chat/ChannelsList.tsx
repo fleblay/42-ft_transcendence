@@ -18,9 +18,6 @@ const joinChannel = (channelId: number) => {
 	});
 }
 
-
-
-
 export function MyChannelsList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
@@ -28,7 +25,7 @@ export function MyChannelsList() {
 
 
 	useEffect(() => {
-		apiClient.get(`/api/chat/channels/my`).then((response) => {
+		apiClient.get(`/api/chat/channels/public`).then((response) => {
 			console.log("MyChannelsList", response);
 			setMyChannelsList(response.data);
 		}).catch((error) => {
@@ -56,8 +53,8 @@ export function MyChannelsList() {
 									<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
 								))}
 							</AvatarGroup>
-
 						</ListItemButton>
+							<ListItemButton onClick={() => joinChannel(channel.id)}>Join</ListItemButton>
 					</ListItem>
 				)
 				)}
