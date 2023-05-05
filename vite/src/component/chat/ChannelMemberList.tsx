@@ -5,6 +5,8 @@ import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { Channel, Member } from "../../types";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useAuthService } from '../../auth/AuthService'
 
 type memberList = {
@@ -152,6 +154,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 							<Avatar alt="User Photo" src={`/avatars/${member.id}.png`} />
 						</Badge>
 						<ListItemText primary={member.user.username} />
+						{member.role == "owner" && <ListItemIcon><StarBorderIcon /></ListItemIcon>}
+						{(Date.parse(member.muteTime) > Date.now()) && <ListItemIcon><VolumeOffIcon /></ListItemIcon>}
 						<GenerateMemberActionList member={member} />
 					</ListItem>
 				)
