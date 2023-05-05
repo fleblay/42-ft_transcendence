@@ -96,7 +96,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 		};
 
 		const handleClickBan = () => {
-			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { ban: member.banned ? false : true }).
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { ban: (!member.banned) }).
 				then(() => console.log("Ban : OK"))
 				.catch((error) => {
 					console.log(error);

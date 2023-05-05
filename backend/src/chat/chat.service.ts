@@ -297,7 +297,7 @@ export class ChatService implements OnModuleInit {
 				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.role}`)
 			modifyMember.role = options.role
 		}
-		if (options.ban) {
+		if (options.ban !== undefined) {
 			if (modifyMember.banned == options.ban)
 				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.ban ? 'banned' : 'unbanned'}}`)
 			modifyMember.banned = options.ban
