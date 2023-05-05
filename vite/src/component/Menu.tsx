@@ -162,10 +162,8 @@ export function MenuBar() {
 					</Box>
 
 					<Box display="flex" sx={{ flexGrow: 0, marginLeft: 'auto' }}>
-						<Button onClick={handleOpenUserMenu} sx={{ color: 'white', display: 'block', fontWeight: 700 }}>
-							<IconButton sx={{ paddingTop: 0, paddingBottom: 0 }}>
-								<Avatar alt={auth.user?.username} src={imgPath} />
-							</IconButton>
+						<Button onClick={handleOpenUserMenu} sx={{ color: 'white', display: 'flex', gap: 1, fontWeight: 700 }}>
+							<Avatar alt={auth.user?.username} src={imgPath} />
 							{auth.user?.username}
 						</Button>
 						<Menu
