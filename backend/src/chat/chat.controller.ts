@@ -44,7 +44,8 @@ export class ChatController {
 		return channels.map((channel: Channel) => ({
 			...channel,
 			password: undefined,
-			hasPassword: channel.password.length !== 0}));
+			hasPassword: channel.password.length !== 0,
+			unreadMessages: this.chatService.getUnreadMessages(user, channel.id)}));
 	}
 
 

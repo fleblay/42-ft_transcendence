@@ -7,6 +7,7 @@ import { SocketContext } from '../../socket/SocketProvider';
 import { useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
 import { Channel } from '../../types'
+import ChatMenu from './ChatMenu';
 
 
 
@@ -76,11 +77,11 @@ export function ChatPage() {
 					</Grid>
 				</Grid>
 				<Divider />
-				<Grid container spacing={3}>
-					<Grid item xs={2}>
-						<MyChannelsList/>
+				<Grid container spacing={2}>
+					<Grid item xs={3}>
+						<ChatMenu/>
 					</Grid>
-					<Grid item xs={8}>
+					<Grid item xs={7}>
 						{channelId ? <MessageArea channelId={channelId} /> : null}
 					</Grid>
 					<Grid item xs={2}>

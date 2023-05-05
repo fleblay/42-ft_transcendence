@@ -186,7 +186,6 @@ function App() {
 						<Route path="chat/:channelId?" element={
 							<RequireAuth>
 								<>
-									<ChatMenu />
 									<ChatPage />
 								</>
 							</RequireAuth>
