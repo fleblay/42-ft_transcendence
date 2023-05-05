@@ -126,56 +126,54 @@ export default function ChatMenu() {
 
 	return (
 		<>
-		<List
-			sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
-			component="nav"
-		>
-			<ListItemButton onClick={browseRooms}>
-				<ListItemIcon>
-					<ExploreOutlinedIcon />
-				</ListItemIcon>
-				<ListItemText primary="Browse the rooms" />
-			</ListItemButton>
-			<ListItemButton onClick={handleOpenCreateChannel}>
-				<ListItemIcon>
-					<AddCircleOutlineOutlinedIcon />
-				</ListItemIcon>
-				<ListItemText primary="Create Channel" />
-			</ListItemButton>
+			<List
+				sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+				component="nav"
+			>
+				<ListItemButton onClick={browseRooms}>
+					<ListItemIcon>
+						<ExploreOutlinedIcon />
+					</ListItemIcon>
+					<ListItemText primary="Browse the rooms" />
+				</ListItemButton>
+				<ListItemButton onClick={handleOpenCreateChannel}>
+					<ListItemIcon>
+						<AddCircleOutlineOutlinedIcon />
+					</ListItemIcon>
+					<ListItemText primary="Create Channel" />
+				</ListItemButton>
 
-			<ListItemButton onClick={() => setRoomsMenu(!roomsMenu)}>
-				<ListItemIcon>
-					<StarBorder />
-				</ListItemIcon>
-				<ListItemText primary="My channel" />
-				{roomsMenu ? <ExpandLess /> : <ExpandMore />}
-			</ListItemButton>
-			<Collapse in={roomsMenu} timeout="auto">
+				<ListItemButton onClick={() => setRoomsMenu(!roomsMenu)}>
+					<ListItemIcon>
+						<StarBorder />
+					</ListItemIcon>
+					<ListItemText primary="My channel" />
+					{roomsMenu ? <ExpandLess /> : <ExpandMore />}
+				</ListItemButton>
+				<Collapse in={roomsMenu} timeout="auto">
 
-						<MyChannelsList/>
-			</Collapse>
+					<MyChannelsList />
+				</Collapse>
 
-			<ListItemButton onClick={() => setFriendMenu(!friendMenu)}>
-				<ListItemIcon>
-					<PeopleAltOutlinedIcon />
-				</ListItemIcon>
-				<ListItemText primary="Friends" />
-				{friendMenu ? <ExpandLess /> : <ExpandMore />}
-			</ListItemButton>
-			<Collapse in={friendMenu} timeout="auto" unmountOnExit>
-				<List component="div" disablePadding>
-					<ListItemButton sx={{ pl: 4 }}>
-						<ListItemIcon>
-							<StarBorder />
-						</ListItemIcon>
-						<ListItemText primary="Starred" />
-					</ListItemButton>
-				</List>
-			</Collapse>
-		</List>
-		<Modal open={openCreateChannel} onClose={handleCloseCreateChannel} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-			<CreateChannelModal handleClose={handleCloseCreateChannel}/>
-		</Modal>
-	</>
+				<ListItemButton onClick={() => setFriendMenu(!friendMenu)}>
+					<ListItemIcon>
+						<PeopleAltOutlinedIcon />
+					</ListItemIcon>
+					<ListItemText primary="Friends" />
+					{friendMenu ? <ExpandLess /> : <ExpandMore />}
+				</ListItemButton>
+				<Collapse in={friendMenu} timeout="auto" unmountOnExit>
+					<List component="div" disablePadding>
+						<ListItemButton sx={{ pl: 4 }}>
+							<ListItemIcon>
+								<StarBorder />
+							</ListItemIcon>
+							<ListItemText primary="Starred" />
+						</ListItemButton>
+					</List>
+				</Collapse>
+			</List>
+			<CreateChannelModal openCreateChannel={openCreateChannel} handleClose={handleCloseCreateChannel} />
+		</>
 	);
 }
