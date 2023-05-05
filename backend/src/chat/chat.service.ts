@@ -52,6 +52,17 @@ export class ChatService implements OnModuleInit {
 		return this.channelsRepo.find({
 			where: {
 				private: false
+			},
+			select: {
+				id: true,
+				name: true,
+				password: true,
+				members: {
+					id: true,
+					user: {
+						id: true,
+					},
+				},
 			}
 		})
 	}
@@ -74,7 +85,7 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, members: { id:true, role: true, banned: true, left: true, user: { id: true } } }
+			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true } } }
 		})
 		if (!channel)
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
@@ -224,7 +235,6 @@ export class ChatService implements OnModuleInit {
 			select: {
 				id: true,
 				name: true,
-				password: true,
 				private: true,
 			}
 		})
@@ -331,14 +341,16 @@ export class ChatService implements OnModuleInit {
 		await this.membersRepo.save(member);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { id: member.user.id });
 	}
-
-	async getMyChannels(user: User): Promise<Channel[]> {
-		return await this.channelsRepo.find({
+	
+	// TODO: return boolean hasPassword
+	getMyChannels(user: User): Promise<Channel[]> {
+		return this.channelsRepo.find({
 			where: {
 				members: {
 					user: {
 						id: user.id,
 					},
+					left: false,
 				},
 			},
 			relations: ['members'],
@@ -353,7 +365,4 @@ export class ChatService implements OnModuleInit {
 			},
 		});
 	}
-
 }
-
-

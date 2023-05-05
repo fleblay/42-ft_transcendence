@@ -78,7 +78,7 @@ export function ChatPage() {
 				<Divider />
 				<Grid container spacing={3}>
 					<Grid item xs={2}>
-						<MyChannelsList channels={channels} />
+						<MyChannelsList/>
 					</Grid>
 					<Grid item xs={8}>
 						{channelId ? <MessageArea channelId={channelId} /> : null}

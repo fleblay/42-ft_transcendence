@@ -131,7 +131,7 @@ export type Channel = {
 	id: number,
 	name: string,
 	private: boolean,
-	password?: string
+	hasPassword: boolean,
 }
 
 export type PlainMember = {
