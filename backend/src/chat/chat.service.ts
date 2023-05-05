@@ -1,6 +1,6 @@
 import { Inject, Injectable, forwardRef, BadRequestException, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { Member } from '../model/member.entity';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../model/channel.entity';
 import { Message } from '../model/message.entity';
@@ -203,6 +203,8 @@ export class ChatService implements OnModuleInit {
 				owner: { user: { id: true, username: true }, role: true, banned: true, left: true, muteTime: true },
 			},
 		});
+		member.lastRead = messages[messages.length - 1];
+		await this.membersRepo.save(member);
 		return messages;
 	}
 
@@ -298,9 +300,9 @@ export class ChatService implements OnModuleInit {
 			modifyMember.left = options.kick
 		}
 		if (options.mute) {
-			if (new Date(modifyMember.muteTime) > new Date(options.mute))
+			if (modifyMember.muteTime > new Date(options.mute))
 				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.mute ? 'muted' : 'unmuted'}`)
-			modifyMember.muteTime = options.mute
+			modifyMember.muteTime = new Date(options.mute)
 		}
 		await this.membersRepo.save(modifyMember)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', { modifyMember });
@@ -366,5 +368,36 @@ export class ChatService implements OnModuleInit {
 				},
 			},
 		});
+	}
+
+	async getUnreadMessages(user: User, channelId: number) : Promise<number> {
+		 const member = await this.membersRepo.findOne({
+			where: {
+				user: {
+					id: user.id,
+				},
+				channel: {
+					id: channelId,
+				},
+			},
+			relations: ['lastRead'],
+			select: {
+				id: true,
+				lastRead: {
+					id: true,
+				},
+			},
+		});
+		if (!member || !member.lastRead)
+			return 0;
+		return await this.messagesRepo.count({
+			where: {
+				channel: {
+					id: channelId,
+				},
+				id: MoreThan(member.lastRead.id),
+			},
+		});
+
 	}
 }
