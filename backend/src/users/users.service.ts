@@ -151,9 +151,11 @@ export class UsersService implements OnModuleInit {
 	async changeUsername(user: User, newUsername: string) {
 		if (!newUsername)
 			throw new BadRequestException("Username is required");
+		newUsername = newUsername.replace(/\s/g, '');
 		if (user.username == newUsername)
-			if (newUsername.length < 3 || newUsername.length > 20)
-				throw new BadRequestException("Username must be between 3 and 20 characters");
+			throw new BadRequestException("Username is the same");
+		if (newUsername.length < 3 || newUsername.length > 10)
+			throw new BadRequestException("Username must be between 3 and 10 characters");
 		if (await this.findOneByUsername(newUsername))
 			throw new BadRequestException("Username already taken");
 		user.username = newUsername;
