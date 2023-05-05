@@ -24,7 +24,9 @@ build: .env.template backend/Dockerfile
 	bash envmaker.sh
 	mkdir -p nginx/avatars
 	docker-compose build
-	curl https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Vimlogo.svg/langfr-320px-Vimlogo.svg.png -sSo nginx/avatars/default.png
+	curl https://i.imgur.com/c7Kos4j.png -sSo nginx/avatars/default.png
+	curl https://i.imgur.com/tX38rch.png -sSo nginx/avatars/1.png
+
 
 down:
 	docker-compose down -t 3
