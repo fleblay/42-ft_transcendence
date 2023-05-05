@@ -96,7 +96,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 		};
 
 		const handleClickBan = () => {
-			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { ban: true }).
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { ban: member.banned ? false : true }).
 				then(() => console.log("Ban : OK"))
 				.catch((error) => {
 					console.log(error);
@@ -155,7 +155,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 				>
 					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role`}</MenuItem>}
 					{myRights.includes("kick") && <MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>}
-					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`Ban ${member.user.username}`}</MenuItem>}
+					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`${member.banned ? "Unban" : "Ban"} ${member.user.username}`}</MenuItem>}
 					{myRights.includes("mute") && <MenuItem onClick={handleClickMute}>{`${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
 					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
 				</Menu>
