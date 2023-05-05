@@ -23,7 +23,7 @@ export class ATGuard implements CanActivate {
 			throw new HttpException('Token invalid', 498);
 		}
 		//console.log("ATGuard: after replace", request.headers.authorization);
-		console.log ("access token", bearerToken)
+		// console.log ("access token", bearerToken)
 		if (!bearerToken) {
 			console.log("ATGuard: no bearer token");
 			return false;

@@ -74,7 +74,7 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, members: { role: true, banned: true, left: true, user: { id: true } } }
+			select: { id: true, private: true, members: { id:true, role: true, banned: true, left: true, user: { id: true } } }
 		})
 		if (!channel)
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
@@ -91,29 +91,27 @@ export class ChatService implements OnModuleInit {
 			console.log("There is a target User", addedUser)
 		}
 
-		console.log("channel Members:", channel.members)
-		console.log("channel :", channel)
 		const member = channel.members.find((member) => (member.user.id == addedUser!.id))
-		console.log("Member searched in channel:", member)
 		if (member) {
-			console.log("Member found", member)
 			if (member.banned)
-				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is banned from the channel`)
+				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is banned from the channel`)
 			if (!member.left)
-				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser} is already in the channel`)
+				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is already in the channel`)
 			else {
 				member.left = false
 				this.membersRepo.save(member)
 				return
 			}
 		}
-		console.log("Member not found :",member, "adding user :", addedUser)
-		const joiner: Member = await this.membersRepo.save({
+		const joiner: Member = this.membersRepo.create({
 			user: addedUser,
 			channel,
 			messages: [],
 			role: (options?.owner) ? "owner" : "regular"
 		})
+		channel.members.push(joiner)
+		this.channelsRepo.save(channel)
+		this.membersRepo.save(joiner)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { id: joiner.user.id, username: joiner.user.username, role: joiner.role });
 	}
 

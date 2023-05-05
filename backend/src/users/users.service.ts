@@ -98,9 +98,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 	isConnected(id: number): boolean {
-
-		//WTF ne marche pas avec elem.id === id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		console.log(`id is ${id}user found connected status is`, this.connectedUsers.get(id))
+		// console.log(`id is ${id}user found connected status is`, this.connectedUsers.get(id))
 		return (this.connectedUsers.get(+id) != undefined)
 	}
 
@@ -112,7 +110,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 	changeStatus(id: number, { newStatus, oldStatus }: { newStatus?: UserStatus, oldStatus?: UserStatus }) {
-		console.log('changing status : new ', newStatus, 'old :', oldStatus)
+		// console.log('changing status : new ', newStatus, 'old :', oldStatus)
 		if (!this.isConnected(id))
 			this.addConnectedUser(id);
 
@@ -135,7 +133,6 @@ export class UsersService implements OnModuleInit {
 
 	uploadAvatar(user: User, file: Express.Multer.File) {
 		const path = '/usr/src/app/avatars/' + user.id + '.png';
-		console.log("user.controller.uploadAvatar", file.buffer);
 		sharp(file.buffer)
 			.resize(200, 200)
 			.toFile(path, (err, info) => {
