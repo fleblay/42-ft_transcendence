@@ -80,26 +80,6 @@ function BackLoader() {
 
 function App() {
 
-	const [backIsReady, setBackIsReady] = useState(false)
-	const [cooldown, setCooldown] = React.useState<number>(10);
-
-	React.useEffect(() => {
-		const intevalId = setInterval(() => {
-			axios.get("/api/areyouready").then((response) => {
-				if (response.status === 200) {
-					setBackIsReady(true);
-					clearInterval(intevalId);
-				}
-			}).catch((error) => {
-				console.log(error);
-			})
-			if (cooldown < 1000)
-				setCooldown(cooldown => cooldown *= 10);
-		}, cooldown)
-		return () => clearInterval(intevalId);
-	}, [cooldown])
-	if (!backIsReady) return <BackLoader />
-
 	return (
 		<AuthService>
 			<SocketProvider>
