@@ -9,7 +9,7 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Modal } from '@mui/material';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 
 import Menu, { MenuProps } from '@mui/material/Menu';
@@ -26,6 +26,8 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../auth/interceptor.axios';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { MyChannelsList } from './ChannelsList';
+import { CreateChannelModal } from './CreatChannelModal';
+
 
 
 export function BasicMenu() {
@@ -96,7 +98,11 @@ export const ProfileMenu: React.FC<MenuProps> = (props) => {
 export default function ChatMenu() {
 	const [friendMenu, setFriendMenu] = React.useState<boolean>(false);
 	const [roomsMenu, setRoomsMenu] = React.useState<boolean>(false);
+	const [openCreateChannel, setOpenCreateChannel] = React.useState<boolean>(false);
+
 	const navigate = useNavigate();
+	const handleOpenCreateChannel = () => setOpenCreateChannel(true);
+	const handleCloseCreateChannel = () => setOpenCreateChannel(false);
 
 	const browseRooms = () => {
 		navigate(`/chat/`);
@@ -119,6 +125,7 @@ export default function ChatMenu() {
 
 
 	return (
+		<>
 		<List
 			sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
 			component="nav"
@@ -129,7 +136,7 @@ export default function ChatMenu() {
 				</ListItemIcon>
 				<ListItemText primary="Browse the rooms" />
 			</ListItemButton>
-			<ListItemButton onClick={createChannel}>
+			<ListItemButton onClick={handleOpenCreateChannel}>
 				<ListItemIcon>
 					<AddCircleOutlineOutlinedIcon />
 				</ListItemIcon>
@@ -166,5 +173,9 @@ export default function ChatMenu() {
 				</List>
 			</Collapse>
 		</List>
+		<Modal open={openCreateChannel} onClose={handleCloseCreateChannel} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+			<CreateChannelModal handleClose={handleCloseCreateChannel}/>
+		</Modal>
+	</>
 	);
 }

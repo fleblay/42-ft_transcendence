@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
 import { Channel } from '../../types'
 import ChatMenu from './ChatMenu';
+import ChannelBrowser from './ChannelBrowse';
 
 
 
@@ -69,7 +70,7 @@ export function ChatPage() {
 						<ChatMenu/>
 					</Grid>
 					<Grid item xs={7}>
-						{channelId ? <MessageArea channelId={channelId} /> : null}
+						{channelId ? <MessageArea channelId={channelId} /> : <ChannelBrowser />}
 					</Grid>
 					<Grid item xs={2}>
 						{channelId ? <MemberList channelId={channelId} /> : null}

@@ -40,7 +40,6 @@ export function MyChannelsList() {
 
 
 	return (
-		<nav aria-label="secondary mailbox folders">
 			<List component="div" disablePadding   sx={{
         width: '100%',
         position: 'relative',
@@ -64,7 +63,6 @@ export function MyChannelsList() {
 				)
 				)}
 			</List>
-		</nav>
 	);
 }
 

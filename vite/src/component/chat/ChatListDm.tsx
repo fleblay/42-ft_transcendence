@@ -39,7 +39,6 @@ export function MyDmList() {
 
 
 	return (
-		<nav aria-label="secondary mailbox folders">
 				<List component="div" disablePadding>
 				{MyChannelsList?.map((channel : Channel) => (
 					<ListItem key={channel.id} sx={{ pl: 4 }} >
@@ -56,6 +55,5 @@ export function MyDmList() {
 				)
 				)}
 			</List>
-		</nav>
 	);
 }
