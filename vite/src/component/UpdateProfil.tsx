@@ -1,6 +1,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, Button, Container, Grid, Switch, Typography } from '@mui/material';
+import { Alert, Button, Container, Grid, Switch, TextField, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
 import { FormEvent } from 'react';
 
@@ -116,7 +116,19 @@ export function UpdateProfil() {
 	const handle2FaChange = () => {
 		if (!dfa)
 			setOpenDfa(true);
+			<Grid container spacing={2} alignItems="center">
 
+			<Grid item xs={12}>
+				<TextField required fullWidth label="name" type="name" name="name" />
+			</Grid>
+			
+			<Grid item xs={12}>
+				<TextField required fullWidth label="password" type="password" name="password" autoComplete="current-password" />
+			</Grid>
+			<Grid item xs={12}>
+				<Button variant="contained" color="primary" type="submit" fullWidth sx={{ my: 2 }}>Submit</Button>
+			</Grid>
+		</Grid>
 		apiClient.post(`/api/users/toggle2fa`).then((response) => {
 			if (response.data == 'turned-off') {
 				setDfa(false);

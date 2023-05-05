@@ -25,7 +25,7 @@ export function MyChannelsList() {
 
 
 	useEffect(() => {
-		apiClient.get(`/api/chat/channels/public`).then((response) => {
+		apiClient.get(`/api/chat/channels/my`).then((response) => {
 			console.log("MyChannelsList", response);
 			setMyChannelsList(response.data);
 		}).catch((error) => {
@@ -57,7 +57,6 @@ export function MyChannelsList() {
 							))}
 						</AvatarGroup>
 					</ListItemButton>
-					<ListItemButton onClick={() => joinChannel(channel.id)}>Join</ListItemButton>
 				</ListItem>
 			)
 			)}

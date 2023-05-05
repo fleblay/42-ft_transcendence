@@ -52,9 +52,10 @@ export class ChatController {
 	// NOTE: A TESTER
 	// to: /chat emit :chat.new.channel
 	@Post('channels/create')
-	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto): Promise<void> {
+	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto): Promise<number> {
 		const channelId: number = await this.chatService.createChannel(body)
 		await this.chatService.joinChannel(user, channelId, { owner: true, password: body.password })
+		return channelId;
 	}
 
 	// NOTE: A TESTER
