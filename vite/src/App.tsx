@@ -20,6 +20,7 @@ import { GamePage } from './component/GamePage';
 import { OldGamePage } from './component/OldGameScreen';
 import { ChatPage } from './component/chat/ChatPage';
 import ChatMenu from './component/chat/ChatMenu';
+import { CircularProgress, Paper, Stack } from '@mui/material';
 
 export interface Destinations {
 	name: string,
@@ -41,7 +42,7 @@ export const allRoutes: Destinations[] = [
 function RequireAuth({ children }: { children: JSX.Element }) {
 	let auth = useAuthService();
 	let location = useLocation();
-	const {socket} = useContext(SocketContext)
+	const { socket } = useContext(SocketContext)
 
 	if (!auth.user) {
 		// Redirect them to the /login page, but save the current location they were
@@ -60,40 +61,22 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 	}
 	if (!socket || !socket.connected) {
 		return (
-			<p>Connecting to server...</p>
+			<Stack direction="column" justifyContent="center" alignItems={'center'} width={'100%'} height={'100vh'}>
+				<CircularProgress />
+			</Stack>
 		)
 	}
 	return children;
 }
 
-function Destinations() {
-	const auth = useAuthService()
-	const links = allRoutes.map((destination) => {
-		if (!auth.user && !destination.public) return (<></>)
-		return (
-			<>
-				<span> </span>
-				<span><Link to={destination.path}>{destination.name}</Link></span>
-				<span> </span>
-			</>)
-	})
+function BackLoader() {
 	return (
-		<div>
-			{...links}
-		</div>
+		<Stack direction="column" justifyContent="center" alignItems={'center'} width={'100%'} height={'100vh'}>
+			<h1>We got a problem with the server, please wait</h1>
+			<CircularProgress />
+		</Stack>
 	)
 }
-
-//export const AppContext = createContext<any>({});
-
-function Loader() {
-	return (
-		<div>
-			Loading...
-		</div>
-	)
-}
-
 
 function App() {
 
@@ -115,7 +98,7 @@ function App() {
 		}, cooldown)
 		return () => clearInterval(intevalId);
 	}, [cooldown])
-	if (!backIsReady) return <Loader />
+	if (!backIsReady) return <BackLoader />
 
 	return (
 		<AuthService>
