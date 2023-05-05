@@ -21,7 +21,7 @@ const joinChannel = (channelId: number) => {
 export function MyChannelsList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
-	const [MyChannelsList, setMyChannelsList] = useState<Channel[]>();
+	const [MyChannelsList, setMyChannelsList] = useState<Channel[]>([]);
 
 
 	useEffect(() => {
@@ -38,31 +38,30 @@ export function MyChannelsList() {
 		navigate(`/chat/${channelId}`);
 	}
 
-
 	return (
-			<List component="div" disablePadding   sx={{
-        width: '100%',
-        position: 'relative',
-        overflow: 'auto',
-        maxHeight: 300,
-      }}>
-				{MyChannelsList?.map((channel: Channel) => (
-					<ListItem key={channel.id} sx={{ pl: 4 }} >
-						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
-							<Badge badgeContent={0} color="primary">
+		<List component="div" disablePadding sx={{
+			width: '100%',
+			position: 'relative',
+			overflow: 'auto',
+			maxHeight: 300,
+		}}>
+			{MyChannelsList?.map((channel: Channel) => (
+				<ListItem key={channel.id} sx={{ pl: 4 }} >
+					<ListItemButton onClick={() => mooveToChannel(channel.id)}>
+						<Badge badgeContent={0} color="primary">
 							<ListItemText primary={channel.name} />
-							</Badge>
-							<AvatarGroup sx={{ml :'auto'}} total={channel.members?.length}>
-								{channel?.members?.map((member: Member) => (
-									<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
-								))}
-							</AvatarGroup>
-						</ListItemButton>
-							<ListItemButton onClick={() => joinChannel(channel.id)}>Join</ListItemButton>
-					</ListItem>
-				)
-				)}
-			</List>
+						</Badge>
+						<AvatarGroup sx={{ ml: 'auto' }} total={channel.members?.length}>
+							{channel?.members?.map((member: Member) => (
+								<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
+							))}
+						</AvatarGroup>
+					</ListItemButton>
+					<ListItemButton onClick={() => joinChannel(channel.id)}>Join</ListItemButton>
+				</ListItem>
+			)
+			)}
+		</List>
 	);
 }
 
