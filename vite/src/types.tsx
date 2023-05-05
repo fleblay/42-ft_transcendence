@@ -133,6 +133,7 @@ export type Channel = {
 	private: boolean,
 	hasPassword: boolean,
 	members: Member[],
+	UnreadMessage: number,
 }
 
 export type PlainMember = {

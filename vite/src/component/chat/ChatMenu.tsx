@@ -1,18 +1,16 @@
 import * as React from 'react';
-import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-import SendIcon from '@mui/icons-material/Send';
+
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
-import AddIcon from '@mui/icons-material/Add';
-import { Button } from '@mui/material';
+import { Box, Button, Modal } from '@mui/material';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 
 import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -28,6 +26,9 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../auth/interceptor.axios';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { MyChannelsList } from './ChannelsList';
+import { CreateChannelModal } from './CreatChannelModal';
+
+
 
 export function BasicMenu() {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -97,7 +98,11 @@ export const ProfileMenu: React.FC<MenuProps> = (props) => {
 export default function ChatMenu() {
 	const [friendMenu, setFriendMenu] = React.useState<boolean>(false);
 	const [roomsMenu, setRoomsMenu] = React.useState<boolean>(false);
+	const [openCreateChannel, setOpenCreateChannel] = React.useState<boolean>(false);
+
 	const navigate = useNavigate();
+	const handleOpenCreateChannel = () => setOpenCreateChannel(true);
+	const handleCloseCreateChannel = () => setOpenCreateChannel(false);
 
 	const browseRooms = () => {
 		navigate(`/chat/`);
@@ -120,6 +125,7 @@ export default function ChatMenu() {
 
 
 	return (
+		<>
 		<List
 			sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
 			component="nav"
@@ -130,7 +136,7 @@ export default function ChatMenu() {
 				</ListItemIcon>
 				<ListItemText primary="Browse the rooms" />
 			</ListItemButton>
-			<ListItemButton onClick={createChannel}>
+			<ListItemButton onClick={handleOpenCreateChannel}>
 				<ListItemIcon>
 					<AddCircleOutlineOutlinedIcon />
 				</ListItemIcon>
@@ -145,12 +151,13 @@ export default function ChatMenu() {
 				{roomsMenu ? <ExpandLess /> : <ExpandMore />}
 			</ListItemButton>
 			<Collapse in={roomsMenu} timeout="auto">
-				<MyChannelsList/>
+
+						<MyChannelsList/>
 			</Collapse>
 
 			<ListItemButton onClick={() => setFriendMenu(!friendMenu)}>
 				<ListItemIcon>
-					<InboxIcon />
+					<PeopleAltOutlinedIcon />
 				</ListItemIcon>
 				<ListItemText primary="Friends" />
 				{friendMenu ? <ExpandLess /> : <ExpandMore />}
@@ -166,5 +173,9 @@ export default function ChatMenu() {
 				</List>
 			</Collapse>
 		</List>
+		<Modal open={openCreateChannel} onClose={handleCloseCreateChannel} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+			<CreateChannelModal handleClose={handleCloseCreateChannel}/>
+		</Modal>
+	</>
 	);
 }

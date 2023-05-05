@@ -7,6 +7,8 @@ import { SocketContext } from '../../socket/SocketProvider';
 import { useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
 import { Channel } from '../../types'
+import ChatMenu from './ChatMenu';
+import {ChannelBrowser} from './ChannelBrowse';
 
 
 
@@ -21,9 +23,6 @@ export function ChatPage() {
 		return addSubscription(`/chat/${channelId || ''}`);
 	}, [channelId]);
 
-	useEffect(() => {
-		updateChannel()
-	}, []);
 
 	useEffect(() => {
 		function onNewChannel(data: Channel) {
@@ -35,16 +34,6 @@ export function ChatPage() {
 			customOff('newChannel', onNewChannel);
 		};
 	}, []);
-
-	const updateChannel = () => {
-		console.log("updateChannel");
-		apiClient.get(`/api/chat/channels/all`).then(({ data }: { data: Channel[] }) => {
-			console.log("channels/all", data);
-			setChannels(data);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
 
 	const createChannel = () => {
 		console.log("createChannel");
@@ -76,12 +65,12 @@ export function ChatPage() {
 					</Grid>
 				</Grid>
 				<Divider />
-				<Grid container spacing={3}>
-					<Grid item xs={2}>
-						<MyChannelsList/>
+				<Grid container spacing={2}>
+					<Grid item xs={3}>
+						<ChatMenu/>
 					</Grid>
-					<Grid item xs={8}>
-						{channelId ? <MessageArea channelId={channelId} /> : null}
+					<Grid item xs={7}>
+						{channelId ? <MessageArea channelId={channelId} /> : <ChannelBrowser />}
 					</Grid>
 					<Grid item xs={2}>
 						{channelId ? <MemberList channelId={channelId} /> : null}
@@ -99,12 +88,12 @@ export function ChatPage() {
 	return (
 		<>
 
-			<Container maxWidth="xl">
-			<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
-						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
-							Chat
-						</Typography>
-					</AppBar>
+			<Container maxWidth="xl" sx={{maxHeight: '100px', minHeight: '100px'}}>
+				<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
+						Chat
+					</Typography>
+				</AppBar>
 				<Box sx={{
 					width: '100%',
 					border: '1px solid #D3C6C6',
@@ -112,17 +101,16 @@ export function ChatPage() {
 					borderRadius: '0 0 16px 16px',
 					p: '2rem',
 					bgcolor: 'background.paper',
+					maxHeight: 'calc(100vh - 80px)',
+					overflowY: 'scroll'
 				}}>
 
 
-					{ MyChannels()}
+					{MyChannels()}
 
 					<Grid container spacing={3} sx={{ mt: "20px" }}>
 						<Grid item xs={4}>
 							<Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
-						</Grid>
-						<Grid item xs={4}>
-							<Button variant="contained" color="primary" onClick={updateChannel}>Update Channel </Button>
 						</Grid>
 					</Grid>
 				</Box>

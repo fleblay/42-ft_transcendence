@@ -28,7 +28,7 @@ export function FakeGames() {
 				<Button variant='contained' onClick={handleClick}>
 					Generate 10 fake games
 				</Button>
-				<p>{info}</p>
+				<label>{info}</label>
 			</Typography>
 		</div>
 	)
