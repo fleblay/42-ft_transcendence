@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { Avatar, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography } from "@mui/material";
+import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
-
+import { styled } from '@mui/material/styles';
 import { Channel, Member } from "../../types";
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
 type memberList = {
 	admins: Member[],
@@ -11,6 +12,9 @@ type memberList = {
 	muted: Member[],
 	regulars: Member[],
 }
+
+const greenColor: string = "#44b700"
+const redColor: string = "#ff0000"
 
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
@@ -43,16 +47,25 @@ export function MemberList({ channelId }: { channelId: string }) {
 			<Typography variant="h6" component="div" gutterBottom>{groupname}</Typography>
 			<List>
 				{groupMembers.map((member) => (
-					<ListItem key={member.id} disablePadding alignItems="flex-start">
-						<ListItemAvatar>
-							<Avatar alt={member.user.username} src={`/avatars/${member.id}.png`} style={{ width: '15px', height: '15px' }} />
-						</ListItemAvatar>
+					<ListItem key={member.id}>
+						<Badge
+							overlap="circular"
+							anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+							variant="dot"
+							sx={{
+								"& .MuiBadge-badge": {
+									backgroundColor: member.isConnected ? greenColor : redColor
+								}
+							}}
+						>
+							<Avatar alt="User Photo" src={`/avatars/${member.id}.png`} />
+						</Badge>
+						<ListItemText primary={member.user.username} />
 						<ListItemButton >
-							<ListItemText primary={member.user.username} />
+							<ListItemIcon>
+								<MoreHorizIcon />
+							</ListItemIcon>
 						</ListItemButton>
-						<ListItemAvatar>
-							<Avatar sx={{ bgcolor: member.isConnected ? 'green' : 'red' }} style={{ width: '10px', height: '10px' }} />
-						</ListItemAvatar>
 					</ListItem>
 				)
 				)}
