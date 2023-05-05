@@ -226,6 +226,9 @@ export class ChatService implements OnModuleInit {
 			select: {
 				id: true,
 				role: true,
+				banned: true,
+				muteTime: true,
+				left: true,
 				user: { id: true, username: true },
 			},
 		});
@@ -305,8 +308,6 @@ export class ChatService implements OnModuleInit {
 			modifyMember.left = options.kick
 		}
 		if (options.mute) {
-			if (modifyMember.muteTime > new Date(options.mute))
-				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.mute ? 'muted' : 'unmuted'}`)
 			modifyMember.muteTime = new Date(options.mute)
 		}
 		await this.membersRepo.save(modifyMember)

@@ -64,7 +64,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					setMyRights([""])
 					break
 				case "owner":
-					setMyRights(["ban", "kick", "mute", "change"])
+					(member.role != "owner") ? setMyRights(["ban", "kick", "mute", "change"]) : setMyRights([""])
 					break
 				case "admin":
 					member.role == "regular" && setMyRights(["ban", "kick", "mute"])
@@ -88,17 +88,45 @@ export function MemberList({ channelId }: { channelId: string }) {
 
 		const handleClickKick = () => {
 			setAnchorEl(null);
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { kick: true }).
+				then(() => console.log("Kick : OK"))
+				.catch((error) => {
+					console.log(error);
+				});
 		};
 
 		const handleClickBan = () => {
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { ban: true }).
+				then(() => console.log("Ban : OK"))
+				.catch((error) => {
+					console.log(error);
+				});
 			setAnchorEl(null);
 		};
 
 		const handleClickMute = () => {
+			let muteEnd = new Date()
+			if (Date.parse(member.muteTime) < Date.now()) {
+				//A faire proprement avec une modale
+				muteEnd.setDate(muteEnd.getDate() + 1)
+			}
+			else
+				muteEnd.setFullYear(1970)
+
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { mute: muteEnd.toISOString() }).
+				then(() => console.log(`Mute till ${muteEnd.toISOString()}: OK`))
+				.catch((error) => {
+					console.log(error);
+				});
 			setAnchorEl(null);
 		};
 
 		const handleClickChangeRole = () => {
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { role: "regular" }).
+				then(() => console.log("Change role to regular: OK"))
+				.catch((error) => {
+					console.log(error);
+				});
 			setAnchorEl(null);
 		};
 
@@ -128,7 +156,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role`}</MenuItem>}
 					{myRights.includes("kick") && <MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>}
 					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`Ban ${member.user.username}`}</MenuItem>}
-					{myRights.includes("mute") && <MenuItem onClick={handleClickMute}>{`Mute ${member.user.username}`}</MenuItem>}
+					{myRights.includes("mute") && <MenuItem onClick={handleClickMute}>{`${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
 					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
 				</Menu>
 			</div>
@@ -138,7 +166,12 @@ export function MemberList({ channelId }: { channelId: string }) {
 	function GenerateMemberGroup({ groupname, groupMembers }: { groupname: string, groupMembers: Member[] }): JSX.Element {
 		return (<>
 			<Typography variant="h5" component="div" gutterBottom>{groupname}</Typography>
-			<List>
+			<List component="div" disablePadding sx={{
+				width: '100%',
+				position: 'relative',
+				overflow: 'auto',
+				maxHeight: 300,
+			}}>
 				{groupMembers.map((member) => (
 					<ListItem key={member.id} alignItems="flex-start">
 						<Badge
