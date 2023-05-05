@@ -20,19 +20,31 @@ const joinChannel = (channelId: number) => {
 
 
 
-export function MyChannelsList({ channels }: { channels: Channel[] }) {
+export function MyChannelsList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
+	const [MyChannelsList, setMyChannelsList] = useState<Channel[]>();
+
+
+	useEffect(() => {
+		apiClient.get(`/api/chat/channels/my`).then((response) => {
+			console.log("MyChannelsList", response);
+			setMyChannelsList(response.data);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}, []);
 
 
 	const mooveToChannel = (channelId: number) => {
 		navigate(`/chat/${channelId}`);
 	}
 
+
 	return (
 		<nav aria-label="secondary mailbox folders">
 			<List>
-				{channels?.map((channel) => (
+				{MyChannelsList?.map((channel) => (
 					<ListItem key={channel.id} disablePadding>
 						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
 							<ListItemText primary={channel.name} />
@@ -47,6 +59,9 @@ export function MyChannelsList({ channels }: { channels: Channel[] }) {
 }
 
 
+
+
+
 export function ChannelsListDebug({ channels }: { channels: Channel[] }) {
 
 	const rows = channels.map((channel: Channel) => {
@@ -54,7 +69,6 @@ export function ChannelsListDebug({ channels }: { channels: Channel[] }) {
 			channelId: channel.id,
 			channelName: channel.name,
 			private: channel.private,
-			password: channel.password,
 		}
 	});
 
@@ -69,7 +83,6 @@ export function ChannelsListDebug({ channels }: { channels: Channel[] }) {
 							<TableCell align="left">channelId</TableCell>
 							<TableCell align="right">ChannelName</TableCell>
 							<TableCell align="right">Private</TableCell>
-							<TableCell align="right">Password</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -81,7 +94,6 @@ export function ChannelsListDebug({ channels }: { channels: Channel[] }) {
 
 								<TableCell align="right">{row.channelName}</TableCell>
 								<TableCell align="right">{row.private}</TableCell>
-								<TableCell align="right">{row.password}</TableCell>
 								<TableCell align="right"><Button onClick={() => joinChannel(row.channelId)}> Join</Button></TableCell>
 							</TableRow>
 						)
