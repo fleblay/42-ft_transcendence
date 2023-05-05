@@ -78,40 +78,45 @@ export const ChannelBrowser: FC = () => {
 				<Typography variant="subtitle1" sx={{ marginLeft: 1, marginTop: 1 }} color="text.secondary"
 				>{`${Object.values(publicChannels).length} channels`}</Typography>
 			</Box>
-			<List>
+			<List
+				sx={{
+					overflow: 'auto',
+					maxHeight: 500,
+				}}
+			>
 				{Object.values(publicChannels)
-				.filter((channel: Channel) => debouncedSearchChannel.length === 0 || channel.name.toLowerCase().includes(debouncedSearchChannel.toLowerCase()))
-				.map((channel: Channel, index, array) => (
-					<ListItem key={channel.id} sx={{
-						paddingTop: 0,
-						paddingBottom: 0,
-						'&:hover': {
-							bgcolor: (theme: Theme) => theme.palette.grey[200],
+					.filter((channel: Channel) => debouncedSearchChannel.length === 0 || channel.name.toLowerCase().includes(debouncedSearchChannel.toLowerCase()))
+					.map((channel: Channel, index, array) => (
+						<ListItem key={channel.id} sx={{
+							paddingTop: 0,
+							paddingBottom: 0,
+							'&:hover': {
+								bgcolor: (theme: Theme) => theme.palette.grey[200],
+								'> button': {
+									visibility: 'visible'
+								}
+							},
+							borderBottom: array.length - 1 === index ? 1 : 0,
+							borderTop: 1,
+							borderColor: (theme: Theme) => theme.palette.grey[300],
 							'> button': {
-								visibility: 'visible'
+								visibility: 'hidden'
 							}
-						},
-						borderBottom: array.length - 1 === index ? 1 : 0,
-						borderTop: 1,
-						borderColor: (theme: Theme) => theme.palette.grey[300],
-						'> button': {
-							visibility: 'hidden'
-						}
-					}}>
-						{channel.hasPassword &&
-							<LockOutlinedIcon
-								sx={{
-									color: (theme: Theme) => theme.palette.grey[500],
-									marginRight: 1
-								}}
-							/>}
-						<ListItemText
-							primary={channel.name}
-							secondary={`${channel.members?.length} members`}
-						/>
-						<Button onClick={() => joinChannel(channel.id)} variant='contained' color='success'>Join</Button>
-					</ListItem>
-				))}
+						}}>
+							{channel.hasPassword &&
+								<LockOutlinedIcon
+									sx={{
+										color: (theme: Theme) => theme.palette.grey[500],
+										marginRight: 1
+									}}
+								/>}
+							<ListItemText
+								primary={channel.name}
+								secondary={`${channel.members?.length} members`}
+							/>
+							<Button onClick={() => joinChannel(channel.id)} variant='contained' color='success'>Join</Button>
+						</ListItem>
+					))}
 			</List>
 		</Box>
 	)
