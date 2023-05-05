@@ -21,7 +21,7 @@ const joinChannel = (channelId: number) => {
 export function MyChannelsList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
-	const [MyChannelsList, setMyChannelsList] = useState<Channel[]>();
+	const [MyChannelsList, setMyChannelsList] = useState<Channel[]>([]);
 
 
 	useEffect(() => {
@@ -37,7 +37,6 @@ export function MyChannelsList() {
 	const mooveToChannel = (channelId: number) => {
 		navigate(`/chat/${channelId}`);
 	}
-
 
 	return (
 		<nav aria-label="secondary mailbox folders">
