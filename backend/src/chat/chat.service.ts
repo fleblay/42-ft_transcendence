@@ -116,7 +116,8 @@ export class ChatService implements OnModuleInit {
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is already in the channel`)
 			else {
 				member.left = false
-				await this.membersRepo.save(member)
+				const joinedMember = await this.membersRepo.save(member)
+				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {joinedMember});
 				return
 			}
 		}
@@ -128,8 +129,8 @@ export class ChatService implements OnModuleInit {
 		})
 		channel.members.push(joiner)
 		await this.channelsRepo.save(channel)
-		await this.membersRepo.save(joiner)
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { id: joiner.user.id, username: joiner.user.username, role: joiner.role });
+		const joinedMember = await this.membersRepo.save(joiner)
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {joinedMember});
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -348,8 +349,8 @@ export class ChatService implements OnModuleInit {
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
 		member.left = true;
-		await this.membersRepo.save(member);
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { id: member.user.id });
+		const leftMember = await this.membersRepo.save(member);
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', {leftMember});
 	}
 
 	// TODO: return boolean hasPassword
