@@ -38,4 +38,13 @@ export class FriendsController {
 	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
 		return this.friendsService.getFriend(user, parseInt(id));
 	}
+
+	@UseGuards(ATGuard)
+	@Get('/received')
+	async getPendingRequests(@CurrentUser() user: User) 
+	{	
+		return await this.friendsService.getFriendReceiveRequests(user);
+	}
+
+
 }

@@ -168,4 +168,28 @@ export class FriendsService {
 			};
 		});
 	}
+
+	async getFriendReceiveRequests(user: User): Promise<Friend[]> {
+		const wantedStatus = 'pending';
+		if (!user)
+			throw new NotFoundException("User not found");
+			
+		const friendList = await this.friendReqRepo.find({
+			where: [
+				{ receiver: { id: user.id }, status: wantedStatus }
+			],
+			relations: { sender: true, receiver: true }
+		});
+
+		return friendList.map(({ sender}) => {
+			return {
+				id: sender.id,
+				username: sender.username || "<UnamedUser>",
+				online: this.usersService.isConnected(sender.id),
+				status: this.gameService.userStatus(sender.id),
+				type: 'received',
+				requestStatus: wantedStatus
+			};
+		});
+	}
 }
