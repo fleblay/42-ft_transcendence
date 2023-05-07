@@ -271,7 +271,7 @@ export class ChatService implements OnModuleInit {
 			throw new NotFoundException('Request member not found');
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
-			relations: ['members'],
+			relations: ['members', 'members.user'],
 			select: {
 				id: true,
 				members: {
@@ -282,6 +282,7 @@ export class ChatService implements OnModuleInit {
 					muteTime: true,
 					user: {
 						id: true,
+						username: true,
 					}
 				}
 			}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useAuthService } from '../../auth/AuthService'
+import { SocketContext } from "../../socket/SocketProvider";
 
 type memberList = {
 	admins: Member[],
@@ -21,11 +22,49 @@ const redColor: string = "#ff0000"
 
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
-
 export function MemberList({ channelId }: { channelId: string }) {
 	const auth = useAuthService()
+	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 	const [memberList, setMemberList] = useState<memberList>(emptyMemberList);
 	const me = React.useRef<Member | null>(null)
+
+	useEffect(() => {
+		return addSubscription(`/chat/${channelId}`);
+	}, [channelId]);
+
+	//On track sur memberList car au premier render, elle a la valeur emptyMemberList
+	//On ajout un on sur l'event chat.member.update
+	//Le call back prend en param la memberList qui est update apres le premier api.Client.get
+	useEffect(() => {
+		function onMemberUpdate({ modifyMember: upDatedMember }: { modifyMember: Member }) {
+			console.log("onMemberUpdate", upDatedMember);
+			const newMemberList : memberList = JSON.parse(JSON.stringify(memberList))
+			for (const [key, value] of Object.entries(newMemberList)) {
+				console.log("in for loop : ", key, value)
+				const oldMemberIndex: number = value.findIndex((member) => member.id == upDatedMember.id)
+				if (oldMemberIndex != -1) {
+					console.log("Found oldmember in :", key)
+					value.splice(oldMemberIndex, 1)
+					break
+				}
+			}
+			if (upDatedMember.role == "admin")
+				newMemberList.admins.push(upDatedMember)
+			else if (upDatedMember.banned)
+				newMemberList.banned.push(upDatedMember)
+			else if (Date.parse(upDatedMember.muteTime) > Date.now())
+				newMemberList.muted.push(upDatedMember)
+			else
+				newMemberList.regulars.push(upDatedMember)
+			console.log("new member list", newMemberList)
+			setMemberList(newMemberList)
+		}
+
+		customOn("chat.modify.members", onMemberUpdate);
+		return () => {
+			customOff("chat.modify.members", onMemberUpdate);
+		};
+	}, [memberList])
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
@@ -73,7 +112,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					member.role == "owner" && setMyRights([""])
 					break
 			}
-		}, [me.current])
+		}, [me.current, memberList])
 
 		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 			setAnchorEl(event.currentTarget);
