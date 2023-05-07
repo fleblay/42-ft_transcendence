@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useAuthService } from '../../auth/AuthService'
+import { SocketContext } from "../../socket/SocketProvider";
 
 type memberList = {
 	admins: Member[],
@@ -18,14 +19,88 @@ type memberList = {
 
 const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
-
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
+function removeOldMember(olMemberId: number, memberList: memberList) : memberList{
+
+	for (const [key, value] of Object.entries(memberList)) {
+		console.log("in for loop : ", key, value)
+		const oldMemberIndex: number = value.findIndex((member) => member.id == olMemberId)
+		if (oldMemberIndex != -1) {
+			console.log("Found oldmember in :", key)
+			value.splice(oldMemberIndex, 1)
+			break
+		}
+	}
+	return({
+		admins: [...memberList.admins],
+		banned: [...memberList.banned],
+		muted: [...memberList.muted],
+		regulars: [...memberList.regulars],
+	})
+}
+
+function addNewMember(newMember: Member, memberList: memberList) : memberList{
+	if (newMember.role == "admin")
+		memberList.admins.push(newMember)
+	else if (newMember.banned)
+		memberList.banned.push(newMember)
+	else if (Date.parse(newMember.muteTime) > Date.now())
+		memberList.muted.push(newMember)
+	else if (!newMember.left)
+		memberList.regulars.push(newMember)
+	console.log("new member list", memberList)
+	return({
+		admins: [...memberList.admins],
+		banned: [...memberList.banned],
+		muted: [...memberList.muted],
+		regulars: [...memberList.regulars],
+	})
+}
 
 export function MemberList({ channelId }: { channelId: string }) {
 	const auth = useAuthService()
+	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 	const [memberList, setMemberList] = useState<memberList>(emptyMemberList);
 	const me = React.useRef<Member | null>(null)
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		return addSubscription(`/chat/${channelId}`);
+	}, [channelId]);
+
+	//On track sur memberList car au premier render, elle a la valeur emptyMemberList
+	//On ajout un on sur l'event chat.member.update
+	//Le call back prend en param la memberList qui est update apres le premier api.Client.get
+	useEffect(() => {
+		function onMemberUpdate({ modifyMember: upDatedMember }: { modifyMember: Member }) {
+			console.log("onMemberUpdate", upDatedMember);
+			removeOldMember(upDatedMember.id, memberList)
+			setMemberList(addNewMember(upDatedMember, memberList))
+		}
+
+		function onMemberJoin({joinedMember}: { joinedMember: Member }) {
+			console.log("onMemberJoin", joinedMember);
+			setMemberList(addNewMember(joinedMember, memberList))
+		}
+
+		function onMemberLeave({leftMember}: { leftMember: Member }) {
+			console.log("onMemberLeft", leftMember);
+			setMemberList(removeOldMember(leftMember.id, memberList))
+			//TODO A fix, ne fonctionne pas
+			if (leftMember.id == me.current!.id)
+				navigate(`/chat`);
+		}
+
+		customOn("chat.modify.members", onMemberUpdate);
+		customOn("chat.member.new", onMemberJoin);
+		customOn("chat.member.leave", onMemberLeave);
+		return () => {
+			customOff("chat.modify.members", onMemberUpdate);
+			customOff("chat.member.new", onMemberJoin);
+			customOn("chat.member.leave", onMemberLeave);
+		};
+	}, [memberList])
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
@@ -73,7 +148,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					member.role == "owner" && setMyRights([""])
 					break
 			}
-		}, [me.current])
+		}, [me.current, memberList])
 
 		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 			setAnchorEl(event.currentTarget);
