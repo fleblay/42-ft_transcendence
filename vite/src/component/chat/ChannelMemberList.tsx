@@ -38,8 +38,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 	useEffect(() => {
 		function onMemberUpdate({ modifyMember: upDatedMember }: { modifyMember: Member }) {
 			console.log("onMemberUpdate", upDatedMember);
-			const newMemberList : memberList = JSON.parse(JSON.stringify(memberList))
-			for (const [key, value] of Object.entries(newMemberList)) {
+			for (const [key, value] of Object.entries(memberList)) {
 				console.log("in for loop : ", key, value)
 				const oldMemberIndex: number = value.findIndex((member) => member.id == upDatedMember.id)
 				if (oldMemberIndex != -1) {
@@ -49,15 +48,20 @@ export function MemberList({ channelId }: { channelId: string }) {
 				}
 			}
 			if (upDatedMember.role == "admin")
-				newMemberList.admins.push(upDatedMember)
+				memberList.admins.push(upDatedMember)
 			else if (upDatedMember.banned)
-				newMemberList.banned.push(upDatedMember)
+				memberList.banned.push(upDatedMember)
 			else if (Date.parse(upDatedMember.muteTime) > Date.now())
-				newMemberList.muted.push(upDatedMember)
+				memberList.muted.push(upDatedMember)
 			else
-				newMemberList.regulars.push(upDatedMember)
-			console.log("new member list", newMemberList)
-			setMemberList(newMemberList)
+				memberList.regulars.push(upDatedMember)
+			console.log("new member list", memberList)
+			setMemberList({
+				admins : [...memberList.admins],
+				banned : [...memberList.banned],
+				muted : [...memberList.muted],
+				regulars : [...memberList.regulars],
+				})
 		}
 
 		customOn("chat.modify.members", onMemberUpdate);
