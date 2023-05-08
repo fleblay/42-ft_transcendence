@@ -22,7 +22,7 @@ export class FriendsService {
 		this.server = server;
 	}
 
-	async addFriend(user: User, friendId: number) {
+	async addFriend(user: User, friendId: string) {
 
 		const friend = await this.usersService.findOne(friendId);
 		if (!friend) {
@@ -62,7 +62,7 @@ export class FriendsService {
 			requestStatus: friendRequest.status
 		} as Friend
 	}
-	async acceptFriend(user: User, friendId: number) {
+	async acceptFriend(user: User, friendId: string) {
 		const friend = await this.usersService.findOne(friendId);
 		if (!friend) {
 			console.log("User not found");
@@ -92,7 +92,7 @@ export class FriendsService {
 		return friendData
 	}
 
-	async removeFriend(user: User, friendId: number) {
+	async removeFriend(user: User, friendId: string) {
 		const friendRequest = await this.getFriendRequest(user, friendId);
 		if (!friendRequest) {
 			console.log("You are not friends with this user");
@@ -108,7 +108,7 @@ export class FriendsService {
 	}
 
 
-	async getFriendRequest(user: User, friendId: number, status?: FriendRequestStatus): Promise<FriendRequest | null> {
+	async getFriendRequest(user: User, friendId: string, status?: FriendRequestStatus): Promise<FriendRequest | null> {
 		const friend = await this.usersService.findOne(friendId);
 		if (!friend) {
 			console.log("User not found");
@@ -137,7 +137,7 @@ export class FriendsService {
 	}
 
 
-	async getFriend(user: User, friendId: number): Promise<Friend | null> {
+	async getFriend(user: User, friendId: string): Promise<Friend | null> {
 		const friendRequest = await this.getFriendRequest(user, friendId);
 		if (!friendRequest)
 			return null;

@@ -9,6 +9,6 @@ export class RefreshToken {
 	refreshToken: string;
 
 	@Column()
-	userId: number;
+	userId: string;
 
 }

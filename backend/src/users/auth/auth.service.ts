@@ -34,7 +34,7 @@ export class AuthService {
 		))
 	}
 
-	turnOnDfa(userID: number): void {
+	turnOnDfa(userID: string): void {
 		this.usersService.update(userID, { dfa: true })
 	}
 
@@ -197,11 +197,11 @@ export class AuthService {
 		return await this.login42API({ stud: true, email, password: "42" })
 	}
 
-	async saveRefreshToken(userId: number, refreshToken: string) {
+	async saveRefreshToken(userId: string, refreshToken: string) {
 		await this.repo.save({ userId, refreshToken });
 	}
 
-	async updateRefreshToken(userId: number, refreshToken: string) {
+	async updateRefreshToken(userId: string, refreshToken: string) {
 		const report = await this.repo.findOne({ where: { userId: userId } });
 		if (!report) {
 			throw new NotFoundException('User not found');

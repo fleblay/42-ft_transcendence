@@ -19,7 +19,7 @@ export type UserScore = {
 export type UserInfo = User & UserState & UserScore & {userConnected: boolean}
 
 export type Friend = {
-	id: number,
+	id: string,
 	username: string,
 	online: boolean,
 	status: UserStatus,
@@ -29,7 +29,7 @@ export type Friend = {
 
 
 export type Blocked= {
-	id: number,
+	id: string,
 	username: string
 }
 

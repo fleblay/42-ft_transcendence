@@ -66,11 +66,11 @@ export class GameService {
 		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, { move: data.move, powerUp: data.powerup })
 	}
 
-	userState(id: number): UserState {
+	userState(id: string): UserState {
 		return this.gameCluster.findUserStateById(id)
 	}
 
-	userStatus(id: number): UserStatus {
+	userStatus(id: string): UserStatus {
 		const allStates = this.gameCluster.findUserStateById(id) as UserState;
 		if (allStates.states.length === 0)
 			return 'offline'
@@ -79,7 +79,7 @@ export class GameService {
 
 	}
 
-	quitGame(userId: number, gameId: UUID) {
+	quitGame(userId: string, gameId: UUID) {
 		this.server.to(`/player/${userId}`).emit('page.player', {})
 		const game = this.gameCluster.playerQuit(gameId, userId);
 		if (game) {
@@ -103,7 +103,7 @@ export class GameService {
 	}
 
 
-	async getListGamesByUser(id: number) {
+	async getListGamesByUser(id: string) {
 		const fullDB = await this.repo.createQueryBuilder("game")
 			.leftJoin("game.players", "player")
 			.addSelect(['player.id', 'player.username'])

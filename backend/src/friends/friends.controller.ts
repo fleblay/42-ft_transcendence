@@ -18,25 +18,19 @@ export class FriendsController {
 	@UseGuards(ATGuard)
 	@Post('/accept/:id')
 	async acceptFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.friendsService.acceptFriend(user, parseInt(id));
+		return await this.friendsService.acceptFriend(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/add/:id')
 	async addFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.friendsService.addFriend(user, parseInt(id));
+		return await this.friendsService.addFriend(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/remove/:id')
 	async removeFriend(@CurrentUser() user: User, @Param("id") id: string) {
-		return await this.friendsService.removeFriend(user, parseInt(id));
-	}
-
-	@UseGuards(ATGuard)
-	@Get('/:id')
-	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
-		return this.friendsService.getFriend(user, parseInt(id));
+		return await this.friendsService.removeFriend(user, id);
 	}
 
 	@UseGuards(ATGuard)
@@ -45,6 +39,14 @@ export class FriendsController {
 	{	
 		return await this.friendsService.getFriendReceiveRequests(user);
 	}
+
+
+	@UseGuards(ATGuard)
+	@Get('/:id')
+	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
+		return this.friendsService.getFriend(user, id);
+	}
+
 
 
 }

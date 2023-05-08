@@ -23,12 +23,12 @@ export class GameController {
 
 	@Get("/userstate/:id")
 	getUserState(@Param('id') id: string): UserState {
-		return this.gameService.userState(parseInt(id))
+		return this.gameService.userState(id)
 	}
 
 	@Get("/usergames/:id")
 	getUserGames(@Param('id') id: string) {
-		return this.gameService.getListGamesByUser(parseInt(id))
+		return this.gameService.getListGamesByUser(id)
 	}
 
 	@UseGuards(ATGuard)
@@ -54,7 +54,7 @@ export class GameController {
 
 	@UseGuards(ATGuard)
 	@Get('/history/:id')
-	async getHistory(@Param('id') id: number) {
+	async getHistory(@Param('id') id: string) {
 
 		const games = await this.gameService.getListGamesByUser(id);
 		//console.log('games: ', games);

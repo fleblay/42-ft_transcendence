@@ -71,7 +71,7 @@ export class GameCluster {
 		return uuidv4();
 	}
 
-	findUserStateById(id: number): UserState {
+	findUserStateById(id: string): UserState {
 		let states: UserStatus[] = []
 		let gameIds: UUID[] = []
 		for (const game of this.gamesMap.values()) {
@@ -124,7 +124,7 @@ export class GameCluster {
 		- 2 players: delete : save game
 
 	*/
-	playerQuit(gameId: UUID, userId: number): Game | null {
+	playerQuit(gameId: UUID, userId: string): Game | null {
 		const game = this.gamesMap.get(gameId);
 
 		if (!game) return null;

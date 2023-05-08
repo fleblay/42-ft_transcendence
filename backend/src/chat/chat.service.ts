@@ -73,7 +73,7 @@ export class ChatService implements OnModuleInit {
 		})
 	}
 
-	async createChannel(data: CreateChannelDto): Promise<number> {
+	async createChannel(data: CreateChannelDto): Promise<string> {
 		if (data.private && data.password)
 			throw new BadRequestException("createChannel : Private channel creation data provide a password")
 
@@ -87,7 +87,7 @@ export class ChatService implements OnModuleInit {
 		return channel.id
 	}
 
-	async joinChannel(user: User, channelId: number, options: { owner?: boolean, password?: string, targetUser?: string } = {}): Promise<void> {
+	async joinChannel(user: User, channelId: string, options: { owner?: boolean, password?: string, targetUser?: string } = {}): Promise<void> {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
@@ -133,7 +133,7 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { joinedMember });
 	}
 
-	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
+	private getMemberOfChannel(user: User, channelId: string): Promise<Member | null> {
 		return this.membersRepo.findOne({
 			where: { user: { id: user.id }, channel: { id: channelId } },
 			relations: ['channel', 'user'],
@@ -169,7 +169,7 @@ export class ChatService implements OnModuleInit {
 			throw new BadRequestException(`You must be ${role} to do this`);
 		return true;
 	}
-	async newMessage(owner: User, channelId: number, messageData: NewMessageDto) {
+	async newMessage(owner: User, channelId: string, messageData: NewMessageDto) {
 		const member = await this.getMemberOfChannel(owner, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
@@ -184,7 +184,7 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
 	}
 
-	async getMessages(user: User, channelId: number, offset: number = 0): Promise<Message[]> {
+	async getMessages(user: User, channelId: string, offset: number = 0): Promise<Message[]> {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
@@ -214,7 +214,7 @@ export class ChatService implements OnModuleInit {
 		return messages;
 	}
 
-	async getChannelMembers(channelId: number): Promise<Member[]> {
+	async getChannelMembers(channelId: string): Promise<Member[]> {
 		const members = await this.membersRepo.find({
 			where: {
 				channel: {
@@ -237,7 +237,7 @@ export class ChatService implements OnModuleInit {
 	}
 
 
-	async getChannelInfo(user: User, channelId: number): Promise<Channel | null> {
+	async getChannelInfo(user: User, channelId: string): Promise<Channel | null> {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
@@ -265,7 +265,7 @@ export class ChatService implements OnModuleInit {
 	}
 
 
-	async modifyMembers(user: User, channelId: number, memberId: number, options: ModifyMemberDto) {
+	async modifyMembers(user: User, channelId: string, memberId: number, options: ModifyMemberDto) {
 
 		const requestingMember = await this.getMemberOfChannel(user, channelId);
 		if (!requestingMember)
@@ -318,7 +318,7 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', { modifyMember });
 	}
 
-	async modifyChannel(user: User, channelId: number, changeChannelData: ChangeChannelDto) {
+	async modifyChannel(user: User, channelId: string, changeChannelData: ChangeChannelDto) {
 		const requestingMember = await this.getMemberOfChannel(user, channelId);
 		if (!requestingMember)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
@@ -348,7 +348,7 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });
 	}
 
-	async leaveChannel(user: User, channelId: number) {
+	async leaveChannel(user: User, channelId: string) {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
@@ -409,7 +409,7 @@ export class ChatService implements OnModuleInit {
 	}
 
 
-	async getUnreadMessages(user: User, channelId: number): Promise<number> {
+	async getUnreadMessages(user: User, channelId: string): Promise<number> {
 		const member = await this.membersRepo.findOne({
 			where: {
 				user: {
@@ -464,7 +464,7 @@ export class ChatService implements OnModuleInit {
 		});
 	}
 
-	async joinDirectMessage(user: User, targetUser: number) {
+	async joinDirectMessage(user: User, targetUser: string) {
 		// check if channel exists
 		const channel = await this.getDMChannel(user, { id: targetUser });
 		if (channel)

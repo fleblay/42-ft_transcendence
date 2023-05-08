@@ -28,7 +28,7 @@ import { ChatService } from '../chat/chat.service';
 type SocketInfo = {
 	id: string,
 	username: string,
-	userId: number,
+	userId: string,
 	actions: string[]
 }
 

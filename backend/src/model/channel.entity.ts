@@ -1,11 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Member } from "./member.entity";
 import { Message } from "./message.entity";
 
 @Entity()
 export class Channel {
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
 	@Column()
 	name: string;
@@ -22,6 +22,10 @@ export class Channel {
 	@OneToMany(() => Member, member => member.channel)
 	members: Member[];
 
+	@CreateDateColumn()
+	createdAt: Date;
+
 	@Column({ default: false })
 	directMessage: boolean;
 }
+//

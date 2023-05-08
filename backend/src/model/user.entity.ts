@@ -6,8 +6,8 @@ import { Member } from './member.entity';
 
 @Entity()
 export class User {
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
 
 	@Column({ nullable: true })
 	username?: string
@@ -17,8 +17,8 @@ export class User {
 	@Column()
 	password: string;
 
-	@Column("int", { array: true, default: [] })
-	blockedId: number[];
+	@Column("uuid", { array: true, default: [] })
+	blockedId: string[];
 
 	@Column({default : false})
 	stud : boolean;

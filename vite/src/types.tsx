@@ -88,12 +88,12 @@ export type Games = {
 }
 
 export type plainUser = {
-	id: number,
+	id: string,
 	username: string,
 	email: string,
 	stud: boolean,
 	dfa: boolean,
-	blockedId: number[],
+	blockedId: string[],
 }
 
 export type UserInfo = plainUser & {
@@ -114,7 +114,7 @@ export type UserStatus = 'online' | 'ingame' | 'watching' | 'offline';
 export type RelationType = 'sent' | 'received';
 
 export type Friend = {
-	id: number,
+	id: string,
 	username: string,
 	online: boolean,
 	status: UserStatus,
@@ -123,12 +123,12 @@ export type Friend = {
 }
 
 export type Blocked = {
-	id: number,
+	id: string,
 	username: string
 }
 
 export type Channel = {
-	id: number,
+	id: string,
 	name: string,
 	private: boolean,
 	hasPassword: boolean,
@@ -139,7 +139,7 @@ export type Channel = {
 export type PlainMember = {
 	id: number;
 	role: string;
-	user: { id: number, username: string; };
+	user: { id: string, username: string; };
 	muteTime: string,
 	banned: boolean,
 	left: boolean

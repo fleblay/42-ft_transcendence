@@ -19,7 +19,7 @@ import { authenticator } from 'otplib';
 @Injectable()
 export class UsersService implements OnModuleInit {
 
-	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
+	private connectedUsers: Map<string, UserStatus[]> = new Map();
 	private server : Server;
 	constructor(
 		@InjectRepository(User) private repo: Repository<User>,
@@ -64,7 +64,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	findOne(id: number, withGames: boolean = false) {
+	findOne(id: string, withGames: boolean = false) {
 		if (!id) return null;
 		return this.repo.findOne({
 			where: { id },
@@ -87,29 +87,29 @@ export class UsersService implements OnModuleInit {
 		return await this.repo.findOneBy({ email });
 	}
 
-	async update(id: number, partialUser: Partial<User>) {
+	async update(id: string, partialUser: Partial<User>) {
 		await this.repo.update(id, partialUser);
 		return this.findOne(id);
 	}
 
-	async remove(id: number) {
+	async remove(id: string) {
 		await this.repo.delete(id);
 		return true;
 	}
 
-	isConnected(id: number): boolean {
+	isConnected(id: string): boolean {
 		// console.log(`id is ${id}user found connected status is`, this.connectedUsers.get(id))
-		return (this.connectedUsers.get(+id) != undefined)
+		return (this.connectedUsers.get(id) != undefined)
 	}
 
-	addConnectedUser(id: number) {
+	addConnectedUser(id: string) {
 		if (this.isConnected(id))
 			this.connectedUsers.get(id)?.push("online")
 		else
 			this.connectedUsers.set(id, ["online"])
 	}
 
-	changeStatus(id: number, { newStatus, oldStatus }: { newStatus?: UserStatus, oldStatus?: UserStatus }) {
+	changeStatus(id: string, { newStatus, oldStatus }: { newStatus?: UserStatus, oldStatus?: UserStatus }) {
 		// console.log('changing status : new ', newStatus, 'old :', oldStatus)
 		if (!this.isConnected(id))
 			this.addConnectedUser(id);
@@ -126,7 +126,7 @@ export class UsersService implements OnModuleInit {
 			this.connectedUsers.delete(id)
 	}
 
-	disconnect(id: number) {
+	disconnect(id: string) {
 		console.log("user.service.disconnect")
 		this.changeStatus(id, { oldStatus: "online" })
 	}
@@ -163,7 +163,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	blockUser(user: User, blockedId: number) {
+	blockUser(user: User, blockedId: string) {
 		if (user.blockedId.includes(blockedId)) {
 			console.log("User is already blocked");
 			return;
@@ -175,7 +175,7 @@ export class UsersService implements OnModuleInit {
 		return this.repo.save(user);
 	}
 
-	unblockUser(user: User, blockedId: number) {
+	unblockUser(user: User, blockedId: string) {
 		const index = user.blockedId.indexOf(blockedId);
 		if (index === -1) {
 			console.log("User is not blocked");
@@ -188,7 +188,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	async getBlocked(user: User, friendId: number): Promise <Blocked | null> {
+	async getBlocked(user: User, friendId: string): Promise <Blocked | null> {
 		if (!user)
 			throw new NotFoundException("User not found");
 		if (user.blockedId.includes(friendId)) {
@@ -204,7 +204,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	async getBlockedUsersList(userId: number): Promise<Blocked[]> {
+	async getBlockedUsersList(userId: string): Promise<Blocked[]> {
 
 		const user = await this.findOne(userId);
 		if (!user)
