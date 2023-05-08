@@ -91,7 +91,7 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true } } }
+			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true , username: true} } }
 		})
 		if (!channel)
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)

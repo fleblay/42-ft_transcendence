@@ -77,6 +77,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 			console.log("onMemberUpdate", upDatedMember);
 			removeOldMember(upDatedMember.id, memberList)
 			setMemberList(addNewMember(upDatedMember, memberList))
+			if (upDatedMember.id == me.current!.id && upDatedMember.left)
+				navigate(`/chat`);
 		}
 
 		function onMemberJoin({joinedMember}: { joinedMember: Member }) {
@@ -85,11 +87,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 		}
 
 		function onMemberLeave({leftMember}: { leftMember: Member }) {
-			console.log("onMemberLeft", leftMember);
+			console.log("onMemberLeft", leftMember, me.current);
 			setMemberList(removeOldMember(leftMember.id, memberList))
-			//TODO A fix, ne fonctionne pas
-			if (leftMember.id == me.current!.id)
-				navigate(`/chat`);
 		}
 
 		customOn("chat.modify.members", onMemberUpdate);
