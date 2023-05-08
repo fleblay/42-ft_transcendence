@@ -1,4 +1,4 @@
-import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query } from '@nestjs/common';
+import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query, UsePipes } from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -17,6 +17,7 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { FriendRequestStatus } from '../model/friend-request.entity';
 import { Request as ExpressRequest } from 'express';
+import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -49,6 +50,8 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/connected/:id')
+	@UsePipes(new ValideIdPipe())
+
 	isConnected(@Param("id") id: string): boolean {
 		return this.usersService.isConnected(parseInt(id));
 	}
@@ -81,24 +84,28 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/blocked/:id')
+	@UsePipes(new ValideIdPipe())
 	getBlockedUsersList(@Param("id") id: string) {
 		return this.usersService.getBlockedUsersList(parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
 	@Get('/getBlocked/:id')
+	@UsePipes(new ValideIdPipe())
 	getBlockedUser(@CurrentUser() user: User, @Param("id") id: string) {
 		return this.usersService.getBlocked(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/blockUser/:id')
+	@UsePipes(new ValideIdPipe())
 	block(@CurrentUser() user: User, @Param("id") id: string) {
 		this.usersService.blockUser(user, parseInt(id));
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/unblockUser/:id')
+	@UsePipes(new ValideIdPipe())
 	unblock(@CurrentUser() user: User, @Param("id") id: string) {
 		this.usersService.unblockUser(user, parseInt(id));
 	}
@@ -123,6 +130,8 @@ export class UsersController {
 	}
 
 	@Get('/:id')
+	@UseGuards(ATGuard)
+	@UsePipes(new ValideIdPipe())
 	async findOne(@Param("id") id: string): Promise<UserInfo> {
 		const user = await this.usersService.findOne(parseInt(id), true);
 		if (!user) {

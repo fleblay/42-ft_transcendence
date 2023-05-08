@@ -13,6 +13,7 @@ import { Server } from 'socket.io'
 import { FriendsService } from '../friends/friends.service';
 import { ChatService } from '../chat/chat.service';
 import { authenticator } from 'otplib';
+import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 
 
 
