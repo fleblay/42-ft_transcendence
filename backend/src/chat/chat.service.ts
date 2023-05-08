@@ -117,7 +117,7 @@ export class ChatService implements OnModuleInit {
 			else {
 				member.left = false
 				const joinedMember = await this.membersRepo.save(member)
-				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {joinedMember});
+				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { joinedMember });
 				return
 			}
 		}
@@ -130,7 +130,7 @@ export class ChatService implements OnModuleInit {
 		channel.members.push(joiner)
 		await this.channelsRepo.save(channel)
 		const joinedMember = await this.membersRepo.save(joiner)
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {joinedMember});
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { joinedMember });
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -290,6 +290,8 @@ export class ChatService implements OnModuleInit {
 		});
 		if (!channel)
 			throw new NotFoundException('Channel not found');
+		if (channel.directMessage)
+			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
 		const modifyMember = channel.members.find((member) => (member.id == memberId))
 		if (!modifyMember)
 			throw new NotFoundException('Member not found');
@@ -332,6 +334,8 @@ export class ChatService implements OnModuleInit {
 		});
 		if (!channel)
 			throw new NotFoundException('Channel not found');
+		if (channel.directMessage)
+			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
 		if (changeChannelData.name && changeChannelData.name === channel.name)
 			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is already named ${changeChannelData.name}`)
 		if (changeChannelData.password && changeChannelData.password === channel.password)
@@ -350,7 +354,7 @@ export class ChatService implements OnModuleInit {
 			throw new NotFoundException('Member not found, the channel may have been deleted');
 		member.left = true;
 		const leftMember = await this.membersRepo.save(member);
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', {leftMember});
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { leftMember });
 	}
 
 	// TODO: return boolean hasPassword
@@ -405,8 +409,8 @@ export class ChatService implements OnModuleInit {
 	}
 
 
-	async getUnreadMessages(user: User, channelId: number) : Promise<number> {
-		 const member = await this.membersRepo.findOne({
+	async getUnreadMessages(user: User, channelId: number): Promise<number> {
+		const member = await this.membersRepo.findOne({
 			where: {
 				user: {
 					id: user.id,
@@ -464,8 +468,7 @@ export class ChatService implements OnModuleInit {
 
 		if (channel)
 			return channel.id;
-		else
-		{
+		else {
 
 			const directMessage = {
 				name: `directMessage_${user.id}_${targetUser}`,
@@ -479,7 +482,7 @@ export class ChatService implements OnModuleInit {
 
 			const channelId = await this.createChannel(directMessage);
 			await this.joinChannel(user, channelId);
-			await this.joinChannel(user, channelId, { targetUser: friendUser?.username});
+			await this.joinChannel(user, channelId, { targetUser: friendUser?.username });
 			return channelId;
 		}
 	}
