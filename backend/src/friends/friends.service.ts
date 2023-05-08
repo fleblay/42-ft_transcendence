@@ -83,7 +83,13 @@ export class FriendsService {
 		this.usersService.unblockUser(user, friendId);
 		this.server.to(`/player/${user.id}`).emit('page.player', {})
 		this.server.to(`/player/${friendId}`).emit('page.player', {})
-		return this.generateFriend(user, friend, friendRequest);
+
+		const friendData = this.generateFriend(user, friend, friendRequest);
+		this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', {
+			status: 'update',
+		})
+
+		return friendData
 	}
 
 	async removeFriend(user: User, friendId: number) {
@@ -173,7 +179,7 @@ export class FriendsService {
 		const wantedStatus = 'pending';
 		if (!user)
 			throw new NotFoundException("User not found");
-			
+
 		const friendList = await this.friendReqRepo.find({
 			where: [
 				{ receiver: { id: user.id }, status: wantedStatus }
@@ -181,7 +187,7 @@ export class FriendsService {
 			relations: { sender: true, receiver: true }
 		});
 
-		return friendList.map(({ sender}) => {
+		return friendList.map(({ sender }) => {
 			return {
 				id: sender.id,
 				username: sender.username || "<UnamedUser>",

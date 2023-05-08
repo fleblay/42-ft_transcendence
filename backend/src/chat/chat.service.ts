@@ -1,6 +1,6 @@
 import { Inject, Injectable, forwardRef, BadRequestException, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { Member } from '../model/member.entity';
-import { MoreThan, Repository } from 'typeorm';
+import { In, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel } from '../model/channel.entity';
 import { Message } from '../model/message.entity';
@@ -80,7 +80,7 @@ export class ChatService implements OnModuleInit {
 		const channel: Channel = await this.channelsRepo.save({
 			name: data.name,
 			private: data.private,
-			password: data.password,
+			password: data.password
 		})
 		if (!channel.private)
 			this.wsServer.to('/chat/').emit('newChannel', { id: channel.id, name: channel.name, protected: !!channel.password })
@@ -378,6 +378,33 @@ export class ChatService implements OnModuleInit {
 		});
 	}
 
+	getMyDirectMessage(user: User): Promise<Channel[]> {
+		console.log('Jve vais crash')
+		return this.channelsRepo.find({
+			where: {
+				members: {
+					user: {
+						id: user.id,
+					},
+					left: false,
+				},
+				directMessage: true,
+			},
+			relations: ['members', 'members.user'],
+			select: {
+				id: true,
+				name: true,
+				private: true,
+				password: true,
+				members: {
+					id: true,
+					user: { id: true, username: true },
+				},
+			},
+		});
+	}
+
+
 	async getUnreadMessages(user: User, channelId: number) : Promise<number> {
 		 const member = await this.membersRepo.findOne({
 			where: {
@@ -408,4 +435,54 @@ export class ChatService implements OnModuleInit {
 		});
 
 	}
+
+	async joinDirectMessage(user: User, targetUser: number) {
+		// check if channel exists
+		const channel = await this.channelsRepo.findOne({
+			where: {
+				directMessage: true,
+				members: {
+					user: {
+						id: In([user.id, targetUser]),
+					},
+					left: false,
+				},
+			},
+
+			relations: ['members', 'members.user'],
+			select: {
+				id: true,
+				name: true,
+				private: true,
+				password: true,
+				members: {
+					id: true,
+					user: { id: true, username: true },
+				},
+			},
+		});
+
+		if (channel)
+			return channel.id;
+		else
+		{
+
+			const directMessage = {
+				name: `directMessage_${user.id}_${targetUser}`,
+				private: true,
+				password: '',
+				directMessage: true,
+			}
+			const friendUser = await this.usersService.findOne(targetUser);
+			if (!friendUser)
+				throw new NotFoundException('Friend not found');
+
+			const channelId = await this.createChannel(directMessage);
+			await this.joinChannel(user, channelId);
+			await this.joinChannel(user, channelId, { targetUser: friendUser?.username});
+			return channelId;
+		}
+	}
+
+
 }

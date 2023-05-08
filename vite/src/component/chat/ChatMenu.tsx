@@ -27,6 +27,7 @@ import apiClient from '../../auth/interceptor.axios';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { MyChannelsList } from './ChannelsList';
 import { CreateChannelModal } from './CreatChannelModal';
+import { ViewDayRounded } from '@mui/icons-material';
 
 
 
@@ -108,19 +109,8 @@ export default function ChatMenu() {
 		navigate(`/chat/`);
 	}
 
-	const createChannel = () => {
-		console.log("createChannel");
-		const channelParams = {
-			name: "test" + Math.floor(Math.random() * 1000),
-			private: false,
-			password: "test"
-		}
-		apiClient.post(`/api/chat/channels/create`, channelParams).then((response) => {
-			console.log("channels/create", "ok");
-		}).catch((error) => {
-			console.log(error);
-		}
-		);
+	const viewFriends = () => {
+		navigate(`/chat/friends`);
 	}
 
 
@@ -135,6 +125,12 @@ export default function ChatMenu() {
 						<ExploreOutlinedIcon />
 					</ListItemIcon>
 					<ListItemText primary="Browse the rooms" />
+				</ListItemButton>
+				<ListItemButton onClick={viewFriends}>
+					<ListItemIcon>
+						<PeopleAltOutlinedIcon />
+					</ListItemIcon>
+					<ListItemText primary="My Friends" />
 				</ListItemButton>
 				<ListItemButton onClick={handleOpenCreateChannel}>
 					<ListItemIcon>
@@ -159,7 +155,7 @@ export default function ChatMenu() {
 					<ListItemIcon>
 						<PeopleAltOutlinedIcon />
 					</ListItemIcon>
-					<ListItemText primary="Friends" />
+					<ListItemText primary="Direct Message" />
 					{friendMenu ? <ExpandLess /> : <ExpandMore />}
 				</ListItemButton>
 				<Collapse in={friendMenu} timeout="auto" unmountOnExit>

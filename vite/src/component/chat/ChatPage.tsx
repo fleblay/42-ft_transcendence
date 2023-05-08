@@ -8,7 +8,8 @@ import { useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
 import { Channel } from '../../types'
 import ChatMenu from './ChatMenu';
-import {ChannelBrowser} from './ChannelBrowse';
+import { ChannelBrowser } from './ChannelBrowse';
+import { FriendsBrowser } from './ChatFriendsBrowser';
 
 
 
@@ -67,13 +68,20 @@ export function ChatPage() {
 				<Divider />
 				<Grid container spacing={2}>
 					<Grid item xs={3}>
-						<ChatMenu/>
+						<ChatMenu />
 					</Grid>
 					<Grid item xs={7}>
-						{channelId ? <MessageArea channelId={channelId} /> : <ChannelBrowser />}
+
+						{channelId
+							? (
+								channelId === 'friends'
+									? <FriendsBrowser />
+									: <MessageArea channelId={channelId} />
+							)
+							: <ChannelBrowser />}
 					</Grid>
 					<Grid item xs={2}>
-						{channelId ? <MemberList channelId={channelId} /> : null}
+						{channelId && channelId !== 'friends' ? <MemberList channelId={channelId} /> : null}
 					</Grid>
 				</Grid>
 				<Divider />
@@ -88,7 +96,7 @@ export function ChatPage() {
 	return (
 		<>
 
-			<Container maxWidth="xl" sx={{maxHeight: '100px', minHeight: '100px'}}>
+			<Container maxWidth="xl" sx={{ maxHeight: '100px', minHeight: '100px' }}>
 				<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 						Chat

@@ -48,6 +48,26 @@ export class ChatController {
 			unreadMessages: this.chatService.getUnreadMessages(user, channel.id)}));
 	}
 
+	@Get('/channels/dm')
+	async getMyDirectMessage(@CurrentUser() user: User){
+		const channels = await this.chatService.getMyDirectMessage(user);
+		return channels.map((channel: Channel) => ({
+			...channel,
+			password: undefined,
+			hasPassword: channel.password.length !== 0,
+			unreadMessages: this.chatService.getUnreadMessages(user, channel.id)}));
+	}
+
+	// /api/chat/dm/${userId}/join
+
+	@Post('/dm/:id/join')
+	async joinDirectMessage(@CurrentUser() user: User, @Param('id') id: string): Promise<number> {
+		const targetId = parseInt(id);
+		if (isNaN(targetId))
+			throw new BadRequestException('Invalid target id');
+		return await this.chatService.joinDirectMessage(user, targetId);
+	}
+
 
 	// NOTE: A TESTER
 	// to: /chat emit :chat.new.channel

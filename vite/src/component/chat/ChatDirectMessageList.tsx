@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, List, ListItem, ListItemButton, ListItemText, AvatarGroup, Avatar } from "@mui/material";
+import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, List, ListItem, ListItemButton, ListItemText, AvatarGroup, Avatar, ListSubheader } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { TablePagination } from "@mui/material";
 
@@ -17,16 +17,16 @@ const joinChannel = (channelId: number) => {
 	});
 }
 
-export function MyDmList() {
+export function MyDirectMessageList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
-	const [MyChannelsList, setMyChannelsList] = useState<Channel[]>();
+	const [MyDmList, setMyDmList] = useState<Channel[]>();
 
 
 	useEffect(() => {
-		apiClient.get(`/api/chat/channels/my`).then((response) => {
-			console.log("MyChannelsList", response);
-			setMyChannelsList(response.data);
+		apiClient.get(`/api/chat/channels/dm`).then((response) => {
+			console.log("MyDmList", response);
+			setMyDmList(response.data);
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -39,21 +39,28 @@ export function MyDmList() {
 
 
 	return (
-				<List component="div" disablePadding>
-				{MyChannelsList?.map((channel : Channel) => (
-					<ListItem key={channel.id} sx={{ pl: 4 }} >
-						<ListItemButton  onClick={() => mooveToChannel(channel.id)}>
-							<ListItemText primary={channel.name} />
-							<AvatarGroup total={channel.members.length}>
-								{channel?.members?.map((member: Member) => (
-									<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
-								))}
-							</AvatarGroup>
+		<List component="div" disablePadding sx={{
+			width: '100%',
+			position: 'relative',
+			overflow: 'auto',
+			maxHeight: 300,
 
+		}} subheader={<li />}>
+			<ListSubheader>{`I'm sticky`}</ListSubheader>
+
+
+			{MyDmList?.map((channel: Channel) => {
+				const AvatarPath = `/avatars/${auth.user?.id == channel.members[0].user.id ? channel.members[0].user.id : channel.members[1].user.id}.png`;
+				return (
+					<ListItem key={channel.id} sx={{ pl: 4 }} >
+						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
+							<Avatar src={`/avatars/${AvatarPath}.png`} />
 						</ListItemButton>
 					</ListItem>
 				)
-				)}
-			</List>
+			})
+
+			}
+		</List>
 	);
 }
