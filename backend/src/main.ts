@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 const session = require('express-session');
 import * as cookieParser from 'cookie-parser';
+import { TypeOrmFilter } from './typeorm.filter';
 
 // doc express-session: https://www.npmjs.com/package/express-session
 
@@ -16,6 +17,7 @@ async function bootstrap() {
 		})
 	);
 	app.use(cookieParser())
+	app.useGlobalFilters(new TypeOrmFilter);
 	await app.listen(3000);
 }
 bootstrap();
