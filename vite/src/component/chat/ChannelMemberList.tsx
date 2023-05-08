@@ -158,7 +158,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 		};
 
 		const handleClickProfile = () => {
-			navigate(`/player/${member.id}`);
+			navigate(`/player/${member.user.id}`);
 		};
 
 		const handleClickKick = () => {
