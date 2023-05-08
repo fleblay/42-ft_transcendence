@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton } from "@mui/material";
+import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton, Modal } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { Channel, Member } from "../../types";
@@ -9,6 +9,7 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
+import { MuteMemberModal } from "./MuteMemberModal";
 
 type memberList = {
 	admins: Member[],
@@ -131,6 +132,14 @@ export function MemberList({ channelId }: { channelId: string }) {
 		const navigate = useNavigate()
 		const [myRights, setMyRights] = React.useState<string[]>([]);
 
+		//Modal
+		const [openModal, setOpenModal] = React.useState<boolean>(false)
+
+		function closeModal(): void {
+			setOpenModal(false)
+			handleClose()
+		}
+
 		useEffect(() => {
 			if (!me.current)
 				return
@@ -189,7 +198,6 @@ export function MemberList({ channelId }: { channelId: string }) {
 		const handleClickMute = () => {
 			let muteEnd = new Date()
 			if (Date.parse(member.muteTime) < Date.now()) {
-				//A faire proprement avec une modale
 				muteEnd.setDate(muteEnd.getDate() + 1)
 			}
 			else
@@ -238,6 +246,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`${member.banned ? "Unban" : "Ban"} ${member.user.username}`}</MenuItem>}
 					{myRights.includes("mute") && <MenuItem onClick={handleClickMute}>{`${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
 					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
+					{myRights.includes("mute") && <MenuItem onClick={()=> setOpenModal(true)}>{`Modal : ${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
+					<MuteMemberModal openModal={openModal} onClose={closeModal} channelId={channelId} member={member} />
 				</Menu>
 			</span>
 		);
