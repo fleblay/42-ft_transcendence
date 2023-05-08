@@ -62,7 +62,6 @@ export class ChatController {
 	// /api/chat/dm/${userId}/join
 
 	@Post('/dm/:id/join')
-	@UsePipes(ValideIdPipe)
 	async joinDirectMessage(@CurrentUser() user: User, @Param('id', ValideIdPipe) targetId: number): Promise<number> {
 	
 		return await this.chatService.joinDirectMessage(user, targetId);
@@ -81,7 +80,6 @@ export class ChatController {
 	// NOTE: A TESTER
 	// to: /chat/${channelId} emit :chat.join.channel
 	@Post('channels/:id/join')
-	@UsePipes(ValideIdPipe)
 	async joinChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: JoinChannelDto): Promise<void> {
 		await this.chatService.joinChannel(user, channelId, { password: body.password, targetUser: body.username })
 	}
@@ -91,7 +89,6 @@ export class ChatController {
 	// a tester
 	// NOTE: A TESTER
 	@Get('channels/:id/messages')
-	@UsePipes(ValideIdPipe)
 	getMessages(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Query('offset') offset: string): Promise<Message[]> {
 	;
 		return this.chatService.getMessages(user, channelId, parseInt(offset) || 0);
@@ -100,13 +97,11 @@ export class ChatController {
 	// NOTE: A TESTER
 	// to: /chat/${channelId} emit :chat.new.message
 	@Post('channels/:id/messages')
-	@UsePipes(ValideIdPipe)
 	async createMessage(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: NewMessageDto): Promise<void> {
 		await this.chatService.newMessage(user, channelId, body);
 	}
 	// NOTE: Return password if user is owner and return all members
 	@Get('channels/:id/info')
-	@UsePipes(ValideIdPipe)
 	getChannelInfo(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number) {
 		return this.chatService.getChannelInfo(user, channelId)
 	}

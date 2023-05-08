@@ -50,10 +50,9 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/connected/:id')
-	@UsePipes(new ValideIdPipe())
 
-	isConnected(@Param("id") id: string): boolean {
-		return this.usersService.isConnected(parseInt(id));
+	isConnected(@Param("id", ValideIdPipe) id: number): boolean {
+		return this.usersService.isConnected(id);
 	}
 
 	@Get('/me')
@@ -84,30 +83,26 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/blocked/:id')
-	@UsePipes(new ValideIdPipe())
-	getBlockedUsersList(@Param("id") id: string) {
-		return this.usersService.getBlockedUsersList(parseInt(id));
+	getBlockedUsersList(@Param("id", ValideIdPipe) id: number) {
+		return this.usersService.getBlockedUsersList(id);
 	}
 
 	@UseGuards(ATGuard)
 	@Get('/getBlocked/:id')
-	@UsePipes(new ValideIdPipe())
-	getBlockedUser(@CurrentUser() user: User, @Param("id") id: string) {
-		return this.usersService.getBlocked(user, parseInt(id));
+	getBlockedUser(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		return this.usersService.getBlocked(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/blockUser/:id')
-	@UsePipes(new ValideIdPipe())
-	block(@CurrentUser() user: User, @Param("id") id: string) {
-		this.usersService.blockUser(user, parseInt(id));
+	block(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		this.usersService.blockUser(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/unblockUser/:id')
-	@UsePipes(new ValideIdPipe())
-	unblock(@CurrentUser() user: User, @Param("id") id: string) {
-		this.usersService.unblockUser(user, parseInt(id));
+	unblock(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		this.usersService.unblockUser(user, id);
 	}
 
 	@UseGuards(ATGuard)
@@ -131,9 +126,8 @@ export class UsersController {
 
 	@Get('/:id')
 	@UseGuards(ATGuard)
-	@UsePipes(new ValideIdPipe())
-	async findOne(@Param("id") id: string): Promise<UserInfo> {
-		const user = await this.usersService.findOne(parseInt(id), true);
+	async findOne(@Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
+		const user = await this.usersService.findOne(id, true);
 		if (!user) {
 			throw new ForbiddenException('User not found');
 		}
