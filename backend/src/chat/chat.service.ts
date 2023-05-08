@@ -98,7 +98,7 @@ export class ChatService implements OnModuleInit {
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
 		if (channel.password && (!options?.password || options.password != channel.password))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
-		if (channel.private && (!options.owner || channel.members.find((member) => (member.user.id == user.id && member.role == "owner")) === undefined))
+		if (channel.private && (!options.owner || channel.members.find((member) => (member.user.id == user.id && member.role == "owner"))))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
 		console.log("joinChannel2 : ", channel, options)
 		let addedUser: User | null = user
