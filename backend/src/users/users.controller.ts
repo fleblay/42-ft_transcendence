@@ -1,4 +1,4 @@
-import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query } from '@nestjs/common';
+import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query, UsePipes } from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -17,6 +17,7 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { FriendRequestStatus } from '../model/friend-request.entity';
 import { Request as ExpressRequest } from 'express';
+import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -49,8 +50,9 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/connected/:id')
-	isConnected(@Param("id") id: string): boolean {
-		return this.usersService.isConnected(parseInt(id));
+
+	isConnected(@Param("id", ValideIdPipe) id: number): boolean {
+		return this.usersService.isConnected(id);
 	}
 
 	@Get('/me')
@@ -81,26 +83,26 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/blocked/:id')
-	getBlockedUsersList(@Param("id") id: string) {
-		return this.usersService.getBlockedUsersList(parseInt(id));
+	getBlockedUsersList(@Param("id", ValideIdPipe) id: number) {
+		return this.usersService.getBlockedUsersList(id);
 	}
 
 	@UseGuards(ATGuard)
 	@Get('/getBlocked/:id')
-	getBlockedUser(@CurrentUser() user: User, @Param("id") id: string) {
-		return this.usersService.getBlocked(user, parseInt(id));
+	getBlockedUser(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		return this.usersService.getBlocked(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/blockUser/:id')
-	block(@CurrentUser() user: User, @Param("id") id: string) {
-		this.usersService.blockUser(user, parseInt(id));
+	block(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		this.usersService.blockUser(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/unblockUser/:id')
-	unblock(@CurrentUser() user: User, @Param("id") id: string) {
-		this.usersService.unblockUser(user, parseInt(id));
+	unblock(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		this.usersService.unblockUser(user, id);
 	}
 
 	@UseGuards(ATGuard)
@@ -123,8 +125,9 @@ export class UsersController {
 	}
 
 	@Get('/:id')
-	async findOne(@Param("id") id: string): Promise<UserInfo> {
-		const user = await this.usersService.findOne(parseInt(id), true);
+	@UseGuards(ATGuard)
+	async findOne(@Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
+		const user = await this.usersService.findOne(id, true);
 		if (!user) {
 			throw new ForbiddenException('User not found');
 		}

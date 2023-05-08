@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, UseGuards, UsePipes } from '@nestjs/common';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { JoinChannelDto } from './dto/join-channel.dto';
 import { NewMessageDto } from './dto/new-message.dto';
@@ -12,6 +12,7 @@ import { Channel } from '../model/channel.entity';
 import { Message } from 'src/model/message.entity';
 import { ChangeChannelDto } from './dto/change-channel.dto';
 import { ModifyMemberDto } from './dto/modify-member.dto';
+import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 
 @Controller('chat')
 @UseGuards(ATGuard)
@@ -61,10 +62,8 @@ export class ChatController {
 	// /api/chat/dm/${userId}/join
 
 	@Post('/dm/:id/join')
-	async joinDirectMessage(@CurrentUser() user: User, @Param('id') id: string): Promise<number> {
-		const targetId = parseInt(id);
-		if (isNaN(targetId))
-			throw new BadRequestException('Invalid target id');
+	async joinDirectMessage(@CurrentUser() user: User, @Param('id', ValideIdPipe) targetId: number): Promise<number> {
+	
 		return await this.chatService.joinDirectMessage(user, targetId);
 	}
 
@@ -81,10 +80,7 @@ export class ChatController {
 	// NOTE: A TESTER
 	// to: /chat/${channelId} emit :chat.join.channel
 	@Post('channels/:id/join')
-	async joinChannel(@CurrentUser() user: User, @Param('id') id: string, @Body() body: JoinChannelDto): Promise<void> {
-		const channelId = parseInt(id);
-		if (isNaN(channelId))
-			throw new BadRequestException('Invalid channel id');
+	async joinChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: JoinChannelDto): Promise<void> {
 		await this.chatService.joinChannel(user, channelId, { password: body.password, targetUser: body.username })
 	}
 
@@ -93,37 +89,26 @@ export class ChatController {
 	// a tester
 	// NOTE: A TESTER
 	@Get('channels/:id/messages')
-	getMessages(@CurrentUser() user: User, @Param('id') id: string, @Query('offset') offset: string): Promise<Message[]> {
-		const channelId = parseInt(id);
-		if (isNaN(channelId))
-			throw new BadRequestException('Invalid channel id');
+	getMessages(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Query('offset') offset: string): Promise<Message[]> {
+	;
 		return this.chatService.getMessages(user, channelId, parseInt(offset) || 0);
 	}
 
 	// NOTE: A TESTER
 	// to: /chat/${channelId} emit :chat.new.message
 	@Post('channels/:id/messages')
-	async createMessage(@CurrentUser() user: User, @Param('id') id: string, @Body() body: NewMessageDto): Promise<void> {
-		const channelId = parseInt(id);
-		if (isNaN(channelId))
-			throw new BadRequestException('Invalid channel id');
+	async createMessage(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: NewMessageDto): Promise<void> {
 		await this.chatService.newMessage(user, channelId, body);
 	}
 	// NOTE: Return password if user is owner and return all members
 	@Get('channels/:id/info')
-	getChannelInfo(@CurrentUser() user: User, @Param('id') id: string) {
-		const channelId = parseInt(id);
-		if (isNaN(channelId))
-			throw new BadRequestException('Invalid channel id');
+	getChannelInfo(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number) {
 		return this.chatService.getChannelInfo(user, channelId)
 	}
 
 	// NOTE: A TESTER
 	@Get('channels/:id/members')
-	async getChannelMembers(@Param('id') id: string) : Promise<Member[]>{
-		const channelId = parseInt(id);
-		if (isNaN(channelId))
-			throw new BadRequestException('Invalid channel id');
+	async getChannelMembers(@Param('id', ValideIdPipe) channelId: number) : Promise<Member[]>{
 		let members = await this.chatService.getChannelMembers(channelId);
 		return members.map((member: Member) =>
 		({
@@ -138,13 +123,9 @@ export class ChatController {
 	// to: /chat/${channelId} emit :chat.modify.members -> { playerId, username, role, isMuted, isBanned }
 	// john
 	@Post('channels/:id/members/:playerId')
-	async modifyMembers(@CurrentUser() user: User, @Param('id') id: string, @Param('playerId') playerId : string, @Body() body: ModifyMemberDto): Promise<void>  {
-		const channelId = parseInt(id);
-		if (isNaN(channelId))
-			throw new BadRequestException('Invalid channel id');
-		const targetId = parseInt(playerId);
-		if (isNaN(targetId))
-			throw new BadRequestException('Invalid player id');
+	async modifyMembers(@CurrentUser() user: User, @Param('id', ValideIdPipe ) channelId: number, @Param('playerId', ValideIdPipe) targetId : number, @Body() body: ModifyMemberDto): Promise<void>  {
+
+	
 		await this.chatService.modifyMembers(user, channelId, targetId, body);
 		return
 	}
@@ -152,20 +133,14 @@ export class ChatController {
 	// to: /chat/${channelId} emit :chat.leave.members -> leaver.id
 	// john
 	@Post('channels/:id/leave')
-	async leaveChannel(@CurrentUser() user: User, @Param('id') id: string): Promise<void> {
-		const channelId = parseInt(id);
-		if (isNaN(channelId))
-			throw new BadRequestException('Invalid channel id');
+	async leaveChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): Promise<void> {
 		this.chatService.leaveChannel(user, channelId);
 	}
 
 	//to: /chat/${channelId} emit :chat.modify.channel -> { name, hasPassword }
 	// john
 	@Post('channels/:id/info')
-	async modifyChannel(@CurrentUser() user : User, @Param('id') id: string, @Body() body: ChangeChannelDto) : Promise<void> {
-		const channelId = parseInt(id);
-		if (isNaN(channelId))
-			throw new BadRequestException('Invalid channel id');
+	async modifyChannel(@CurrentUser() user : User, @Param('id', ValideIdPipe) channelId: number, @Body() body: ChangeChannelDto) : Promise<void> {
 		await this.chatService.modifyChannel(user, channelId, body);
 	}
 
