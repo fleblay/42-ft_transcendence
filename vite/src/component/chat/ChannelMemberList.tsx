@@ -21,7 +21,7 @@ const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
-function removeOldMember(olMemberId: number, memberList: memberList) : memberList{
+function removeOldMember(olMemberId: number, memberList: memberList): memberList {
 
 	for (const [key, value] of Object.entries(memberList)) {
 		console.log("in for loop : ", key, value)
@@ -32,7 +32,7 @@ function removeOldMember(olMemberId: number, memberList: memberList) : memberLis
 			break
 		}
 	}
-	return({
+	return ({
 		admins: [...memberList.admins],
 		banned: [...memberList.banned],
 		muted: [...memberList.muted],
@@ -40,7 +40,7 @@ function removeOldMember(olMemberId: number, memberList: memberList) : memberLis
 	})
 }
 
-function addNewMember(newMember: Member, memberList: memberList) : memberList{
+function addNewMember(newMember: Member, memberList: memberList): memberList {
 	if (newMember.role == "admin")
 		memberList.admins.push(newMember)
 	else if (newMember.banned)
@@ -50,7 +50,7 @@ function addNewMember(newMember: Member, memberList: memberList) : memberList{
 	else if (!newMember.left)
 		memberList.regulars.push(newMember)
 	console.log("new member list", memberList)
-	return({
+	return ({
 		admins: [...memberList.admins],
 		banned: [...memberList.banned],
 		muted: [...memberList.muted],
@@ -81,12 +81,12 @@ export function MemberList({ channelId }: { channelId: string }) {
 				navigate(`/chat`);
 		}
 
-		function onMemberJoin({joinedMember}: { joinedMember: Member }) {
+		function onMemberJoin({ joinedMember }: { joinedMember: Member }) {
 			console.log("onMemberJoin", joinedMember);
 			setMemberList(addNewMember(joinedMember, memberList))
 		}
 
-		function onMemberLeave({leftMember}: { leftMember: Member }) {
+		function onMemberLeave({ leftMember }: { leftMember: Member }) {
 			console.log("onMemberLeft", leftMember, me.current);
 			setMemberList(removeOldMember(leftMember.id, memberList))
 		}
@@ -176,6 +176,13 @@ export function MemberList({ channelId }: { channelId: string }) {
 				.catch((error) => {
 					console.log(error);
 				});
+			if (!member.banned) {
+				apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { kick: true}).
+					then(() => console.log("Ban : OK"))
+					.catch((error) => {
+						console.log(error);
+					});
+			}
 			setAnchorEl(null);
 		};
 
