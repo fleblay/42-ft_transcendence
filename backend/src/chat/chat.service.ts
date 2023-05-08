@@ -93,13 +93,14 @@ export class ChatService implements OnModuleInit {
 			relations: { members: { user: true } },
 			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true , username: true} } }
 		})
+		console.log("joinChannel : ", channel, options)
 		if (!channel)
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
 		if (channel.password && (!options?.password || options.password != channel.password))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
-		if (channel.private && channel.members.find((member) => (member.user.id == user.id) && ((member.role == "owner") || (member.role == "admin"))))
+		if (channel.private && (!options.owner || channel.members.find((member) => (member.user.id == user.id && member.role == "owner"))))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
-
+		console.log("joinChannel2 : ", channel, options)
 		let addedUser: User | null = user
 		if (options?.targetUser) {
 			addedUser = await this.usersService.findOneByUsername(options.targetUser)
@@ -357,7 +358,6 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { leftMember });
 	}
 
-	// TODO: return boolean hasPassword
 	getMyChannels(user: User): Promise<Channel[]> {
 		return this.channelsRepo.find({
 			where: {
@@ -383,7 +383,6 @@ export class ChatService implements OnModuleInit {
 	}
 
 	getMyDirectMessage(user: User): Promise<Channel[]> {
-		console.log('Jve vais crash')
 		return this.channelsRepo.find({
 			where: {
 				members: {
@@ -482,8 +481,11 @@ export class ChatService implements OnModuleInit {
 				throw new NotFoundException('Friend not found');
 
 			const channelId = await this.createChannel(directMessage);
+			console.log("joinDirectMessage : channel created", channelId)
 			await this.joinChannel(user, channelId, { owner: true });
+			console.log("joinDirectMessage : channel joined", channelId)
 			await this.joinChannel(user, channelId, { targetUser: friendUser.username });
+			console.log("joinDirectMessage : channel joined", channelId)
 			return channelId;
 		}
 	}

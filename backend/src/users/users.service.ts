@@ -13,6 +13,7 @@ import { Server } from 'socket.io'
 import { FriendsService } from '../friends/friends.service';
 import { ChatService } from '../chat/chat.service';
 import { authenticator } from 'otplib';
+import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 
 
 
@@ -65,7 +66,8 @@ export class UsersService implements OnModuleInit {
 
 
 	findOne(id: number, withGames: boolean = false) {
-		if (!id) return null;
+		if (!id || typeof id !== 'number') return null;
+		if (id < 0 || id > 2147483647) return null;
 		return this.repo.findOne({
 			where: { id },
 			relations: withGames ? ["savedGames", "wonGames"] : []
