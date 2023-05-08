@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button } from "@mui/material";
+import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { Channel, Member } from "../../types";
@@ -94,11 +94,11 @@ export function MemberList({ channelId }: { channelId: string }) {
 		customOn("chat.modify.members", onMemberUpdate);
 		customOn("chat.member.new", onMemberJoin);
 		customOn("chat.member.leave", onMemberLeave);
-		return () => {
+		return (() => {
 			customOff("chat.modify.members", onMemberUpdate);
 			customOff("chat.member.new", onMemberJoin);
 			customOn("chat.member.leave", onMemberLeave);
-		};
+		})
 	}, [memberList])
 
 	useEffect(() => {
@@ -177,7 +177,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					console.log(error);
 				});
 			if (!member.banned) {
-				apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { kick: true}).
+				apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { kick: true }).
 					then(() => console.log("Ban : OK"))
 					.catch((error) => {
 						console.log(error);
@@ -213,19 +213,17 @@ export function MemberList({ channelId }: { channelId: string }) {
 		};
 
 		return (
-			<div>
-				<Button
+			<span>
+				<IconButton
 					id="basic-button"
 					aria-controls={open ? 'basic-menu' : undefined}
 					aria-haspopup="true"
 					aria-expanded={open ? 'true' : undefined}
 					onClick={handleClick}
+					style={{ height: "40px", width: "40px" }}
 				>
-					<ListItemIcon>
-						<MoreHorizIcon />
-					</ListItemIcon>
-				</Button>
-
+					<MoreHorizIcon />
+				</IconButton>
 				<Menu
 					id="basic-menu"
 					anchorEl={anchorEl}
@@ -241,37 +239,40 @@ export function MemberList({ channelId }: { channelId: string }) {
 					{myRights.includes("mute") && <MenuItem onClick={handleClickMute}>{`${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
 					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
 				</Menu>
-			</div>
+			</span>
 		);
 	}
 
 	function GenerateMemberGroup({ groupname, groupMembers }: { groupname: string, groupMembers: Member[] }): JSX.Element {
 		return (<>
-			<Typography variant="h5" component="div" gutterBottom>{groupname}</Typography>
-			<List component="div" disablePadding sx={{
-				width: '100%',
-				position: 'relative',
-				overflow: 'auto',
-				maxHeight: 300,
-			}}>
+			<Typography component="div" gutterBottom>{groupname}</Typography>
+			<List>
 				{groupMembers.map((member) => (
-					<ListItem key={member.id} alignItems="flex-start">
-						<Badge
-							overlap="circular"
-							anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-							variant="dot"
-							sx={{
-								"& .MuiBadge-badge": {
-									backgroundColor: member.isConnected ? greenColor : redColor
-								}
-							}}
-						>
-							<Avatar alt="User Photo" src={`/avatars/${member.id}.png`} />
-						</Badge>
-						<ListItemText primary={member.user.username} />
-						{member.role == "owner" && <ListItemIcon><StarBorderIcon /></ListItemIcon>}
-						{(Date.parse(member.muteTime) > Date.now()) && <ListItemIcon><VolumeOffIcon /></ListItemIcon>}
-						<GenerateMemberActionList member={member} />
+					<ListItem key={member.id} >
+						<Grid container wrap="nowrap" direction="row" justifyContent="flex-start" alignItems="center">
+							<Grid item xs>
+								<Badge
+									overlap="circular"
+									anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+									variant="dot"
+									sx={{
+										"& .MuiBadge-badge": {
+											backgroundColor: member.isConnected ? greenColor : redColor
+										}
+									}}
+								>
+									<Avatar alt="User Photo" src={`/avatars/${member.id}.png`} />
+								</Badge>
+							</Grid>
+							<Grid item xs={8}>
+								<ListItemText primary={member.user.username} />
+								<ListItemIcon>{member.role == "owner" && <StarBorderIcon />}</ListItemIcon>
+								<ListItemIcon>{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}</ListItemIcon>
+							</Grid>
+							<Grid item xs>
+								<GenerateMemberActionList member={member} />
+							</Grid>
+						</Grid>
 					</ListItem>
 				)
 				)}
@@ -280,8 +281,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 	}
 
 	return (
-		<nav aria-label="secondary mailbox folders">
-			<GenerateMemberGroup groupname={"Admin"} groupMembers={memberList.admins} />
+		<nav>
+			<GenerateMemberGroup groupname={"Admins"} groupMembers={memberList.admins} />
 			<GenerateMemberGroup groupname={"Users"} groupMembers={memberList.regulars} />
 			<GenerateMemberGroup groupname={"Muted"} groupMembers={memberList.muted} />
 			<GenerateMemberGroup groupname={"Banned"} groupMembers={memberList.banned} />
