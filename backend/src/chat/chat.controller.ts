@@ -101,7 +101,10 @@ export class ChatController {
 	// NOTE: A TESTER
 	@Get('channels/:id/members')
 	async getChannelMembers(@Param('id') id: string) : Promise<Member[]>{
-		let members = await this.chatService.getChannelMembers(parseInt(id));
+		const channelId = parseInt(id);
+		if (isNaN(channelId))
+			throw new BadRequestException('Invalid channel id');
+		let members = await this.chatService.getChannelMembers(channelId);
 		return members.map((member: Member) =>
 		({
 			...member,
@@ -130,7 +133,10 @@ export class ChatController {
 	// john
 	@Post('channels/:id/leave')
 	async leaveChannel(@CurrentUser() user: User, @Param('id') id: string): Promise<void> {
-		this.chatService.leaveChannel(user, parseInt(id));
+		const channelId = parseInt(id);
+		if (isNaN(channelId))
+			throw new BadRequestException('Invalid channel id');
+		this.chatService.leaveChannel(user, channelId);
 	}
 
 	//to: /chat/${channelId} emit :chat.modify.channel -> { name, hasPassword }
