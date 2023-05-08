@@ -74,7 +74,7 @@ export class AuthService {
 		}
 	}
 
-	decodeToken(bearerToken: string): Promise<User | null> | null{
+	async decodeToken(bearerToken: string): Promise<User | null> {
 		try {
 			// console.log(`Bearer token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.decode(bearerToken);

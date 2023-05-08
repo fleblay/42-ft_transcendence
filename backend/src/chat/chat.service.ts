@@ -358,7 +358,6 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { leftMember });
 	}
 
-	// TODO: return boolean hasPassword
 	getMyChannels(user: User): Promise<Channel[]> {
 		return this.channelsRepo.find({
 			where: {
@@ -384,7 +383,6 @@ export class ChatService implements OnModuleInit {
 	}
 
 	getMyDirectMessage(user: User): Promise<Channel[]> {
-		console.log('Jve vais crash')
 		return this.channelsRepo.find({
 			where: {
 				members: {
