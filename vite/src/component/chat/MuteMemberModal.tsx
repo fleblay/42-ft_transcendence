@@ -1,27 +1,28 @@
 import { Box, Button, Container, CssBaseline, Divider, FormControl, FormControlLabel, FormLabel, Grid, Input, Modal, Radio, RadioGroup, TextField, Typography } from "@mui/material";
-import React, { FormEvent } from "react";
+import React, { FormEvent, useEffect } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { useNavigate } from "react-router-dom";
 import { DatePicker, DateTimePicker } from "@mui/x-date-pickers";
 import { Member } from "../../types";
+import dayjs, { Dayjs } from "dayjs";
 
 export function MuteMemberModal({ openModal, onClose, channelId, member }: { openModal: boolean, onClose: () => void, channelId: string, member: Member }) {
 
-	const [muteEnd, setMuteEnd] = React.useState<Date>(new Date());
+	const [muteEnd, setMuteEnd] = React.useState<Dayjs | null>(dayjs().add(1, 'hour').add(1, 'minute'));
+	let mutedState: boolean = Date.parse(member.muteTime) > Date.now()
 
-	function handleDateChange(date: Date | null) {
-		if (date) {
-			setMuteEnd(date)
-			console.log("date is now", date.toISOString())
-		}
+	const handleChangeValue = (value: Dayjs | null) => {
+		if (!value)
+			return
+		if (value.diff(dayjs()) > 0)
+			setMuteEnd(value)
+		else
+			setMuteEnd(dayjs().add(1, 'hour').add(1, 'minute'))
 	}
 
 	const handleSubmit = () => {
-		if (Date.parse(member.muteTime) > Date.now())
-			muteEnd.setFullYear(1970)
-		apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { mute: muteEnd }).
+		apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { mute: mutedState ? dayjs("1970-1-1").toDate() : muteEnd }).
 			then(() => {
-				console.log(`Mute till ${muteEnd.toISOString()}: OK`)
 				onClose();
 			})
 			.catch((error) => {
@@ -43,13 +44,15 @@ export function MuteMemberModal({ openModal, onClose, channelId, member }: { ope
 					bgcolor: 'background.paper',
 					p: '3rem'
 				}}>
-					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, mb: '10px' }} >{`${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</Typography>
+					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, mb: '10px' }} >{`${mutedState ? "Unmute" : "Mute"} ${member.user.username}`}</Typography>
 					<Divider />
-					<form>
+					<form >
 						{
-							(Date.parse(member.muteTime) < Date.now()) && <DateTimePicker onChange={(date: Date | null) => handleDateChange(date)} label="Select end of mute period" />
+							!mutedState && <DateTimePicker value={muteEnd} onChange={handleChangeValue} label="Select end of mute period" />
 						}
-						<Button onClick={handleSubmit} variant="outlined" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>{`${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</Button>
+						<Button onClick={handleSubmit} variant="outlined" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>
+							{ mutedState ? "Umute" : `Mute ${member.user.username} for ${muteEnd!.diff(dayjs(), 'hours')} hour(s) and ${muteEnd!.diff(dayjs(), 'minutes') % 60} minute(s)`}
+						</Button>
 						<Divider />
 					</form>
 					<Button onClick={onClose}>Close</Button>

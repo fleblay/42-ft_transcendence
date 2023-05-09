@@ -318,7 +318,11 @@ export class ChatService implements OnModuleInit {
 			modifyMember.muteTime = new Date(options.mute)
 		}
 		await this.membersRepo.save(modifyMember)
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', { modifyMember });
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', {
+			modifyMember : {
+				...modifyMember,
+				isConnected: this.usersService.isConnected(modifyMember.user.id)
+			}})
 	}
 
 	async modifyChannel(user: User, channelId: number, changeChannelData: ChangeChannelDto) {

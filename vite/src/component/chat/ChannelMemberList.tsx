@@ -78,8 +78,12 @@ export function MemberList({ channelId }: { channelId: string }) {
 			console.log("onMemberUpdate", upDatedMember);
 			removeOldMember(upDatedMember.id, memberList)
 			setMemberList(addNewMember(upDatedMember, memberList))
-			if (upDatedMember.id == me.current!.id && upDatedMember.left)
-				navigate(`/chat`);
+			if (upDatedMember.id == me.current!.id) {
+				console.log("I have changed : ", upDatedMember)
+				me.current = upDatedMember
+				if (upDatedMember.left)
+					navigate(`/chat`);
+			}
 		}
 
 		function onMemberJoin({ joinedMember }: { joinedMember: Member }) {
@@ -98,7 +102,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 		return (() => {
 			customOff("chat.modify.members", onMemberUpdate);
 			customOff("chat.member.new", onMemberJoin);
-			customOn("chat.member.leave", onMemberLeave);
+			customOff("chat.member.leave", onMemberLeave);
 		})
 	}, [memberList])
 
@@ -131,12 +135,13 @@ export function MemberList({ channelId }: { channelId: string }) {
 		const open = Boolean(anchorEl);
 		const navigate = useNavigate()
 		const [myRights, setMyRights] = React.useState<string[]>([]);
+		const mutedState: boolean = Date.parse(member.muteTime) > Date.now()
 
 		//Modal
-		const [openModal, setOpenModal] = React.useState<boolean>(false)
+		const [muteModalOpen, setMuteModalOpen] = React.useState<boolean>(false)
 
-		function closeModal(): void {
-			setOpenModal(false)
+		function closeMuteModal(): void {
+			setMuteModalOpen(false)
 			handleClose()
 		}
 
@@ -156,7 +161,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					member.role == "owner" && setMyRights([""])
 					break
 			}
-		}, [me.current, memberList])
+		}, [me.current?.role, memberList, member.role])
 
 		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 			setAnchorEl(event.currentTarget);
@@ -195,13 +200,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 			setAnchorEl(null);
 		};
 
-		const handleClickMute = () => {
-			let muteEnd = new Date()
-			if (Date.parse(member.muteTime) < Date.now()) {
-				muteEnd.setDate(muteEnd.getDate() + 1)
-			}
-			else
-				muteEnd.setFullYear(1970)
+		const handleClickUnMute = () => {
+			const muteEnd = new Date()
+			muteEnd.setFullYear(1970)
 
 			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { mute: muteEnd.toISOString() }).
 				then(() => console.log(`Mute till ${muteEnd.toISOString()}: OK`))
@@ -212,8 +213,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 		};
 
 		const handleClickChangeRole = () => {
-			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { role: "regular" }).
-				then(() => console.log("Change role to regular: OK"))
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { role: (member.role == "regular") ? "admin" : "regular" }).
+				then(() => console.log("Change role OK"))
 				.catch((error) => {
 					console.log(error);
 				});
@@ -241,13 +242,13 @@ export function MemberList({ channelId }: { channelId: string }) {
 						'aria-labelledby': 'basic-button',
 					}}
 				>
-					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role`}</MenuItem>}
+					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
+					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role to ${member.role == "regular" ? "admin" : "regular"}`}</MenuItem>}
 					{myRights.includes("kick") && <MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>}
 					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`${member.banned ? "Unban" : "Ban"} ${member.user.username}`}</MenuItem>}
-					{myRights.includes("mute") && <MenuItem onClick={handleClickMute}>{`${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
-					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
-					{myRights.includes("mute") && <MenuItem onClick={()=> setOpenModal(true)}>{`Modal : ${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
-					<MuteMemberModal openModal={openModal} onClose={closeModal} channelId={channelId} member={member} />
+					{myRights.includes("mute") && mutedState && <MenuItem onClick={handleClickUnMute}>{`Unmute ${member.user.username}`}</MenuItem>}
+					{myRights.includes("mute") && !mutedState && <MenuItem onClick={() => setMuteModalOpen(true)}>{`Mute ${member.user.username}`}</MenuItem>}
+					<MuteMemberModal openModal={muteModalOpen} onClose={closeMuteModal} channelId={channelId} member={member} />
 				</Menu>
 			</span>
 		);
