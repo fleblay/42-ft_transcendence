@@ -42,20 +42,23 @@ export function MyChannelsList() {
 
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
-			console.log("onModifyChannel", data);
-			//if (myChannelsList[data.id].unreadMessages !== data.unreadMessages && (channelId ?? 0) === data.id) return;
-			setMyChannelsList(myChannelsList => ({ ...myChannelsList, [data.id] : data})	);
+			setMyChannelsList(channelList => ({ ...channelList, [data.id]: data }));
 		}
 		function onDeleteChannel(data: Channel) {
-			setMyChannelsList(myChannelsList => { delete myChannelsList[data.id]; return myChannelsList; });
+			setMyChannelsList(channelList => { delete channelList[data.id]; return channelList; });
 		}
-	
+		function onUnreadMessage(data: { unreadMessages: number, id: number }) {
+			if (!channelId || parseInt(channelId) != data.id)
+				setMyChannelsList(channelList => ({ ...channelList, [data.id]: { ...channelList[data.id], unreadMessages: data.unreadMessages } }));
+		}
+
 		customOn('modifyChannel', onModifyChannel);
 		customOn('leaveChannel', onDeleteChannel);
+		customOn('unreadMessage', onUnreadMessage);
 		return () => {
 			customOff('modifyChannel', onModifyChannel);
 			customOff('leaveChannel', onDeleteChannel);
-
+			customOff('unreadMessage', onUnreadMessage);
 		};
 	}, []);
 
@@ -87,22 +90,22 @@ export function MyChannelsList() {
 			maxHeight: 300,
 		}}>
 			{Object.values(myChannelsList)
-			.sort((a: Channel, b: Channel) => b.unreadMessages - a.unreadMessages)
+				.sort((a: Channel, b: Channel) => b.unreadMessages - a.unreadMessages)
 				.map((channel: Channel) => (
-				<ListItem key={channel.id} sx={{ pl: 4 }} >
-					<ListItemButton onClick={() => mooveToChannel(channel.id)}>
-						<Badge badgeContent={channel.unreadMessages} color="primary">
-							<ListItemText primary={channel.name} />
-						</Badge>
-						<AvatarGroup sx={{ ml: 'auto' }} total={channel.members?.length}>
-							{channel?.members?.map((member: Member) => (
-								<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
-							))}
-						</AvatarGroup>
-					</ListItemButton>
-				</ListItem>
-			)
-			)}
+					<ListItem key={channel.id} sx={{ pl: 4 }} >
+						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
+							<Badge badgeContent={channel.unreadMessages} color="primary">
+								<ListItemText primary={channel.name} />
+							</Badge>
+							<AvatarGroup sx={{ ml: 'auto' }} total={channel.members?.length}>
+								{channel?.members?.map((member: Member) => (
+									<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
+								))}
+							</AvatarGroup>
+						</ListItemButton>
+					</ListItem>
+				)
+				)}
 		</List>
 	);
 }
