@@ -108,6 +108,13 @@ export function MemberList({ channelId }: { channelId: string }) {
 		})
 	}, [memberList])
 
+	//playing and viewing icons
+	/*
+	useEffect(() => {
+		return addSubscription(`/game/`);
+	}, [memberList]);
+	*/
+
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
 			console.log("memberlist fetched : ", data);
