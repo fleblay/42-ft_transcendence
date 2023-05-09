@@ -125,7 +125,6 @@ export class ChatController {
 	@Post('channels/:id/members/:playerId')
 	async modifyMembers(@CurrentUser() user: User, @Param('id', ValideIdPipe ) channelId: number, @Param('playerId', ValideIdPipe) targetId : number, @Body() body: ModifyMemberDto): Promise<void>  {
 
-	
 		await this.chatService.modifyMembers(user, channelId, targetId, body);
 		return
 	}

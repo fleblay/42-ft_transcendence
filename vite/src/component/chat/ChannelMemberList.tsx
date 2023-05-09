@@ -78,8 +78,12 @@ export function MemberList({ channelId }: { channelId: string }) {
 			console.log("onMemberUpdate", upDatedMember);
 			removeOldMember(upDatedMember.id, memberList)
 			setMemberList(addNewMember(upDatedMember, memberList))
-			if (upDatedMember.id == me.current!.id && upDatedMember.left)
-				navigate(`/chat`);
+			if (upDatedMember.id == me.current!.id) {
+				console.log("I have changed : ", upDatedMember)
+				me.current = upDatedMember
+				if (upDatedMember.left)
+					navigate(`/chat`);
+			}
 		}
 
 		function onMemberJoin({ joinedMember }: { joinedMember: Member }) {
@@ -157,7 +161,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					member.role == "owner" && setMyRights([""])
 					break
 			}
-		}, [me.current, memberList])
+		}, [me.current?.role, memberList, member.role])
 
 		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 			setAnchorEl(event.currentTarget);
@@ -209,8 +213,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 		};
 
 		const handleClickChangeRole = () => {
-			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { role: "regular" }).
-				then(() => console.log("Change role to regular: OK"))
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { role: (member.role == "regular") ? "admin" : "regular" }).
+				then(() => console.log("Change role OK"))
 				.catch((error) => {
 					console.log(error);
 				});
@@ -239,10 +243,10 @@ export function MemberList({ channelId }: { channelId: string }) {
 					}}
 				>
 					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
-					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role`}</MenuItem>}
+					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role to ${member.role == "regular" ? "admin" : "regular"}`}</MenuItem>}
 					{myRights.includes("kick") && <MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>}
 					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`${member.banned ? "Unban" : "Ban"} ${member.user.username}`}</MenuItem>}
-					{myRights.includes("mute") &&  mutedState && <MenuItem onClick={handleClickUnMute}>{`Unmute ${member.user.username}`}</MenuItem>}
+					{myRights.includes("mute") && mutedState && <MenuItem onClick={handleClickUnMute}>{`Unmute ${member.user.username}`}</MenuItem>}
 					{myRights.includes("mute") && !mutedState && <MenuItem onClick={() => setMuteModalOpen(true)}>{`Mute ${member.user.username}`}</MenuItem>}
 					<MuteMemberModal openModal={muteModalOpen} onClose={closeMuteModal} channelId={channelId} member={member} />
 				</Menu>

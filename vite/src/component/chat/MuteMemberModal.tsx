@@ -9,7 +9,7 @@ import dayjs, { Dayjs } from "dayjs";
 export function MuteMemberModal({ openModal, onClose, channelId, member }: { openModal: boolean, onClose: () => void, channelId: string, member: Member }) {
 
 	const [muteEnd, setMuteEnd] = React.useState<Dayjs | null>(dayjs().add(1, 'hour').add(1, 'minute'));
-	const mutedState: boolean = Date.parse(member.muteTime) > Date.now()
+	let mutedState: boolean = Date.parse(member.muteTime) > Date.now()
 
 	const handleChangeValue = (value: Dayjs | null) => {
 		if (!value)
