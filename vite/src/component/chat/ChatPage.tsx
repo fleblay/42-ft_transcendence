@@ -12,6 +12,47 @@ import { ChannelBrowser } from './ChannelBrowse';
 import { FriendsBrowser } from './ChatFriendsBrowser';
 
 
+const MyChannels = ({channelId} : {channelId : string} ) => {
+	return (
+		<>
+			<Grid container spacing={3}>
+				<Grid item xs={2}>
+					<Typography textAlign={'center'}> Channels</Typography>
+				</Grid>
+				<Grid item xs={8}>
+					<Typography textAlign={'center'}> {channelId} </Typography>
+				</Grid>
+				<Grid item xs={2}>
+					<Typography textAlign={'center'}> User</Typography>
+				</Grid>
+			</Grid>
+			<Divider />
+			<Grid container spacing={2}>
+				<Grid item xs={3}>
+					<ChatMenu />
+				</Grid>
+				<Grid item xs={7}>
+
+					{channelId
+						? (
+							channelId === 'friends'
+								? <FriendsBrowser />
+								: <MessageArea channelId={channelId} />
+						)
+						: <ChannelBrowser />}
+				</Grid>
+				<Grid item xs={2}>
+					{channelId && channelId !== 'friends' ? <MemberList channelId={channelId} /> : null}
+				</Grid>
+			</Grid>
+			<Divider />
+			<Grid container spacing={3} sx={{ mt: "20px" }}>
+				<Grid item xs={2}>
+				</Grid>
+			</Grid>
+		</>
+	)
+}
 
 export function ChatPage() {
 
@@ -51,47 +92,6 @@ export function ChatPage() {
 		);
 	}
 
-	const MyChannels = () => {
-		return (
-			<>
-				<Grid container spacing={3}>
-					<Grid item xs={2}>
-						<Typography textAlign={'center'}> Channels</Typography>
-					</Grid>
-					<Grid item xs={8}>
-						<Typography textAlign={'center'}> {channelId} </Typography>
-					</Grid>
-					<Grid item xs={2}>
-						<Typography textAlign={'center'}> User</Typography>
-					</Grid>
-				</Grid>
-				<Divider />
-				<Grid container spacing={2}>
-					<Grid item xs={3}>
-						<ChatMenu />
-					</Grid>
-					<Grid item xs={7}>
-
-						{channelId
-							? (
-								channelId === 'friends'
-									? <FriendsBrowser />
-									: <MessageArea channelId={channelId} />
-							)
-							: <ChannelBrowser />}
-					</Grid>
-					<Grid item xs={2}>
-						{channelId && channelId !== 'friends' ? <MemberList channelId={channelId} /> : null}
-					</Grid>
-				</Grid>
-				<Divider />
-				<Grid container spacing={3} sx={{ mt: "20px" }}>
-					<Grid item xs={2}>
-					</Grid>
-				</Grid>
-			</>
-		)
-	}
 
 	return (
 		<>
@@ -112,15 +112,7 @@ export function ChatPage() {
 					maxHeight: 'calc(100vh - 80px)',
 					overflowY: 'scroll'
 				}}>
-
-
-					{MyChannels()}
-
-					<Grid container spacing={3} sx={{ mt: "20px" }}>
-						<Grid item xs={4}>
-							<Button variant="contained" color="primary" onClick={createChannel}> Create Channel </Button>
-						</Grid>
-					</Grid>
+					<MyChannels channelId={channelId || ''} />
 				</Box>
 			</Container >
 		</>
