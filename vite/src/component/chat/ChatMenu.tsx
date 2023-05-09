@@ -28,6 +28,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import { MyChannelsList } from './ChannelsList';
 import { CreateChannelModal } from './CreatChannelModal';
 import { ViewDayRounded } from '@mui/icons-material';
+import { MyDirectMessageList } from './ChatDirectMessageList';
 
 
 
@@ -159,14 +160,7 @@ export default function ChatMenu() {
 					{friendMenu ? <ExpandLess /> : <ExpandMore />}
 				</ListItemButton>
 				<Collapse in={friendMenu} timeout="auto" unmountOnExit>
-					<List component="div" disablePadding>
-						<ListItemButton sx={{ pl: 4 }}>
-							<ListItemIcon>
-								<StarBorder />
-							</ListItemIcon>
-							<ListItemText primary="Starred" />
-						</ListItemButton>
-					</List>
+					<MyDirectMessageList/>
 				</Collapse>
 			</List>
 			<CreateChannelModal openCreateChannel={openCreateChannel} handleClose={handleCloseCreateChannel} />

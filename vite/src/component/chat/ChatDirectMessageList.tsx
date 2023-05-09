@@ -8,14 +8,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { Channel, Member, UserInfo } from "../../types";
 import { useAuthService } from "../../auth/AuthService";
+import { StyledBadge } from "./ChatFriendsBrowser";
 
-const joinChannel = (channelId: number) => {
-	apiClient.post(`/api/chat/channels/${channelId}/join`).then((response) => {
-		console.log("joinChannel", response);
-	}).catch((error) => {
-		console.log(error);
-	});
-}
 
 export function MyDirectMessageList() {
 	const navigate = useNavigate();
@@ -45,17 +39,24 @@ export function MyDirectMessageList() {
 			overflow: 'auto',
 			maxHeight: 300,
 
-		}} subheader={<li />}>
-			<ListSubheader>{`I'm sticky`}</ListSubheader>
+		}}>
 
 
 			{MyDmList?.map((channel: Channel) => {
-				const AvatarPath = `/avatars/${auth.user?.id == channel.members[0].user.id ? channel.members[0].user.id : channel.members[1].user.id}.png`;
+				const friend = channel.members[0].user.id == auth.user?.id ? channel.members[1] : channel.members[0];
+				const AvatarPath = `/avatars/${friend.user.id}.png`;
 				return (
 					<ListItem key={channel.id} sx={{ pl: 4 }} >
 						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
-							<Avatar src={`/avatars/${AvatarPath}.png`} />
-						</ListItemButton>
+							<StyledBadge
+								overlap="circular"
+								anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+								variant="dot"
+								color={friend.isConnected ? "success" : "error"}
+							>
+								<Avatar src={`/avatars/${friend.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
+							</StyledBadge>
+							<ListItemText primary={friend.user.username} />						</ListItemButton>
 					</ListItem>
 				)
 			})

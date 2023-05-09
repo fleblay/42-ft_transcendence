@@ -28,7 +28,7 @@ export class ChatController {
 		return this.chatService.getAllChannels()
 	}
 	// Return all channels public and protected
-// NOTE: A TESTER
+	// NOTE: A TESTER
 	@Get('/channels/public')
 	async getAllPublic() {
 		const publicChannels = await this.chatService.getAllPublicChannels()
@@ -40,30 +40,36 @@ export class ChatController {
 	}
 
 	@Get('/channels/my')
-	async getMyChannels(@CurrentUser() user: User){
+	async getMyChannels(@CurrentUser() user: User) {
 		const channels = await this.chatService.getMyChannels(user);
 		return channels.map((channel: Channel) => ({
 			...channel,
 			password: undefined,
 			hasPassword: channel.password.length !== 0,
-			unreadMessages: this.chatService.getUnreadMessages(user, channel.id)}));
+			unreadMessages: this.chatService.getUnreadMessages(user, channel.id)
+		}));
 	}
 
 	@Get('/channels/dm')
-	async getMyDirectMessage(@CurrentUser() user: User){
+	async getMyDirectMessage(@CurrentUser() user: User) {
 		const channels = await this.chatService.getMyDirectMessage(user);
 		return channels.map((channel: Channel) => ({
 			...channel,
 			password: undefined,
 			hasPassword: channel.password.length !== 0,
-			unreadMessages: this.chatService.getUnreadMessages(user, channel.id)}));
+			unreadMessages: this.chatService.getUnreadMessages(user, channel.id),
+			members: channel.members.map((member: Member) => ({
+				...member,
+				isConnected: this.userService.isConnected(member.user.id)
+			}))
+		}));
 	}
 
 	// /api/chat/dm/${userId}/join
 
 	@Post('/dm/:id/join')
 	async joinDirectMessage(@CurrentUser() user: User, @Param('id', ValideIdPipe) targetId: number): Promise<number> {
-	
+
 		return await this.chatService.joinDirectMessage(user, targetId);
 	}
 
@@ -90,7 +96,7 @@ export class ChatController {
 	// NOTE: A TESTER
 	@Get('channels/:id/messages')
 	getMessages(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Query('offset') offset: string): Promise<Message[]> {
-	;
+		;
 		return this.chatService.getMessages(user, channelId, parseInt(offset) || 0);
 	}
 
@@ -108,7 +114,7 @@ export class ChatController {
 
 	// NOTE: A TESTER
 	@Get('channels/:id/members')
-	async getChannelMembers(@Param('id', ValideIdPipe) channelId: number) : Promise<Member[]>{
+	async getChannelMembers(@Param('id', ValideIdPipe) channelId: number): Promise<Member[]> {
 		let members = await this.chatService.getChannelMembers(channelId);
 		return members.map((member: Member) =>
 		({
@@ -123,9 +129,9 @@ export class ChatController {
 	// to: /chat/${channelId} emit :chat.modify.members -> { playerId, username, role, isMuted, isBanned }
 	// john
 	@Post('channels/:id/members/:playerId')
-	async modifyMembers(@CurrentUser() user: User, @Param('id', ValideIdPipe ) channelId: number, @Param('playerId', ValideIdPipe) targetId : number, @Body() body: ModifyMemberDto): Promise<void>  {
+	async modifyMembers(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Param('playerId', ValideIdPipe) targetId: number, @Body() body: ModifyMemberDto): Promise<void> {
 
-	
+
 		await this.chatService.modifyMembers(user, channelId, targetId, body);
 		return
 	}
@@ -140,7 +146,7 @@ export class ChatController {
 	//to: /chat/${channelId} emit :chat.modify.channel -> { name, hasPassword }
 	// john
 	@Post('channels/:id/info')
-	async modifyChannel(@CurrentUser() user : User, @Param('id', ValideIdPipe) channelId: number, @Body() body: ChangeChannelDto) : Promise<void> {
+	async modifyChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: ChangeChannelDto): Promise<void> {
 		await this.chatService.modifyChannel(user, channelId, body);
 	}
 
