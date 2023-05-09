@@ -1,6 +1,6 @@
-import { Box, Button, Divider, Grid, List, ListItem, ListItemText, TextField, makeStyles } from "@mui/material";
+import { Box, Button, Divider, List, TextField } from "@mui/material";
 import { Message } from "../../types";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { SocketContext } from "../../socket/SocketProvider";
 import { ChatMsg } from "./ChatMessage";
@@ -22,6 +22,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [messageToSend, setMessageToSend] = useState<string>("");
 
+	const messageAreaRef = useRef<HTMLUListElement>(null);
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/messages`).then(({ data }: { data: Message[] }) => {
@@ -37,6 +38,11 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 	}, [channelId]);
 
 	useEffect(() => {
+		if (messageAreaRef.current) {
+			const element = messageAreaRef.current;
+			if (Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) <= 250 || element.scrollTop === 0)
+				element.scrollTo({ top: element.scrollHeight, behavior: element.scrollTop === 0 ? 'auto' : 'smooth' });
+		}
 		function onNewMessage(message: Message) {
 			console.log("onNewMessage", message);
 			setMessages((messages) => {
@@ -48,7 +54,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		return () => {
 			customOff("chat.message.new", onNewMessage);
 		};
-	}, [messages])
+	}, [messages, messageAreaRef.current])
 
 	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setMessageToSend(event.target.value);
@@ -68,7 +74,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		if (messageToSend.trim().length !== 0)
 			message = messageToSend;
 
-		customEmit('game.create', { }, (gameId: string) => {
+		customEmit('game.create', {}, (gameId: string) => {
 			apiClient.post(`/api/chat/channels/${channelId}/messages`, { content: message, gameId }).then((response) => {
 				setMessageToSend("");
 			}).catch((error) => {
@@ -80,7 +86,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 
 	return (
 		<>
-			<List sx={{ height: '50vh', overflow: 'auto' }}>
+			<List sx={{ height: '50vh', overflow: 'auto' }} ref={messageAreaRef}>
 				{
 					messages.reduce((acc: Message[][], message: Message) => {
 						if (acc.length === 0) {
