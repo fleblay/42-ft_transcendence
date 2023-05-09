@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, List, ListItem, ListItemButton, ListItemText, AvatarGroup, Avatar, Badge } from "@mui/material";
-import { Link as LinkRouter, useNavigate } from "react-router-dom";
+import { Link as LinkRouter, useNavigate, useParams } from "react-router-dom";
 import { TablePagination } from "@mui/material";
 import MailIcon from '@mui/icons-material/Mail';
 import { SocketContext } from '../../socket/SocketProvider';
@@ -38,9 +38,12 @@ export function MyChannelsList() {
 	// newMember
 	//newName
 
+	const { channelId } = useParams()
+
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
 			console.log("onModifyChannel", data);
+			//if (myChannelsList[data.id].unreadMessages !== data.unreadMessages && (channelId ?? 0) === data.id) return;
 			setMyChannelsList(myChannelsList => ({ ...myChannelsList, [data.id] : data})	);
 		}
 		function onDeleteChannel(data: Channel) {
@@ -70,6 +73,9 @@ export function MyChannelsList() {
 
 
 	const mooveToChannel = (channelId: number) => {
+		setMyChannelsList(channels => {
+			return { ...channels, [channelId]: { ...channels[channelId], unreadMessages: 0 } }
+		});
 		navigate(`/chat/${channelId}`);
 	}
 

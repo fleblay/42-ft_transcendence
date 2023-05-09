@@ -105,6 +105,11 @@ export class ChatController {
 		await this.chatService.joinChannel(user, channelId, { password: body.password, targetUser: body.username })
 	}
 
+	@Post('channels/:id/ack')
+	ackChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): void {
+		this.chatService.ackChannel(user, channelId);
+	}
+
 	// TODO: Limit the number of messages to 50
 	// NOTE: Offset is message id or number?
 	// a tester

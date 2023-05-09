@@ -44,7 +44,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 				element.scrollTo({ top: element.scrollHeight, behavior: element.scrollTop === 0 ? 'auto' : 'smooth' });
 		}
 		function onNewMessage(message: Message) {
-			console.log("onNewMessage", message);
+			apiClient.post(`/api/chat/channels/${channelId}/ack`)
 			setMessages((messages) => {
 				return [...messages, message];
 			});
