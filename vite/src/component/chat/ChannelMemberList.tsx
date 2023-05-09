@@ -7,6 +7,8 @@ import { Channel, Member } from "../../types";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
 import { MuteMemberModal } from "./MuteMemberModal";
@@ -22,11 +24,11 @@ const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
-function removeOldMember(olMemberId: number, memberList: memberList): memberList {
+function removeOldMember(oldMemberId: number, memberList: memberList): memberList {
 
 	for (const [key, value] of Object.entries(memberList)) {
 		console.log("in for loop : ", key, value)
-		const oldMemberIndex: number = value.findIndex((member) => member.id == olMemberId)
+		const oldMemberIndex: number = value.findIndex((member) => member.id == oldMemberId)
 		if (oldMemberIndex != -1) {
 			console.log("Found oldmember in :", key)
 			value.splice(oldMemberIndex, 1)
@@ -106,6 +108,13 @@ export function MemberList({ channelId }: { channelId: string }) {
 		})
 	}, [memberList])
 
+	//playing and viewing icons
+	/*
+	useEffect(() => {
+		return addSubscription(`/game/`);
+	}, [memberList]);
+	*/
+
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
 			console.log("memberlist fetched : ", data);
@@ -148,6 +157,10 @@ export function MemberList({ channelId }: { channelId: string }) {
 		useEffect(() => {
 			if (!me.current)
 				return
+			if (me.current.id == member.id) {
+				setMyRights(["self"])
+				return
+			}
 			switch (me.current.role) {
 				case "regular":
 					setMyRights([""])
@@ -173,6 +186,16 @@ export function MemberList({ channelId }: { channelId: string }) {
 
 		const handleClickProfile = () => {
 			navigate(`/player/${member.user.id}`);
+		};
+
+		const handleClickLeave = () => {
+			setAnchorEl(null);
+			apiClient.post(`/api/chat/channels/${channelId}/leave`, { kick: true }).
+				then(() => console.log("Leave : OK"))
+				.catch((error) => {
+					console.log(error);
+				});
+			navigate(`/chat/`);
 		};
 
 		const handleClickKick = () => {
@@ -242,7 +265,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 						'aria-labelledby': 'basic-button',
 					}}
 				>
-					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
+					<MenuItem onClick={handleClickProfile}>{`${(member.id != me.current?.id) ? member.user.username + "'s" :"My"} Profile`}</MenuItem>
+					{myRights.includes("self") && <MenuItem onClick={handleClickLeave}>Leave Channel</MenuItem>}
 					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role to ${member.role == "regular" ? "admin" : "regular"}`}</MenuItem>}
 					{myRights.includes("kick") && <MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>}
 					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`${member.banned ? "Unban" : "Ban"} ${member.user.username}`}</MenuItem>}
@@ -279,6 +303,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 								<ListItemText primary={member.user.username} />
 								<ListItemIcon>{member.role == "owner" && <StarBorderIcon />}</ListItemIcon>
 								<ListItemIcon>{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}</ListItemIcon>
+								<ListItemIcon>{member.states.includes("ingame") && <VideogameAssetIcon />}</ListItemIcon>
+								<ListItemIcon>{member.states.includes("watching") && <VisibilityIcon />}</ListItemIcon>
 							</Grid>
 							<Grid item xs>
 								<GenerateMemberActionList member={member} />

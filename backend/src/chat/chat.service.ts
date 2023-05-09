@@ -12,8 +12,7 @@ import { NewMessageDto } from './dto/new-message.dto';
 import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ChangeChannelDto } from './dto/change-channel.dto';
 import { dir } from 'console';
-
-
+import { GameService } from 'src/game/game.service';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -24,6 +23,7 @@ export class ChatService implements OnModuleInit {
 		@InjectRepository(Channel) private channelsRepo: Repository<Channel>,
 		@InjectRepository(Message) private messagesRepo: Repository<Message>,
 		@Inject(forwardRef(() => UsersService)) private usersService: UsersService,
+		@Inject(forwardRef(() => GameService)) private gameService: GameService,
 	) { }
 
 	async onModuleInit() {
@@ -124,7 +124,8 @@ export class ChatService implements OnModuleInit {
 				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
 					joinedMember: {
 						...joinedMember,
-						isConnected: this.usersService.isConnected(joinedMember.user.id)
+						isConnected: this.usersService.isConnected(joinedMember.user.id),
+						...this.gameService.userState(joinedMember.user.id),
 					}
 				});
 				return
@@ -143,7 +144,8 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
 			joinedMember: {
 				...joinedMember,
-				isConnected: this.usersService.isConnected(joinedMember.user.id)
+				isConnected: this.usersService.isConnected(joinedMember.user.id),
+				...this.gameService.userState(joinedMember.user.id),
 			}
 		});
 	}
@@ -334,7 +336,8 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', {
 			modifyMember: {
 				...modifyMember,
-				isConnected: this.usersService.isConnected(modifyMember.user.id)
+				isConnected: this.usersService.isConnected(modifyMember.user.id),
+				...this.gameService.userState(modifyMember.user.id),
 			}
 		})
 	}

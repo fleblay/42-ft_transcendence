@@ -13,13 +13,14 @@ import { Message } from 'src/model/message.entity';
 import { ChangeChannelDto } from './dto/change-channel.dto';
 import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
+import { GameService } from 'src/game/game.service';
 
 @Controller('chat')
 @UseGuards(ATGuard)
 export class ChatController {
 
 	constructor(
-		private chatService: ChatService, private userService: UsersService
+		private chatService: ChatService, private userService: UsersService, private gameService : GameService
 	) { }
 
 	// NOTE: DEBUG PURPOSES ONLY !
@@ -133,7 +134,8 @@ export class ChatController {
 		return members.map((member: Member) =>
 		({
 			...member,
-			isConnected: this.userService.isConnected(member.user.id)
+			isConnected: this.userService.isConnected(member.user.id),
+			...this.gameService.userState(member.user.id),
 		}));
 	}
 
@@ -144,7 +146,6 @@ export class ChatController {
 	// john
 	@Post('channels/:id/members/:playerId')
 	async modifyMembers(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Param('playerId', ValideIdPipe) targetId: number, @Body() body: ModifyMemberDto): Promise<void> {
-
 
 		await this.chatService.modifyMembers(user, channelId, targetId, body);
 		return
