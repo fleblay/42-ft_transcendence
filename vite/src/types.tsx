@@ -155,6 +155,8 @@ export type Message = {
 
 export type Member = PlainMember & {
 	isConnected: boolean;
+	states: string[],
+	gameIds: string[],
 };
 
 

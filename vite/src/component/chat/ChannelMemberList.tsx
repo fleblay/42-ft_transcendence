@@ -7,6 +7,8 @@ import { Channel, Member } from "../../types";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
 import { MuteMemberModal } from "./MuteMemberModal";
@@ -294,6 +296,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 								<ListItemText primary={member.user.username} />
 								<ListItemIcon>{member.role == "owner" && <StarBorderIcon />}</ListItemIcon>
 								<ListItemIcon>{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}</ListItemIcon>
+								<ListItemIcon>{member.states.includes("ingame") && <VideogameAssetIcon />}</ListItemIcon>
+								<ListItemIcon>{member.states.includes("watching") && <VisibilityIcon />}</ListItemIcon>
 							</Grid>
 							<Grid item xs>
 								<GenerateMemberActionList member={member} />
