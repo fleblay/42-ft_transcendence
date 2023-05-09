@@ -1,7 +1,6 @@
 import { AppBar, Box, Button, Container, Divider, Fab, Grid, Tab, Tabs, TextField, Typography } from '@mui/material';
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import apiClient from '../../auth/interceptor.axios';
-import { ChannelsListDebug, MyChannelsList } from './ChannelsList';
 import { MessageArea } from './MessageArea';
 import { SocketContext } from '../../socket/SocketProvider';
 import { useParams } from 'react-router-dom';

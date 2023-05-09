@@ -54,7 +54,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		return () => {
 			customOff("chat.message.new", onNewMessage);
 		};
-	}, [messages, messageAreaRef.current])
+	}, [channelId, messages, messageAreaRef.current])
 
 	const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setMessageToSend(event.target.value);
