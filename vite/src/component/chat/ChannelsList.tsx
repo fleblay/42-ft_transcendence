@@ -23,8 +23,8 @@ const joinChannel = (channelId: number) => {
 export function MyChannelsList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
-	const [myChannelsList, setMyChannelsList] = useState<Channel[]>([]);
-	const {customOff, customOn, addSubscription } = useContext(SocketContext);
+	const [myChannelsList, setMyChannelsList] = useState<{ [id: number]: Channel }>({});
+	const { customOff, customOn, addSubscription } = useContext(SocketContext);
 
 	useEffect(() => {
 		return addSubscription(`/chat/myChannels/${auth.user?.id}`);
@@ -36,23 +36,33 @@ export function MyChannelsList() {
 	// newChannel
 	// newMessage
 	// newMember
+	//newName
 
-/* 	useEffect(() => {
-		function onNewChannel(data: Channel) {
-			setMyChannelsList(myChannelsList => [...myChannelsList, data]);
+	useEffect(() => {
+		function onModifyChannel(data: Channel) {
+			console.log("onModifyChannel", data);
+			setMyChannelsList(myChannelsList => ({ ...myChannelsList, [data.id] : data})	);
 		}
-		customOn('newChannel', onNewChannel);
-		customOn('newChannel', onNewChannel);
-		customOn('newChannel', onNewChannel);
-		customOn('newChannel', onNewChannel);
+		function onDeleteChannel(data: Channel) {
+			setMyChannelsList(myChannelsList => { delete myChannelsList[data.id]; return myChannelsList; });
+		}
+	
+		customOn('modifyChannel', onModifyChannel);
+		customOn('leaveChannel', onDeleteChannel);
 		return () => {
-			customOff('newChannel', onNewChannel);
+			customOff('modifyChannel', onModifyChannel);
+			customOff('leaveChannel', onDeleteChannel);
+
 		};
-	}, []); */
+	}, []);
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/my`).then((response) => {
-			setMyChannelsList(response.data);
+			console.log("MyChannelsList", response);
+			setMyChannelsList(response.data.reduce((map: { [id: number]: Channel }, obj: Channel) => {
+				map[obj.id] = obj;
+				return map;
+			}, {}));
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -70,10 +80,12 @@ export function MyChannelsList() {
 			overflow: 'auto',
 			maxHeight: 300,
 		}}>
-			{myChannelsList?.map((channel: Channel) => (
+			{Object.values(myChannelsList)
+			.sort((a: Channel, b: Channel) => b.unreadMessages - a.unreadMessages)
+				.map((channel: Channel) => (
 				<ListItem key={channel.id} sx={{ pl: 4 }} >
 					<ListItemButton onClick={() => mooveToChannel(channel.id)}>
-						<Badge badgeContent={channel?.UnreadMessages} color="primary">
+						<Badge badgeContent={channel.unreadMessages} color="primary">
 							<ListItemText primary={channel.name} />
 						</Badge>
 						<AvatarGroup sx={{ ml: 'auto' }} total={channel.members?.length}>

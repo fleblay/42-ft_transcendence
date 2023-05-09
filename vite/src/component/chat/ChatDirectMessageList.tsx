@@ -44,7 +44,6 @@ export function MyDirectMessageList() {
 
 			{MyDmList?.map((channel: Channel) => {
 				const friend = channel.members[0].user.id == auth.user?.id ? channel.members[1] : channel.members[0];
-				const AvatarPath = `/avatars/${friend.user.id}.png`;
 				return (
 					<ListItem key={channel.id} sx={{ pl: 4 }} >
 						<ListItemButton onClick={() => mooveToChannel(channel.id)}>

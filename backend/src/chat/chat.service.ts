@@ -197,6 +197,7 @@ export class ChatService implements OnModuleInit {
 		});
 		await this.messagesRepo.save(newMessage);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
+		this.emitToAllMembers(channelId);
 	}
 
 	async getMessages(user: User, channelId: number, offset: number = 0): Promise<Message[]> {
@@ -368,6 +369,37 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });
 	}
 
+	async emitToAllMembers(channelId: number) {
+		const channel = await this.channelsRepo.findOne({
+			where: { id: channelId },
+			relations: ['members', 'members.user'],
+			select: {
+				id: true,
+				name: true,
+				private: true,
+				password: true,
+				members: {
+					id: true,
+					user: {
+						id: true,
+						username: true,
+					},
+				},
+			},
+			relationLoadStrategy: "query",
+		});
+		if (!channel)
+			return;
+		for (const member of channel.members) {
+			this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit('modifyChannel', {
+				...channel,
+				password: undefined,
+				hasPassword: channel.password.length !== 0,
+				unreadMessages: await this.getUnreadMessages(member.user, channel.id)
+			});
+		}
+	}
+
 	async leaveChannel(user: User, channelId: number) {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
@@ -446,7 +478,7 @@ export class ChatService implements OnModuleInit {
 				},
 			},
 		});
-		console.log("getUnreadMessages : ", member);		
+		console.log("getUnreadMessages : ", member);
 		if (!member || !member.lastRead)
 			return 0;
 		return await this.messagesRepo.count({

@@ -42,28 +42,42 @@ export class ChatController {
 	@Get('/channels/my')
 	async getMyChannels(@CurrentUser() user: User) {
 		const channels = await this.chatService.getMyChannels(user);
-		return channels.map((channel: Channel) => ({
-			...channel,
-			password: undefined,
-			hasPassword: channel.password.length !== 0,
-			unreadMessages: this.chatService.getUnreadMessages(user, channel.id)
-		}));
+		const listChannels = [];
+		for (const channel of channels) {
+			const unreadMessages = await this.chatService.getUnreadMessages(user, channel.id);
+			listChannels.push({
+				...channel,
+				password: undefined,
+				hasPassword: channel.password.length !== 0,
+				unreadMessages,
+				members: channel.members.map((member: Member) => ({
+					...member,
+					isConnected: this.userService.isConnected(member.user.id)
+				}))
+			})
+		}
+		return listChannels
 	}
 
 	@Get('/channels/dm')
 	async getMyDirectMessage(@CurrentUser() user: User) {
 		const channels = await this.chatService.getMyDirectMessage(user);
-		return channels.map((channel: Channel) => ({
-			...channel,
-			password: undefined,
-			hasPassword: channel.password.length !== 0,
-			unreadMessages: this.chatService.getUnreadMessages(user, channel.id),
-			members: channel.members.map((member: Member) => ({
-				...member,
-				isConnected: this.userService.isConnected(member.user.id)
-			}))
-		}));
-	}
+		const listChannels = [];
+		for (const channel of channels) {
+			const unreadMessages = await this.chatService.getUnreadMessages(user, channel.id);
+			listChannels.push({
+				...channel,
+				password: undefined,
+				hasPassword: channel.password.length !== 0,
+				unreadMessages,
+				members: channel.members.map((member: Member) => ({
+					...member,
+					isConnected: this.userService.isConnected(member.user.id)
+				}))
+			})
+		}
+		return listChannels
+	};
 
 	// /api/chat/dm/${userId}/join
 
