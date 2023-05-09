@@ -21,6 +21,8 @@ import { OldGamePage } from './component/OldGameScreen';
 import { ChatPage } from './component/chat/ChatPage';
 import ChatMenu from './component/chat/ChatMenu';
 import { CircularProgress, Paper, Stack } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 export interface Destinations {
 	name: string,
@@ -78,9 +80,11 @@ function BackLoader() {
 	)
 }
 
+
 function App() {
 
 	return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
 		<AuthService>
 			<SocketProvider>
 				<RequireAuth>
@@ -146,6 +150,7 @@ function App() {
 				</Routes>
 			</SocketProvider>
 		</AuthService>
+    </LocalizationProvider>
 	);
 }
 
