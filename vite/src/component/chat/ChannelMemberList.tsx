@@ -97,7 +97,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 		return (() => {
 			customOff("chat.modify.members", onMemberUpdate);
 			customOff("chat.member.new", onMemberJoin);
-			customOn("chat.member.leave", onMemberLeave);
+			customOff("chat.member.leave", onMemberLeave);
 		})
 	}, [memberList])
 
