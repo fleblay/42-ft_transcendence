@@ -13,7 +13,7 @@ import { useAuthService } from "../../auth/AuthService"
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import Badge from '@mui/material/Badge';
 
-const StyledBadge = styled(Badge)(({ theme, color }) => ({
+export const StyledBadge = styled(Badge)(({ theme, color }) => ({
 	'& .MuiBadge-badge': {
 		backgroundColor: color,
 		color: color,
@@ -98,7 +98,7 @@ export const FriendsBrowser: FC = () => {
 	const joinDm = (userId: number) => {
 		apiClient.post(`/api/chat/dm/${userId}/join`).then((response) => {
 			console.log("joinChannel", response);
-			navigate(`/chat/${response.data.id}`);
+			navigate(`/chat/${response.data}`);
 		}).catch((error) => {
 			console.log(error);
 		});

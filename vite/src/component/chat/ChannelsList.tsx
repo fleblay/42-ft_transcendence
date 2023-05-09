@@ -48,7 +48,7 @@ export function MyChannelsList() {
 			{MyChannelsList?.map((channel: Channel) => (
 				<ListItem key={channel.id} sx={{ pl: 4 }} >
 					<ListItemButton onClick={() => mooveToChannel(channel.id)}>
-						<Badge badgeContent={0} color="primary">
+						<Badge badgeContent={channel?.UnreadMessage} color="primary">
 							<ListItemText primary={channel.name} />
 						</Badge>
 						<AvatarGroup sx={{ ml: 'auto' }} total={channel.members?.length}>

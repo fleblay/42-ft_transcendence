@@ -10,4 +10,9 @@ export class CreateChannelDto {
 	@IsString()
 	@IsOptional()
 	password?: string;
+
+	@IsBoolean()
+	@IsOptional()
+	directMessage?: boolean;
+
 }
