@@ -46,7 +46,7 @@ export function MuteMemberModal({ openModal, onClose, channelId, member }: { ope
 				}}>
 					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, mb: '10px' }} >{`${mutedState ? "Unmute" : "Mute"} ${member.user.username}`}</Typography>
 					<Divider />
-					<form>
+					<form >
 						{
 							!mutedState && <DateTimePicker value={muteEnd} onChange={handleChangeValue} label="Select end of mute period" />
 						}
