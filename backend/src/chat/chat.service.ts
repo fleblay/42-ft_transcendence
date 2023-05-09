@@ -35,7 +35,7 @@ export class ChatService implements OnModuleInit {
 		if (!generalChannel) {
 			const channelId = await this.createChannel({ name: "general", private: false })
 			await this.joinChannel(adminUser, channelId, { owner: true })
-			console.log("creating general channel", channelId)
+			//console.log("creating general channel", channelId)
 			await this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
 			await this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
 			await this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
@@ -93,22 +93,22 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true , username: true} } }
+			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true, username: true } } }
 		})
-		console.log("joinChannel : ", channel, options)
+		//console.log("joinChannel : ", channel, options)
 		if (!channel)
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
 		if (channel.password && (!options?.password || options.password != channel.password))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
 		if (channel.private && (!options.owner && channel.members.find((member) => (member.user.id == user.id))?.role != "owner"))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
-		console.log("joinChannel2 : ", channel, options)
+		//console.log("joinChannel2 : ", channel, options)
 		let addedUser: User | null = user
 		if (options?.targetUser) {
 			addedUser = await this.usersService.findOneByUsername(options.targetUser)
 			if (!addedUser)
 				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
-			console.log("There is a target User", addedUser)
+			//console.log("There is a target User", addedUser)
 		}
 
 		const member = channel.members.find((member) => (member.user.id == addedUser!.id))
@@ -120,7 +120,13 @@ export class ChatService implements OnModuleInit {
 			else {
 				member.left = false
 				const joinedMember = await this.membersRepo.save(member)
-				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { joinedMember });
+				console.log("here 1")
+				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
+					joinedMember: {
+						...joinedMember,
+						isConnected: this.usersService.isConnected(joinedMember.user.id)
+					}
+				});
 				return
 			}
 		}
@@ -133,7 +139,13 @@ export class ChatService implements OnModuleInit {
 		channel.members.push(joiner)
 		await this.channelsRepo.save(channel)
 		const joinedMember = await this.membersRepo.save(joiner)
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { joinedMember });
+		console.log("here 2")
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
+			joinedMember: {
+				...joinedMember,
+				isConnected: this.usersService.isConnected(joinedMember.user.id)
+			}
+		});
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -319,10 +331,11 @@ export class ChatService implements OnModuleInit {
 		}
 		await this.membersRepo.save(modifyMember)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', {
-			modifyMember : {
+			modifyMember: {
 				...modifyMember,
 				isConnected: this.usersService.isConnected(modifyMember.user.id)
-			}})
+			}
+		})
 	}
 
 	async modifyChannel(user: User, channelId: number, changeChannelData: ChangeChannelDto) {
@@ -433,6 +446,7 @@ export class ChatService implements OnModuleInit {
 				},
 			},
 		});
+		console.log("getUnreadMessages : ", member);		
 		if (!member || !member.lastRead)
 			return 0;
 		return await this.messagesRepo.count({
@@ -447,10 +461,10 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async getDMChannel(me: User, friend: Partial<User>): Promise<Channel | null> {
-		console.log("getDMChannel : ", me, friend);
+		//console.log("getDMChannel : ", me, friend);
 		if (!friend.id || friend.id === me.id)
 			return null;
-		console.log("getDMChannel :searching channel");
+		//console.log("getDMChannel :searching channel");
 		return await this.membersRepo.findOne({
 			where: {
 				user: {
@@ -490,7 +504,7 @@ export class ChatService implements OnModuleInit {
 	async joinDirectMessage(user: User, targetUser: number) {
 		// check if channel exists
 		const channel = await this.getDMChannel(user, { id: targetUser });
-		console.log("findChannel : ", channel);
+		//console.log("findChannel : ", channel);
 		if (channel)
 			return channel.id;
 		else {
@@ -506,11 +520,11 @@ export class ChatService implements OnModuleInit {
 				throw new NotFoundException('Friend not found');
 
 			const channelId = await this.createChannel(directMessage);
-			console.log("joinDirectMessage : channel created", channelId)
+			//console.log("joinDirectMessage : channel created", channelId)
 			await this.joinChannel(user, channelId, { owner: true });
-			console.log("joinDirectMessage : channel joined", channelId)
+			//console.log("joinDirectMessage : channel joined", channelId)
 			await this.joinChannel(user, channelId, { targetUser: friendUser.username });
-			console.log("joinDirectMessage : channel joined", channelId)
+			//console.log("joinDirectMessage : channel joined", channelId)
 			return channelId;
 		}
 	}
