@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, List, ListItem, ListItemButton, ListItemText, AvatarGroup, Avatar, Badge } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { TablePagination } from "@mui/material";
 import MailIcon from '@mui/icons-material/Mail';
-
+import { SocketContext } from '../../socket/SocketProvider';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { Channel, Member, UserInfo } from "../../types";
@@ -18,15 +18,40 @@ const joinChannel = (channelId: number) => {
 	});
 }
 
+
+
 export function MyChannelsList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
-	const [MyChannelsList, setMyChannelsList] = useState<Channel[]>([]);
+	const [myChannelsList, setMyChannelsList] = useState<Channel[]>([]);
+	const {customOff, customOn, addSubscription } = useContext(SocketContext);
 
+	useEffect(() => {
+		return addSubscription(`/chat/myChannels/${auth.user?.id}`);
+	}, [auth.user?.id]);
+
+	// event list :
+	// ban
+	// kick
+	// newChannel
+	// newMessage
+	// newMember
+
+/* 	useEffect(() => {
+		function onNewChannel(data: Channel) {
+			setMyChannelsList(myChannelsList => [...myChannelsList, data]);
+		}
+		customOn('newChannel', onNewChannel);
+		customOn('newChannel', onNewChannel);
+		customOn('newChannel', onNewChannel);
+		customOn('newChannel', onNewChannel);
+		return () => {
+			customOff('newChannel', onNewChannel);
+		};
+	}, []); */
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/my`).then((response) => {
-			console.log("MyChannelsList", response);
 			setMyChannelsList(response.data);
 		}).catch((error) => {
 			console.log(error);
@@ -45,10 +70,10 @@ export function MyChannelsList() {
 			overflow: 'auto',
 			maxHeight: 300,
 		}}>
-			{MyChannelsList?.map((channel: Channel) => (
+			{myChannelsList?.map((channel: Channel) => (
 				<ListItem key={channel.id} sx={{ pl: 4 }} >
 					<ListItemButton onClick={() => mooveToChannel(channel.id)}>
-						<Badge badgeContent={0} color="primary">
+						<Badge badgeContent={channel?.UnreadMessages} color="primary">
 							<ListItemText primary={channel.name} />
 						</Badge>
 						<AvatarGroup sx={{ ml: 'auto' }} total={channel.members?.length}>

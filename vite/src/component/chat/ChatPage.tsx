@@ -12,7 +12,7 @@ import { ChannelBrowser } from './ChannelBrowse';
 import { FriendsBrowser } from './ChatFriendsBrowser';
 
 
-const MyChannels = ({channelId} : {channelId : string} ) => {
+const MyChannels = ({ channelId }: { channelId: string }) => {
 	return (
 		<>
 			<Grid container spacing={3}>
@@ -92,10 +92,8 @@ export function ChatPage() {
 		);
 	}
 
-
 	return (
 		<>
-
 			<Container maxWidth="xl" sx={{ maxHeight: '100px', minHeight: '100px' }}>
 				<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
 					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>

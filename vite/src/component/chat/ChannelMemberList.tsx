@@ -272,7 +272,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 										}
 									}}
 								>
-									<Avatar alt="User Photo" src={`/avatars/${member.id}.png`} />
+									<Avatar alt="User Photo" src={`/avatars/${member.user.id}.png`} />
 								</Badge>
 							</Grid>
 							<Grid item xs={8}>
