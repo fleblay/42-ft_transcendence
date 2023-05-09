@@ -140,6 +140,6 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		}
 	}
 
-	const value = { customEmit, socket: socket, customOn, customOff, addSubscription }
+	const value = { customEmit, socket: socket, customOn, customOff, addSubscription}
 	return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
 }

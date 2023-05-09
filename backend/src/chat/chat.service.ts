@@ -91,7 +91,7 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true , username: true} } }
+			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true, username: true } } }
 		})
 		console.log("joinChannel : ", channel, options)
 		if (!channel)
@@ -118,7 +118,13 @@ export class ChatService implements OnModuleInit {
 			else {
 				member.left = false
 				const joinedMember = await this.membersRepo.save(member)
-				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { joinedMember });
+				console.log("here 1")
+				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
+					joinedMember: {
+						...joinedMember,
+						isConnected: this.usersService.isConnected(joinedMember.user.id)
+					}
+				});
 				return
 			}
 		}
@@ -131,7 +137,13 @@ export class ChatService implements OnModuleInit {
 		channel.members.push(joiner)
 		await this.channelsRepo.save(channel)
 		const joinedMember = await this.membersRepo.save(joiner)
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', { joinedMember });
+		console.log("here 2")
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
+			joinedMember: {
+				...joinedMember,
+				isConnected: this.usersService.isConnected(joinedMember.user.id)
+			}
+		});
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -317,10 +329,11 @@ export class ChatService implements OnModuleInit {
 		}
 		await this.membersRepo.save(modifyMember)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', {
-			modifyMember : {
+			modifyMember: {
 				...modifyMember,
 				isConnected: this.usersService.isConnected(modifyMember.user.id)
-			}})
+			}
+		})
 	}
 
 	async modifyChannel(user: User, channelId: number, changeChannelData: ChangeChannelDto) {
