@@ -133,10 +133,10 @@ export function MemberList({ channelId }: { channelId: string }) {
 		const [myRights, setMyRights] = React.useState<string[]>([]);
 
 		//Modal
-		const [openModal, setOpenModal] = React.useState<boolean>(false)
+		const [muteModalOpen, setMuteModalOpen] = React.useState<boolean>(false)
 
-		function closeModal(): void {
-			setOpenModal(false)
+		function closeMuteModal(): void {
+			setMuteModalOpen(false)
 			handleClose()
 		}
 
@@ -246,8 +246,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`${member.banned ? "Unban" : "Ban"} ${member.user.username}`}</MenuItem>}
 					{myRights.includes("mute") && <MenuItem onClick={handleClickMute}>{`${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
 					<MenuItem onClick={handleClickProfile}>{`${member.user.username}'s Profile`}</MenuItem>
-					{myRights.includes("mute") && <MenuItem onClick={()=> setOpenModal(true)}>{`Modal : ${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
-					<MuteMemberModal openModal={openModal} onClose={closeModal} channelId={channelId} member={member} />
+					{myRights.includes("mute") && <MenuItem onClick={()=> setMuteModalOpen(true)}>{`Modal : ${Date.parse(member.muteTime) > Date.now() ? "Unmute" : "Mute"} ${member.user.username}`}</MenuItem>}
+					<MuteMemberModal openModal={muteModalOpen} onClose={closeMuteModal} channelId={channelId} member={member} />
 				</Menu>
 			</span>
 		);
