@@ -11,7 +11,7 @@ import { ChannelBrowser } from './ChannelBrowse';
 import { FriendsBrowser } from './ChatFriendsBrowser';
 
 
-const MyChannels = ({ channelId }: { channelId: string }) => {
+const MyChannels = ({ channelName, channelId }: { channelName: string, channelId: string }) => {
 	return (
 		<>
 			<Grid container spacing={3}>
@@ -19,7 +19,7 @@ const MyChannels = ({ channelId }: { channelId: string }) => {
 					<Typography textAlign={'center'}> Channels</Typography>
 				</Grid>
 				<Grid item xs={8}>
-					<Typography textAlign={'center'}> {channelId} </Typography>
+					<Typography textAlign={'center'}> {channelName} </Typography>
 				</Grid>
 				<Grid item xs={2}>
 					<Typography textAlign={'center'}> User</Typography>
@@ -56,12 +56,29 @@ const MyChannels = ({ channelId }: { channelId: string }) => {
 export function ChatPage() {
 
 	const [channels, setChannels] = useState<Channel[]>([]);
+	const [channelName, setChannelName] = useState<string>("");
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
 
 	useEffect(() => {
 		console.log('changing chat', channelId)
 		return addSubscription(`/chat/${channelId || ''}`);
+	}, [channelId]);
+
+	useEffect(() => {
+		if (!channelId)
+			setChannelName("");
+		else {
+			apiClient.get(`/api/chat/channels/${channelId}/name`).then((response) => {
+				console.log("channel", response);
+				setChannelName(response.data);
+			}
+			).catch((error) => {
+				console.log(error);
+			}
+			);
+		}
+
 	}, [channelId]);
 
 
@@ -75,21 +92,6 @@ export function ChatPage() {
 			customOff('newChannel', onNewChannel);
 		};
 	}, []);
-
-	const createChannel = () => {
-		console.log("createChannel");
-		const channelParams = {
-			name: "test" + Math.floor(Math.random() * 1000),
-			private: false,
-			password: "test"
-		}
-		apiClient.post(`/api/chat/channels/create`, channelParams).then((response) => {
-			console.log("channels/create", "ok");
-		}).catch((error) => {
-			console.log(error);
-		}
-		);
-	}
 
 	return (
 		<>
@@ -109,7 +111,7 @@ export function ChatPage() {
 					maxHeight: 'calc(100vh - 80px)',
 					overflowY: 'scroll'
 				}}>
-					<MyChannels channelId={channelId || ''} />
+					<MyChannels channelName={channelName} channelId={channelId || ''} />
 				</Box>
 			</Container >
 		</>

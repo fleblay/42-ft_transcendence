@@ -93,7 +93,7 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, members: { id: true, role: true, banned: true, left: true, user: { id: true, username: true } } }
+			select: { id: true, private: true, name: true, members: { id: true, role: true, banned: true, left: true, user: { id: true, username: true } } }
 		})
 		//console.log("joinChannel : ", channel, options)
 		if (!channel)
@@ -120,7 +120,6 @@ export class ChatService implements OnModuleInit {
 			else {
 				member.left = false
 				const joinedMember = await this.membersRepo.save(member)
-				console.log("here 1")
 				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
 					joinedMember: {
 						...joinedMember,
@@ -128,6 +127,7 @@ export class ChatService implements OnModuleInit {
 						...this.gameService.userState(joinedMember.user.id),
 					}
 				});
+				this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
 				return
 			}
 		}
@@ -140,7 +140,6 @@ export class ChatService implements OnModuleInit {
 		channel.members.push(joiner)
 		await this.channelsRepo.save(channel)
 		const joinedMember = await this.membersRepo.save(joiner)
-		console.log("here 2")
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
 			joinedMember: {
 				...joinedMember,
@@ -148,6 +147,7 @@ export class ChatService implements OnModuleInit {
 				...this.gameService.userState(joinedMember.user.id),
 			}
 		});
+		this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -301,6 +301,30 @@ export class ChatService implements OnModuleInit {
 		})
 	}
 
+	async getChannelName(user : User, channelId: number): Promise<string | undefined> {
+		const channel = await this.channelsRepo.findOne({
+			where: { id: channelId },
+			select: {
+				id: true,
+				name: true,
+				directMessage: true,
+			}
+		})
+		if (!channel)
+			throw new NotFoundException('Channel not found');
+		if (channel.directMessage)
+		{
+			const members = await this.getChannelMembers(channelId);
+			const otherMember = members.find((member) => (member.user.id != user.id))
+			if (!otherMember)
+				throw new NotFoundException('Channel not found');
+			console.log("getChannelName : ", otherMember.user.username)
+			return otherMember.user.username;
+		}
+		return channel.name;
+	}
+
+
 	private checkModifyPermissions(requestingMember: Member, modifyMember: Member, options: ModifyMemberDto) {
 
 		if (requestingMember.role === 'regular')
@@ -432,6 +456,7 @@ export class ChatService implements OnModuleInit {
 		member.left = true;
 		const leftMember = await this.membersRepo.save(member);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { leftMember });
+		this.wsServer.to(`/chat/myChannels/${user.id}`).emit('chat.channel.leave', member.channel.id);
 	}
 
 	getMyChannels(user: User): Promise<Channel[]> {

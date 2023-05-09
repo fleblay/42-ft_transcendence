@@ -132,6 +132,11 @@ export class ChatController {
 		return this.chatService.getChannelInfo(user, channelId)
 	}
 
+	@Get('channels/:id/name')
+	getChannelName(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): Promise<string | undefined> {
+		return this.chatService.getChannelName(user, channelId);
+	}
+
 	// NOTE: A TESTER
 	@Get('channels/:id/members')
 	async getChannelMembers(@Param('id', ValideIdPipe) channelId: number): Promise<Member[]> {

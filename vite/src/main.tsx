@@ -53,7 +53,6 @@ const themeDark = createTheme({
 });
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-	<React.StrictMode>
 		<BrowserRouter>
 			<RouterProvider>
 				<ThemeProvider theme={true ? themeLight : themeDark}>
@@ -61,7 +60,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 				</ThemeProvider>
 			</RouterProvider>
 		</BrowserRouter>
-	</React.StrictMode>,
 )
 
 /*

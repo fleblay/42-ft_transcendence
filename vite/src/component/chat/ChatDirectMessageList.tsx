@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, List, ListItem, ListItemButton, ListItemText, AvatarGroup, Avatar, ListSubheader } from "@mui/material";
-import { Link as LinkRouter, useNavigate } from "react-router-dom";
-import { TablePagination } from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemText, Avatar, Badge } from "@mui/material";
+import { Link as LinkRouter, useNavigate, useParams } from "react-router-dom";
+import { SocketContext } from '../../socket/SocketProvider';
 
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
-import { Channel, Member, UserInfo } from "../../types";
+import { Channel } from "../../types";
 import { useAuthService } from "../../auth/AuthService";
 import { StyledBadge } from "./ChatFriendsBrowser";
 
@@ -14,20 +12,52 @@ import { StyledBadge } from "./ChatFriendsBrowser";
 export function MyDirectMessageList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
-	const [MyDmList, setMyDmList] = useState<Channel[]>();
+	const [myDmList, setMyDmList] = useState<{ [id: number]: Channel }>({});
+	const { customOff, customOn, addSubscription } = useContext(SocketContext);
 
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/dm`).then((response) => {
 			console.log("MyDmList", response);
-			setMyDmList(response.data);
+			setMyDmList(response.data.reduce((map: { [id: number]: Channel }, obj: Channel) => {
+				map[obj.id] = obj;
+				return map;
+			}, {}));
 		}).catch((error) => {
 			console.log(error);
 		});
 	}, []);
 
+	const { channelId } = useParams()
+
+	useEffect(() => {
+		function onModifyChannel(data: Channel) {
+			console.log("onModifyChannel", data)
+			setMyDmList(channelList => ({ ...channelList, [data.id]: data }));
+		}
+		function onDeleteChannel(id: number) {
+			setMyDmList(channelList => { delete channelList[id]; console.log(channelList); return { ...channelList }; });
+			if (channelId && +channelId == id)
+				navigate(`/chat`);
+		}
+		function onUnreadMessage(data: { unreadMessages: number, id: number }) {
+			if (!channelId || +channelId != data.id)
+				setMyDmList(channelList => ({ ...channelList, [data.id]: { ...channelList[data.id], unreadMessages: data.unreadMessages } }));
+		}
+
+		customOn('chat.modify.channel', onModifyChannel);
+		customOn('chat.channel.leave', onDeleteChannel);
+		customOn('unreadMessage', onUnreadMessage);
+		return () => {
+			customOff('chat.modify.channel', onModifyChannel);
+			customOff('chat.channel.leave', onDeleteChannel);
+			customOff('unreadMessage', onUnreadMessage);
+		};
+	}, [channelId]);
+
 
 	const mooveToChannel = (channelId: number) => {
+		setMyDmList(channelList => ({ ...channelList, [channelId]: { ...channelList[channelId], unreadMessages: 0 } }));
 		navigate(`/chat/${channelId}`);
 	}
 
@@ -42,23 +72,29 @@ export function MyDirectMessageList() {
 		}}>
 
 
-			{MyDmList?.map((channel: Channel) => {
-				const friend = channel.members[0].user.id == auth.user?.id ? channel.members[1] : channel.members[0];
-				return (
-					<ListItem key={channel.id} sx={{ pl: 4 }} >
-						<ListItemButton onClick={() => mooveToChannel(channel.id)}>
-							<StyledBadge
-								overlap="circular"
-								anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-								variant="dot"
-								color={friend.isConnected ? "success" : "error"}
-							>
-								<Avatar src={`/avatars/${friend.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
-							</StyledBadge>
-							<ListItemText primary={friend.user.username} />						</ListItemButton>
-					</ListItem>
-				)
-			})
+			{Object.values(myDmList)
+				.sort((a: Channel, b: Channel) => b.unreadMessages - a.unreadMessages)
+				.map((channel: Channel) => {
+					const friend = channel.members[0].user.id == auth.user?.id ? channel.members[1] : channel.members[0];
+					return (
+						<ListItem key={channel.id} sx={{ pl: 4 }} >
+							<ListItemButton onClick={() => mooveToChannel(channel.id)}>
+								<StyledBadge
+									overlap="circular"
+									anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+									variant="dot"
+									color={friend.isConnected ? "success" : "error"}
+								>
+									<Avatar src={`/avatars/${friend.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
+								</StyledBadge>
+								<Badge badgeContent={channel.unreadMessages} color="primary">
+									<ListItemText primary={friend.user.username} />
+								</Badge>
+							</ListItemButton>
+
+						</ListItem>
+					)
+				})
 
 			}
 		</List>
