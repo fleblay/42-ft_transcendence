@@ -28,7 +28,6 @@ export function MenuBar() {
 	React.useEffect(() => {
 		if (!auth.user) return;
 		const userId = auth.user.id;
-		console.log(userId);
 		setImgPath(`/avatars/${userId}.png`);
 	}, [auth.user])
 

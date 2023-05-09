@@ -188,13 +188,15 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	}
 
 	@SubscribeMessage('client.component.join')
-	handleClientComponentJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: { subscription: string }): void {
+	async handleClientComponentJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: { subscription: string }) {
 		this.updateSocket(client, "client.component.join");
-		client.join(data.subscription);
+		console.log("client.component.join", user.username, data.subscription)
+		await client.join(data.subscription);
 	}
 
 	@SubscribeMessage('client.component.leave')
 	handleClientComponentLeave(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: { unsubscription: string }): void {
+		console.log("client.component.leave", user.username, data.unsubscription)
 		client.leave(data.unsubscription);
 	}
 }

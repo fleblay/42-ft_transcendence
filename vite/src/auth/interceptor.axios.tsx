@@ -26,10 +26,8 @@ const apiClient = axios.create({});
 
 apiClient.interceptors.request.use(
 	async (config) => {
-		const token = getAccessToken()
-		console.log("token :", token);
-		if (token) {
-			const access_token = getAccessToken()
+		const access_token = getAccessToken()
+		if (access_token) {
 			config.headers.Authorization = `Bearer ${access_token}`;
 		}
 		else {

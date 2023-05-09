@@ -503,7 +503,6 @@ export class ChatService implements OnModuleInit {
 				},
 			},
 		});
-		console.log("getUnreadMessages : ", member);
 		if (!member || !member.lastRead)
 			return 0;
 		return await this.messagesRepo.count({

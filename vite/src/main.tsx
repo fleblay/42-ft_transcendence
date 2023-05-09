@@ -10,14 +10,14 @@ import {
 
 import { Paper, ThemeProvider, createTheme } from '@mui/material';
 
-export const RouterContext = React.createContext<{to: string, from: string}>(null!!);
+export const RouterContext = React.createContext<{ to: string, from: string }>(null!!);
 
 const RouterProvider = ({ children }: { children: JSX.Element }) => {
 	const location = useLocation()
-	const [route, setRoute] = React.useState({to: "init", from: "init"})
+	const [route, setRoute] = React.useState({ to: "init", from: "init" })
 
 	React.useEffect(() => {
-		setRoute({to: location.pathname, from : route.to})
+		setRoute({ to: location.pathname, from: route.to })
 	}, [location]);
 
 	return <RouterContext.Provider value={route}>
@@ -27,30 +27,30 @@ const RouterProvider = ({ children }: { children: JSX.Element }) => {
 
 const themeLight = createTheme({
 	palette: {
-	  background: {
-		default: "#eff0f4",
-	  },
-	  primary: {
-		main: "#3f51b5"
-	  },
-	
+		background: {
+			default: "#eff0f4",
+		},
+		primary: {
+			main: "#3f51b5"
+		},
+
 	}
-  });
-  
-  const themeDark = createTheme({
+});
+
+const themeDark = createTheme({
 	palette: {
-	  background: {
-		default: "#010409",
-		paper: "#333333"
-	  },
-	  primary: {
-		main: "#3f51b5"
-	  },
-	  text: {
-		primary: "#ffffff"
-	  }
+		background: {
+			default: "#010409",
+			paper: "#333333"
+		},
+		primary: {
+			main: "#3f51b5"
+		},
+		text: {
+			primary: "#ffffff"
+		}
 	}
-  });
+});
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
