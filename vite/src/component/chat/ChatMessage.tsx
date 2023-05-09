@@ -54,7 +54,10 @@ export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username }) 
 							style={{
 								backgroundColor: side === 'left' ? '#e0e0e0' : 'rgb(62, 74, 142)',
 								color: side === 'left' ? '#000' : '#fff',
-								borderRadius: 15,
+								borderTopLeftRadius: 15,
+								borderBottomLeftRadius: 15,
+								borderTopRightRadius: 15,
+								borderBottomRightRadius: 15,
 								padding: 10,
 								marginBottom: 5,
 								marginTop: 5,
