@@ -26,7 +26,6 @@ export function MyChannelsList() {
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/my`).then((response) => {
-			console.log("MyChannelsList", response);
 			setMyChannelsList(response.data);
 		}).catch((error) => {
 			console.log(error);
