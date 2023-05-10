@@ -122,7 +122,7 @@ export type Friend = {
 	requestStatus: 'accepted' | 'pending',
 }
 
-export type Blocked = {
+export type ShortUser = {
 	id: number,
 	username: string
 }
@@ -163,4 +163,12 @@ export type ChannelInfo = {
 	id: number;
 	name: string;
 	directMessage: boolean;
+}
+
+export interface PublicChannel {
+	id: number;
+	name: string;
+	hasPassword: boolean;
+	membersLength: number;
+	owner: ShortUser | undefined;
 }

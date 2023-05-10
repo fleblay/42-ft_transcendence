@@ -4,13 +4,13 @@ import { AppBar, Avatar, Button, Container, Switch, TextField, Typography } from
 import apiClient from '../auth/interceptor.axios';
 import { Box } from '@mui/system';
 import { Divider } from '@mui/material';
-import { Blocked } from '../types';
+import { ShortUser } from '../types';
 import { useAuthService } from '../auth/AuthService';
 import { useNavigate } from 'react-router-dom';
 
 export function BlockedList() {
 	//send a post with image
-	const [blockedList, setBlockedList] = useState<Blocked[] | null>(null);
+	const [blockedList, setBlockedList] = useState<ShortUser[] | null>(null);
 	const auth = useAuthService();
 	const navigate = useNavigate();
 
@@ -58,7 +58,7 @@ export function BlockedList() {
 					</AppBar>
 					<Box position="static" sx={{ height: 'auto' }}>
 						{blockedList?.length === 0 ? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any blockeds yet </Typography> : null}
-						{blockedList?.map((blocked: Blocked) => {
+						{blockedList?.map((blocked: ShortUser) => {
 							const imgPath = `/avatars/${blocked.id}.png`
 
 							return (

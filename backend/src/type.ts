@@ -28,7 +28,7 @@ export type Friend = {
 }
 
 
-export type Blocked = {
+export type ShortUser = {
 	id: number,
 	username: string
 }
@@ -50,4 +50,12 @@ export interface ChannelInfo {
 	id: number;
 	name: string;
 	directMessage: boolean;
+}
+
+export interface PublicChannel {
+	id: number;
+	name: string;
+	hasPassword: boolean;
+	membersLength: number;
+	owner: ShortUser | undefined;
 }
