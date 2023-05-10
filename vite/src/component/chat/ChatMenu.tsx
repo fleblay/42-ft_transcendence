@@ -30,73 +30,6 @@ import { CreateChannelModal } from './CreatChannelModal';
 import { ViewDayRounded } from '@mui/icons-material';
 import { MyDirectMessageList } from './ChatDirectMessageList';
 
-
-
-export function BasicMenu() {
-	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-	const open = Boolean(anchorEl);
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-		setAnchorEl(event.currentTarget);
-	};
-	const handleClose = () => {
-		setAnchorEl(null);
-	};
-
-	return (
-		<div>
-			<Button
-				id="basic-button"
-				onClick={handleClick}
-			>
-				Dashboard
-			</Button>
-			<Button
-				id="basic-button"
-				onClick={handleClick}
-			>
-				Dashboard
-			</Button>
-			<ProfileMenu anchorEl={anchorEl} open={open} onClose={handleClose} />
-		</div>
-	);
-}
-
-export const ProfileMenu: React.FC<MenuProps> = (props) => {
-	return (
-		<Paper sx={{ width: 320, maxWidth: '100%' }}>
-			<Menu {...props}>
-				<MenuItem>
-					<ListItemIcon>
-						<ContentCut fontSize="small" />
-					</ListItemIcon>
-					<ListItemText>Cut</ListItemText>
-				</MenuItem>
-				<MenuItem>
-					<ListItemIcon>
-						<ContentCopy fontSize="small" />
-					</ListItemIcon>
-					<ListItemText>Copy</ListItemText>
-				</MenuItem>
-				<MenuItem>
-					<ListItemIcon>
-						<ContentPaste fontSize="small" />
-					</ListItemIcon>
-					<ListItemText>Paste</ListItemText>
-				</MenuItem>
-				<Divider />
-				<MenuItem>
-					<ListItemIcon>
-						<Cloud fontSize="small" />
-					</ListItemIcon>
-					<ListItemText>Web Clipboard</ListItemText>
-				</MenuItem>
-			</Menu>
-		</Paper>
-	);
-}
-
-
-
 export default function ChatMenu() {
 	const [friendMenu, setFriendMenu] = React.useState<boolean>(false);
 	const [roomsMenu, setRoomsMenu] = React.useState<boolean>(false);
@@ -160,7 +93,7 @@ export default function ChatMenu() {
 					{friendMenu ? <ExpandLess /> : <ExpandMore />}
 				</ListItemButton>
 				<Collapse in={friendMenu} timeout="auto" unmountOnExit>
-					<MyDirectMessageList/>
+					<MyDirectMessageList />
 				</Collapse>
 			</List>
 			<CreateChannelModal openCreateChannel={openCreateChannel} handleClose={handleCloseCreateChannel} />
