@@ -87,11 +87,12 @@ function removeOldMember(oldMemberId: number, memberList: memberList): memberLis
 }
 
 function addNewMember(newMember: Member, memberList: memberList): memberList {
+	console.log("newMember : ", newMember)
 	if (newMember.role == "admin" || newMember.role == "owner" && !newMember.left)
 		memberList.admins.push(newMember)
 	else if (newMember.banned)
 		memberList.banned.push(newMember)
-	else if (Date.parse(newMember.muteTime) > Date.now() && !newMember.left)
+	else if ((Date.parse(newMember.muteTime) > Date.now()) && !newMember.left)
 		memberList.muted.push(newMember)
 	else if (!newMember.left)
 		memberList.regulars.push(newMember)

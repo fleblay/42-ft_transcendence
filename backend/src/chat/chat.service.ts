@@ -93,7 +93,7 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, name: true, members: { id: true, role: true, banned: true, left: true, user: { id: true, username: true } } }
+			select: { id: true, private: true, name: true, members: { id: true, role: true, banned: true, left: true, muteTime: true, user: { id: true, username: true } } }
 		})
 		//console.log("joinChannel : ", channel, options)
 		if (!channel)
