@@ -452,6 +452,7 @@ export class ChatService implements OnModuleInit {
 					},
 					left: false,
 				},
+				directMessage: false,
 			},
 			relations: ['members', 'members.user'],
 			select: {
