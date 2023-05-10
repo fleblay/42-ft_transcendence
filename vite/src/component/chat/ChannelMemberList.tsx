@@ -75,11 +75,11 @@ function removeOldMember(oldMemberId: number, memberList: memberList): memberLis
 }
 
 function addNewMember(newMember: Member, memberList: memberList): memberList {
-	if (newMember.role == "admin")
+	if (newMember.role == "admin" || newMember.role == "owner" && !newMember.left)
 		memberList.admins.push(newMember)
 	else if (newMember.banned)
 		memberList.banned.push(newMember)
-	else if (Date.parse(newMember.muteTime) > Date.now())
+	else if (Date.parse(newMember.muteTime) > Date.now() && !newMember.left)
 		memberList.muted.push(newMember)
 	else if (!newMember.left)
 		memberList.regulars.push(newMember)
@@ -162,9 +162,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
 			console.log("memberlist fetched : ", data);
 			const newMemberList: memberList = {
-				admins: data.filter((member) => member.role == "admin" || member.role == "owner"),
+				admins: data.filter((member) => (member.role == "admin" || member.role == "owner") && !member.left),
 				banned: data.filter((member) => member.banned),
-				muted: data.filter((member) => Date.parse(member.muteTime) > Date.now()),
+				muted: data.filter((member) => (Date.parse(member.muteTime) > Date.now()) && !member.left),
 				regulars: []
 			}
 			newMemberList.regulars = data.filter((member) => {
