@@ -445,6 +445,7 @@ export class ChatService implements OnModuleInit {
 					user: {
 						id: true,
 					},
+					left: true,
 				},
 			},
 			relationLoadStrategy: "query",

@@ -107,8 +107,8 @@ export class ChatController {
 	}
 
 	@Post('channels/:id/ack')
-	ackChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): void {
-		this.chatService.ackChannel(user, channelId);
+	async ackChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number) {
+		await this.chatService.ackChannel(user, channelId);
 	}
 
 	// TODO: Limit the number of messages to 50
