@@ -167,22 +167,19 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
-	private async cbEmitAll(member: Member)
-	{
-		const channel = await this.getOneChannel(member.user, member.channel.id);
-		if (!channel)
-			return null;
+	private async cbEmitAll(member: Member, channel: Channel) {
 		return {
 			...channel,
-			password : undefined,
-			hasPassword : channel.password.length !== 0,
-			members : channel.members.filter((member) => !member.left)
-			.map((member : Member) => (
-				{
-				...member,
-				isConnected: this.usersService.isConnected(member.user.id)
-			}
-			))};
+			password: undefined,
+			hasPassword: channel.password.length !== 0,
+			members: channel.members.filter((member) => !member.left)
+				.map((member: Member) => (
+					{
+						...member,
+						isConnected: this.usersService.isConnected(member.user.id)
+					}
+				))
+		};
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -448,27 +445,14 @@ export class ChatService implements OnModuleInit {
 
 	}
 
-	async emitToAllMembers(channelId: number, event: string, cb: (member: Member) => any) {
-		const channel = await this.channelsRepo.findOne({
-			where: { id: channelId },
-			relations: ['members', 'members.user'],
-			select: {
-				id: true,
-				members: {
-					id: true,
-					user: {
-						id: true,
-					},
-					left: true,
-				},
-			},
-			relationLoadStrategy: "query",
-		});
+	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {
+		const channel = await this.getOneChannel(channelId);
+
 		if (!channel)
 			return;
 		for (const member of channel.members) {
 			if (!member.left)
-				this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit(event, await cb(member));
+				this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit(event, await cb.bind(this)(member, channel));
 		}
 	}
 
@@ -482,7 +466,7 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/myChannels/${user.id}`).emit('chat.channel.leave', member.channel.id);
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
-		const channel = await this.getOneChannel(user, channelId);
+		const channel = await this.getOneChannel(channelId, user);
 		if (!channel) return;
 
 		if (!channel.private) {
@@ -523,15 +507,13 @@ export class ChatService implements OnModuleInit {
 		});
 	}
 
-	async getOneChannel(user: User, channelId: number): Promise<Channel | null> {
+	async getOneChannel(channelId: number, user?: User): Promise<Channel | null> {
 		return await this.channelsRepo.findOne({
 			where: {
 				id: channelId,
-				members: {
-					user: {
-						id: user.id,
-					},
-				},
+				members: user ? {
+					user: { id: user.id },
+				} : undefined,
 			},
 			relations: ['members', 'members.user'],
 			select: {
@@ -549,7 +531,6 @@ export class ChatService implements OnModuleInit {
 			relationLoadStrategy: "query",
 		});
 	}
-
 
 	getMyDirectMessage(user: User): Promise<Channel[]> {
 		return this.channelsRepo.find({
