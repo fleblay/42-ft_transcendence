@@ -46,9 +46,9 @@ export class GameService {
 		let game = this.gameCluster.findOne(gameId);
 		if (!game)
 			throw new NotFoundException('Game not found');
-		game.addUser(user, client);
+		const joinType: string = game.addUser(user, client);
 		//this.usersService.addConnectedUser(user.id)
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
+		this.server.to(`/player/${user.id}`).emit('page.player', {userId : user.id, event : joinType})
 		return { gameId: game.gameId, gameInfo: game.generateGameInfo() };
 	}
 
@@ -80,7 +80,7 @@ export class GameService {
 	}
 
 	quitGame(userId: number, gameId: UUID) {
-		this.server.to(`/player/${userId}`).emit('page.player', {})
+		this.server.to(`/player/${userId}`).emit('page.player', {userId, event: "leave"})
 		const game = this.gameCluster.playerQuit(gameId, userId);
 		if (game) {
 			const savedGame = game.generateSavedGameInfo();

@@ -243,9 +243,10 @@ export class Game {
 	}
 
 
-	addUser(user: User, client: Socket) {
+	addUser(user: User, client: Socket) : string {
 		// TODO: If player reconnect, check if he is in the game and change his socket
 		// Disconnect old socket
+		let joinType = ""
 		if (this.players.find((player) => player.user.id === user.id))
 			throw new NotFoundException('Already in game')
 
@@ -264,6 +265,7 @@ export class Game {
 				ammo: this.options?.shoot ? this.startAmmo : 0
 			})
 			client.join(this.playerRoom)
+			joinType = "ingame"
 			if (this.players.length === 1) {
 				this.status = GameStatus.waiting
 				this.play()
@@ -282,8 +284,10 @@ export class Game {
 		else {
 			this.viewers.push({ user, clientId: client.id })
 			client.join(this.viewerRoom)
+			joinType = "watching"
 		}
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
+		return joinType
 	}
 
 	//Todo : gere la taille de la balle !!!!

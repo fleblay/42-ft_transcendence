@@ -24,6 +24,25 @@ const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
+function userUpDateState(userId: number, event: string, memberList: memberList): memberList {
+
+	for (const [key, value] of Object.entries(memberList)) {
+		console.log("in for loop : ", key, value)
+		const member : Member | undefined = value.find((member) => member.user.id == userId)
+		if (member) {
+			console.log("Found user in :", key)
+			event == "leave" ? member.states.pop() : member.states.push(event)
+			break
+		}
+	}
+	return ({
+		admins: [...memberList.admins],
+		banned: [...memberList.banned],
+		muted: [...memberList.muted],
+		regulars: [...memberList.regulars],
+	})
+}
+
 function subscribeToMemberEvents(addSubscription: (sub: string) => (() => void) | void, memberList: memberList): ((() => void) | void)[] {
 
 	const fxArray: ((() => void) | void)[] = []
@@ -110,18 +129,26 @@ export function MemberList({ channelId }: { channelId: string }) {
 			setMemberList(removeOldMember(leftMember.id, memberList))
 		}
 
+		function onPlayerEvent({ userId, event }: { userId: number, event: string }) {
+			console.log("onPlayerEvent", userId, event);
+			setMemberList(userUpDateState(userId, event, memberList))
+		}
+
 		customOn("chat.modify.members", onMemberUpdate);
 		customOn("chat.member.new", onMemberJoin);
 		customOn("chat.member.leave", onMemberLeave);
+		customOn("page.player", onPlayerEvent);
 		const fxArray: ((() => void) | void)[] = subscribeToMemberEvents(addSubscription, memberList)
 		return (() => {
 			customOff("chat.modify.members", onMemberUpdate);
 			customOff("chat.member.new", onMemberJoin);
 			customOff("chat.member.leave", onMemberLeave);
+			customOff("page.player", onPlayerEvent);
 			fxArray.forEach(fx => {
 				if (typeof fx === "function")
 					fx()
-		})})
+			})
+		})
 	}, [memberList])
 
 	//playing and viewing icons
