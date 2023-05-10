@@ -94,7 +94,7 @@ function removeOldMember(oldMemberId: number, memberList: memberList): memberLis
 
 function addNewMember(newMember: Member, memberList: memberList): memberList {
 	console.log("newMember : ", newMember)
-	if (newMember.role == "admin" || newMember.role == "owner" && !newMember.left)
+	if ((newMember.role == "admin" || newMember.role == "owner") && !newMember.left)
 		memberList.admins.push(newMember)
 	else if (newMember.banned)
 		memberList.banned.push(newMember)
@@ -179,9 +179,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
-			console.log("memberlist fetched : ", data);
+			console.log("memberlist fetched is: ", data);
 			const newMemberList: memberList = {
-				admins: data.filter((member) => (member.role == "admin" || member.role == "owner") && !member.left),
+				admins: data.filter((member) => ((member.role == "admin" || member.role == "owner")) && !member.left),
 				banned: data.filter((member) => member.banned),
 				muted: data.filter((member) => (Date.parse(member.muteTime) > Date.now()) && !member.left),
 				regulars: []
