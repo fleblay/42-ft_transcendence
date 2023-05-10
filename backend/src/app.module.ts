@@ -60,7 +60,7 @@ import { Channel } from './model/channel.entity';
 			useValue: new ValidationPipe({
 				whitelist: true,
 			}),
-		}
+		},
 	],
 })
 export class AppModule implements NestModule {

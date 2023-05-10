@@ -11,7 +11,6 @@ import { User } from '../model/user.entity';
 import { NewMessageDto } from './dto/new-message.dto';
 import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ChangeChannelDto } from './dto/change-channel.dto';
-import { dir } from 'console';
 import { GameService } from 'src/game/game.service';
 import { ChannelInfo, PublicChannel, ShortUser } from '../type';
 
@@ -98,8 +97,6 @@ export class ChatService implements OnModuleInit {
 			password: data.password,
 			directMessage: data.directMessage ? true : false
 		})
-		if (!channel.private)
-			this.wsServer.to('/chat/').emit('newChannel', { id: channel.id, name: channel.name, protected: !!channel.password })
 		return channel.id
 	}
 
@@ -117,14 +114,15 @@ export class ChatService implements OnModuleInit {
 		if (channel.private && (!options.owner && channel.members.find((member) => (member.user.id == user.id))?.role != "owner"))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
 		//console.log("joinChannel2 : ", channel, options)
-		let addedUser: User | null = user
+		let addedUser: User = user
 		if (options?.targetUser) {
-			addedUser = await this.usersService.findOneByUsername(options.targetUser)
-			if (!addedUser)
+			addedUser = await this.usersService.findOneByUsername(options.targetUser) as User
+			if (!addedUser) {
 				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
-			//console.log("There is a target User", addedUser)
+			}
 		}
-
+		let joiner: Member;
+		// Find if the user is already in the channel
 		const member = channel.members.find((member) => (member.user.id == addedUser!.id))
 		if (member) {
 			if (member.banned)
@@ -133,55 +131,55 @@ export class ChatService implements OnModuleInit {
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is already in the channel`)
 			else {
 				member.left = false
-				const joinedMember = await this.membersRepo.save(member)
-				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
-					joinedMember: {
-						...joinedMember,
-						isConnected: this.usersService.isConnected(joinedMember.user.id),
-						...this.gameService.userState(joinedMember.user.id),
-					}
-				});
-				this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
-				this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
-				return
+				joiner = await this.membersRepo.save(member)
 			}
 		}
-		const joiner: Member = this.membersRepo.create({
-			user: addedUser,
-			channel,
-			messages: [],
-			role: (options?.owner) ? "owner" : "regular"
-		})
-		channel.members.push(joiner)
-		await this.channelsRepo.save(channel)
-		const joinedMember = await this.membersRepo.save(joiner)
+		// If not, create a new member
+		else {
+			joiner = this.membersRepo.create({
+				user: addedUser,
+				channel,
+				messages: [],
+				role: (options?.owner) ? "owner" : "regular"
+			})
+			channel.members.push(joiner)
+			await this.channelsRepo.save(channel)
+			joiner = await this.membersRepo.save(joiner)
+		}
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
 			joinedMember: {
-				...joinedMember,
-				isConnected: this.usersService.isConnected(joinedMember.user.id),
-				...this.gameService.userState(joinedMember.user.id),
+				...joiner,
+				isConnected: this.usersService.isConnected(joiner.user.id),
+				...this.gameService.userState(joiner.user.id),
 			}
 		});
 		this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
+
+		if (!channel.private) {
+			this.wsServer.to('/chat/public').emit('chat.public.update', {
+				id: channel.id,
+				name: channel.name,
+				hasPassword: !!channel.password,
+				membersLength: channel.members.filter(member => !member.left).length,
+				owner: channel.members.find((member) => member.role === 'owner')?.user as ShortUser,
+			} as PublicChannel);
+		}
 	}
 
-	private async cbEmitAll(member: Member)
-	{
-		const channel = await this.getOneChannel(member.user, member.channel.id);
-		if (!channel)
-			return null;
+	private async cbEmitAll(member: Member, channel: Channel) {
 		return {
 			...channel,
-			password : undefined,
-			hasPassword : channel.password.length !== 0,
-			members : channel.members.filter((member) => !member.left)
-			.map((member : Member) => (
-				{
-				...member,
-				isConnected: this.usersService.isConnected(member.user.id)
-			}
-			))};
+			password: undefined,
+			hasPassword: channel.password.length !== 0,
+			members: channel.members.filter((member) => !member.left)
+				.map((member: Member) => (
+					{
+						...member,
+						isConnected: this.usersService.isConnected(member.user.id)
+					}
+				))
+		};
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -447,27 +445,14 @@ export class ChatService implements OnModuleInit {
 
 	}
 
-	async emitToAllMembers(channelId: number, event: string, cb: (member: Member) => any) {
-		const channel = await this.channelsRepo.findOne({
-			where: { id: channelId },
-			relations: ['members', 'members.user'],
-			select: {
-				id: true,
-				members: {
-					id: true,
-					user: {
-						id: true,
-					},
-					left: true,
-				},
-			},
-			relationLoadStrategy: "query",
-		});
+	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {
+		const channel = await this.getOneChannel(channelId);
+
 		if (!channel)
 			return;
 		for (const member of channel.members) {
 			if (!member.left)
-				this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit(event, await cb(member));
+				this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit(event, await cb.bind(this)(member, channel));
 		}
 	}
 
@@ -481,6 +466,18 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/myChannels/${user.id}`).emit('chat.channel.leave', member.channel.id);
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
+		const channel = await this.getOneChannel(channelId, user);
+		if (!channel) return;
+
+		if (!channel.private) {
+			this.wsServer.to('/chat/public').emit('chat.public.update', {
+				id: channel.id,
+				name: channel.name,
+				hasPassword: !!channel.password,
+				membersLength: channel.members.filter(member => !member.left).length,
+				owner: channel.members.find(member => member.role === 'owner')?.user as ShortUser,
+			} as PublicChannel);
+		}
 	}
 
 	async getMyChannels(user: User): Promise<Channel[]> {
@@ -510,15 +507,13 @@ export class ChatService implements OnModuleInit {
 		});
 	}
 
-	async getOneChannel(user: User, channelId: number): Promise<Channel | null> {
+	async getOneChannel(channelId: number, user?: User): Promise<Channel | null> {
 		return await this.channelsRepo.findOne({
 			where: {
 				id: channelId,
-				members: {
-					user: {
-						id: user.id,
-					},
-				},
+				members: user ? {
+					user: { id: user.id },
+				} : undefined,
 			},
 			relations: ['members', 'members.user'],
 			select: {
@@ -528,14 +523,14 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
-					user: { id: true, username: true },
 					left: true,
+					role: true,
+					user: { id: true, username: true },
 				},
 			},
 			relationLoadStrategy: "query",
 		});
 	}
-
 
 	getMyDirectMessage(user: User): Promise<Channel[]> {
 		return this.channelsRepo.find({
