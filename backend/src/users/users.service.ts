@@ -28,7 +28,7 @@ export class UsersService implements OnModuleInit {
 		@Inject(forwardRef(() => FriendsService)) private friendsService: FriendsService,
 		private chatService: ChatService
 	) {
-		//setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
+		setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
 	}
 
 	setWsServer(server: any) {
@@ -118,7 +118,7 @@ export class UsersService implements OnModuleInit {
 
 		if (oldStatus) {
 			const index = this.connectedUsers.get(id)?.indexOf(oldStatus);
-			if (index && index > -1) {
+			if (index !== undefined && index > -1) {
 				this.connectedUsers.get(id)?.splice(index, 1);
 			}
 		}
