@@ -43,9 +43,13 @@ export function MyChannelsList() {
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
 			console.log("onModifyChannel", data)
+			if (!data)
+				return;
 			setMyChannelsList(channelList => ({ ...channelList, [data.id]: data }));
 		}
 		function onDeleteChannel(id : number) {
+			if(!id)
+				return
 			setMyChannelsList(channelList => { delete channelList[id]; console.log(channelList); return {...channelList}; });
 			if (channelId && +channelId == id)
 				navigate(`/chat`);
