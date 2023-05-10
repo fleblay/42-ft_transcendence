@@ -90,6 +90,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.connectedSockets.push({ id: socket.id, username: foundUser.username || "<UnamedUser>", userId: foundUser.id, actions: ["connection"] })
 		this.usersServices.addConnectedUser(foundUser.id)
 		this.server.to(`/player/${foundUser.id}`).emit('page.player', {
+			userId: foundUser.id, event: "connected",
 			connected: true
 		})
 	}
@@ -104,6 +105,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 			this.usersServices.disconnect(foundUser.id)
 
 			this.server.to(`/player/${foundUser.id}`).emit('page.player', {
+				userId: foundUser.id, event: "disconnected",
 				connected: false
 			})
 		}

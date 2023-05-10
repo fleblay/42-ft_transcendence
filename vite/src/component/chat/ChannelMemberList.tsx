@@ -28,11 +28,23 @@ function userUpDateState(userId: number, event: string, memberList: memberList):
 
 	for (const [key, value] of Object.entries(memberList)) {
 		console.log("in for loop : ", key, value)
-		const member : Member | undefined = value.find((member) => member.user.id == userId)
+		const member: Member | undefined = value.find((member) => member.user.id == userId)
 		if (member) {
 			console.log("Found user in :", key)
-			event == "leave" ? member.states.pop() : member.states.push(event)
-			break
+			switch (event) {
+				case ("leave"):
+					member.states.pop()
+					break
+				case ("ingame" || "watching"):
+					member.states.push(event)
+					break
+				case ("connected"):
+					member.isConnected = true
+					break
+				case ("disconnected"):
+					member.isConnected = false
+					break
+			}
 		}
 	}
 	return ({
