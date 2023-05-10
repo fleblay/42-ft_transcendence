@@ -1,4 +1,4 @@
-import { AfterInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { AfterInsert, AfterLoad, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Member } from "./member.entity";
 import { Message } from "./message.entity";
 import { WebSocketServer } from "@nestjs/websockets";
@@ -36,9 +36,10 @@ export class Channel {
 
 
 	@AfterInsert()
-	afterInsert() {
-		console.log('Inserted Channel');
-		this.server.emit('chat.message.new', {content: this.name, id: this.id});
+	async afterInsert() {
+		console.log('############################Inserted Channel');
 	}
 
+
 }
+//

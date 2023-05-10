@@ -18,6 +18,7 @@ async function bootstrap() {
 	);
 	app.use(cookieParser())
 	app.useGlobalFilters(new TypeOrmFilter);
+
 	await app.listen(3000);
 }
 bootstrap();

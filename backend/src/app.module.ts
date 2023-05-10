@@ -18,6 +18,9 @@ import { APP_PIPE } from '@nestjs/core';
 import { Member } from './model/member.entity';
 import { Message } from './model/message.entity';
 import { Channel } from './model/channel.entity';
+import { Subscriber } from 'rxjs';
+import { ChannelSubscriber } from './events-subscriber/event-subsriber.listener';
+import { EventsSubscriberModule } from './events-subscriber/events-subscriber.module';
 
 @Module({
 	imports: [
@@ -42,7 +45,9 @@ import { Channel } from './model/channel.entity';
 					Member,
 					Message,
 					Channel
-				]
+				],
+				subscribers: [ChannelSubscriber],
+
 			})
 		}),
 		UsersModule,
@@ -50,7 +55,8 @@ import { Channel } from './model/channel.entity';
 		GameModule,
 		AuthModule,
 		FriendsModule,
-		ChatModule
+		ChatModule,
+		EventsSubscriberModule
 	],
 	controllers: [AppController],
 	providers: [

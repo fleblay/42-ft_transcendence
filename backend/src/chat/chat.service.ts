@@ -154,7 +154,7 @@ export class ChatService implements OnModuleInit {
 			}
 		});
 		this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
-		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
+		//this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
 		if (!channel.private) {
 			this.wsServer.to('/chat/public').emit('chat.public.update', {
