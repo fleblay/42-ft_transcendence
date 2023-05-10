@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton, Modal } from "@mui/material";
+import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton, Modal, Box } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { Channel, Member } from "../../types";
@@ -304,7 +304,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 		};
 
 		return (
-			<span>
+			<>
 				<IconButton
 					id="basic-button"
 					aria-controls={open ? 'basic-menu' : undefined}
@@ -333,7 +333,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					{myRights.includes("mute") && !mutedState && <MenuItem onClick={() => setMuteModalOpen(true)}>{`Mute ${member.user.username}`}</MenuItem>}
 					<MuteMemberModal openModal={muteModalOpen} onClose={closeMuteModal} channelId={channelId} member={member} />
 				</Menu>
-			</span>
+			</>
 		);
 	}
 
@@ -342,33 +342,32 @@ export function MemberList({ channelId }: { channelId: string }) {
 			<Typography component="div" gutterBottom>{groupname}</Typography>
 			<List>
 				{groupMembers.map((member) => (
-					<ListItem key={member.id} >
-						<Grid container wrap="nowrap" direction="row" justifyContent="flex-start" alignItems="center">
-							<Grid item xs>
-								<Badge
-									overlap="circular"
-									anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-									variant="dot"
-									sx={{
-										"& .MuiBadge-badge": {
-											backgroundColor: member.isConnected ? greenColor : redColor
-										}
-									}}
-								>
-									<Avatar alt="User Photo" src={`/avatars/${member.user.id}.png`} />
-								</Badge>
-							</Grid>
-							<Grid item xs={8}>
-								<ListItemText primary={member.user.username} />
-								<ListItemIcon>{member.role == "owner" ? <MilitaryTechIcon /> : <PersonIcon />}</ListItemIcon>
-								<ListItemIcon>{(Date.parse(member.muteTime) > Date.now()) ? <VolumeOffIcon /> : <VolumeUpIcon />}</ListItemIcon>
-								<ListItemIcon>{member.states.includes("ingame") && <VideogameAssetIcon />}</ListItemIcon>
-								<ListItemIcon>{member.states.includes("watching") && <VisibilityIcon />}</ListItemIcon>
-							</Grid>
-							<Grid item xs>
-								<GenerateMemberActionList member={member} />
-							</Grid>
-						</Grid>
+					<ListItem key={member.id}
+					>
+						<Badge
+							overlap="circular"
+							anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+							variant="dot"
+							sx={{
+								"& .MuiBadge-badge": {
+									backgroundColor: member.isConnected ? greenColor : redColor
+								}
+							}}
+						>
+							<Avatar alt="User Photo" src={`/avatars/${member.user.id}.png`} />
+						</Badge>
+						<Box sx={{ display: "flex", alignContent: "center" }} >
+							<>
+								{`${member.user.username}`}
+								{member.role == "owner" && <MilitaryTechIcon />}
+								{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}
+								{member.states.includes("ingame") && <VideogameAssetIcon />}
+								{member.states.includes("watching") && <VisibilityIcon />}
+								<Box sx={{ marginLeft: "auto" }}>
+									<GenerateMemberActionList member={member} />
+								</Box>
+							</>
+						</Box>
 					</ListItem>
 				)
 				)}
