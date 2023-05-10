@@ -3,7 +3,6 @@ import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
-import { OldCreateGame } from './component/OldCreateGame'
 import { ListUsers } from './component/ListUsers'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
@@ -17,7 +16,6 @@ import { BlockedList } from './component/BlockedList';
 import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
 import { GamePage } from './component/GamePage';
-import { OldGamePage } from './component/OldGameScreen';
 import { ChatPage } from './component/chat/ChatPage';
 import ChatMenu from './component/chat/ChatMenu';
 import { CircularProgress, Paper, Stack } from '@mui/material';
