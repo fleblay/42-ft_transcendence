@@ -32,13 +32,8 @@ export class ChatController {
 	// Return all channels public and protected
 	// NOTE: A TESTER
 	@Get('/channels/public')
-	async getAllPublic() {
-		const publicChannels = await this.chatService.getAllPublicChannels()
-		return publicChannels.map((channel: Channel) => ({
-			...channel,
-			password: undefined,
-			hasPassword: channel.password.length !== 0
-		}));
+	getAllPublic() {
+		return this.chatService.getAllPublicChannels()
 	}
 
 	@Get('/channels/my')

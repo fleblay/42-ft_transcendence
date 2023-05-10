@@ -1,6 +1,6 @@
-import { Box, Button, List, ListItem, ListItemText, Theme, Typography } from "@mui/material"
+import { Avatar, Box, Button, List, ListItem, ListItemText, Theme, Typography } from "@mui/material"
 import { FC, useContext, useEffect, useState } from "react"
-import { Channel } from "../../types"
+import { Channel, PublicChannel } from "../../types"
 import { useNavigate } from "react-router-dom"
 import apiClient from "../../auth/interceptor.axios"
 import { SocketContext } from "../../socket/SocketProvider"
@@ -8,7 +8,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useDebouncedValue } from "../Debounced"
 import { SearchBar } from "../SearchBar"
 
-interface ChannelMap { [id: number]: Channel };
+interface ChannelMap { [id: number]: PublicChannel };
 
 export const ChannelBrowser: FC = () => {
 	const [publicChannels, setPublicChannels] = useState<ChannelMap>({});
@@ -26,9 +26,9 @@ export const ChannelBrowser: FC = () => {
 	useEffect(() => {
 		function onUpdateChannel(channel: Channel) {
 			console.log("onNewMessage", channel);
-			setPublicChannels((oldChannel) => {
-				return { ...oldChannel, [channel.id]: channel };
-			});
+			// setPublicChannels((oldChannel) => {
+			// 	return { ...oldChannel, [channel.id]: channel };
+			// });
 		}
 
 		customOn("chat.message.new", onUpdateChannel);
@@ -38,9 +38,10 @@ export const ChannelBrowser: FC = () => {
 	}, [publicChannels])
 
 	useEffect(() => {
-		apiClient.get(`/api/chat/channels/public`).then((response) => {
-
-			let result: ChannelMap = response.data.reduce((map: ChannelMap, obj: Channel) => {
+		apiClient.get<PublicChannel[]>(`/api/chat/channels/public`).then(({ status, data }) => {
+			if (status !== 200)
+				return;
+			let result: ChannelMap = data.reduce((map: ChannelMap, obj: PublicChannel) => {
 				map[obj.id] = obj;
 				return map;
 			}, {});
@@ -73,8 +74,8 @@ export const ChannelBrowser: FC = () => {
 				}}
 			>
 				{Object.values(publicChannels)
-					.filter((channel: Channel) => debouncedSearchChannel.length === 0 || channel.name.toLowerCase().includes(debouncedSearchChannel.toLowerCase()))
-					.map((channel: Channel, index, array) => (
+					.filter((channel: PublicChannel) => debouncedSearchChannel.length === 0 || channel.name.toLowerCase().includes(debouncedSearchChannel.toLowerCase()))
+					.map((channel: PublicChannel, index, array) => (
 						<ListItem key={channel.id} sx={{
 							paddingTop: 0,
 							paddingBottom: 0,
@@ -100,8 +101,20 @@ export const ChannelBrowser: FC = () => {
 								/>}
 							<ListItemText
 								primary={channel.name}
-								secondary={`${channel.members?.length} members`}
+								secondary={`${channel.membersLength} members`}
 							/>
+							{
+								channel.owner && (
+									<Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', marginRight: 1 }}>
+										<Avatar src={`/avatars/${channel.owner?.id || 'default'}.png`} sx={{ width: 24, height: 24 }}>
+											{channel.owner?.username[0]}
+										</Avatar>
+										<Typography variant="body2" color="text.secondary">
+											{channel.owner?.username}
+										</Typography>
+									</Box>
+								)
+							}
 							<Button onClick={() => joinChannel(channel.id)} variant='contained' color='success'>Join</Button>
 						</ListItem>
 					))}

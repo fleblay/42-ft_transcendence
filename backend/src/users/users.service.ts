@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../model/user.entity'
-import { UserStatus, Blocked } from '../type';
+import { UserStatus, ShortUser } from '../type';
 import * as sharp from 'sharp';
 import { In } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
@@ -190,7 +190,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	async getBlocked(user: User, friendId: number): Promise <Blocked | null> {
+	async getBlocked(user: User, friendId: number): Promise <ShortUser | null> {
 		if (!user)
 			throw new NotFoundException("User not found");
 		if (user.blockedId.includes(friendId)) {
@@ -206,7 +206,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	async getBlockedUsersList(userId: number): Promise<Blocked[]> {
+	async getBlockedUsersList(userId: number): Promise<ShortUser[]> {
 
 		const user = await this.findOne(userId);
 		if (!user)
@@ -214,7 +214,7 @@ export class UsersService implements OnModuleInit {
 		const BlockedList = await this.repo.find({
 			select: ['id', 'username'],
 			where: { id: In(user.blockedId) },
-		}) as Blocked[];
+		}) as ShortUser[];
 		return BlockedList;
 	}
 

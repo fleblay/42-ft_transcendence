@@ -13,7 +13,7 @@ import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ChangeChannelDto } from './dto/change-channel.dto';
 import { dir } from 'console';
 import { GameService } from 'src/game/game.service';
-import { ChannelInfo } from '../type';
+import { ChannelInfo, PublicChannel, ShortUser } from '../type';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -51,10 +51,14 @@ export class ChatService implements OnModuleInit {
 		return this.channelsRepo.find();
 	}
 
-	getAllPublicChannels(): Promise<Channel[]> {
-		return this.channelsRepo.find({
+	async getAllPublicChannels(): Promise<PublicChannel[]> {
+		const publicChannels = await this.channelsRepo.find({
 			where: {
-				private: false
+				private: false,
+				directMessage: false,
+				members: {
+					left: false
+				}
 			},
 			relations: {
 				members: {
@@ -67,12 +71,21 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
+					role: true,
 					user: {
 						id: true,
+						username: true,
 					},
 				},
 			}
 		})
+		return publicChannels.map((channel) => ({
+			id: channel.id,
+			name: channel.name,
+			hasPassword: !!channel.password,
+			membersLength: channel.members.length,
+			owner: channel.members.find((member) => member.role === 'owner')?.user as ShortUser,
+		}))
 	}
 
 	async createChannel(data: CreateChannelDto): Promise<number> {
