@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton, Modal, Box } from "@mui/material";
+import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton, Modal, Box, Divider } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import { Channel, Member } from "../../types";
@@ -38,7 +38,10 @@ function userUpDateState(userId: number, event: string, memberList: memberList):
 				case ("leave"):
 					member.states.pop()
 					break
-				case ("ingame" || "watching"):
+				case ("ingame"):
+					member.states.push(event)
+					break
+				case ("watching"):
 					member.states.push(event)
 					break
 				case ("connected"):
@@ -339,10 +342,10 @@ export function MemberList({ channelId }: { channelId: string }) {
 
 	function GenerateMemberGroup({ groupname, groupMembers }: { groupname: string, groupMembers: Member[] }): JSX.Element {
 		return (<>
-			<Typography component="div" gutterBottom>{groupname}</Typography>
-			<List>
+			<Typography component="div">{groupname}</Typography>
+			<List disablePadding>
 				{groupMembers.map((member) => (
-					<ListItem key={member.id}
+					<ListItem sx={{ gap: 1 }} disableGutters key={member.id}
 					>
 						<Badge
 							overlap="circular"
@@ -357,16 +360,14 @@ export function MemberList({ channelId }: { channelId: string }) {
 							<Avatar alt="User Photo" src={`/avatars/${member.user.id}.png`} />
 						</Badge>
 						<Box sx={{ display: "flex", alignContent: "center" }} >
-							<>
-								{`${member.user.username}`}
-								{member.role == "owner" && <MilitaryTechIcon />}
-								{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}
-								{member.states.includes("ingame") && <VideogameAssetIcon />}
-								{member.states.includes("watching") && <VisibilityIcon />}
-								<Box sx={{ marginLeft: "auto" }}>
-									<GenerateMemberActionList member={member} />
-								</Box>
-							</>
+							{`${member.user.username}`}
+							{member.role == "owner" && <MilitaryTechIcon />}
+							{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}
+							{member.states.includes("ingame") && <VideogameAssetIcon />}
+							{member.states.includes("watching") && <VisibilityIcon />}
+						</Box>
+						<Box sx={{ marginLeft: "auto" }}>
+							<GenerateMemberActionList member={member} />
 						</Box>
 					</ListItem>
 				)
@@ -378,8 +379,11 @@ export function MemberList({ channelId }: { channelId: string }) {
 	return (
 		<nav>
 			<GenerateMemberGroup groupname={"Admins"} groupMembers={memberList.admins} />
+			<Divider />
 			<GenerateMemberGroup groupname={"Users"} groupMembers={memberList.regulars} />
+			<Divider />
 			<GenerateMemberGroup groupname={"Muted"} groupMembers={memberList.muted} />
+			<Divider />
 			<GenerateMemberGroup groupname={"Banned"} groupMembers={memberList.banned} />
 		</nav>
 	);
