@@ -134,7 +134,7 @@ export class ChatService implements OnModuleInit {
 					if (!channel)
 						return null;
 					return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
-				});	
+				});
 				return
 			}
 		}
@@ -160,7 +160,7 @@ export class ChatService implements OnModuleInit {
 			if (!channel)
 				return null;
 			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
-		});	
+		});
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -431,7 +431,7 @@ export class ChatService implements OnModuleInit {
 			if (!channel)
 				return null;
 			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
-		});	
+		});
 	}
 
 	async emitToAllMembers(channelId: number, event: string, cb: (member: Member) => any) {
@@ -471,7 +471,7 @@ export class ChatService implements OnModuleInit {
 			if (!channel)
 				return null;
 			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
-		});	
+		});
 	}
 
 	async getMyChannels(user: User): Promise<Channel[]> {
@@ -481,6 +481,7 @@ export class ChatService implements OnModuleInit {
 					user: {
 						id: user.id,
 					},
+					left: false,
 				},
 				directMessage: false,
 			},
