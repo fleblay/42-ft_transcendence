@@ -31,6 +31,7 @@ function userUpDateState(userId: number, event: string, memberList: memberList):
 		const member: Member | undefined = value.find((member) => member.user.id == userId)
 		if (member) {
 			console.log("Found user in :", key)
+			console.log("event is :", event)
 			switch (event) {
 				case ("leave"):
 					member.states.pop()
