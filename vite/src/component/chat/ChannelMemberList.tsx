@@ -9,6 +9,9 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
+import PersonIcon from '@mui/icons-material/Person';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
 import { MuteMemberModal } from "./MuteMemberModal";
@@ -357,8 +360,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 							</Grid>
 							<Grid item xs={8}>
 								<ListItemText primary={member.user.username} />
-								<ListItemIcon>{member.role == "owner" && <StarBorderIcon />}</ListItemIcon>
-								<ListItemIcon>{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}</ListItemIcon>
+								<ListItemIcon>{member.role == "owner" ? <MilitaryTechIcon /> : <PersonIcon />}</ListItemIcon>
+								<ListItemIcon>{(Date.parse(member.muteTime) > Date.now()) ? <VolumeOffIcon /> : <VolumeUpIcon />}</ListItemIcon>
 								<ListItemIcon>{member.states.includes("ingame") && <VideogameAssetIcon />}</ListItemIcon>
 								<ListItemIcon>{member.states.includes("watching") && <VisibilityIcon />}</ListItemIcon>
 							</Grid>
