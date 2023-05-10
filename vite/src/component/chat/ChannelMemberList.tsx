@@ -24,6 +24,18 @@ const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
+function subscribeToMemberEvents(addSubscription: (sub: string) => (() => void) | void, memberList: memberList): ((() => void) | void)[] {
+
+	const fxArray: ((() => void) | void)[] = []
+
+	for (const [key, value] of Object.entries(memberList)) {
+		value.forEach((member) => {
+			fxArray.push(addSubscription(`/player/${member.user.id}`))
+		})
+	}
+	return fxArray
+}
+
 function removeOldMember(oldMemberId: number, memberList: memberList): memberList {
 
 	for (const [key, value] of Object.entries(memberList)) {
@@ -101,11 +113,15 @@ export function MemberList({ channelId }: { channelId: string }) {
 		customOn("chat.modify.members", onMemberUpdate);
 		customOn("chat.member.new", onMemberJoin);
 		customOn("chat.member.leave", onMemberLeave);
+		const fxArray: ((() => void) | void)[] = subscribeToMemberEvents(addSubscription, memberList)
 		return (() => {
 			customOff("chat.modify.members", onMemberUpdate);
 			customOff("chat.member.new", onMemberJoin);
 			customOff("chat.member.leave", onMemberLeave);
-		})
+			fxArray.forEach(fx => {
+				if (typeof fx === "function")
+					fx()
+		})})
 	}, [memberList])
 
 	//playing and viewing icons
@@ -265,7 +281,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 						'aria-labelledby': 'basic-button',
 					}}
 				>
-					<MenuItem onClick={handleClickProfile}>{`${(member.id != me.current?.id) ? member.user.username + "'s" :"My"} Profile`}</MenuItem>
+					<MenuItem onClick={handleClickProfile}>{`${(member.id != me.current?.id) ? member.user.username + "'s" : "My"} Profile`}</MenuItem>
 					{myRights.includes("self") && <MenuItem onClick={handleClickLeave}>Leave Channel</MenuItem>}
 					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role to ${member.role == "regular" ? "admin" : "regular"}`}</MenuItem>}
 					{myRights.includes("kick") && <MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>}
