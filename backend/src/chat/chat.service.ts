@@ -11,7 +11,6 @@ import { User } from '../model/user.entity';
 import { NewMessageDto } from './dto/new-message.dto';
 import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ChangeChannelDto } from './dto/change-channel.dto';
-import { dir } from 'console';
 import { GameService } from 'src/game/game.service';
 import { ChannelInfo, PublicChannel, ShortUser } from '../type';
 
@@ -98,8 +97,6 @@ export class ChatService implements OnModuleInit {
 			password: data.password,
 			directMessage: data.directMessage ? true : false
 		})
-		if (!channel.private)
-			this.wsServer.to('/chat/').emit('newChannel', { id: channel.id, name: channel.name, protected: !!channel.password })
 		return channel.id
 	}
 
@@ -158,6 +155,16 @@ export class ChatService implements OnModuleInit {
 		});
 		this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
+
+		if (!channel.private) {
+			this.wsServer.to('/chat/public').emit('chat.public.update', {
+				id: channel.id,
+				name: channel.name,
+				hasPassword: !!channel.password,
+				membersLength: channel.members.length,
+				owner: channel.members.find((member) => member.role === 'owner')?.user as ShortUser,
+			} as PublicChannel);
+		}
 	}
 
 	private async cbEmitAll(member: Member)
@@ -475,6 +482,18 @@ export class ChatService implements OnModuleInit {
 		this.wsServer.to(`/chat/myChannels/${user.id}`).emit('chat.channel.leave', member.channel.id);
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
+		const channel = await this.getOneChannel(user, channelId);
+		if (!channel) return;
+
+		if (!channel.private) {
+			this.wsServer.to('/chat/public').emit('chat.public.update', {
+				id: channel.id,
+				name: channel.name,
+				hasPassword: !!channel.password,
+				membersLength: channel.members.length,
+				owner: channel.members.find((member) => member.role === 'owner')?.user as ShortUser,
+			} as PublicChannel);
+		}
 	}
 
 	async getMyChannels(user: User): Promise<Channel[]> {

@@ -24,16 +24,15 @@ export const ChannelBrowser: FC = () => {
 	}, []);
 
 	useEffect(() => {
-		function onUpdateChannel(channel: Channel) {
-			console.log("onNewMessage", channel);
-			// setPublicChannels((oldChannel) => {
-			// 	return { ...oldChannel, [channel.id]: channel };
-			// });
+		function onUpdateChannel(channel: PublicChannel) {
+			setPublicChannels((oldChannel) => {
+				return { ...oldChannel, [channel.id]: channel };
+			});
 		}
 
-		customOn("chat.message.new", onUpdateChannel);
+		customOn("chat.public.update", onUpdateChannel);
 		return () => {
-			customOff("chat.message.new", onUpdateChannel);
+			customOff("chat.public.update", onUpdateChannel);
 		};
 	}, [publicChannels])
 

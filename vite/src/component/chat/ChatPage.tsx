@@ -67,7 +67,6 @@ const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | nul
 
 export function ChatPage() {
 
-	const [channels, setChannels] = useState<Channel[]>([]);
 	const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
@@ -89,18 +88,6 @@ export function ChatPage() {
 		}
 
 	}, [channelId]);
-
-
-	useEffect(() => {
-		function onNewChannel(data: Channel) {
-			console.log('newChannel', data);
-			setChannels((channels) => [...channels, data]);
-		}
-		customOn('newChannel', onNewChannel);
-		return () => {
-			customOff('newChannel', onNewChannel);
-		};
-	}, []);
 
 	return (
 		<>
