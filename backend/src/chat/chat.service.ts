@@ -117,14 +117,15 @@ export class ChatService implements OnModuleInit {
 		if (channel.private && (!options.owner && channel.members.find((member) => (member.user.id == user.id))?.role != "owner"))
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
 		//console.log("joinChannel2 : ", channel, options)
-		let addedUser: User | null = user
+		let addedUser: User = user
 		if (options?.targetUser) {
-			addedUser = await this.usersService.findOneByUsername(options.targetUser)
-			if (!addedUser)
+			addedUser = await this.usersService.findOneByUsername(options.targetUser) as User
+			if (!addedUser) {
 				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
-			//console.log("There is a target User", addedUser)
+			}
 		}
-
+		let joiner: Member;
+		// Find if the user is already in the channel
 		const member = channel.members.find((member) => (member.user.id == addedUser!.id))
 		if (member) {
 			if (member.banned)
@@ -133,38 +134,26 @@ export class ChatService implements OnModuleInit {
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is already in the channel`)
 			else {
 				member.left = false
-				const joinedMember = await this.membersRepo.save(member)
-				this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
-					joinedMember: {
-						...joinedMember,
-						isConnected: this.usersService.isConnected(joinedMember.user.id),
-						...this.gameService.userState(joinedMember.user.id),
-					}
-				});
-				this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
-				this.emitToAllMembers(channelId, 'chat.modify.channel', async (member: Member) => {
-					const channel = await this.getOneChannel(member.user, channelId);
-					if (!channel)
-						return null;
-					return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
-				});
-				return
+				joiner = await this.membersRepo.save(member)
 			}
 		}
-		const joiner: Member = this.membersRepo.create({
-			user: addedUser,
-			channel,
-			messages: [],
-			role: (options?.owner) ? "owner" : "regular"
-		})
-		channel.members.push(joiner)
-		await this.channelsRepo.save(channel)
-		const joinedMember = await this.membersRepo.save(joiner)
+		// If not, create a new member
+		else {
+			joiner = this.membersRepo.create({
+				user: addedUser,
+				channel,
+				messages: [],
+				role: (options?.owner) ? "owner" : "regular"
+			})
+			channel.members.push(joiner)
+			await this.channelsRepo.save(channel)
+			joiner = await this.membersRepo.save(joiner)
+		}
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
 			joinedMember: {
-				...joinedMember,
-				isConnected: this.usersService.isConnected(joinedMember.user.id),
-				...this.gameService.userState(joinedMember.user.id),
+				...joiner,
+				isConnected: this.usersService.isConnected(joiner.user.id),
+				...this.gameService.userState(joiner.user.id),
 			}
 		});
 		this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
@@ -172,7 +161,7 @@ export class ChatService implements OnModuleInit {
 			const channel = await this.getOneChannel(member.user, channelId);
 			if (!channel)
 				return null;
-			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
+			return { ...channel, password: undefined, hasPassword: channel.password.length !== 0, members: channel.members.filter((member) => !member.left) };
 		});
 	}
 
@@ -408,8 +397,9 @@ export class ChatService implements OnModuleInit {
 			const channel = await this.getOneChannel(member.user, channelId);
 			if (!channel)
 				return null;
-			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
-		});			}
+			return { ...channel, password: undefined, hasPassword: channel.password.length !== 0, members: channel.members.filter((member) => !member.left) };
+		});
+	}
 
 	async modifyChannel(user: User, channelId: number, changeChannelData: ChangeChannelDto) {
 		const requestingMember = await this.getMemberOfChannel(user, channelId);
@@ -443,7 +433,7 @@ export class ChatService implements OnModuleInit {
 			const channel = await this.getOneChannel(member.user, channelId);
 			if (!channel)
 				return null;
-			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
+			return { ...channel, password: undefined, hasPassword: channel.password.length !== 0, members: channel.members.filter((member) => !member.left) };
 		});
 	}
 
@@ -483,7 +473,7 @@ export class ChatService implements OnModuleInit {
 			const channel = await this.getOneChannel(member.user, channelId);
 			if (!channel)
 				return null;
-			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
+			return { ...channel, password: undefined, hasPassword: channel.password.length !== 0, members: channel.members.filter((member) => !member.left) };
 		});
 	}
 
