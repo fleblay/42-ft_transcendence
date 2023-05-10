@@ -1,4 +1,4 @@
-import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { AfterInsert, AfterUpdate, AfterRemove, Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "./channel.entity";
 import { Message } from "./message.entity";
 import { User } from "./user.entity";
@@ -20,8 +20,8 @@ export class Member {
 	@ManyToOne(() => Message)
 	lastRead: Message;
 
-	@Column({ type: 'timestamptz', default : new Date() })
-	muteTime: Date ;
+	@Column({ type: 'timestamptz', default: new Date() })
+	muteTime: Date;
 
 	@Column({ default: false })
 	banned: boolean;
@@ -34,4 +34,17 @@ export class Member {
 
 	@DeleteDateColumn()
 	deletedAt: Date;
+
+	@AfterInsert()
+	logInsert() {
+		console.log('Inserted Member', this);
+	}
+	@AfterUpdate()
+	logUpdate() {
+		console.log('Updated Member', this);
+	}
+	@AfterRemove()
+	logRemove() {
+		console.log('Removed Member', this);
+	}
 }
