@@ -15,10 +15,17 @@ export function MyDirectMessageList() {
 	const [myDmList, setMyDmList] = useState<{ [id: number]: Channel }>({});
 	const { customOff, customOn, addSubscription } = useContext(SocketContext);
 
+	useEffect(() => {
+		return addSubscription(`/chat/myChannels/${auth.user?.id}`);
+	}, [auth.user?.id]);
+
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/dm`).then((response) => {
 			console.log("MyDmList", response);
+			console.log("MyDmList data", response.data);
+			if (response.data.length == 0)
+				return;
 			setMyDmList(response.data.reduce((map: { [id: number]: Channel }, obj: Channel) => {
 				map[obj.id] = obj;
 				return map;
@@ -45,17 +52,18 @@ export function MyDirectMessageList() {
 				navigate(`/chat`);
 		}
 		function onUnreadMessage(data: { unreadMessages: number, id: number }) {
+			console.log("onUnreadMessage.dm", data);
 			if (!channelId || +channelId != data.id)
 				setMyDmList(channelList => ({ ...channelList, [data.id]: { ...channelList[data.id], unreadMessages: data.unreadMessages } }));
 		}
 
 		customOn('chat.modify.channel', onModifyChannel);
 		customOn('chat.channel.leave', onDeleteChannel);
-		customOn('unreadMessage', onUnreadMessage);
+		customOn('unreadMessage.dm', onUnreadMessage);
 		return () => {
 			customOff('chat.modify.channel', onModifyChannel);
 			customOff('chat.channel.leave', onDeleteChannel);
-			customOff('unreadMessage', onUnreadMessage);
+			customOff('unreadMessage.dm', onUnreadMessage);
 		};
 	}, [channelId]);
 

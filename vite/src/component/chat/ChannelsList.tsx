@@ -61,11 +61,11 @@ export function MyChannelsList() {
 
 		customOn('chat.modify.channel', onModifyChannel);
 		customOn('chat.channel.leave', onDeleteChannel);
-		customOn('unreadMessage', onUnreadMessage);
+		customOn('unreadMessage.channel', onUnreadMessage);
 		return () => {
 			customOff('chat.modify.channel', onModifyChannel);
 			customOff('chat.channel.leave', onDeleteChannel);
-			customOff('unreadMessage', onUnreadMessage);
+			customOff('unreadMessage.channel', onUnreadMessage);
 		};
 	}, [channelId]);
 

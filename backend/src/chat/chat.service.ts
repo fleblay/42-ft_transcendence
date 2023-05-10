@@ -231,7 +231,8 @@ export class ChatService implements OnModuleInit {
 		});
 		await this.messagesRepo.save(newMessage);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
-		this.emitToAllMembers(channelId, 'unreadMessage', async (member: Member) => {
+		const nameOfEmmiter = newMessage.channel.directMessage ? "unreadMessage.dm" : "unreadMessage.channel";
+		this.emitToAllMembers(channelId, nameOfEmmiter, async (member: Member) => {
 			const unreadMessages = await this.getUnreadMessages(member.user, channelId);
 			return {
 				id: channelId,
