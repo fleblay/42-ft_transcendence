@@ -294,10 +294,10 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width }: Iprops): JSX.
 		// Player Info
 		context.current.font = `${20 * canvasRatio}px serif`
 		context.current.fillStyle = player1color
-		context.current.fillText(`${gameInfo.players[0].user.username} : ${gameInfo.players[0].amo}`, 5 * canvasRatio, 20 * canvasRatio)
+		context.current.fillText(`${gameInfo.players[0].user.username} : ${gameInfo.players[0].ammo}`, 5 * canvasRatio, 20 * canvasRatio)
 		context.current.fillStyle = player2color
 		if (gameInfo.players[1]) {
-			const player2info = `${gameInfo.players[1].user.username} : ${gameInfo.players[1].amo}`
+			const player2info = `${gameInfo.players[1].user.username} : ${gameInfo.players[1].ammo}`
 			context.current.fillText(player2info, canvasWidth * canvasRatio - (5 * canvasRatio + context.current.measureText(player2info).width), 20 * canvasRatio)
 		}
 
