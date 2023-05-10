@@ -161,7 +161,7 @@ export class ChatService implements OnModuleInit {
 				id: channel.id,
 				name: channel.name,
 				hasPassword: !!channel.password,
-				membersLength: channel.members.length,
+				membersLength: channel.members.filter(member => !member.left).length,
 				owner: channel.members.find((member) => member.role === 'owner')?.user as ShortUser,
 			} as PublicChannel);
 		}
@@ -490,8 +490,8 @@ export class ChatService implements OnModuleInit {
 				id: channel.id,
 				name: channel.name,
 				hasPassword: !!channel.password,
-				membersLength: channel.members.length,
-				owner: channel.members.find((member) => member.role === 'owner')?.user as ShortUser,
+				membersLength: channel.members.filter(member => !member.left).length,
+				owner: channel.members.find(member => member.role === 'owner')?.user as ShortUser,
 			} as PublicChannel);
 		}
 	}
@@ -541,8 +541,9 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
-					user: { id: true, username: true },
 					left: true,
+					role: true,
+					user: { id: true, username: true },
 				},
 			},
 			relationLoadStrategy: "query",
