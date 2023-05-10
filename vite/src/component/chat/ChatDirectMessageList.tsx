@@ -33,9 +33,13 @@ export function MyDirectMessageList() {
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
 			console.log("onModifyChannel", data)
+			if (!data)
+				return;
 			setMyDmList(channelList => ({ ...channelList, [data.id]: data }));
 		}
 		function onDeleteChannel(id: number) {
+			if (!id)
+				return
 			setMyDmList(channelList => { delete channelList[id]; console.log(channelList); return { ...channelList }; });
 			if (channelId && +channelId == id)
 				navigate(`/chat`);
