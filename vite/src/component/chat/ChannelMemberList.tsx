@@ -28,11 +28,23 @@ function userUpDateState(userId: number, event: string, memberList: memberList):
 
 	for (const [key, value] of Object.entries(memberList)) {
 		console.log("in for loop : ", key, value)
-		const member : Member | undefined = value.find((member) => member.user.id == userId)
+		const member: Member | undefined = value.find((member) => member.user.id == userId)
 		if (member) {
 			console.log("Found user in :", key)
-			event == "leave" ? member.states.pop() : member.states.push(event)
-			break
+			switch (event) {
+				case ("leave"):
+					member.states.pop()
+					break
+				case ("ingame" || "watching"):
+					member.states.push(event)
+					break
+				case ("connected"):
+					member.isConnected = true
+					break
+				case ("disconnected"):
+					member.isConnected = false
+					break
+			}
 		}
 	}
 	return ({
@@ -75,11 +87,12 @@ function removeOldMember(oldMemberId: number, memberList: memberList): memberLis
 }
 
 function addNewMember(newMember: Member, memberList: memberList): memberList {
-	if (newMember.role == "admin")
+	console.log("newMember : ", newMember)
+	if (newMember.role == "admin" || newMember.role == "owner" && !newMember.left)
 		memberList.admins.push(newMember)
 	else if (newMember.banned)
 		memberList.banned.push(newMember)
-	else if (Date.parse(newMember.muteTime) > Date.now())
+	else if ((Date.parse(newMember.muteTime) > Date.now()) && !newMember.left)
 		memberList.muted.push(newMember)
 	else if (!newMember.left)
 		memberList.regulars.push(newMember)
@@ -162,9 +175,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
 			console.log("memberlist fetched : ", data);
 			const newMemberList: memberList = {
-				admins: data.filter((member) => member.role == "admin" || member.role == "owner"),
+				admins: data.filter((member) => (member.role == "admin" || member.role == "owner") && !member.left),
 				banned: data.filter((member) => member.banned),
-				muted: data.filter((member) => Date.parse(member.muteTime) > Date.now()),
+				muted: data.filter((member) => (Date.parse(member.muteTime) > Date.now()) && !member.left),
 				regulars: []
 			}
 			newMemberList.regulars = data.filter((member) => {
