@@ -315,7 +315,8 @@ export class ChatService implements OnModuleInit {
 				user: { id: true, username: true },
 			},
 		});
-		return members.filter((member) => !member.left && !member.banned);
+		return members
+		//return members.filter((member) => !member.left && !member.banned);
 	}
 
 	async getChannelInfo(user: User, channelId: number): Promise<ChannelInfo | undefined> {
