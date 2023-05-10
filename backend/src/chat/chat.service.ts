@@ -128,6 +128,12 @@ export class ChatService implements OnModuleInit {
 					}
 				});
 				this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
+				this.emitToAllMembers(channelId, 'chat.modify.channel', async (member: Member) => {
+					const channel = await this.getOneChannel(member.user, channelId);
+					if (!channel)
+						return null;
+					return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
+				});	
 				return
 			}
 		}
@@ -148,6 +154,12 @@ export class ChatService implements OnModuleInit {
 			}
 		});
 		this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
+		this.emitToAllMembers(channelId, 'chat.modify.channel', async (member: Member) => {
+			const channel = await this.getOneChannel(member.user, channelId);
+			if (!channel)
+				return null;
+			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
+		});	
 	}
 
 	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
@@ -282,7 +294,7 @@ export class ChatService implements OnModuleInit {
 				user: { id: true, username: true },
 			},
 		});
-		return members;
+		return members.filter((member) => !member.left && !member.banned);
 	}
 
 
@@ -395,7 +407,12 @@ export class ChatService implements OnModuleInit {
 				...this.gameService.userState(modifyMember.user.id),
 			}
 		})
-	}
+		this.emitToAllMembers(channelId, 'chat.modify.channel', async (member: Member) => {
+			const channel = await this.getOneChannel(member.user, channelId);
+			if (!channel)
+				return null;
+			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
+		});			}
 
 	async modifyChannel(user: User, channelId: number, changeChannelData: ChangeChannelDto) {
 		const requestingMember = await this.getMemberOfChannel(user, channelId);
@@ -425,6 +442,12 @@ export class ChatService implements OnModuleInit {
 			channel.password = changeChannelData.password
 		await this.channelsRepo.save(channel)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });
+		this.emitToAllMembers(channelId, 'chat.modify.channel', async (member: Member) => {
+			const channel = await this.getOneChannel(member.user, channelId);
+			if (!channel)
+				return null;
+			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
+		});	
 	}
 
 	async emitToAllMembers(channelId: number, event: string, cb: (member: Member) => any) {
@@ -445,7 +468,8 @@ export class ChatService implements OnModuleInit {
 		if (!channel)
 			return;
 		for (const member of channel.members) {
-			this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit(event, await cb(member));
+			if (!member.left)
+				this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit(event, await cb(member));
 		}
 	}
 
@@ -457,16 +481,21 @@ export class ChatService implements OnModuleInit {
 		const leftMember = await this.membersRepo.save(member);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { leftMember });
 		this.wsServer.to(`/chat/myChannels/${user.id}`).emit('chat.channel.leave', member.channel.id);
+		this.emitToAllMembers(channelId, 'chat.modify.channel', async (member: Member) => {
+			const channel = await this.getOneChannel(member.user, channelId);
+			if (!channel)
+				return null;
+			return {...channel, password : undefined, hasPassword : channel.password.length !== 0, members : channel.members.filter((member) => !member.left)};
+		});	
 	}
 
-	getMyChannels(user: User): Promise<Channel[]> {
-		return this.channelsRepo.find({
+	async getMyChannels(user: User): Promise<Channel[]> {
+		return await this.channelsRepo.find({
 			where: {
 				members: {
 					user: {
 						id: user.id,
 					},
-					left: false,
 				},
 			},
 			relations: ['members', 'members.user'],
@@ -478,11 +507,39 @@ export class ChatService implements OnModuleInit {
 				members: {
 					id: true,
 					user: { id: true, username: true },
+					left: true,
 				},
 			},
 			relationLoadStrategy: "query",
 		});
 	}
+
+	async getOneChannel(user: User, channelId: number): Promise<Channel | null> {
+		return await this.channelsRepo.findOne({
+			where: {
+				id: channelId,
+				members: {
+					user: {
+						id: user.id,
+					},
+				},
+			},
+			relations: ['members', 'members.user'],
+			select: {
+				id: true,
+				name: true,
+				private: true,
+				password: true,
+				members: {
+					id: true,
+					user: { id: true, username: true },
+					left: true,
+				},
+			},
+			relationLoadStrategy: "query",
+		});
+	}
+
 
 	getMyDirectMessage(user: User): Promise<Channel[]> {
 		return this.channelsRepo.find({
