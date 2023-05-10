@@ -1,14 +1,12 @@
-import { Box, Button, List, ListItem, ListItemText, TextField, Theme, Toolbar, Typography } from "@mui/material"
+import { Box, Button, List, ListItem, ListItemText, Theme, Typography } from "@mui/material"
 import { FC, useContext, useEffect, useState } from "react"
 import { Channel } from "../../types"
 import { useNavigate } from "react-router-dom"
 import apiClient from "../../auth/interceptor.axios"
 import { SocketContext } from "../../socket/SocketProvider"
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import { styled, alpha } from '@mui/material/styles';
-import InputBase from '@mui/material/InputBase';
 import { useDebouncedValue } from "../Debounced"
+import { SearchBar } from "../SearchBar"
 
 interface ChannelMap { [id: number]: Channel };
 
@@ -64,17 +62,7 @@ export const ChannelBrowser: FC = () => {
 	return (
 		<Box>
 			<Box sx={{ marginTop: 1 }}>
-				<Search>
-					<SearchIconWrapper>
-						<SearchIcon />
-					</SearchIconWrapper>
-					<StyledInputBase
-						placeholder="Search…"
-						inputProps={{ 'aria-label': 'search' }}
-						value={searchChannel}
-						onChange={(event) => setSearchChannel(event.target.value)}
-					/>
-				</Search>
+				<SearchBar value={searchChannel} onChange={(event) => setSearchChannel(event.target.value)} />
 				<Typography variant="subtitle1" sx={{ marginLeft: 1, marginTop: 1 }} color="text.secondary"
 				>{`${Object.values(publicChannels).length} channels`}</Typography>
 			</Box>
@@ -121,45 +109,3 @@ export const ChannelBrowser: FC = () => {
 		</Box>
 	)
 }
-
-const Search = styled('div')(({ theme }) => ({
-	position: 'relative',
-	borderRadius: theme.shape.borderRadius,
-	backgroundColor: theme.palette.common.white,
-	'&:hover': {
-		backgroundColor: theme.palette.common.white,
-	},
-	marginLeft: 0,
-	width: '100%',
-	[theme.breakpoints.up('sm')]: {
-		marginLeft: theme.spacing(1),
-		width: 'auto',
-	},
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-	padding: theme.spacing(0, 2),
-	height: '100%',
-	position: 'absolute',
-	pointerEvents: 'none',
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(TextField)(({ theme }) => ({
-	color: 'inherit',
-	'& .MuiInputBase-input': {
-		padding: theme.spacing(1, 1, 1, 0),
-		// vertical padding + font size from searchIcon
-		paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-		transition: theme.transitions.create('width'),
-		width: '100%',
-		[theme.breakpoints.up('sm')]: {
-			width: '12ch',
-			'&:focus': {
-				width: '20ch',
-			},
-		},
-	},
-}));

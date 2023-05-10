@@ -1,17 +1,14 @@
-import { Avatar, Box, Button, IconButton, List, ListItem, ListItemText, TextField, Theme, Toolbar, Typography } from "@mui/material"
+import { Avatar, Box, IconButton, List, ListItem, ListItemText, Theme, Typography, styled } from "@mui/material"
 import { FC, useContext, useEffect, useState } from "react"
-import { Channel, Friend } from "../../types"
+import { Friend } from "../../types"
 import { useNavigate } from "react-router-dom"
 import apiClient from "../../auth/interceptor.axios"
 import { SocketContext } from "../../socket/SocketProvider"
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import { styled, alpha } from '@mui/material/styles';
-import InputBase from '@mui/material/InputBase';
 import { useDebouncedValue } from "../Debounced"
 import { useAuthService } from "../../auth/AuthService"
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import Badge from '@mui/material/Badge';
+import { SearchBar } from "../SearchBar"
 
 export const StyledBadge = styled(Badge)(({ theme, color }) => ({
 	'& .MuiBadge-badge': {
@@ -107,17 +104,7 @@ export const FriendsBrowser: FC = () => {
 	return (
 		<Box>
 			<Box sx={{ marginTop: 1 }}>
-				<Search>
-					<SearchIconWrapper>
-						<SearchIcon />
-					</SearchIconWrapper>
-					<StyledInputBase
-						placeholder="Search…"
-						inputProps={{ 'aria-label': 'search' }}
-						value={searchFriends}
-						onChange={(event) => setSearchFriends(event.target.value)}
-					/>
-				</Search>
+				<SearchBar value={searchFriends} onChange={(event) => setSearchFriends(event.target.value)} />
 				<Typography variant="subtitle1" sx={{ marginLeft: 1, marginTop: 1 }} color="text.secondary"
 				>{`${friendList.size} Friends`}</Typography>
 			</Box>
@@ -157,45 +144,3 @@ export const FriendsBrowser: FC = () => {
 		</Box>
 	)
 }
-
-const Search = styled('div')(({ theme }) => ({
-	position: 'relative',
-	borderRadius: theme.shape.borderRadius,
-	backgroundColor: theme.palette.common.white,
-	'&:hover': {
-		backgroundColor: theme.palette.common.white,
-	},
-	marginLeft: 0,
-	width: '100%',
-	[theme.breakpoints.up('sm')]: {
-		marginLeft: theme.spacing(1),
-		width: 'auto',
-	},
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-	padding: theme.spacing(0, 2),
-	height: '100%',
-	position: 'absolute',
-	pointerEvents: 'none',
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(TextField)(({ theme }) => ({
-	color: 'inherit',
-	'& .MuiInputBase-input': {
-		padding: theme.spacing(1, 1, 1, 0),
-		// vertical padding + font size from searchIcon
-		paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-		transition: theme.transitions.create('width'),
-		width: '100%',
-		[theme.breakpoints.up('sm')]: {
-			width: '12ch',
-			'&:focus': {
-				width: '20ch',
-			},
-		},
-	},
-}));
