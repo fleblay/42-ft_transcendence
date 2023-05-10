@@ -1,13 +1,13 @@
 import { FriendRequestStatus } from './model/friend-request.entity';
-import {User} from './model/user.entity'
+import { User } from './model/user.entity'
 export type SocketId = string;
 export type UUID = string;
 
 export type UserStatus = 'online' | 'ingame' | 'watching' | 'offline';
 
 export type UserState = {
-	states : UserStatus[],
-	gameIds : string[],
+	states: UserStatus[],
+	gameIds: string[],
 }
 
 export type UserScore = {
@@ -16,7 +16,7 @@ export type UserScore = {
 	totalwonGames: number,
 }
 
-export type UserInfo = User & UserState & UserScore & {userConnected: boolean}
+export type UserInfo = User & UserState & UserScore & { userConnected: boolean }
 
 export type Friend = {
 	id: number,
@@ -28,7 +28,7 @@ export type Friend = {
 }
 
 
-export type Blocked= {
+export type Blocked = {
 	id: number,
 	username: string
 }
@@ -44,4 +44,10 @@ export interface Login42User {
 	username?: string;
 	password: string
 	stud: boolean;
+}
+
+export interface ChannelInfo {
+	id: number;
+	name: string;
+	directMessage: boolean;
 }

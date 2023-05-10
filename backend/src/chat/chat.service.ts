@@ -13,6 +13,7 @@ import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ChangeChannelDto } from './dto/change-channel.dto';
 import { dir } from 'console';
 import { GameService } from 'src/game/game.service';
+import { ChannelInfo } from '../type';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -285,23 +286,7 @@ export class ChatService implements OnModuleInit {
 		return members;
 	}
 
-
-	async getChannelInfo(user: User, channelId: number): Promise<Channel | null> {
-		const member = await this.getMemberOfChannel(user, channelId);
-		if (!member)
-			throw new NotFoundException('Member not found, the channel may have been deleted');
-		this.memberHasRole(member, 'owner');
-		return this.channelsRepo.findOne({
-			where: { id: channelId },
-			select: {
-				id: true,
-				name: true,
-				private: true,
-			}
-		})
-	}
-
-	async getChannelName(user : User, channelId: number): Promise<string | undefined> {
+	async getChannelInfo(user: User, channelId: number): Promise<ChannelInfo | undefined> {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			select: {
@@ -312,16 +297,15 @@ export class ChatService implements OnModuleInit {
 		})
 		if (!channel)
 			throw new NotFoundException('Channel not found');
-		if (channel.directMessage)
-		{
+		if (channel.directMessage) {
 			const members = await this.getChannelMembers(channelId);
 			const otherMember = members.find((member) => (member.user.id != user.id))
 			if (!otherMember)
 				throw new NotFoundException('Channel not found');
 			console.log("getChannelName : ", otherMember.user.username)
-			return otherMember.user.username;
+			return { id: channel.id, directMessage: true, name: (otherMember.user.username || 'Unknown') };
 		}
-		return channel.name;
+		return { id: channel.id, name: channel.name, directMessage: false };
 	}
 
 

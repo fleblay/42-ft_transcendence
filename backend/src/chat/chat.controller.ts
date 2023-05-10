@@ -14,6 +14,7 @@ import { ChangeChannelDto } from './dto/change-channel.dto';
 import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 import { GameService } from 'src/game/game.service';
+import { ChannelInfo } from '../type';
 
 @Controller('chat')
 @UseGuards(ATGuard)
@@ -126,15 +127,10 @@ export class ChatController {
 	async createMessage(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: NewMessageDto): Promise<void> {
 		await this.chatService.newMessage(user, channelId, body);
 	}
-	// NOTE: Return password if user is owner and return all members
-	@Get('channels/:id/info')
-	getChannelInfo(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number) {
-		return this.chatService.getChannelInfo(user, channelId)
-	}
 
-	@Get('channels/:id/name')
-	getChannelName(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): Promise<string | undefined> {
-		return this.chatService.getChannelName(user, channelId);
+	@Get('channels/:id/info')
+	getChannelName(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): Promise<ChannelInfo | undefined> {
+		return this.chatService.getChannelInfo(user, channelId);
 	}
 
 	// NOTE: A TESTER

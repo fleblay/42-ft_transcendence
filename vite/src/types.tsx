@@ -159,4 +159,8 @@ export type Member = PlainMember & {
 	gameIds: string[],
 };
 
-
+export type ChannelInfo = {
+	id: number;
+	name: string;
+	directMessage: boolean;
+}

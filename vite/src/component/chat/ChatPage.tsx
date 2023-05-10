@@ -5,25 +5,37 @@ import { MessageArea } from './MessageArea';
 import { SocketContext } from '../../socket/SocketProvider';
 import { useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
-import { Channel } from '../../types'
+import { Channel, ChannelInfo } from '../../types'
 import ChatMenu from './ChatMenu';
 import { ChannelBrowser } from './ChannelBrowse';
 import { FriendsBrowser } from './ChatFriendsBrowser';
 
 
-const MyChannels = ({ channelName, channelId }: { channelName: string, channelId: string }) => {
+const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | null, channelId: string }) => {
 	return (
 		<>
 			<Grid container spacing={3}>
 				<Grid item xs={2}>
 					<Typography textAlign={'center'}> Channels</Typography>
 				</Grid>
-				<Grid item xs={8}>
-					<Typography textAlign={'center'}> {channelName} </Typography>
-				</Grid>
-				<Grid item xs={2}>
-					<Typography textAlign={'center'}> User</Typography>
-				</Grid>
+				{
+					channelInfo
+					&& (
+						<>
+							<Grid item xs={8}>
+								<Typography textAlign={'center'}> {channelInfo.name} </Typography>
+							</Grid>
+							{
+								!channelInfo.directMessage
+								&& (
+									<Grid item xs={2}>
+										<Typography textAlign={'center'}>Users</Typography>
+									</Grid>
+								)
+							}
+						</>
+					)
+				}
 			</Grid>
 			<Divider />
 			<Grid container spacing={2}>
@@ -41,12 +53,12 @@ const MyChannels = ({ channelName, channelId }: { channelName: string, channelId
 						: <ChannelBrowser />}
 				</Grid>
 				<Grid item xs={2}>
-					{channelId && channelId !== 'friends' ? <MemberList channelId={channelId} /> : null}
-				</Grid>
-			</Grid>
-			<Divider />
-			<Grid container spacing={3} sx={{ mt: "20px" }}>
-				<Grid item xs={2}>
+					{channelId
+						&& channelId !== 'friends'
+						&& !channelInfo?.directMessage
+						? <MemberList channelId={channelId} />
+						: null
+					}
 				</Grid>
 			</Grid>
 		</>
@@ -56,7 +68,7 @@ const MyChannels = ({ channelName, channelId }: { channelName: string, channelId
 export function ChatPage() {
 
 	const [channels, setChannels] = useState<Channel[]>([]);
-	const [channelName, setChannelName] = useState<string>("");
+	const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
 
@@ -66,17 +78,14 @@ export function ChatPage() {
 	}, [channelId]);
 
 	useEffect(() => {
-		if (!channelId)
-			setChannelName("");
+		if (!channelId || channelId === 'friends')
+			setChannelInfo(null);
 		else {
-			apiClient.get(`/api/chat/channels/${channelId}/name`).then((response) => {
-				console.log("channel", response);
-				setChannelName(response.data);
-			}
-			).catch((error) => {
+			apiClient.get<ChannelInfo>(`/api/chat/channels/${channelId}/info`).then(({ data }) => {
+				setChannelInfo(data);
+			}).catch((error) => {
 				console.log(error);
-			}
-			);
+			});
 		}
 
 	}, [channelId]);
@@ -111,7 +120,7 @@ export function ChatPage() {
 					maxHeight: 'calc(100vh - 80px)',
 					overflowY: 'scroll'
 				}}>
-					<MyChannels channelName={channelName} channelId={channelId || ''} />
+					<MyChannels channelInfo={channelInfo} channelId={channelId || ''} />
 				</Box>
 			</Container >
 		</>
