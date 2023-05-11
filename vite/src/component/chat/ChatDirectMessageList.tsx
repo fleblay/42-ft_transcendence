@@ -40,7 +40,7 @@ export function MyDirectMessageList() {
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
 			console.log("onModifyChannel", data)
-			if (!data)
+			if (!data || data.directMessage == false)
 				return;
 			setMyDmList(channelList => ({ ...channelList, [data.id]: data }));
 		}

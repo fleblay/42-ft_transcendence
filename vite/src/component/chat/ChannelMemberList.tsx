@@ -116,10 +116,6 @@ export function MemberList({ channelId }: { channelId: string }) {
 	const me = React.useRef<Member | null>(null)
 	const navigate = useNavigate()
 
-	useEffect(() => {
-		return addSubscription(`/chat/${channelId}`);
-	}, [channelId]);
-
 	//On track sur memberList car au premier render, elle a la valeur emptyMemberList
 	//On ajout un on sur l'event chat.member.update
 	//Le call back prend en param la memberList qui est update apres le premier api.Client.get
