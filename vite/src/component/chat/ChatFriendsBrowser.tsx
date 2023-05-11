@@ -129,7 +129,7 @@ export const FriendsBrowser: FC = () => {
 
 	useEffect(() => {
 		function onFriendUpdate({ status, friend }: { status: 'removed' | 'update', friend: Friend }) {
-			console.log("onFriendUpdate", friend);
+			console.log("onFriendUpdate status" , status, friend);
 			if (status === 'removed') {
 				setFriendList((oldFriendList) => {
 					const newFriendList = new Map(oldFriendList);
@@ -142,9 +142,9 @@ export const FriendsBrowser: FC = () => {
 				});
 			}
 		}
-		customOn("chat.friend.update", onFriendUpdate);
+		customOn("chat.friends.update", onFriendUpdate);
 		return () => {
-			customOff("chat.friend.update", onFriendUpdate);
+			customOff("chat.friends.update", onFriendUpdate);
 		}
 	}, [friendList])
 
