@@ -99,6 +99,8 @@ export function MyDirectMessageList() {
 			if (response.data.length == 0)
 				return;
 			setMyDmList(response.data.reduce((map: { [id: number]: Channel }, obj: Channel) => {
+				if (obj.members.length != 2)
+					return map;
 				map[obj.id] = obj;
 				return map;
 			}, {}));
@@ -114,6 +116,8 @@ export function MyDirectMessageList() {
 			console.log("onModifyChannel dm", data)
 			
 			if (!data)
+				return;
+			if (data.members.length != 2)
 				return;
 			if (data.directMessage == true)
 				setMyDmList(channelList => ({ ...channelList, [data.id]: data }));
