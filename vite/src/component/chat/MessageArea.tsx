@@ -26,51 +26,33 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 
 	const messageAreaRef = useRef<HTMLUListElement>(null);
 
-	function requestMessages() {
-		apiClient.get<Message[]>(`/api/chat/channels/${channelId}/messages?offset=${offset}`).then(({ data }) => {
-			console.log(`channels/${channelId}/messages`, data);
+	const requestMessages = useCallback((overwriteOffset?: number) => {
+		apiClient.get<Message[]>(`/api/chat/channels/${channelId}/messages?offset=${overwriteOffset || offset}`).then(({ data }) => {
 			setMessages((messages) => {
 				return [...data, ...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 			});
-			setOffset((offset) => offset + 10);
+			if (data && data.length > 0)
+				setOffset((offset) => overwriteOffset || offset + 10);
 		}).catch((error) => {
 			console.log(error);
 		});
-	}
+	}, [channelId, offset]);
 
 	useEffect(() => {
 		setOffset(0);
 		setMessages([]);
-		requestMessages();
+		requestMessages(0);
 		if (messageAreaRef.current) {
 			messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'auto' });
 		}
-
 		return addSubscription(`/chat/${channelId}`);
 	}, [channelId]);
 
 	useEffect(() => {
-		function onScroll(event: Event) {
-			const element = event.target as HTMLUListElement;
-			if (element.scrollTop === 0) {
-				requestMessages();
-			}
-		}
-		if (!messageAreaRef.current) return
-		messageAreaRef.current.addEventListener("scroll", onScroll);
-		return () => {
-			if (!messageAreaRef.current) return
-			messageAreaRef.current.removeEventListener("scroll", onScroll);
-		};
-	}, [channelId, offset]);
-
-	useEffect(() => {
 		if (messageAreaRef.current) {
 			const element = messageAreaRef.current;
-			if (element.scrollTop === 0)
-				element.scrollTo({ top: 1, behavior: 'auto' });
 			if (Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) <= 250)
-				element.scrollTo({ top: element.scrollHeight, behavior: element.scrollTop === 0 ? 'auto' : 'smooth' });
+				element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
 		}
 		function onNewMessage(message: Message) {
 			apiClient.post(`/api/chat/channels/${channelId}/ack`)
@@ -113,9 +95,18 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		});
 	}
 
+
+	function onScroll(event: React.UIEvent<HTMLUListElement, UIEvent>) {
+		const element = event.currentTarget;
+		if (element.scrollTop === 0) {
+			requestMessages();
+			element.scrollTo({ top: 1, behavior: 'auto' });
+		}
+	}
+
 	return (
 		<>
-			<List sx={{ height: '50vh', overflow: 'auto' }} ref={messageAreaRef}>
+			<List sx={{ height: '50vh', overflow: 'auto' }} ref={messageAreaRef} onScroll={onScroll}>
 				{
 					messages.reduce((acc: Message[][], message: Message) => {
 						if (acc.length === 0) {
