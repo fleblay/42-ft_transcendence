@@ -152,6 +152,7 @@ export type Message = {
 	content: string,
 	date: string,
 	gameId: string,
+	createdAt: string,
 }
 
 export type Member = PlainMember & {
@@ -163,7 +164,9 @@ export type Member = PlainMember & {
 export type ChannelInfo = {
 	id: number;
 	name: string;
+	private: boolean;
 	directMessage: boolean;
+	ownerId: number | undefined;
 }
 
 export interface PublicChannel {

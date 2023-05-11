@@ -1,5 +1,5 @@
-import { AppBar, Box, Button, Container, Divider, Fab, Grid, Tab, Tabs, TextField, Typography } from '@mui/material';
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import { AppBar, Box, Button, Container, Divider, Grid, Typography } from '@mui/material';
+import React, { useState, useEffect, useContext } from 'react';
 import apiClient from '../../auth/interceptor.axios';
 import { MessageArea } from './MessageArea';
 import { SocketContext } from '../../socket/SocketProvider';
@@ -9,9 +9,16 @@ import { Channel, ChannelInfo } from '../../types'
 import ChatMenu from './ChatMenu';
 import { ChannelBrowser } from './ChannelBrowse';
 import { FriendsBrowser } from './ChatFriendsBrowser';
-
+import { useAuthService } from '../../auth/AuthService';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
+import { ModifyChannelModal } from './ModifyChannelModal';
 
 const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | null, channelId: string }) => {
+	const { user } = useAuthService()
+
+	const [openModal, setOpenModal] = useState(false)
+
 	return (
 		<>
 			<Grid container spacing={3}>
@@ -23,7 +30,15 @@ const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | nul
 					&& (
 						<>
 							<Grid item xs={8}>
-								<Typography textAlign={'center'}> {channelInfo.name} </Typography>
+								<Typography textAlign={'center'}>
+									{!channelInfo.directMessage && channelInfo.private && <ShieldOutlinedIcon sx={{ color: (theme) => theme.palette.grey[500], marginRight: 1 }} />}
+									{channelInfo.name}
+									{!channelInfo.directMessage
+										&& channelInfo.ownerId
+										&& channelInfo.ownerId === user?.id
+										&& <Button variant='text' onClick={() => setOpenModal(true)}><SettingsIcon /></Button>
+									}
+								</Typography>
 							</Grid>
 							{
 								!channelInfo.directMessage
@@ -61,6 +76,7 @@ const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | nul
 					}
 				</Grid>
 			</Grid>
+			<ModifyChannelModal channelInfo={channelInfo} open={openModal} handleClose={() => setOpenModal(false)} />
 		</>
 	)
 }
@@ -75,6 +91,20 @@ export function ChatPage() {
 		console.log('changing chat', channelId)
 		return addSubscription(`/chat/${channelId || ''}`);
 	}, [channelId]);
+
+	useEffect(() => {
+		function onChannelModify(channel: Channel) {
+			setChannelInfo((prev) => {
+				if (!prev)
+					return null;
+				return { ...prev, name: channel.name, private: channel.private, hasPassword: channel.hasPassword };
+			});
+		}
+		customOn('chat.modify.channel', onChannelModify);
+		return () => {
+			customOff('chat.modify.channel', onChannelModify);
+		}
+	}, []);
 
 	useEffect(() => {
 		if (!channelId || channelId === 'friends')

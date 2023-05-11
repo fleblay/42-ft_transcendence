@@ -99,6 +99,8 @@ export function MyDirectMessageList() {
 			if (response.data.length == 0)
 				return;
 			setMyDmList(response.data.reduce((map: { [id: number]: Channel }, obj: Channel) => {
+				if (obj.members.length != 2)
+					return map;
 				map[obj.id] = obj;
 				return map;
 			}, {}));
@@ -111,10 +113,14 @@ export function MyDirectMessageList() {
 
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
-			console.log("onModifyChannel", data)
-			if (!data || data.directMessage == false)
+			console.log("onModifyChannel dm", data)
+			
+			if (!data)
 				return;
-			setMyDmList(channelList => ({ ...channelList, [data.id]: data }));
+			if (data.members.length != 2)
+				return;
+			if (data.directMessage == true)
+				setMyDmList(channelList => ({ ...channelList, [data.id]: data }));
 		}
 		function onDeleteChannel(id: number) {
 			if (!id)

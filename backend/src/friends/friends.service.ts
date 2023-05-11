@@ -7,12 +7,14 @@ import { User } from "../model/user.entity";
 import { Friend } from "../type";
 import { GameService } from "../game/game.service";
 import { Server } from 'socket.io'
+import { ChatService } from "../chat/chat.service";
 
 @Injectable()
 export class FriendsService {
 	private server: Server;
 	constructor(
 		@Inject(forwardRef(() => UsersService)) private usersService: UsersService,
+		private chatService: ChatService,
 		private gameService: GameService,
 		@InjectRepository(FriendRequest) private friendReqRepo: Repository<FriendRequest>
 	) {
@@ -87,8 +89,10 @@ export class FriendsService {
 		const friendData = this.generateFriend(user, friend, friendRequest);
 		this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', {
 			status: 'update',
+			friend: friendData,
 		})
 
+		await this.chatService.joinDirectMessage(user, friendId);
 		return friendData
 	}
 
@@ -98,6 +102,7 @@ export class FriendsService {
 			console.log("You are not friends with this user");
 			return null;
 		}
+		const removeFriend = this.generateFriend(user, friendRequest.sender.id === user.id ? friendRequest.receiver : friendRequest.sender, friendRequest);
 		this.friendReqRepo.softRemove(friendRequest);
 		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : friendId, event: "remove" })
 		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId : friendId, event: "me-remove" })

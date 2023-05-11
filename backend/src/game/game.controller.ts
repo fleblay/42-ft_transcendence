@@ -4,6 +4,7 @@ import { UUID, UserState } from '../type';
 import { ATGuard } from '../users/guard/access-token.guard';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../model/user.entity';
+import { ValideIdPipe } from '../pipe/validateID.pipe';
 
 @Controller('game')
 export class GameController {
@@ -22,13 +23,13 @@ export class GameController {
 
 
 	@Get("/userstate/:id")
-	getUserState(@Param('id') id: string): UserState {
-		return this.gameService.userState(parseInt(id))
+	getUserState(@Param('id', ValideIdPipe) id: number): UserState {
+		return this.gameService.userState(id)
 	}
 
 	@Get("/usergames/:id")
-	getUserGames(@Param('id') id: string) {
-		return this.gameService.getListGamesByUser(parseInt(id))
+	getUserGames(@Param('id', ValideIdPipe) id: number) {
+		return this.gameService.getListGamesByUser(id)
 	}
 
 	@UseGuards(ATGuard)
@@ -42,7 +43,7 @@ export class GameController {
 
 	@UseGuards(ATGuard)
 	@Get('/list/:page')
-	async getLeaderboard(@Param('page') page: string) {
+	async getLeaderboard(@Param('page', ValideIdPipe) page: number) {
 		const pageNumber = +page;
 		if (isNaN(pageNumber) || pageNumber < 0) {
 			throw new Error("Invalid page number");
@@ -54,7 +55,7 @@ export class GameController {
 
 	@UseGuards(ATGuard)
 	@Get('/history/:id')
-	async getHistory(@Param('id') id: number) {
+	async getHistory(@Param('id', ValideIdPipe) id: number) {
 
 		const games = await this.gameService.getListGamesByUser(id);
 		//console.log('games: ', games);

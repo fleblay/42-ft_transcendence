@@ -66,7 +66,7 @@ function FriendsTabs({ value, setValue }: FriendsTabsProps) {
 		</Box>
 	);
 }
-
+//
 export function FriendList() {
 	//send a post with image
 	const [friendList, setFriendList] = useState<{[status: string]: Friend[]}>({});

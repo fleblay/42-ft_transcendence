@@ -101,7 +101,7 @@ export class ChatService implements OnModuleInit {
 		return channel.id
 	}
 
-	async joinChannel(user: User, channelId: number, options: { owner?: boolean, password?: string, targetUser?: string } = {}): Promise<void> {
+	async joinChannel(user: User, channelId: number, options: { owner?: boolean, password?: string, targetUsername?: string } = {}): Promise<void> {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
@@ -109,6 +109,7 @@ export class ChatService implements OnModuleInit {
 				id: true,
 				private: true,
 				name: true,
+				directMessage: true,
 				members: {
 					id: true,
 					role: true,
@@ -132,10 +133,10 @@ export class ChatService implements OnModuleInit {
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
 		//console.log("joinChannel2 : ", channel, options)
 		let addedUser: User = user
-		if (options?.targetUser) {
-			addedUser = await this.usersService.findOneByUsername(options.targetUser) as User
+		if (options?.targetUsername) {
+			addedUser = await this.usersService.findOneByUsername(options.targetUsername) as User
 			if (!addedUser) {
-				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
+				throw new BadRequestException(`joinChannel : the username ${options.targetUsername} matches no user in database`)
 			}
 		}
 		let joiner: Member;
@@ -253,7 +254,6 @@ export class ChatService implements OnModuleInit {
 		console.log("newMessage : ", newMessage);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
 		const nameOfEmmiter = newMessage.channel.directMessage ? "unreadMessage.dm" : "unreadMessage.channel";
-		console.log ("newMessage : ", nameOfEmmiter)
 		this.emitToAllMembers(channelId, nameOfEmmiter, async (member: Member) => {
 			const unreadMessages = await this.getUnreadMessages(member.user, channelId);
 			return {
@@ -300,7 +300,7 @@ export class ChatService implements OnModuleInit {
 				},
 			},
 			order: {
-				createdAt: 'ASC',
+				createdAt: 'DESC',
 			},
 			relations: {
 				owner: { user: true }
@@ -310,10 +310,13 @@ export class ChatService implements OnModuleInit {
 				gameId: true,
 				content: true,
 				createdAt: true,
-				owner: { user: { id: true, username: true, blockedId: true}, role: true, banned: true, left: true, muteTime: true },
+				owner: { user: { id: true, username: true, blockedId: true }, role: true, banned: true, left: true, muteTime: true },
 			},
+			skip: offset,
+			take: 10,
 		});
-		member.lastRead = messages[messages.length - 1];
+		if(messages.length > 0)
+			member.lastRead = messages[0];
 		await this.membersRepo.save(member);
 		return messages;
 	}
@@ -343,11 +346,21 @@ export class ChatService implements OnModuleInit {
 
 	async getChannelInfo(user: User, channelId: number): Promise<ChannelInfo | undefined> {
 		const channel = await this.channelsRepo.findOne({
-			where: { id: channelId },
+			where: { id: channelId, members: { role: 'owner' } },
+			relations: {
+				members: {
+					user: true,
+				},
+			},
 			select: {
 				id: true,
 				name: true,
+				private: true,
 				directMessage: true,
+				members: {
+					role: true,
+					user: { id: true },
+				}
 			}
 		})
 		if (!channel)
@@ -358,9 +371,9 @@ export class ChatService implements OnModuleInit {
 			if (!otherMember)
 				throw new NotFoundException('Channel not found');
 			console.log("getChannelName : ", otherMember.user.username)
-			return { id: channel.id, directMessage: true, name: (otherMember.user.username || 'Unknown') };
+			return { id: channel.id, directMessage: true, name: (otherMember.user.username || 'Unknown'), private: channel.private };
 		}
-		return { id: channel.id, name: channel.name, directMessage: false };
+		return { id: channel.id, name: channel.name, directMessage: false, ownerId: channel.members.find((member) => member.role === 'owner')?.user.id, private: channel.private };
 	}
 
 
@@ -553,15 +566,15 @@ export class ChatService implements OnModuleInit {
 					id: true,
 					left: true,
 					role: true,
-					user: { id: true, username: true, blockedId: true},
+					user: { id: true, username: true, blockedId: true },
 				},
 			},
 			relationLoadStrategy: "query",
 		});
 	}
 
-	getMyDirectMessage(user: User): Promise<Channel[]> {
-		return this.channelsRepo.find({
+	async getMyDirectMessage(user: User): Promise<Channel[]> {
+		return await this.channelsRepo.find({
 			where: {
 				members: {
 					user: {
@@ -580,6 +593,7 @@ export class ChatService implements OnModuleInit {
 				members: {
 					id: true,
 					user: { id: true, username: true, blockedId: true},
+					left: true,
 				},
 			},
 			relationLoadStrategy: "query",
@@ -606,6 +620,9 @@ export class ChatService implements OnModuleInit {
 		});
 		if (!member || !member.lastRead)
 			return 0;
+		console.log("getUnreadMessages : ", member.lastRead);
+		
+		
 		return await this.messagesRepo.count({
 			where: {
 				channel: {
@@ -618,7 +635,7 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async getDMChannel(me: User, friend: Partial<User>): Promise<Channel | null> {
-		//console.log("getDMChannel : ", me, friend);
+		////console.log("getDMChannel : ", me, friend);
 		if (!friend.id || friend.id === me.id)
 			return null;
 		//console.log("getDMChannel :searching channel");
@@ -643,9 +660,10 @@ export class ChatService implements OnModuleInit {
 					name: true,
 					private: true,
 					password: true,
+					directMessage: true,
 					members: {
 						id: true,
-						user: { id: true, username: true , blockedId: true},
+						user: { id: true, username: true, blockedId: true },
 					},
 				},
 			},
@@ -659,11 +677,16 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async joinDirectMessage(user: User, targetUser: number) {
+		console.log("joinDirectMessage : ", user, targetUser);
 		// check if channel exists
 		const channel = await this.getDMChannel(user, { id: targetUser });
-		//console.log("findChannel : ", channel);
-		if (channel)
+		if (channel) {
+			channel.members.forEach((member) => {
+				member.left = false;
+			});
+			await this.channelsRepo.save(channel);
 			return channel.id;
+		}
 		else {
 
 			const directMessage = {
@@ -680,9 +703,23 @@ export class ChatService implements OnModuleInit {
 			//console.log("joinDirectMessage : channel created", channelId)
 			await this.joinChannel(user, channelId, { owner: true });
 			//console.log("joinDirectMessage : channel joined", channelId)
-			await this.joinChannel(user, channelId, { targetUser: friendUser.username });
+			await this.joinChannel(user, channelId, { targetUsername: friendUser.username });
 			//console.log("joinDirectMessage : channel joined", channelId)
 			return channelId;
 		}
 	}
+
+	async leaveDirectMessage(user: User, friendId : number) {
+		const channel = await this.getDMChannel(user, { id: friendId });
+		if (!channel)
+			return;
+		channel.members.forEach((member) => {
+			this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit('chat.channel.leave', channel.id);
+			member.left = true;
+		});
+		await this.channelsRepo.save(channel);
+
+		this.emitToAllMembers(channel.id, 'chat.modify.channel', this.cbEmitAll);
+	}
 }
+

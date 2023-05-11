@@ -5,6 +5,7 @@ import { UsersModule } from 'src/users/users.module';
 import { GameModule } from 'src/game/game.module';
 import { FriendRequest } from 'src/model/friend-request.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ChatModule } from 'src/chat/chat.module';
 
 @Module({
 	controllers: [FriendsController],
@@ -13,6 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 		forwardRef(() => UsersModule),
 		GameModule,
 		TypeOrmModule.forFeature([FriendRequest]),
+		ChatModule
 	],
 	exports: [FriendsService]
 })

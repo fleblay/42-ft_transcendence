@@ -49,7 +49,9 @@ export interface Login42User {
 export interface ChannelInfo {
 	id: number;
 	name: string;
+	private: boolean;
 	directMessage: boolean;
+	ownerId?: number;
 }
 
 export interface PublicChannel {
