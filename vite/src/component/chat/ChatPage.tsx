@@ -24,7 +24,7 @@ const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, open: bool
 
 		const channelForm = new FormData(event.currentTarget);
 
-		apiClient.put(`/channels/${channelInfo?.id}`, {
+		apiClient.post(`/api/chat/channels/${channelInfo?.id}/info`, {
 			name: channelForm.get('name'),
 			password: channelForm.get('password') || ''
 		}).then(() => {
@@ -35,7 +35,7 @@ const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, open: bool
 	}
 	function handleInviteMember() {
 		if (memberInvite.length < 3) return;
-		apiClient.post(`/channels/${channelInfo?.id}/invite`, {
+		apiClient.post(`/api/chat/channels/${channelInfo?.id}/join`, {
 			username: memberInvite
 		}).then(() => {
 			setMemberInvite("")
@@ -179,6 +179,20 @@ export function ChatPage() {
 		console.log('changing chat', channelId)
 		return addSubscription(`/chat/${channelId || ''}`);
 	}, [channelId]);
+
+	useEffect(() => {
+		function onChannelModify(channel: Channel) {
+			setChannelInfo((prev) => {
+				if (!prev)
+					return null;
+				return { ...prev, name: channel.name, private: channel.private, hasPassword: channel.hasPassword };
+			});
+		}
+		customOn('chat.modify.channel', onChannelModify);
+		return () => {
+			customOff('chat.modify.channel', onChannelModify);
+		}
+	}, []);
 
 	useEffect(() => {
 		if (!channelId || channelId === 'friends')
