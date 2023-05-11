@@ -1,7 +1,7 @@
 import React, { FC, useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { List, ListItem, ListItemButton, ListItemText, Avatar, Badge } from "@mui/material";
-import { Link as LinkRouter, useNavigate, useParams } from "react-router-dom";
+import { Link as LinkRouter, NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { SocketContext } from '../../socket/SocketProvider';
 
 import { Channel, Friend, Member } from "../../types";
@@ -13,6 +13,15 @@ interface FriendDisplayProps {
 	originalMember: Member;
 	channel: Channel;
 	mooveToChannel: (channelId: number) => void;
+}
+
+export const joinDm = (userId: number, navigate: NavigateFunction) => {
+	apiClient.post(`/api/chat/dm/${userId}/join`).then((response) => {
+		console.log("joinChannel", response);
+		navigate(`/chat/${response.data}`);
+	}).catch((error) => {
+		console.log(error);
+	});
 }
 
 
@@ -49,15 +58,6 @@ const FriendDisplay: FC<FriendDisplayProps> = ({ originalMember, channel, mooveT
 			customOff("page.player", onFriendUpdate);
 		}
 	}, [member])
-
-	const joinDm = (userId: number) => {
-		apiClient.post(`/api/chat/dm/${userId}/join`).then((response) => {
-			console.log("joinChannel", response);
-			navigate(`/chat/${response.data}`);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
 
 	return (
 		<ListItem key={channel.id} sx={{ pl: 4 }} >
@@ -114,7 +114,7 @@ export function MyDirectMessageList() {
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
 			console.log("onModifyChannel dm", data)
-			
+
 			if (!data)
 				return;
 			if (data.members.length != 2)

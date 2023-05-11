@@ -19,6 +19,27 @@ interface UserInfoDisplayProps {
 
 }
 
+export const handleUnblockUser = (idPlayer: string | undefined) => {
+	apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
+		console.log(response);
+		//setChangeRelation(!changeRelation);
+	}).catch((error) => {
+		console.log(error);
+	});
+}
+
+export const handleBlockUser = (idPlayer: string | undefined) => {
+	apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
+		console.log(response);
+		//setChangeRelation(!changeRelation);
+
+	}).catch((error) => {
+		console.log(error);
+	});
+}
+
+
+
 export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayProps) {
 
 	const [userData, setUserData] = useState<UserInfo | null>(null);
@@ -137,25 +158,6 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 		});
 	}
 
-	const handleBlockUser = () => {
-		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
-			console.log(response);
-			//setChangeRelation(!changeRelation);
-
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
-	const handleUnblockUser = () => {
-		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
-			console.log(response);
-			//setChangeRelation(!changeRelation);
-		}).catch((error) => {
-			console.log(error);
-		});
-	}
-
 	const renderButton = (relation: Friend | null) => {
 
 		console.log("relation", relation);
@@ -205,7 +207,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 					{itsMe ? <UpdateProfil /> : (
 						<>
 							{renderButton(relation)}
-							{displayBlocked && isBlocked ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleUnblockUser}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={handleBlockUser}>block</Button>}
+							{displayBlocked && isBlocked ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleUnblockUser(idPlayer)}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleBlockUser(idPlayer)}>block</Button>}
 						</>
 					)}
 

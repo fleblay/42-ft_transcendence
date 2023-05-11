@@ -12,7 +12,8 @@ import { NewMessageDto } from './dto/new-message.dto';
 import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ChangeChannelDto } from './dto/change-channel.dto';
 import { GameService } from 'src/game/game.service';
-import { ChannelInfo, PublicChannel, ShortUser } from '../type';
+import { ChannelInfo, Friend, PublicChannel, ShortUser } from '../type';
+import { FriendsService } from 'src/friends/friends.service';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -24,6 +25,8 @@ export class ChatService implements OnModuleInit {
 		@InjectRepository(Message) private messagesRepo: Repository<Message>,
 		@Inject(forwardRef(() => UsersService)) private usersService: UsersService,
 		@Inject(forwardRef(() => GameService)) private gameService: GameService,
+		@Inject(forwardRef(() => FriendsService)) private friendsService: FriendsService,
+
 	) { }
 
 	async onModuleInit() {
@@ -442,6 +445,7 @@ export class ChatService implements OnModuleInit {
 			modifyMember.muteTime = new Date(options.mute)
 		}
 		await this.membersRepo.save(modifyMember)
+		modifyMember.user = {...modifyMember.user, friendId : (await this.friendsService.getFriendsList(modifyMember.user)).map((friend: Friend) => friend.id)}
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', {
 			modifyMember: {
 				...modifyMember,

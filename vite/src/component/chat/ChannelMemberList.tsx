@@ -14,6 +14,8 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
 import { MuteMemberModal } from "./MuteMemberModal";
+import { joinDm } from "./ChatDirectMessageList"
+import { handleBlockUser, handleUnblockUser } from "../UserInfoDisplay"
 
 type memberList = {
 	admins: Member[],
@@ -26,7 +28,7 @@ const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
-function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Member | null>>, userId: number, event: string, memberList: memberList, targetId?: number): memberList {
+function userUpDateState(me: Member | null, setMe: Dispatch<SetStateAction<Member | null>>, userId: number, event: string, memberList: memberList, targetId?: number): memberList {
 
 	for (const [key, value] of Object.entries(memberList)) {
 		const member: Member | undefined = value.find((member) => member.user.id == userId)
@@ -52,42 +54,42 @@ function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Memb
 				case ("blocked"):
 					if (me != null && targetId != undefined && me.user.id == userId)
 						me.user.blockedId.push(targetId)
-						setMe(me)
+					setMe(me)
 					break
 				case ("unblocked"):
 					if (me != null && targetId != undefined && me.user.id == userId)
 						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != targetId)
-						setMe(me)
+					setMe(me)
 					break
 				case ("me-blocked"):
 					if (me != null && targetId && userId == me.user.id)
 						me.user.blockedId.push(targetId)
-						setMe(me)
+					setMe(me)
 					break
 				case ("me-unblocked"):
 					if (me != null && targetId && userId == me.user.id)
 						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != targetId)
-						setMe(me)
+					setMe(me)
 					break
 				case ("accept"):
 					if (me != null && targetId != undefined && me.user.id == userId)
 						me.user.friendId.push(targetId)
-						setMe(me)
+					setMe(me)
 					break
 				case ("remove"):
 					if (me != null && targetId != undefined && me.user.id == userId)
 						me.user.friendId = me.user.friendId.filter((friend) => friend != targetId)
-						setMe(me)
+					setMe(me)
 					break
 				case ("me-accept"):
 					if (me != null && targetId && targetId == me.user.id)
 						me.user.friendId.push(userId)
-						setMe(me)
+					setMe(me)
 					break
 				case ("me-remove"):
 					if (me != null && targetId && targetId == me.user.id)
 						me.user.friendId = me.user.friendId.filter((friend) => friend != userId)
-						setMe(me)
+					setMe(me)
 					break
 			}
 		}
@@ -166,7 +168,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 			setMemberList(addNewMember(upDatedMember, memberList))
 			if (upDatedMember.id == me!.id) {
 				console.log("I have changed : ", upDatedMember)
-				setMe(upDatedMember)
+					setMe(upDatedMember)
 				if (upDatedMember.left)
 					navigate(`/chat`);
 			}
@@ -247,6 +249,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 		}
 
 		useEffect(() => {
+			const relationRights: string[] = []
+			const priviledgeRights: string[] = []
 			if (!me)
 				return
 			if (me.id == member.id) {
@@ -254,18 +258,18 @@ export function MemberList({ channelId }: { channelId: string }) {
 				return
 			}
 			switch (me.role) {
-				case "regular":
-					setMyRights([""])
-					break
 				case "owner":
-					(member.role != "owner") ? setMyRights(["ban", "kick", "mute", "change"]) : setMyRights([""])
+					(member.role != "owner") && priviledgeRights.push("ban", "kick", "mute", "change")
 					break
 				case "admin":
-					member.role == "regular" && setMyRights(["ban", "kick", "mute"])
-					member.role == "admin" && setMyRights(["ban", "kick", "mute"])
-					member.role == "owner" && setMyRights([""])
+					member.role == "regular" && priviledgeRights.push("ban", "kick", "mute")
+					member.role == "admin" && priviledgeRights.push("ban", "kick", "mute")
 					break
 			}
+			if (me.user.friendId.includes(member.user.id))
+				relationRights.push("friend")
+			relationRights.push((me.user.blockedId.includes(member.user.id)) ? "unblock" : "block")
+			setMyRights([...relationRights, ...priviledgeRights])
 		}, [me, memberList, member.role])
 
 		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -364,13 +368,16 @@ export function MemberList({ channelId }: { channelId: string }) {
 					{myRights.includes("ban") && <MenuItem onClick={handleClickBan}>{`${member.banned ? "Unban" : "Ban"} ${member.user.username}`}</MenuItem>}
 					{myRights.includes("mute") && mutedState && <MenuItem onClick={handleClickUnMute}>{`Unmute ${member.user.username}`}</MenuItem>}
 					{myRights.includes("mute") && !mutedState && <MenuItem onClick={() => setMuteModalOpen(true)}>{`Mute ${member.user.username}`}</MenuItem>}
+					{myRights.includes("friend") && <MenuItem onClick={() => joinDm(member.user.id, navigate)}>{`Send ${member.user.username} a DM`}</MenuItem>}
+					{myRights.includes("unblock") && <MenuItem onClick={() => handleUnblockUser(member.user.id.toString())}>{`Unblock ${member.user.username}`}</MenuItem>}
+					{myRights.includes("block") && <MenuItem onClick={() => handleBlockUser(member.user.id.toString())}>{`Block ${member.user.username}`}</MenuItem>}
 					<MuteMemberModal openModal={muteModalOpen} onClose={closeMuteModal} channelId={channelId} member={member} />
 				</Menu>
 			</>
 		);
 	}
 
-	function GenerateMemberGroup({ groupname, groupMembers, me }: { groupname: string, groupMembers: Member[], me: Member | null}): JSX.Element {
+	function GenerateMemberGroup({ groupname, groupMembers, me }: { groupname: string, groupMembers: Member[], me: Member | null }): JSX.Element {
 		console.log('rendering membergroup, me is : ', me)
 		return (<>
 			<Typography component="div">{groupname}</Typography>
@@ -397,8 +404,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 							{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}
 							{member.states.includes("ingame") && <VideogameAssetIcon />}
 							{member.states.includes("watching") && <VisibilityIcon />}
-							{me!.user.blockedId.includes(member.user.id) && <BlockIcon />}
-							{me!.user.friendId.includes(member.user.id) && <FavoriteBorderIcon />}
+							{me?.user.blockedId.includes(member.user.id) && <BlockIcon />}
+							{me?.user.friendId.includes(member.user.id) && <FavoriteBorderIcon />}
 						</Box>
 						<Box sx={{ marginLeft: "auto" }}>
 							<GenerateMemberActionList member={member} />
@@ -416,9 +423,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 			<Divider />
 			<GenerateMemberGroup groupname={"Users"} groupMembers={memberList.regulars} me={me} />
 			<Divider />
-			<GenerateMemberGroup groupname={"Muted"} groupMembers={memberList.muted} me={me}/>
+			<GenerateMemberGroup groupname={"Muted"} groupMembers={memberList.muted} me={me} />
 			<Divider />
-			<GenerateMemberGroup groupname={"Banned"} groupMembers={memberList.banned} me={me}/>
+			<GenerateMemberGroup groupname={"Banned"} groupMembers={memberList.banned} me={me} />
 		</nav>
 	);
 }
