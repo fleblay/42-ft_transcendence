@@ -164,7 +164,9 @@ export type Member = PlainMember & {
 export type ChannelInfo = {
 	id: number;
 	name: string;
+	private: boolean;
 	directMessage: boolean;
+	ownerId: number | undefined;
 }
 
 export interface PublicChannel {
