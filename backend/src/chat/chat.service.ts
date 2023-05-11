@@ -314,9 +314,7 @@ export class ChatService implements OnModuleInit {
 			skip: offset,
 			take: 10,
 		});
-		if(messages.length > 0)
-			member.lastRead = messages[0];
-		await this.membersRepo.save(member);
+		await this.ackChannel(user, channelId);
 		return messages;
 	}
 
@@ -369,7 +367,6 @@ export class ChatService implements OnModuleInit {
 			const otherMember = members.find((member) => (member.user.id != user.id))
 			if (!otherMember)
 				throw new NotFoundException('Channel not found');
-			console.log("getChannelName : ", otherMember.user.username)
 			return { id: channel.id, directMessage: true, name: (otherMember.user.username || 'Unknown'), private: channel.private };
 		}
 		return { id: channel.id, name: channel.name, directMessage: false, ownerId: channel.members.find((member) => member.role === 'owner')?.user.id, private: channel.private };
@@ -620,8 +617,8 @@ export class ChatService implements OnModuleInit {
 		if (!member || !member.lastRead)
 			return 0;
 		console.log("getUnreadMessages : ", member.lastRead);
-		
-		
+
+
 		return await this.messagesRepo.count({
 			where: {
 				channel: {
