@@ -74,6 +74,7 @@ export class ChatService implements OnModuleInit {
 					user: {
 						id: true,
 						username: true,
+						blockedId: true
 					},
 				},
 			}
@@ -104,7 +105,23 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, directMessage : true,  name: true, members: { id: true, role: true, banned: true, left: true, muteTime: true, user: { id: true, username: true } } }
+			select: {
+				id: true,
+				private: true,
+				name: true,
+				members: {
+					id: true,
+					role: true,
+					banned: true,
+					left: true,
+					muteTime: true,
+					user: {
+						id: true,
+						username: true,
+						blockedId: true
+					}
+				}
+			}
 		})
 		//console.log("joinChannel : ", channel, options)
 		if (!channel)
@@ -199,6 +216,7 @@ export class ChatService implements OnModuleInit {
 				user: {
 					id: true,
 					username: true,
+					blockedId: true,
 				}
 			},
 		});
@@ -281,7 +299,7 @@ export class ChatService implements OnModuleInit {
 				},
 			},
 			order: {
-				createdAt: 'ASC',
+				createdAt: 'DESC',
 			},
 			relations: {
 				owner: { user: true }
@@ -291,8 +309,10 @@ export class ChatService implements OnModuleInit {
 				gameId: true,
 				content: true,
 				createdAt: true,
-				owner: { user: { id: true, username: true }, role: true, banned: true, left: true, muteTime: true },
+				owner: { user: { id: true, username: true, blockedId: true}, role: true, banned: true, left: true, muteTime: true },
 			},
+			skip: offset,
+			take: 10,
 		});
 		member.lastRead = messages[messages.length - 1];
 		await this.membersRepo.save(member);
@@ -315,7 +335,7 @@ export class ChatService implements OnModuleInit {
 				banned: true,
 				muteTime: true,
 				left: true,
-				user: { id: true, username: true },
+				user: { id: true, username: true, blockedId: true },
 			},
 		});
 		return members
@@ -378,6 +398,7 @@ export class ChatService implements OnModuleInit {
 					user: {
 						id: true,
 						username: true,
+						blockedId: true
 					}
 				}
 			}
@@ -533,7 +554,7 @@ export class ChatService implements OnModuleInit {
 					id: true,
 					left: true,
 					role: true,
-					user: { id: true, username: true },
+					user: { id: true, username: true, blockedId: true},
 				},
 			},
 			relationLoadStrategy: "query",
@@ -559,7 +580,7 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
-					user: { id: true, username: true },
+					user: { id: true, username: true, blockedId: true},
 				},
 			},
 			relationLoadStrategy: "query",
@@ -625,7 +646,7 @@ export class ChatService implements OnModuleInit {
 					password: true,
 					members: {
 						id: true,
-						user: { id: true, username: true },
+						user: { id: true, username: true , blockedId: true},
 					},
 				},
 			},

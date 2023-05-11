@@ -165,28 +165,30 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	blockUser(user: User, blockedId: number) {
+	async blockUser(user: User, blockedId: number) {
 		if (user.blockedId.includes(blockedId)) {
 			console.log("User is already blocked");
 			return;
 		}
 		this.friendsService.removeFriend(user, blockedId);
 		user.blockedId.push(blockedId);
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
-		this.server.to(`/player/${blockedId}`).emit('page.player', {})
-		return this.repo.save(user);
+		this.server.to(`/player/${user.id}`).emit('page.player', {userId: user.id, blockedId, event : "blocked"})
+		this.server.to(`/player/${blockedId}`).emit('page.player', {userId: user.id, blockedId, event: "me-blocked"})
+		const updatedUser = await this.repo.save(user);
+		return updatedUser
 	}
 
-	unblockUser(user: User, blockedId: number) {
+	async unblockUser(user: User, blockedId: number) {
 		const index = user.blockedId.indexOf(blockedId);
 		if (index === -1) {
 			console.log("User is not blocked");
 			return;
 		}
 		user.blockedId.splice(index, 1);
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
-		this.server.to(`/player/${blockedId}`).emit('page.player', {})
-		return this.repo.save(user);
+		this.server.to(`/player/${user.id}`).emit('page.player', {userId: user.id, blockedId, event : "unblocked"})
+		this.server.to(`/player/${blockedId}`).emit('page.player', {userId: user.id, blockedId, event: "me-unblocked"})
+		const updatedUser = await this.repo.save(user);
+		return updatedUser
 	}
 
 

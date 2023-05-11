@@ -106,14 +106,9 @@ export class ChatController {
 		await this.chatService.ackChannel(user, channelId);
 	}
 
-	// TODO: Limit the number of messages to 50
-	// NOTE: Offset is message id or number?
-	// a tester
-	// NOTE: A TESTER
 	@Get('channels/:id/messages')
-	getMessages(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Query('offset') offset: string): Promise<Message[]> {
-		;
-		return this.chatService.getMessages(user, channelId, parseInt(offset) || 0);
+	getMessages(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Query('offset', ValideIdPipe) offset: number): Promise<Message[]> {
+		return this.chatService.getMessages(user, channelId, offset || 0);
 	}
 
 	// NOTE: A TESTER

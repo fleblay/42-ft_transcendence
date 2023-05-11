@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { Dispatch, MutableRefObject, SetStateAction, useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton, Modal, Box, Divider } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
+import BlockIcon from '@mui/icons-material/Block';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
 import { MuteMemberModal } from "./MuteMemberModal";
@@ -24,10 +25,9 @@ const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
-function userUpDateState(userId: number, event: string, memberList: memberList): memberList {
+function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Member | null>>, userId: number, event: string, memberList: memberList, blockedId?: number): memberList {
 
 	for (const [key, value] of Object.entries(memberList)) {
-		console.log("in for loop : ", key, value)
 		const member: Member | undefined = value.find((member) => member.user.id == userId)
 		if (member) {
 			console.log("Found user in :", key)
@@ -47,6 +47,26 @@ function userUpDateState(userId: number, event: string, memberList: memberList):
 					break
 				case ("disconnected"):
 					member.isConnected = false
+					break
+				case ("blocked"):
+					if (me != null && blockedId != undefined && me.user.id == userId)
+						me.user.blockedId.push(blockedId)
+						setMe(me)
+					break
+				case ("unblocked"):
+					if (me != null && blockedId != undefined && me.user.id == userId)
+						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != blockedId)
+						setMe(me)
+					break
+				case ("me-blocked"):
+					if (me != null && blockedId && userId == me.user.id)
+						me.user.blockedId.push(blockedId)
+						setMe(me)
+					break
+				case ("me-unblocked"):
+					if (me != null && blockedId && userId == me.user.id)
+						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != blockedId)
+						setMe(me)
 					break
 			}
 		}
@@ -74,7 +94,6 @@ function subscribeToMemberEvents(addSubscription: (sub: string) => (() => void) 
 function removeOldMember(oldMemberId: number, memberList: memberList): memberList {
 
 	for (const [key, value] of Object.entries(memberList)) {
-		console.log("in for loop : ", key, value)
 		const oldMemberIndex: number = value.findIndex((member) => member.id == oldMemberId)
 		if (oldMemberIndex != -1) {
 			console.log("Found oldmember in :", key)
@@ -113,7 +132,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 	const auth = useAuthService()
 	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 	const [memberList, setMemberList] = useState<memberList>(emptyMemberList);
-	const me = React.useRef<Member | null>(null)
+	const [me, setMe] = useState<Member | null>(null);
 	const navigate = useNavigate()
 
 	//On track sur memberList car au premier render, elle a la valeur emptyMemberList
@@ -124,9 +143,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 			console.log("onMemberUpdate", upDatedMember);
 			removeOldMember(upDatedMember.id, memberList)
 			setMemberList(addNewMember(upDatedMember, memberList))
-			if (upDatedMember.id == me.current!.id) {
+			if (upDatedMember.id == me!.id) {
 				console.log("I have changed : ", upDatedMember)
-				me.current = upDatedMember
+				setMe(upDatedMember)
 				if (upDatedMember.left)
 					navigate(`/chat`);
 			}
@@ -138,13 +157,15 @@ export function MemberList({ channelId }: { channelId: string }) {
 		}
 
 		function onMemberLeave({ leftMember }: { leftMember: Member }) {
-			console.log("onMemberLeft", leftMember, me.current);
+			console.log("onMemberLeft", leftMember, me);
 			setMemberList(removeOldMember(leftMember.id, memberList))
 		}
 
-		function onPlayerEvent({ userId, event }: { userId: number, event: string }) {
+		function onPlayerEvent({ userId, event, blockedId }: { userId: number, blockedId?: number, event: string }) {
+			if (!userId || !event)
+				return
 			console.log("onPlayerEvent", userId, event);
-			setMemberList(userUpDateState(userId, event, memberList))
+			setMemberList(userUpDateState(me, setMe, userId, event, memberList, blockedId))
 		}
 
 		customOn("chat.modify.members", onMemberUpdate);
@@ -182,8 +203,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 			})
 			setMemberList(newMemberList)
 			if (auth.user)
-				me.current = data.find((member) => member.user.id == auth.user!.id) || null
-			console.log("Je suis : ", me.current)
+				setMe(data.find((member) => member.user.id == auth.user!.id) || null)
+			console.log("Je suis : ", me)
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -205,13 +226,13 @@ export function MemberList({ channelId }: { channelId: string }) {
 		}
 
 		useEffect(() => {
-			if (!me.current)
+			if (!me)
 				return
-			if (me.current.id == member.id) {
+			if (me.id == member.id) {
 				setMyRights(["self"])
 				return
 			}
-			switch (me.current.role) {
+			switch (me.role) {
 				case "regular":
 					setMyRights([""])
 					break
@@ -224,7 +245,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					member.role == "owner" && setMyRights([""])
 					break
 			}
-		}, [me.current?.role, memberList, member.role])
+		}, [me, memberList, member.role])
 
 		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 			setAnchorEl(event.currentTarget);
@@ -315,7 +336,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 						'aria-labelledby': 'basic-button',
 					}}
 				>
-					<MenuItem onClick={handleClickProfile}>{`${(member.id != me.current?.id) ? member.user.username + "'s" : "My"} Profile`}</MenuItem>
+					<MenuItem onClick={handleClickProfile}>{`${(member.id != me?.id) ? member.user.username + "'s" : "My"} Profile`}</MenuItem>
 					{myRights.includes("self") && <MenuItem onClick={handleClickLeave}>Leave Channel</MenuItem>}
 					{myRights.includes("change") && <MenuItem onClick={handleClickChangeRole}>{`Change ${member.user.username}'s role to ${member.role == "regular" ? "admin" : "regular"}`}</MenuItem>}
 					{myRights.includes("kick") && <MenuItem onClick={handleClickKick}>{`Kick ${member.user.username}`}</MenuItem>}
@@ -328,7 +349,8 @@ export function MemberList({ channelId }: { channelId: string }) {
 		);
 	}
 
-	function GenerateMemberGroup({ groupname, groupMembers }: { groupname: string, groupMembers: Member[] }): JSX.Element {
+	function GenerateMemberGroup({ groupname, groupMembers, me }: { groupname: string, groupMembers: Member[], me: Member | null}): JSX.Element {
+		console.log('rendering membergroup, me is : ', me)
 		return (<>
 			<Typography component="div">{groupname}</Typography>
 			<List disablePadding>
@@ -353,6 +375,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 							{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}
 							{member.states.includes("ingame") && <VideogameAssetIcon />}
 							{member.states.includes("watching") && <VisibilityIcon />}
+							{me!.user.blockedId.includes(member.user.id) && <BlockIcon />}
 						</Box>
 						<Box sx={{ marginLeft: "auto" }}>
 							<GenerateMemberActionList member={member} />
@@ -366,13 +389,13 @@ export function MemberList({ channelId }: { channelId: string }) {
 
 	return (
 		<nav>
-			<GenerateMemberGroup groupname={"Admins"} groupMembers={memberList.admins} />
+			<GenerateMemberGroup groupname={"Admins"} groupMembers={memberList.admins} me={me} />
 			<Divider />
-			<GenerateMemberGroup groupname={"Users"} groupMembers={memberList.regulars} />
+			<GenerateMemberGroup groupname={"Users"} groupMembers={memberList.regulars} me={me} />
 			<Divider />
-			<GenerateMemberGroup groupname={"Muted"} groupMembers={memberList.muted} />
+			<GenerateMemberGroup groupname={"Muted"} groupMembers={memberList.muted} me={me}/>
 			<Divider />
-			<GenerateMemberGroup groupname={"Banned"} groupMembers={memberList.banned} />
+			<GenerateMemberGroup groupname={"Banned"} groupMembers={memberList.banned} me={me}/>
 		</nav>
 	);
 }
