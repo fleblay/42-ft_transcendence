@@ -102,10 +102,15 @@ export class FriendsService {
 			console.log("You are not friends with this user");
 			return null;
 		}
+		const removeFriend = this.generateFriend(user, friendRequest.sender.id === user.id ? friendRequest.receiver : friendRequest.sender, friendRequest);
 		this.friendReqRepo.softRemove(friendRequest);
 		this.server.to(`/player/${user.id}`).emit('page.player', {})
 		this.server.to(`/player/${friendId}`).emit('page.player', {})
-		this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', { status: 'update', friend : {} })
+		
+		this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', {
+			status: 'removed',
+			friend: removeFriend,
+		})		
 		this.chatService.leaveDirectMessage(user);
 		return {
 			friendId: friendId,
