@@ -314,7 +314,8 @@ export class ChatService implements OnModuleInit {
 			skip: offset,
 			take: 10,
 		});
-		member.lastRead = messages[messages.length - 1];
+		if(messages.length > 0)
+			member.lastRead = messages[0];
 		await this.membersRepo.save(member);
 		return messages;
 	}
@@ -618,6 +619,9 @@ export class ChatService implements OnModuleInit {
 		});
 		if (!member || !member.lastRead)
 			return 0;
+		console.log("getUnreadMessages : ", member.lastRead);
+		
+		
 		return await this.messagesRepo.count({
 			where: {
 				channel: {
@@ -630,7 +634,7 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async getDMChannel(me: User, friend: Partial<User>): Promise<Channel | null> {
-		//console.log("getDMChannel : ", me, friend);
+		////console.log("getDMChannel : ", me, friend);
 		if (!friend.id || friend.id === me.id)
 			return null;
 		//console.log("getDMChannel :searching channel");
