@@ -101,7 +101,7 @@ export class ChatService implements OnModuleInit {
 		return channel.id
 	}
 
-	async joinChannel(user: User, channelId: number, options: { owner?: boolean, password?: string, targetUser?: string } = {}): Promise<void> {
+	async joinChannel(user: User, channelId: number, options: { owner?: boolean, password?: string, targetUsername?: string } = {}): Promise<void> {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
@@ -133,10 +133,10 @@ export class ChatService implements OnModuleInit {
 			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
 		//console.log("joinChannel2 : ", channel, options)
 		let addedUser: User = user
-		if (options?.targetUser) {
-			addedUser = await this.usersService.findOneByUsername(options.targetUser) as User
+		if (options?.targetUsername) {
+			addedUser = await this.usersService.findOneByUsername(options.targetUsername) as User
 			if (!addedUser) {
-				throw new BadRequestException(`joinChannel : the username ${options.targetUser} matches no user in database`)
+				throw new BadRequestException(`joinChannel : the username ${options.targetUsername} matches no user in database`)
 			}
 		}
 		let joiner: Member;
@@ -702,7 +702,7 @@ export class ChatService implements OnModuleInit {
 			//console.log("joinDirectMessage : channel created", channelId)
 			await this.joinChannel(user, channelId, { owner: true });
 			//console.log("joinDirectMessage : channel joined", channelId)
-			await this.joinChannel(user, channelId, { targetUser: friendUser.username });
+			await this.joinChannel(user, channelId, { targetUsername: friendUser.username });
 			//console.log("joinDirectMessage : channel joined", channelId)
 			return channelId;
 		}

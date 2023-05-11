@@ -98,7 +98,7 @@ export class ChatController {
 	// to: /chat/${channelId} emit :chat.join.channel
 	@Post('channels/:id/join')
 	async joinChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: JoinChannelDto): Promise<void> {
-		await this.chatService.joinChannel(user, channelId, { password: body.password, targetUser: body.username })
+		await this.chatService.joinChannel(user, channelId, { password: body.password, targetUsername: body.username })
 	}
 
 	@Post('channels/:id/ack')
@@ -160,7 +160,5 @@ export class ChatController {
 	async modifyChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: ChangeChannelDto): Promise<void> {
 		await this.chatService.modifyChannel(user, channelId, body);
 	}
-
-
 
 }
