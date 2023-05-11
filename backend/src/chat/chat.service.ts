@@ -128,7 +128,7 @@ export class ChatService implements OnModuleInit {
 			if (member.banned)
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is banned from the channel`)
 			if (!member.left)
-				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is already in the channel`)
+				return;
 			else {
 				member.left = false
 				joiner = await this.membersRepo.save(member)
