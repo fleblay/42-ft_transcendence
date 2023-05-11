@@ -660,9 +660,10 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async joinDirectMessage(user: User, targetUser: number) {
+		console.log("joinDirectMessage : ", user, targetUser);
 		// check if channel exists
 		const channel = await this.getDMChannel(user, { id: targetUser });
-		//console.log("findChannel : ", channel);
+		console.log("findChannel : ", channel);
 		if (channel)
 		{
 			channel.members.forEach((member) => {
@@ -701,6 +702,7 @@ export class ChatService implements OnModuleInit {
 			member.left = true;
 		});
 		await this.channelsRepo.save(channel);
+		this.emitToAllMembers(channel.id, 'chat.modify.channel', this.cbEmitAll);
 	
 	}
 }

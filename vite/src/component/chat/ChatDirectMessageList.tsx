@@ -111,10 +111,12 @@ export function MyDirectMessageList() {
 
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
-			console.log("onModifyChannel", data)
-			if (!data || data.directMessage == false)
+			console.log("onModifyChannel dm", data)
+			
+			if (!data)
 				return;
-			setMyDmList(channelList => ({ ...channelList, [data.id]: data }));
+			if (data.directMessage == true)
+				setMyDmList(channelList => ({ ...channelList, [data.id]: data }));
 		}
 		function onDeleteChannel(id: number) {
 			if (!id)
