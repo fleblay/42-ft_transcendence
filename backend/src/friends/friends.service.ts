@@ -111,7 +111,7 @@ export class FriendsService {
 			status: 'removed',
 			friend: removeFriend,
 		})		
-		this.chatService.leaveDirectMessage(user);
+		this.chatService.leaveDirectMessage(user, friendId);
 		return {
 			friendId: friendId,
 			status: 'declined'

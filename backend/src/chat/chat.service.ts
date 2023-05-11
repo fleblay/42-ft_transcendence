@@ -109,6 +109,7 @@ export class ChatService implements OnModuleInit {
 				id: true,
 				private: true,
 				name: true,
+				directMessage: true,
 				members: {
 					id: true,
 					role: true,
@@ -561,8 +562,8 @@ export class ChatService implements OnModuleInit {
 		});
 	}
 
-	getMyDirectMessage(user: User): Promise<Channel[]> {
-		return this.channelsRepo.find({
+	async getMyDirectMessage(user: User): Promise<Channel[]> {
+		return await this.channelsRepo.find({
 			where: {
 				members: {
 					user: {
@@ -581,6 +582,7 @@ export class ChatService implements OnModuleInit {
 				members: {
 					id: true,
 					user: { id: true, username: true, blockedId: true},
+					left: true,
 				},
 			},
 			relationLoadStrategy: "query",
@@ -644,6 +646,7 @@ export class ChatService implements OnModuleInit {
 					name: true,
 					private: true,
 					password: true,
+					directMessage: true,
 					members: {
 						id: true,
 						user: { id: true, username: true , blockedId: true},
@@ -694,11 +697,12 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
-	async leaveDirectMessage(user: User) {
-		const channel = await this.getDMChannel(user, { id: user.id });
+	async leaveDirectMessage(user: User, friendId : number) {
+		const channel = await this.getDMChannel(user, { id: friendId });
 		if (!channel)
 			return;
 		channel.members.forEach((member) => {
+			this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit('chat.channel.leave', channel.id);
 			member.left = true;
 		});
 		await this.channelsRepo.save(channel);
