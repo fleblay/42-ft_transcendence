@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Container, Divider, Fab, Grid, Tab, Tabs, TextField, Typography } from '@mui/material';
+import { AppBar, Box, Button, Container, Divider, Fab, FilledInput, FormControl, Grid, IconButton, Input, InputAdornment, InputLabel, Modal, Tab, Tabs, TextField, Typography } from '@mui/material';
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import apiClient from '../../auth/interceptor.axios';
 import { MessageArea } from './MessageArea';
@@ -9,9 +9,104 @@ import { Channel, ChannelInfo } from '../../types'
 import ChatMenu from './ChatMenu';
 import { ChannelBrowser } from './ChannelBrowse';
 import { FriendsBrowser } from './ChatFriendsBrowser';
+import { useAuthService } from '../../auth/AuthService';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 
+const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, open: boolean, handleClose: () => void }> = ({ channelInfo, open, handleClose }) => {
+	const [error, setError] = useState<string | null>(null);
 
+	const [memberInvite, setMemberInvite] = useState<string>("");
+
+	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+
+		const channelForm = new FormData(event.currentTarget);
+
+		apiClient.put(`/channels/${channelInfo?.id}`, {
+			name: channelForm.get('name'),
+			password: channelForm.get('password') || ''
+		}).then(() => {
+			handleClose()
+		}).catch((err) => {
+			setError(err.response.data.message)
+		})
+	}
+	function handleInviteMember() {
+		if (memberInvite.length < 3) return;
+		apiClient.post(`/channels/${channelInfo?.id}/invite`, {
+			username: memberInvite
+		}).then(() => {
+			setMemberInvite("")
+		}).catch((err) => {
+			setError(err.response.data.message)
+		})
+	}
+	return (
+		<Modal open={open} onClose={handleClose} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+			<Container maxWidth="sm" className="centered-container" >
+				<Box sx={{
+					width: '100%',
+					border: '1px solid #D3C6C6',
+					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+					borderRadius: '16px',
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					bgcolor: 'background.paper',
+					p: '1rem'
+				}}>
+					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, mb: '10px' }} >
+						Modify Channel
+					</Typography>
+					<Divider />
+					{error
+						&& <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, mb: '10px' }} >
+							{error}
+						</Typography>
+					}
+
+					<form onSubmit={handleSubmit} style={{ width: '50%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+						<TextField required label="name" type="name" name="name" defaultValue={channelInfo?.name} sx={{ flexGrow: 1, }} />
+						{!channelInfo?.private && <TextField label="Password" type="password" name="password" sx={{ flexGrow: 1, }} />}
+						<Button variant="outlined" type='submit' sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>
+							Modify
+						</Button>
+					</form>
+
+					{
+						channelInfo?.private
+						&& <FormControl sx={{ m: 1, width: '25ch' }} variant="standard">
+							<InputLabel>Invite members</InputLabel>
+							<Input
+								type='text'
+								value={memberInvite}
+								onChange={(e) => setMemberInvite(e.target.value)}
+								endAdornment={
+									<InputAdornment position="end">
+										<IconButton
+											onClick={handleInviteMember}
+										>
+											<PersonAddIcon />
+										</IconButton>
+									</InputAdornment>
+								}
+							/>
+						</FormControl>
+
+					}
+					<Button onClick={handleClose}>Close</Button>
+				</Box>
+			</Container>
+		</Modal>
+	);
+}
 const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | null, channelId: string }) => {
+	const { user } = useAuthService()
+
+	const [openModal, setOpenModal] = useState(false)
+
 	return (
 		<>
 			<Grid container spacing={3}>
@@ -23,7 +118,15 @@ const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | nul
 					&& (
 						<>
 							<Grid item xs={8}>
-								<Typography textAlign={'center'}> {channelInfo.name} </Typography>
+								<Typography textAlign={'center'}>
+									{!channelInfo.directMessage && channelInfo.private && <ShieldOutlinedIcon sx={{ color: (theme) => theme.palette.grey[500], marginRight: 1 }} />}
+									{channelInfo.name}
+									{!channelInfo.directMessage
+										&& channelInfo.ownerId
+										&& channelInfo.ownerId === user?.id
+										&& <Button variant='text' onClick={() => setOpenModal(true)}><SettingsIcon /></Button>
+									}
+								</Typography>
 							</Grid>
 							{
 								!channelInfo.directMessage
@@ -61,6 +164,7 @@ const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | nul
 					}
 				</Grid>
 			</Grid>
+			<ModifyChannelModal channelInfo={channelInfo} open={openModal} handleClose={() => setOpenModal(false)} />
 		</>
 	)
 }
