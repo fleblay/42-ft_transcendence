@@ -281,7 +281,7 @@ export class ChatService implements OnModuleInit {
 				},
 			},
 			order: {
-				createdAt: 'ASC',
+				createdAt: 'DESC',
 			},
 			relations: {
 				owner: { user: true }
@@ -293,6 +293,8 @@ export class ChatService implements OnModuleInit {
 				createdAt: true,
 				owner: { user: { id: true, username: true }, role: true, banned: true, left: true, muteTime: true },
 			},
+			skip: offset,
+			take: 10,
 		});
 		member.lastRead = messages[messages.length - 1];
 		await this.membersRepo.save(member);

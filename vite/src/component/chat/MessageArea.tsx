@@ -1,6 +1,6 @@
 import { Box, Button, Divider, List, TextField } from "@mui/material";
 import { Message } from "../../types";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { SocketContext } from "../../socket/SocketProvider";
 import { ChatMsg } from "./ChatMessage";
@@ -17,6 +17,8 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 	const { user } = useAuthService()
 	const { customEmit, customOn, customOff, addSubscription } = useContext(SocketContext);
 
+	const [offset, setOffset] = useState(0);
+
 	const navigate = useNavigate();
 
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -24,23 +26,50 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 
 	const messageAreaRef = useRef<HTMLUListElement>(null);
 
-	useEffect(() => {
-		apiClient.get(`/api/chat/channels/${channelId}/messages`).then(({ data }: { data: Message[] }) => {
+	function requestMessages() {
+		apiClient.get<Message[]>(`/api/chat/channels/${channelId}/messages?offset=${offset}`).then(({ data }) => {
 			console.log(`channels/${channelId}/messages`, data);
-			setMessages(data);
+			setMessages((messages) => {
+				return [...data, ...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+			});
+			setOffset((offset) => offset + 10);
 		}).catch((error) => {
 			console.log(error);
 		});
-	}, [channelId]);
+	}
 
 	useEffect(() => {
+		setOffset(0);
+		setMessages([]);
+		requestMessages();
+		if (messageAreaRef.current) {
+			messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'auto' });
+		}
+
 		return addSubscription(`/chat/${channelId}`);
 	}, [channelId]);
 
 	useEffect(() => {
+		function onScroll(event: Event) {
+			const element = event.target as HTMLUListElement;
+			if (element.scrollTop === 0) {
+				requestMessages();
+			}
+		}
+		if (!messageAreaRef.current) return
+		messageAreaRef.current.addEventListener("scroll", onScroll);
+		return () => {
+			if (!messageAreaRef.current) return
+			messageAreaRef.current.removeEventListener("scroll", onScroll);
+		};
+	}, [channelId, offset]);
+
+	useEffect(() => {
 		if (messageAreaRef.current) {
 			const element = messageAreaRef.current;
-			if (Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) <= 250 || element.scrollTop === 0)
+			if (element.scrollTop === 0)
+				element.scrollTo({ top: 1, behavior: 'auto' });
+			if (Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) <= 250)
 				element.scrollTo({ top: element.scrollHeight, behavior: element.scrollTop === 0 ? 'auto' : 'smooth' });
 		}
 		function onNewMessage(message: Message) {
