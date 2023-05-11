@@ -20,6 +20,8 @@ export class User {
 	@Column("int", { array: true, default: [] })
 	blockedId: number[];
 
+	friendId?: number[];
+
 	@Column({default : false})
 	stud : boolean;
 

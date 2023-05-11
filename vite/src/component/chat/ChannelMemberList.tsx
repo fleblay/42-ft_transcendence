@@ -10,6 +10,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import BlockIcon from '@mui/icons-material/Block';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
 import { MuteMemberModal } from "./MuteMemberModal";
@@ -369,6 +370,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 						>
 							<Avatar alt="User Photo" src={`/avatars/${member.user.id}.png`} />
 						</Badge>
+
 						<Box sx={{ display: "flex", alignContent: "center" }} >
 							{`${member.user.username}`}
 							{member.role == "owner" && <MilitaryTechIcon />}
@@ -376,6 +378,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 							{member.states.includes("ingame") && <VideogameAssetIcon />}
 							{member.states.includes("watching") && <VisibilityIcon />}
 							{me!.user.blockedId.includes(member.user.id) && <BlockIcon />}
+							{me!.user.friendId.includes(member.user.id) && <FavoriteBorderIcon />}
 						</Box>
 						<Box sx={{ marginLeft: "auto" }}>
 							<GenerateMemberActionList member={member} />

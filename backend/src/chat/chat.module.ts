@@ -7,6 +7,7 @@ import { Channel } from '../model/channel.entity';
 import { Message } from '../model/message.entity';
 import { UsersModule } from '../users/users.module';
 import { GameModule } from 'src/game/game.module';
+import { FriendsModule } from 'src/friends/friends.module';
 
 @Module({
 	imports: [
@@ -17,6 +18,7 @@ import { GameModule } from 'src/game/game.module';
 		]),
 		forwardRef(() => UsersModule),
 		forwardRef(() => GameModule),
+		forwardRef(() => FriendsModule),
 	],
 	providers: [ChatService],
 	controllers: [ChatController],

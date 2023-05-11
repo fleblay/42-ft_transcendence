@@ -14,14 +14,18 @@ import { ChangeChannelDto } from './dto/change-channel.dto';
 import { ModifyMemberDto } from './dto/modify-member.dto';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 import { GameService } from 'src/game/game.service';
-import { ChannelInfo } from '../type';
+import { ChannelInfo, Friend } from '../type';
+import { FriendsService } from 'src/friends/friends.service';
 
 @Controller('chat')
 @UseGuards(ATGuard)
 export class ChatController {
 
 	constructor(
-		private chatService: ChatService, private userService: UsersService, private gameService : GameService
+		private chatService: ChatService,
+		private userService: UsersService,
+		private gameService: GameService,
+		private friendsService: FriendsService
 	) { }
 
 	// NOTE: DEBUG PURPOSES ONLY !
@@ -127,16 +131,18 @@ export class ChatController {
 	getChannelName(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): Promise<ChannelInfo | undefined> {
 		return this.chatService.getChannelInfo(user, channelId);
 	}
-
 	// NOTE: A TESTER
 	@Get('channels/:id/members')
 	async getChannelMembers(@Param('id', ValideIdPipe) channelId: number): Promise<Partial<Member>[]> {
 		let members = await this.chatService.getChannelMembers(channelId);
-		return members.map((member: Member) =>
-		({
-			...member,
-			isConnected: this.userService.isConnected(member.user.id),
-			...this.gameService.userState(member.user.id),
+		return Promise.all(members.map(async (member: Member) => {
+
+			member.user = {...member.user, friendId : (await this.friendsService.getFriendsList(member.user)).map((friend: Friend) => friend.id)}
+			return {
+				...member,
+				isConnected: this.userService.isConnected(member.user.id),
+				...this.gameService.userState(member.user.id),
+			}
 		}));
 	}
 
