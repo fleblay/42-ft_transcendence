@@ -26,7 +26,7 @@ const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
-function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Member | null>>, userId: number, event: string, memberList: memberList, blockedId?: number): memberList {
+function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Member | null>>, userId: number, event: string, memberList: memberList, targetId?: number): memberList {
 
 	for (const [key, value] of Object.entries(memberList)) {
 		const member: Member | undefined = value.find((member) => member.user.id == userId)
@@ -50,23 +50,43 @@ function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Memb
 					member.isConnected = false
 					break
 				case ("blocked"):
-					if (me != null && blockedId != undefined && me.user.id == userId)
-						me.user.blockedId.push(blockedId)
+					if (me != null && targetId != undefined && me.user.id == userId)
+						me.user.blockedId.push(targetId)
 						setMe(me)
 					break
 				case ("unblocked"):
-					if (me != null && blockedId != undefined && me.user.id == userId)
-						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != blockedId)
+					if (me != null && targetId != undefined && me.user.id == userId)
+						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != targetId)
 						setMe(me)
 					break
 				case ("me-blocked"):
-					if (me != null && blockedId && userId == me.user.id)
-						me.user.blockedId.push(blockedId)
+					if (me != null && targetId && userId == me.user.id)
+						me.user.blockedId.push(targetId)
 						setMe(me)
 					break
 				case ("me-unblocked"):
-					if (me != null && blockedId && userId == me.user.id)
-						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != blockedId)
+					if (me != null && targetId && userId == me.user.id)
+						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != targetId)
+						setMe(me)
+					break
+				case ("accept"):
+					if (me != null && targetId != undefined && me.user.id == userId)
+						me.user.friendId.push(targetId)
+						setMe(me)
+					break
+				case ("remove"):
+					if (me != null && targetId != undefined && me.user.id == userId)
+						me.user.friendId = me.user.friendId.filter((friend) => friend != targetId)
+						setMe(me)
+					break
+				case ("me-accept"):
+					if (me != null && targetId && targetId == me.user.id)
+						me.user.friendId.push(userId)
+						setMe(me)
+					break
+				case ("me-remove"):
+					if (me != null && targetId && targetId == me.user.id)
+						me.user.friendId = me.user.friendId.filter((friend) => friend != userId)
 						setMe(me)
 					break
 			}
@@ -162,11 +182,11 @@ export function MemberList({ channelId }: { channelId: string }) {
 			setMemberList(removeOldMember(leftMember.id, memberList))
 		}
 
-		function onPlayerEvent({ userId, event, blockedId }: { userId: number, blockedId?: number, event: string }) {
+		function onPlayerEvent({ userId, event, targetId }: { userId: number, targetId?: number, event: string }) {
 			if (!userId || !event)
 				return
 			console.log("onPlayerEvent", userId, event);
-			setMemberList(userUpDateState(me, setMe, userId, event, memberList, blockedId))
+			setMemberList(userUpDateState(me, setMe, userId, event, memberList, targetId))
 		}
 
 		customOn("chat.modify.members", onMemberUpdate);
