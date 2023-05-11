@@ -184,7 +184,7 @@ export const FriendsBrowser: FC = () => {
 					.map((friend: Friend, index, array) => {
 
 							return (
-							<FriendDisplay originalFriend={friend} index={index} array={array}/>
+							<FriendDisplay key={friend.id} originalFriend={friend} index={index} array={array}/>
 							)
 						})
 					}
