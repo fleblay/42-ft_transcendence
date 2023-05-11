@@ -167,6 +167,7 @@ export class ChatService implements OnModuleInit {
 			await this.channelsRepo.save(channel)
 			joiner = await this.membersRepo.save(joiner)
 		}
+		joiner.user = {...joiner.user, friendId : (await this.friendsService.getFriendsList(joiner.user)).map((friend: Friend) => friend.id)}
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
 			joinedMember: {
 				...joiner,
