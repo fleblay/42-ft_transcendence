@@ -643,7 +643,13 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.getDMChannel(user, { id: targetUser });
 		//console.log("findChannel : ", channel);
 		if (channel)
+		{
+			channel.members.forEach((member) => {
+				member.left = false;
+			});
+			await this.channelsRepo.save(channel);
 			return channel.id;
+		}
 		else {
 
 			const directMessage = {
@@ -665,4 +671,16 @@ export class ChatService implements OnModuleInit {
 			return channelId;
 		}
 	}
+
+	async leaveDirectMessage(user: User) {
+		const channel = await this.getDMChannel(user, { id: user.id });
+		if (!channel)
+			return;
+		channel.members.forEach((member) => {
+			member.left = true;
+		});
+		await this.channelsRepo.save(channel);
+	
+	}
 }
+
