@@ -92,21 +92,25 @@ export function ChatPage() {
 	return (
 		<>
 			<Container maxWidth="xl" sx={{ maxHeight: '100px', minHeight: '100px' }}>
-				<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+				<AppBar position="static"
+					sx={({ shape }) => ({
+						borderRadius: `${shape.borderRadius}px ${shape.borderRadius}px 0 0`,
+						height: '80px'
+					})}>
 					<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 						Chat
 					</Typography>
 				</AppBar>
-				<Box sx={{
+				<Box sx={({ shape }) => ({
 					width: '100%',
 					border: '1px solid #D3C6C6',
 					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-					borderRadius: '0 0 16px 16px',
+					borderRadius: `0 0 ${shape.borderRadius}px ${shape.borderRadius}px`,
 					p: '2rem',
 					bgcolor: 'background.paper',
 					maxHeight: 'calc(100vh - 80px)',
 					overflowY: 'scroll'
-				}}>
+				})}>
 					<MyChannels channelInfo={channelInfo} channelId={channelId || ''} />
 				</Box>
 			</Container >
