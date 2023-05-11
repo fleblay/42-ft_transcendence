@@ -1,12 +1,84 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { List, ListItem, ListItemButton, ListItemText, Avatar, Badge } from "@mui/material";
 import { Link as LinkRouter, useNavigate, useParams } from "react-router-dom";
 import { SocketContext } from '../../socket/SocketProvider';
 
-import { Channel } from "../../types";
+import { Channel, Friend, Member } from "../../types";
 import { useAuthService } from "../../auth/AuthService";
 import { StyledBadge } from "./ChatFriendsBrowser";
+
+
+interface FriendDisplayProps {
+	originalMember: Member;
+	channel: Channel;
+	mooveToChannel: (channelId: number) => void;
+}
+
+
+const FriendDisplay: FC<FriendDisplayProps> = ({ originalMember, channel, mooveToChannel }) => {
+	const navigate = useNavigate();
+	const [member, setMember] = useState<Member>(originalMember);
+	const { addSubscription, customOn, customOff } = useContext(SocketContext);
+
+	useEffect(() => {
+		return addSubscription(`/player/${member.user.id}`);
+	}, []);
+
+	useEffect(() => {
+		function onFriendUpdate({ userId, event }: { userId: number, event: string }) {
+			console.log("onFriendUpdate", userId, event);
+			switch (event) {
+				case "connected":
+					setMember((oldMember) => {
+						return { ...oldMember, isConnected: true };
+					});
+					break;
+				case "disconnected":
+					setMember((oldMember) => {
+						return { ...oldMember, isConnected: false };
+					});
+					break;
+				default:
+					break;
+
+			}
+		}
+		customOn("page.player", onFriendUpdate);
+		return () => {
+			customOff("page.player", onFriendUpdate);
+		}
+	}, [member])
+
+	const joinDm = (userId: number) => {
+		apiClient.post(`/api/chat/dm/${userId}/join`).then((response) => {
+			console.log("joinChannel", response);
+			navigate(`/chat/${response.data}`);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}
+
+	return (
+		<ListItem key={channel.id} sx={{ pl: 4 }} >
+			<ListItemButton onClick={() => mooveToChannel(channel.id)}>
+				<StyledBadge
+					overlap="circular"
+					anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+					variant="dot"
+					color={member.isConnected ? "success" : "error"}
+				>
+					<Avatar src={`/avatars/${member.user.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
+				</StyledBadge>
+				<Badge badgeContent={channel.unreadMessages} color="primary">
+					<ListItemText primary={member.user.username} />
+				</Badge>
+			</ListItemButton>
+
+		</ListItem>
+	)
+}
+
 
 
 export function MyDirectMessageList() {
@@ -82,29 +154,12 @@ export function MyDirectMessageList() {
 			maxHeight: 300,
 
 		}}>
-
-
 			{Object.values(myDmList)
 				.sort((a: Channel, b: Channel) => b.unreadMessages - a.unreadMessages)
 				.map((channel: Channel) => {
 					const friend = channel.members[0].user.id == auth.user?.id ? channel.members[1] : channel.members[0];
 					return (
-						<ListItem key={channel.id} sx={{ pl: 4 }} >
-							<ListItemButton onClick={() => mooveToChannel(channel.id)}>
-								<StyledBadge
-									overlap="circular"
-									anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-									variant="dot"
-									color={friend.isConnected ? "success" : "error"}
-								>
-									<Avatar src={`/avatars/${friend.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
-								</StyledBadge>
-								<Badge badgeContent={channel.unreadMessages} color="primary">
-									<ListItemText primary={friend.user.username} />
-								</Badge>
-							</ListItemButton>
-
-						</ListItem>
+						<FriendDisplay key={channel.id} originalMember={friend} channel={channel} mooveToChannel={mooveToChannel} />
 					)
 				})
 
