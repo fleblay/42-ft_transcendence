@@ -104,7 +104,7 @@ export class ChatService implements OnModuleInit {
 		const channel = await this.channelsRepo.findOne({
 			where: { id: channelId },
 			relations: { members: { user: true } },
-			select: { id: true, private: true, name: true, members: { id: true, role: true, banned: true, left: true, muteTime: true, user: { id: true, username: true } } }
+			select: { id: true, private: true, directMessage : true,  name: true, members: { id: true, role: true, banned: true, left: true, muteTime: true, user: { id: true, username: true } } }
 		})
 		//console.log("joinChannel : ", channel, options)
 		if (!channel)
@@ -194,6 +194,7 @@ export class ChatService implements OnModuleInit {
 				muteTime: true,
 				channel: {
 					id: true,
+					directMessage: true,
 				},
 				user: {
 					id: true,
@@ -230,8 +231,10 @@ export class ChatService implements OnModuleInit {
 			content: messageData.content
 		});
 		await this.messagesRepo.save(newMessage);
+		console.log("newMessage : ", newMessage);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
 		const nameOfEmmiter = newMessage.channel.directMessage ? "unreadMessage.dm" : "unreadMessage.channel";
+		console.log ("newMessage : ", nameOfEmmiter)
 		this.emitToAllMembers(channelId, nameOfEmmiter, async (member: Member) => {
 			const unreadMessages = await this.getUnreadMessages(member.user, channelId);
 			return {
@@ -365,6 +368,7 @@ export class ChatService implements OnModuleInit {
 			relations: ['members', 'members.user'],
 			select: {
 				id: true,
+				directMessage: true,
 				members: {
 					id: true,
 					role: true,
@@ -424,6 +428,7 @@ export class ChatService implements OnModuleInit {
 			where: { id: channelId },
 			select: {
 				id: true,
+				directMessage: true,
 				name: true,
 				password: true,
 				private: true,
@@ -523,6 +528,7 @@ export class ChatService implements OnModuleInit {
 				name: true,
 				private: true,
 				password: true,
+				directMessage: true,
 				members: {
 					id: true,
 					left: true,
