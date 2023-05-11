@@ -139,7 +139,7 @@ export type Channel = {
 export type PlainMember = {
 	id: number;
 	role: string;
-	user: { id: number, username: string; };
+	user: { id: number, username: string; blockedId : number[]};
 	muteTime: string,
 	banned: boolean,
 	left: boolean
