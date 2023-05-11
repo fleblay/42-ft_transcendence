@@ -83,8 +83,8 @@ export class FriendsService {
 		friendRequest.status = 'accepted';
 		this.friendReqRepo.save(friendRequest);
 		this.usersService.unblockUser(user, friendId);
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
-		this.server.to(`/player/${friendId}`).emit('page.player', {})
+		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : friendId, event: "accept" })
+		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId : friendId, event: "me-accept" })
 
 		const friendData = this.generateFriend(user, friend, friendRequest);
 		this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', {
@@ -104,14 +104,8 @@ export class FriendsService {
 		}
 		const removeFriend = this.generateFriend(user, friendRequest.sender.id === user.id ? friendRequest.receiver : friendRequest.sender, friendRequest);
 		this.friendReqRepo.softRemove(friendRequest);
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
-		this.server.to(`/player/${friendId}`).emit('page.player', {})
-		
-		this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', {
-			status: 'removed',
-			friend: removeFriend,
-		})		
-		this.chatService.leaveDirectMessage(user, friendId);
+		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : friendId, event: "remove" })
+		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId : friendId, event: "me-remove" })
 		return {
 			friendId: friendId,
 			status: 'declined'

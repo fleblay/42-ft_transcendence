@@ -38,6 +38,7 @@ export class AuthService {
 		this.usersService.update(userID, { dfa: true })
 	}
 
+
 	is2faCodeValid(dfaCode: string, user: User) {
 		console.log("is2facodevalid")
 		return authenticator.verify({ token: dfaCode, secret: user.dfaSecret })

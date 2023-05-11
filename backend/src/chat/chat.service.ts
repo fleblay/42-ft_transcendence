@@ -222,6 +222,7 @@ export class ChatService implements OnModuleInit {
 			},
 		});
 	}
+
 	private memberIsAllowed(member: Member, ignore: { banned?: boolean, left?: boolean, mute?: boolean } = {}): boolean {
 		if (ignore.banned !== true && member.banned)
 			throw new BadRequestException('You are banned from this channel');

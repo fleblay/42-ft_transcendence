@@ -21,7 +21,7 @@ import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 export class UsersService implements OnModuleInit {
 
 	private connectedUsers: Map<number, UserStatus[]> = new Map<number, UserStatus[]>();
-	private server : Server;
+	private server: Server;
 	constructor(
 		@InjectRepository(User) private repo: Repository<User>,
 		@Inject(forwardRef(() => GameService)) private gameService: GameService,
@@ -49,7 +49,7 @@ export class UsersService implements OnModuleInit {
 
 	create(dataUser: Partial<User>) {
 		//console.log(`create user ${dataUser?.username} : ${dataUser?.email} : ${dataUser?.password}`);
-		const user = this.repo.create({ ...dataUser, dfaSecret: authenticator.generateSecret()})
+		const user = this.repo.create({ ...dataUser, dfaSecret: authenticator.generateSecret() })
 		console.log("save user :", user);
 		return this.repo.save(user);
 	}
@@ -65,13 +65,14 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	findOne(id: number, withGames: boolean = false) {
+	async findOne(id: number, withGames: boolean = false) {
 		if (!id || typeof id !== 'number') return null;
 		if (id < 0 || id > 2147483647) return null;
-		return this.repo.findOne({
+		let foundUser: User | null = await this.repo.findOne({
 			where: { id },
 			relations: withGames ? ["savedGames", "wonGames"] : []
 		})
+		return foundUser
 	}
 
 	async findOneByUsername(username: string) {
@@ -172,8 +173,8 @@ export class UsersService implements OnModuleInit {
 		}
 		this.friendsService.removeFriend(user, blockedId);
 		user.blockedId.push(blockedId);
-		this.server.to(`/player/${user.id}`).emit('page.player', {userId: user.id, blockedId, event : "blocked"})
-		this.server.to(`/player/${blockedId}`).emit('page.player', {userId: user.id, blockedId, event: "me-blocked"})
+		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : blockedId, event: "blocked" })
+		this.server.to(`/player/${blockedId}`).emit('page.player', { userId: user.id, targetId : blockedId, event: "me-blocked" })
 		const updatedUser = await this.repo.save(user);
 		return updatedUser
 	}
@@ -185,14 +186,14 @@ export class UsersService implements OnModuleInit {
 			return;
 		}
 		user.blockedId.splice(index, 1);
-		this.server.to(`/player/${user.id}`).emit('page.player', {userId: user.id, blockedId, event : "unblocked"})
-		this.server.to(`/player/${blockedId}`).emit('page.player', {userId: user.id, blockedId, event: "me-unblocked"})
+		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : blockedId, event: "unblocked" })
+		this.server.to(`/player/${blockedId}`).emit('page.player', { userId: user.id, targetId : blockedId, event: "me-unblocked" })
 		const updatedUser = await this.repo.save(user);
 		return updatedUser
 	}
 
 
-	async getBlocked(user: User, friendId: number): Promise <ShortUser | null> {
+	async getBlocked(user: User, friendId: number): Promise<ShortUser | null> {
 		if (!user)
 			throw new NotFoundException("User not found");
 		if (user.blockedId.includes(friendId)) {
@@ -220,7 +221,8 @@ export class UsersService implements OnModuleInit {
 		return BlockedList;
 	}
 
-	dfa(user: User): Promise<User | null> {
-		return this.update(user.id, {dfa: !user.dfa})
+	async dfa(user: User): Promise<void> {
+		await this.update(user.id, { dfa: !user.dfa })
+		return
 	}
 }

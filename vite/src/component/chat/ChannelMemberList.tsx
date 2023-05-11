@@ -10,6 +10,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import BlockIcon from '@mui/icons-material/Block';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
 import { MuteMemberModal } from "./MuteMemberModal";
@@ -25,7 +26,7 @@ const greenColor: string = "#44b700"
 const redColor: string = "#ff0000"
 const emptyMemberList: memberList = { admins: [], banned: [], muted: [], regulars: [] }
 
-function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Member | null>>, userId: number, event: string, memberList: memberList, blockedId?: number): memberList {
+function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Member | null>>, userId: number, event: string, memberList: memberList, targetId?: number): memberList {
 
 	for (const [key, value] of Object.entries(memberList)) {
 		const member: Member | undefined = value.find((member) => member.user.id == userId)
@@ -49,23 +50,43 @@ function userUpDateState(me: Member | null, setMe : Dispatch<SetStateAction<Memb
 					member.isConnected = false
 					break
 				case ("blocked"):
-					if (me != null && blockedId != undefined && me.user.id == userId)
-						me.user.blockedId.push(blockedId)
+					if (me != null && targetId != undefined && me.user.id == userId)
+						me.user.blockedId.push(targetId)
 						setMe(me)
 					break
 				case ("unblocked"):
-					if (me != null && blockedId != undefined && me.user.id == userId)
-						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != blockedId)
+					if (me != null && targetId != undefined && me.user.id == userId)
+						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != targetId)
 						setMe(me)
 					break
 				case ("me-blocked"):
-					if (me != null && blockedId && userId == me.user.id)
-						me.user.blockedId.push(blockedId)
+					if (me != null && targetId && userId == me.user.id)
+						me.user.blockedId.push(targetId)
 						setMe(me)
 					break
 				case ("me-unblocked"):
-					if (me != null && blockedId && userId == me.user.id)
-						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != blockedId)
+					if (me != null && targetId && userId == me.user.id)
+						me.user.blockedId = me.user.blockedId.filter((blocked) => blocked != targetId)
+						setMe(me)
+					break
+				case ("accept"):
+					if (me != null && targetId != undefined && me.user.id == userId)
+						me.user.friendId.push(targetId)
+						setMe(me)
+					break
+				case ("remove"):
+					if (me != null && targetId != undefined && me.user.id == userId)
+						me.user.friendId = me.user.friendId.filter((friend) => friend != targetId)
+						setMe(me)
+					break
+				case ("me-accept"):
+					if (me != null && targetId && targetId == me.user.id)
+						me.user.friendId.push(userId)
+						setMe(me)
+					break
+				case ("me-remove"):
+					if (me != null && targetId && targetId == me.user.id)
+						me.user.friendId = me.user.friendId.filter((friend) => friend != userId)
 						setMe(me)
 					break
 			}
@@ -161,11 +182,11 @@ export function MemberList({ channelId }: { channelId: string }) {
 			setMemberList(removeOldMember(leftMember.id, memberList))
 		}
 
-		function onPlayerEvent({ userId, event, blockedId }: { userId: number, blockedId?: number, event: string }) {
+		function onPlayerEvent({ userId, event, targetId }: { userId: number, targetId?: number, event: string }) {
 			if (!userId || !event)
 				return
 			console.log("onPlayerEvent", userId, event);
-			setMemberList(userUpDateState(me, setMe, userId, event, memberList, blockedId))
+			setMemberList(userUpDateState(me, setMe, userId, event, memberList, targetId))
 		}
 
 		customOn("chat.modify.members", onMemberUpdate);
@@ -369,6 +390,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 						>
 							<Avatar alt="User Photo" src={`/avatars/${member.user.id}.png`} />
 						</Badge>
+
 						<Box sx={{ display: "flex", alignContent: "center" }} >
 							{`${member.user.username}`}
 							{member.role == "owner" && <MilitaryTechIcon />}
@@ -376,6 +398,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 							{member.states.includes("ingame") && <VideogameAssetIcon />}
 							{member.states.includes("watching") && <VisibilityIcon />}
 							{me!.user.blockedId.includes(member.user.id) && <BlockIcon />}
+							{me!.user.friendId.includes(member.user.id) && <FavoriteBorderIcon />}
 						</Box>
 						<Box sx={{ marginLeft: "auto" }}>
 							<GenerateMemberActionList member={member} />

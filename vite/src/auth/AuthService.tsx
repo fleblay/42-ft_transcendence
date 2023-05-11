@@ -31,6 +31,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 			const response = await apiClient.get('/api/users/me');
 			if (response.status === 200) {
 				setUser(response.data);
+				console.log("AuthService : me is :", response.data)
 			}
 		} catch (error) {
 			console.log("Not connected", error);

@@ -7,7 +7,7 @@ import { GameService } from '../game/game.service';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { ATGuard } from './guard/access-token.guard';
 import { CurrentUser } from './decorators/current-user.decorator'
-import { UserInfo, UserScore } from '../type'
+import { Friend, UserInfo, UserScore } from '../type'
 import { User } from "../model/user.entity";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
@@ -18,6 +18,7 @@ import { UserDto } from './dtos/user.dto';
 import { FriendRequestStatus } from '../model/friend-request.entity';
 import { Request as ExpressRequest } from 'express';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
+import { FriendsService } from '../friends/friends.service';
 
 @Controller('users')
 export class UsersController {
@@ -26,6 +27,7 @@ export class UsersController {
 		private authService: AuthService,
 		@Inject(forwardRef(() => GameService))
 		private gameService: GameService,
+		private friendsService: FriendsService,
 	) { }
 
 	@UseGuards(ATGuard)
@@ -58,12 +60,17 @@ export class UsersController {
 	@Get('/me')
 	@UseGuards(ATGuard)
 	@Serialize(UserDto)
-	getMe(@Request() req: ExpressRequest) {
+	async getMe(@Request() req: ExpressRequest) {
 		const token = req.cookies['access_token'];
 		if (!token) {
 			throw new ForbiddenException('User not found');
 		}
-		return this.authService.validateAccessToken(token);
+		let foundUser : User | null = await this.authService.validateAccessToken(token);
+		if (foundUser) {
+			const friendId: number[] = (await this.friendsService.getFriendsList(foundUser))
+				.map((friend : Friend) => friend.id)
+			return {...foundUser, friendId}
+		}
 	}
 
 	@Patch('/me')
