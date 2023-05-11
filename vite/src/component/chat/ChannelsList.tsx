@@ -43,7 +43,7 @@ export function MyChannelsList() {
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
 			console.log("onModifyChannel", data)
-			if (!data)
+			if (!data || data.directMessage == true)
 				return;
 			setMyChannelsList(channelList => ({ ...channelList, [data.id]: data }));
 		}
@@ -55,6 +55,7 @@ export function MyChannelsList() {
 				navigate(`/chat`);
 		}
 		function onUnreadMessage(data: { unreadMessages: number, id: number }) {
+			console.log("onUnreadMessage.channel", data);
 			if (!channelId || +channelId != data.id)
 				setMyChannelsList(channelList => ({ ...channelList, [data.id]: { ...channelList[data.id], unreadMessages: data.unreadMessages } }));
 		}

@@ -145,7 +145,7 @@ export class ChatService implements OnModuleInit {
 			if (member.banned)
 				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is banned from the channel`)
 			if (!member.left)
-				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is already in the channel`)
+				return;
 			else {
 				member.left = false
 				joiner = await this.membersRepo.save(member)
@@ -211,6 +211,7 @@ export class ChatService implements OnModuleInit {
 				muteTime: true,
 				channel: {
 					id: true,
+					directMessage: true,
 				},
 				user: {
 					id: true,
@@ -248,8 +249,10 @@ export class ChatService implements OnModuleInit {
 			content: messageData.content
 		});
 		await this.messagesRepo.save(newMessage);
+		console.log("newMessage : ", newMessage);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
 		const nameOfEmmiter = newMessage.channel.directMessage ? "unreadMessage.dm" : "unreadMessage.channel";
+		console.log ("newMessage : ", nameOfEmmiter)
 		this.emitToAllMembers(channelId, nameOfEmmiter, async (member: Member) => {
 			const unreadMessages = await this.getUnreadMessages(member.user, channelId);
 			return {
@@ -383,6 +386,7 @@ export class ChatService implements OnModuleInit {
 			relations: ['members', 'members.user'],
 			select: {
 				id: true,
+				directMessage: true,
 				members: {
 					id: true,
 					role: true,
@@ -443,6 +447,7 @@ export class ChatService implements OnModuleInit {
 			where: { id: channelId },
 			select: {
 				id: true,
+				directMessage: true,
 				name: true,
 				password: true,
 				private: true,
@@ -542,6 +547,7 @@ export class ChatService implements OnModuleInit {
 				name: true,
 				private: true,
 				password: true,
+				directMessage: true,
 				members: {
 					id: true,
 					left: true,

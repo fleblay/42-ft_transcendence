@@ -33,8 +33,10 @@ const themeLight = createTheme({
 		primary: {
 			main: "#3f51b5"
 		},
-
-	}
+	},
+	shape: {
+		borderRadius: 16
+	},
 });
 
 const themeDark = createTheme({

@@ -100,6 +100,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 						}
 						return acc;
 					}, []).map((messages: Message[], i: number) => {
+						if (messages.length === 0) return null;
 						return (
 							<ChatMsg
 								key={i}
@@ -107,6 +108,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 								avatar={`/avatars/${messages[0].owner.user.id}.png`}
 								messages={messages}
 								username={messages[0].owner.user.username}
+								blocked={user?.blockedId.includes(messages[0].owner.user.id)}
 							/>
 						);
 					})

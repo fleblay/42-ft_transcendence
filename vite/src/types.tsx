@@ -134,6 +134,7 @@ export type Channel = {
 	hasPassword: boolean,
 	members: Member[],
 	unreadMessages: number,
+	directMessage: boolean,
 }
 
 export type PlainMember = {
