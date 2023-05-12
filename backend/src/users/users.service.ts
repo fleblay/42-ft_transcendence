@@ -33,6 +33,10 @@ export class UsersService implements OnModuleInit {
 		this.server = server;
 	}
 
+	get wsServer() {
+		return this.server
+	}
+
 	async onModuleInit() {
 		const adminUser = await this.repo.findOne({ where: { username: "admin" } })
 		if (!adminUser) {

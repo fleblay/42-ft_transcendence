@@ -239,6 +239,7 @@ export class Game {
 		savedGame.players = this.players.map((player) => player.user);
 		savedGame.score = this.players.map((player) => player.score);
 		savedGame.winner = (this.players[0].score > this.players[1].score) ? this.players[0].user : this.players[1].user;
+		console.log("generateSavedGamedInfo : ", savedGame)
 		return savedGame;
 	}
 
