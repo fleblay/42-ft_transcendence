@@ -10,19 +10,39 @@ import { ErrorProviderContext } from '../ErrorProvider/ErrorProvider';
 export function MyError() {
     const {error, setError} = React.useContext(ErrorProviderContext);
     const [severity, setSeverity] = React.useState<"error" | "success" | "info" | "warning">("error");
+    const [message, setMessage] = React.useState<string>("");
 
     const [open, setOpen] = React.useState(false);
 
     React.useEffect(() => {
         if (error) {
+            console.log("error in my error", error);
             setOpen(true);
-            if (error.code === 401) {
-                setSeverity("warning");
-            } else {
-                setSeverity("error");
-            }
+            switch (error.status) {
+                case 400:
+                    setMessage("Bad request");
+                    setSeverity("error");
+                    break;
+                case 401:
+                    setMessage("You are not logged in");
+                    setSeverity("warning");
+                    break;
+                case 403:
+                    setMessage("You are not allowed to do this");
+                    setSeverity("warning");
+                    break;
+                case 404:
+                    setMessage("This page does not exist");
+                    setSeverity("warning");
+                    break;
+                default:
+                    setMessage("An error occured, for more explication call the admin Mbraets on discord");
+                    setSeverity("error");
+                    break;
         }
-    }, [error]);
+        }
+
+    }, [error, message]);
 
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -37,9 +57,9 @@ export function MyError() {
     return (
         <>
         { error ? 
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical:"bottom", horizontal:'center' }}>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical:"top", horizontal:'center' }}>
                 <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
-                    {error?.message}
+                    {message}
                 </Alert>
             </Snackbar>
             : null

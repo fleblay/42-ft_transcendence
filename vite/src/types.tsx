@@ -183,5 +183,5 @@ export interface PublicChannel {
 
 export type Error = {
 	message: string,
-	code: number,
+	status: number,
 }
