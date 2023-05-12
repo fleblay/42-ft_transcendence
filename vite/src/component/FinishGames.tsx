@@ -21,7 +21,7 @@ export function FinishGames() {
 
 	useEffect(() => {
 		apiClient.get(`/api/game/list/${gamePage}`).then((response) => {
-			console.log(response.data);
+			console.log("gameList :", response.data);
 			setListGames(response.data)
 		})
 			.catch(() => {
@@ -67,7 +67,7 @@ export function FinishGames() {
 								</TableCell>
 								<TableCell align="right">{game.score.sort((a: number, b: number) => b - a).map((score: number) => score.toString()).join(' ')}</TableCell>
 								<TableCell align="right">{game.date}</TableCell>
-								<TableCell align="right">{game.winner.username}</TableCell>
+								<TableCell align="right">{game.winner?.username}</TableCell>
 							</TableRow>
 						))}
 					</TableBody>
