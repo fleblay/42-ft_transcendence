@@ -32,7 +32,8 @@ export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame>
 		rankArray.sort((a, b) => b.points - a.points)
 		await Promise.all(allUserDB.map((user) => {
 			user.rank = rankArray.findIndex((rank) => rank.userId == user.id) + 1
-			this.usersService.secureUpdate(user.id, user)
+			this.usersService.wsServer.to(`/player/${user.id}`).emit('page.player', { userId: user.id, event: `rank-${user.rank}` })
+			return this.usersService.secureUpdate(user.id, user)
 		}))
 	}
 }
