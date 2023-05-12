@@ -155,6 +155,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 	const auth = useAuthService()
 	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 	const [memberList, setMemberList] = useState<memberList>(emptyMemberList);
+	const [memberListFetched, setMemberListFetched] = useState<boolean>(false);
 	const [me, setMe] = useState<Member | null>(null);
 	const navigate = useNavigate()
 
@@ -162,13 +163,15 @@ export function MemberList({ channelId }: { channelId: string }) {
 	//On ajout un on sur l'event chat.member.update
 	//Le call back prend en param la memberList qui est update apres le premier api.Client.get
 	useEffect(() => {
+		if (!memberListFetched)
+			return
 		function onMemberUpdate({ modifyMember: upDatedMember }: { modifyMember: Member }) {
 			console.log("onMemberUpdate", upDatedMember);
 			removeOldMember(upDatedMember.id, memberList)
 			setMemberList(addNewMember(upDatedMember, memberList))
 			if (upDatedMember.id == me!.id) {
 				console.log("I have changed : ", upDatedMember)
-					setMe(upDatedMember)
+				setMe(upDatedMember)
 				if (upDatedMember.left)
 					navigate(`/chat`);
 			}
@@ -206,7 +209,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					fx()
 			})
 		})
-	}, [memberList])
+	}, [memberListFetched])
 
 
 	useEffect(() => {
@@ -230,7 +233,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 			console.log("Je suis : ", me)
 		}).catch((error) => {
 			console.log(error);
-		});
+		}).then(() => setMemberListFetched(true))
 	}, [channelId]);
 
 	function GenerateMemberActionList({ member }: { member: Member }): JSX.Element {
@@ -399,7 +402,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 						</Badge>
 
 						<Box sx={{ display: "flex", alignContent: "center" }} >
-							{`${member.user.username}`}
+							{`${member.user.rank != -1 ? ("#" + member.user.rank) : ""} - ${member.user.username}`}
 							{member.role == "owner" && <MilitaryTechIcon />}
 							{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}
 							{member.states.includes("ingame") && <VideogameAssetIcon />}
