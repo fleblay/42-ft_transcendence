@@ -19,6 +19,7 @@ import { Member } from './model/member.entity';
 import { Message } from './model/message.entity';
 import { Channel } from './model/channel.entity';
 import { SavedGameSubscriber } from './model/saved-game.subscriber';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
 	imports: [
@@ -52,7 +53,8 @@ import { SavedGameSubscriber } from './model/saved-game.subscriber';
 		GameModule,
 		AuthModule,
 		FriendsModule,
-		ChatModule
+		ChatModule,
+		NotificationModule
 	],
 	controllers: [AppController],
 	providers: [

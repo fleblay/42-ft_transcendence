@@ -1,4 +1,4 @@
-import { AfterInsert, AfterUpdate, AfterRemove, Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, JoinTable } from "typeorm";
+import { AfterInsert, AfterUpdate, AfterRemove, Column, DeleteDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, JoinTable, CreateDateColumn } from "typeorm";
 import { Channel } from "./channel.entity";
 import { Message } from "./message.entity";
 import { User } from "./user.entity";
@@ -22,6 +22,11 @@ export class Notification {
     @OneToOne(() => Message, message => message.owner)
     newMessage : Message;
 
+	@Column({ default: false })
+	read: boolean;
+	
+	@CreateDateColumn()
+	createdAt: Date;
     // for invitation 
     
 	@DeleteDateColumn()
