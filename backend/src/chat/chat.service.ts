@@ -77,7 +77,8 @@ export class ChatService implements OnModuleInit {
 					user: {
 						id: true,
 						username: true,
-						blockedId: true
+						blockedId: true,
+						friendId: true
 					},
 				},
 			}
@@ -122,7 +123,8 @@ export class ChatService implements OnModuleInit {
 					user: {
 						id: true,
 						username: true,
-						blockedId: true
+						blockedId: true,
+						friendId: true
 					}
 				}
 			}
@@ -167,7 +169,7 @@ export class ChatService implements OnModuleInit {
 			await this.channelsRepo.save(channel)
 			joiner = await this.membersRepo.save(joiner)
 		}
-		joiner.user = {...joiner.user, friendId : (await this.friendsService.getFriendsList(joiner.user)).map((friend: Friend) => friend.id)}
+		//joiner.user = {...joiner.user, friendId : (await this.friendsService.getFriendsList(joiner.user)).map((friend: Friend) => friend.id)}
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.new', {
 			joinedMember: {
 				...joiner,
@@ -222,6 +224,7 @@ export class ChatService implements OnModuleInit {
 					id: true,
 					username: true,
 					blockedId: true,
+					friendId: true
 				}
 			},
 		});
@@ -314,7 +317,7 @@ export class ChatService implements OnModuleInit {
 				gameId: true,
 				content: true,
 				createdAt: true,
-				owner: { user: { id: true, username: true, blockedId: true }, role: true, banned: true, left: true, muteTime: true },
+				owner: { user: { id: true, username: true, blockedId: true, friendId: true}, role: true, banned: true, left: true, muteTime: true },
 			},
 			skip: offset,
 			take: 10,
@@ -339,7 +342,7 @@ export class ChatService implements OnModuleInit {
 				banned: true,
 				muteTime: true,
 				left: true,
-				user: { id: true, username: true, blockedId: true },
+				user: { id: true, username: true, blockedId: true, friendId: true},
 			},
 		});
 		return members
@@ -411,7 +414,8 @@ export class ChatService implements OnModuleInit {
 					user: {
 						id: true,
 						username: true,
-						blockedId: true
+						blockedId: true,
+						friendId: true
 					}
 				}
 			}
@@ -443,7 +447,7 @@ export class ChatService implements OnModuleInit {
 			modifyMember.muteTime = new Date(options.mute)
 		}
 		await this.membersRepo.save(modifyMember)
-		modifyMember.user = {...modifyMember.user, friendId : (await this.friendsService.getFriendsList(modifyMember.user)).map((friend: Friend) => friend.id)}
+		//modifyMember.user = {...modifyMember.user, friendId : (await this.friendsService.getFriendsList(modifyMember.user)).map((friend: Friend) => friend.id)}
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.members', {
 			modifyMember: {
 				...modifyMember,
@@ -568,7 +572,7 @@ export class ChatService implements OnModuleInit {
 					id: true,
 					left: true,
 					role: true,
-					user: { id: true, username: true, blockedId: true },
+					user: { id: true, username: true, blockedId: true, friendId : true},
 				},
 			},
 			relationLoadStrategy: "query",
@@ -594,7 +598,7 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
-					user: { id: true, username: true, blockedId: true},
+					user: { id: true, username: true, blockedId: true, friendId: true},
 					left: true,
 				},
 			},
@@ -665,7 +669,7 @@ export class ChatService implements OnModuleInit {
 					directMessage: true,
 					members: {
 						id: true,
-						user: { id: true, username: true, blockedId: true },
+						user: { id: true, username: true, blockedId: true, friendId: true},
 					},
 				},
 			},

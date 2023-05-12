@@ -66,11 +66,14 @@ export class UsersController {
 			throw new ForbiddenException('User not found');
 		}
 		let foundUser : User | null = await this.authService.validateAccessToken(token);
+		/*
 		if (foundUser) {
 			const friendId: number[] = (await this.friendsService.getFriendsList(foundUser))
 				.map((friend : Friend) => friend.id)
 			return {...foundUser, friendId}
 		}
+		*/
+	   return foundUser
 	}
 
 	@Patch('/me')

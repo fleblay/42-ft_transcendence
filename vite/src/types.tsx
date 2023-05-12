@@ -94,6 +94,7 @@ export type plainUser = {
 	stud: boolean,
 	dfa: boolean,
 	blockedId: number[],
+	friendId: number[],
 }
 
 export type UserInfo = plainUser & {

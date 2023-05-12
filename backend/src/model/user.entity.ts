@@ -20,7 +20,11 @@ export class User {
 	@Column("int", { array: true, default: [] })
 	blockedId: number[];
 
-	friendId?: number[];
+	@Column("int", { array: true, default: [] })
+	friendId: number[];
+
+	@Column({default : -1})
+	rank: number
 
 	@Column({default : false})
 	stud : boolean;

@@ -15,8 +15,6 @@ import { ChatService } from '../chat/chat.service';
 import { authenticator } from 'otplib';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 
-
-
 @Injectable()
 export class UsersService implements OnModuleInit {
 
@@ -191,7 +189,6 @@ export class UsersService implements OnModuleInit {
 		const updatedUser = await this.repo.save(user);
 		return updatedUser
 	}
-
 
 	async getBlocked(user: User, friendId: number): Promise<ShortUser | null> {
 		if (!user)
