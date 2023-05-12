@@ -18,6 +18,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { Member } from './model/member.entity';
 import { Message } from './model/message.entity';
 import { Channel } from './model/channel.entity';
+import { SavedGameSubscriber } from './model/saved-game.subscriber';
 
 @Module({
 	imports: [
@@ -42,7 +43,8 @@ import { Channel } from './model/channel.entity';
 					Member,
 					Message,
 					Channel
-				]
+				],
+				subscribers : [SavedGameSubscriber]
 			})
 		}),
 		UsersModule,

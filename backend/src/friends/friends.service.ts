@@ -83,6 +83,14 @@ export class FriendsService {
 		friendRequest.status = 'accepted';
 		this.friendReqRepo.save(friendRequest);
 		this.usersService.unblockUser(user, friendId);
+
+		//FriendId
+		user.friendId.push(friendId)
+		friend.friendId.push(user.id)
+		await this.usersService.update(user.id, user);
+		await this.usersService.update(friend.id, friend);
+		//FriendId
+
 		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : friendId, event: "accept" })
 		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId : friendId, event: "me-accept" })
 
@@ -97,6 +105,11 @@ export class FriendsService {
 	}
 
 	async removeFriend(user: User, friendId: number) {
+		const friend = await this.usersService.findOne(friendId);
+		if (!friend) {
+			console.log("User not found");
+			return;
+		}
 		const friendRequest = await this.getFriendRequest(user, friendId);
 		if (!friendRequest) {
 			console.log("You are not friends with this user");
@@ -104,6 +117,21 @@ export class FriendsService {
 		}
 		const removeFriend = this.generateFriend(user, friendRequest.sender.id === user.id ? friendRequest.receiver : friendRequest.sender, friendRequest);
 		this.friendReqRepo.softRemove(friendRequest);
+
+		//FriendId
+		const indexInUser = user.friendId.indexOf(friendId);
+		const indexInFriend = friend.friendId.indexOf(user.id);
+		if (indexInUser === -1 || indexInFriend === -1) {
+			console.log("FriendId missing an element");
+			return;
+		}
+		user.friendId.splice(indexInUser, 1);
+		friend.friendId.splice(indexInFriend, 1);
+		await this.usersService.update(user.id, user);
+		await this.usersService.update(friend.id, friend);
+		//FriendId
+
+
 		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : friendId, event: "remove" })
 		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId : friendId, event: "me-remove" })
 		return {

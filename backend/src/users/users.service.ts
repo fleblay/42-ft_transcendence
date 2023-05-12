@@ -15,8 +15,6 @@ import { ChatService } from '../chat/chat.service';
 import { authenticator } from 'otplib';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 
-
-
 @Injectable()
 export class UsersService implements OnModuleInit {
 
@@ -26,7 +24,7 @@ export class UsersService implements OnModuleInit {
 		@InjectRepository(User) private repo: Repository<User>,
 		@Inject(forwardRef(() => GameService)) private gameService: GameService,
 		@Inject(forwardRef(() => FriendsService)) private friendsService: FriendsService,
-		private chatService: ChatService
+		private chatService: ChatService,
 	) {
 		setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
 	}
@@ -191,7 +189,6 @@ export class UsersService implements OnModuleInit {
 		const updatedUser = await this.repo.save(user);
 		return updatedUser
 	}
-
 
 	async getBlocked(user: User, friendId: number): Promise<ShortUser | null> {
 		if (!user)

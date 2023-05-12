@@ -94,6 +94,8 @@ export type plainUser = {
 	stud: boolean,
 	dfa: boolean,
 	blockedId: number[],
+	friendId: number[],
+	rank: number
 }
 
 export type UserInfo = plainUser & {
@@ -140,7 +142,7 @@ export type Channel = {
 export type PlainMember = {
 	id: number;
 	role: string;
-	user: { id: number, username: string; blockedId : number[], friendId: number[]};
+	user: { id: number, username: string; blockedId : number[], friendId: number[], rank: number};
 	muteTime: string,
 	banned: boolean,
 	left: boolean
