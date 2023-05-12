@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { UsersService } from "src/users/users.service";
-import { EntitySubscriberInterface, EventSubscriber, InsertEvent } from "typeorm";
+import { Connection, EntitySubscriberInterface, EventSubscriber, InsertEvent } from "typeorm";
 import { SavedGame } from "./saved-game.entity";
 import { User } from "./user.entity";
 
@@ -8,7 +8,12 @@ import { User } from "./user.entity";
 @EventSubscriber()
 export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame> {
 
-	constructor(private usersService: UsersService) { }
+
+	constructor(
+		private readonly connection : Connection,
+		private usersService: UsersService) {
+			connection.subscribers.push(this)
+	}
 
 	listenTo() {
 		return SavedGame
@@ -25,8 +30,9 @@ export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame>
 			}
 		})
 		rankArray.sort((a, b) => b.points - a.points)
-		allUserDB.forEach((user)=>{
-			user
-		})
+		await Promise.all(allUserDB.map((user) => {
+			user.rank = rankArray.findIndex((rank) => rank.userId == user.id) + 1
+			this.usersService.secureUpdate(user.id, user)
+		}))
 	}
 }

@@ -24,7 +24,7 @@ export function UserAchivement() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <MilitaryTechOutlinedIcon sx={{ ml: 2 }} color="primary" />
                         <Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-                            Rank : {userData?.totalwonGames}
+                            Rank : {userData?.rank}
                         </Typography>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
