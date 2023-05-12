@@ -88,6 +88,16 @@ export class UsersService implements OnModuleInit {
 		return await this.repo.findOneBy({ email });
 	}
 
+	async secureUpdate(id: number, partialUser: Partial<User>) {
+		const user: User | null = await this.findOne(id);
+		if (user) {
+			Object.assign(user, partialUser)
+			return await this.repo.save(user);
+		}
+		throw new BadRequestException("secureUpdate : id does not match any User");
+	}
+
+	//WARNING, THIS IS UPDATE IS BROKEN IN TYPEORM 
 	async update(id: number, partialUser: Partial<User>) {
 		await this.repo.update(id, partialUser);
 		return this.findOne(id);
@@ -171,8 +181,8 @@ export class UsersService implements OnModuleInit {
 		}
 		this.friendsService.removeFriend(user, blockedId);
 		user.blockedId.push(blockedId);
-		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : blockedId, event: "blocked" })
-		this.server.to(`/player/${blockedId}`).emit('page.player', { userId: user.id, targetId : blockedId, event: "me-blocked" })
+		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: blockedId, event: "blocked" })
+		this.server.to(`/player/${blockedId}`).emit('page.player', { userId: user.id, targetId: blockedId, event: "me-blocked" })
 		const updatedUser = await this.repo.save(user);
 		return updatedUser
 	}
@@ -184,8 +194,8 @@ export class UsersService implements OnModuleInit {
 			return;
 		}
 		user.blockedId.splice(index, 1);
-		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : blockedId, event: "unblocked" })
-		this.server.to(`/player/${blockedId}`).emit('page.player', { userId: user.id, targetId : blockedId, event: "me-unblocked" })
+		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: blockedId, event: "unblocked" })
+		this.server.to(`/player/${blockedId}`).emit('page.player', { userId: user.id, targetId: blockedId, event: "me-unblocked" })
 		const updatedUser = await this.repo.save(user);
 		return updatedUser
 	}

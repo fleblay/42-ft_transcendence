@@ -24,7 +24,7 @@ import { SavedGameSubscriber } from 'src/model/saved-game.subscriber';
 	],
 	controllers: [UsersController],
 	providers: [AuthService, UsersService, SavedGameSubscriber],
-	exports: [AuthService, UsersService],
+	exports: [AuthService, UsersService, SavedGameSubscriber],
 })
 export class UsersModule { }
 //

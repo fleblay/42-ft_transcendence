@@ -44,7 +44,7 @@ import { SavedGameSubscriber } from './model/saved-game.subscriber';
 					Message,
 					Channel
 				],
-				subscribers : [SavedGameSubscriber]
+				//subscribers : [SavedGameSubscriber]
 			})
 		}),
 		UsersModule,
