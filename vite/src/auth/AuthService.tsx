@@ -87,8 +87,6 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 				.get("/api/auth/logout")
 				.then(async (response) => {
 					setUser(null);
-					delAccessToken();
-					delRefreshToken();
 					resolve()
 				})
 				.catch((error) => {

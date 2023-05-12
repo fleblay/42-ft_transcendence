@@ -63,9 +63,11 @@ export class AuthController {
 
 	@Get('/logout')
 	@UseGuards(ATGuard)
-	async logout(@Request() req: ExpressRequest) {
+	async logout(@Request() req: ExpressRequest, @Response({ passthrough: true }) res: ExpressResponse) {
 		//console.log('logout');
 		const refreshToken = req.cookies['refresh_token'];
+		res.cookie('access_token', '', { maxAge: 0 });
+		res.cookie('refresh_token', '', { httpOnly: true, maxAge: 0 });
 		return this.authService.deleteRefreshToken(refreshToken);
 	}
 	@Get('/42externalauth')
