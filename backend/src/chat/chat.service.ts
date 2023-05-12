@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef, BadRequestException, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, forwardRef, BadRequestException, NotFoundException, OnModuleInit, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { Member } from '../model/member.entity';
 import { In, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -133,17 +133,17 @@ export class ChatService implements OnModuleInit {
 		})
 		//console.log("joinChannel : ", channel, options)
 		if (!channel)
-			throw new BadRequestException(`joinChannel : channel with id ${channelId} does not exist`)
+			throw new ForbiddenException(`joinChannel : channel with id ${channelId} does not exist`)
 		if (channel.password && (!options?.password || options.password != channel.password))
-			throw new BadRequestException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
+			throw new ForbiddenException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
 		if (channel.private && (!options.owner && channel.members.find((member) => (member.user.id == user.id))?.role != "owner"))
-			throw new BadRequestException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
+			throw new ForbiddenException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
 		//console.log("joinChannel2 : ", channel, options)
 		let addedUser: User = user
 		if (options?.targetUsername) {
 			addedUser = await this.usersService.findOneByUsername(options.targetUsername) as User
 			if (!addedUser) {
-				throw new BadRequestException(`joinChannel : the username ${options.targetUsername} matches no user in database`)
+				throw new ForbiddenException(`joinChannel : the username ${options.targetUsername} matches no user in database`)
 			}
 		}
 		let joiner: Member;
@@ -151,7 +151,7 @@ export class ChatService implements OnModuleInit {
 		const member = channel.members.find((member) => (member.user.id == addedUser!.id))
 		if (member) {
 			if (member.banned)
-				throw new BadRequestException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is banned from the channel`)
+				throw new ForbiddenException(`joinChannel : channeld with id ${channelId} : ${addedUser.username} is banned from the channel`)
 			if (!member.left)
 				return;
 			else {
@@ -235,18 +235,18 @@ export class ChatService implements OnModuleInit {
 
 	private memberIsAllowed(member: Member, ignore: { banned?: boolean, left?: boolean, mute?: boolean } = {}): boolean {
 		if (ignore.banned !== true && member.banned)
-			throw new BadRequestException('You are banned from this channel');
+			throw new ForbiddenException('You are banned from this channel');
 		if (ignore.left !== true && member.left)
-			throw new BadRequestException('You are kicked from this channel');
+			throw new ForbiddenException('You are kicked from this channel');
 		if (ignore.mute !== true && member.muteTime && new Date(member.muteTime) > new Date())
-			throw new BadRequestException('You are muted from this channel');
+			throw new ForbiddenException('You are muted from this channel');
 		return true;
 	}
 	private memberHasRole(member: Member, role: string): boolean {
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
 		if (member.role != role)
-			throw new BadRequestException(`You must be ${role} to do this`);
+			throw new ForbiddenException(`You must be ${role} to do this`);
 		return true;
 	}
 	async newMessage(owner: User, channelId: number, messageData: NewMessageDto) {
@@ -387,13 +387,13 @@ export class ChatService implements OnModuleInit {
 	private checkModifyPermissions(requestingMember: Member, modifyMember: Member, options: ModifyMemberDto) {
 
 		if (requestingMember.role === 'regular')
-			throw new BadRequestException('You must be owner or admin to do this');
+			throw new ForbiddenException('You must be owner or admin to do this');
 		if (modifyMember.role === 'owner')
-			throw new BadRequestException('You can\'t modify owner');
+			throw new ForbiddenException('You can\'t modify owner');
 		if (modifyMember.role === 'admin' && requestingMember.role !== 'owner')
-			throw new BadRequestException('You can\'t modify admin, only owner can do this');
+			throw new ForbiddenException('You can\'t modify admin, only owner can do this');
 		if (options.role && options.role === 'owner' && requestingMember.role !== 'owner')
-			throw new BadRequestException('You can\'t set owner, only owner can do this');
+			throw new ForbiddenException('You can\'t set owner, only owner can do this');
 	}
 
 
@@ -427,24 +427,24 @@ export class ChatService implements OnModuleInit {
 		if (!channel)
 			throw new NotFoundException('Channel not found');
 		if (channel.directMessage)
-			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
+			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
 		const modifyMember = channel.members.find((member) => (member.id == memberId))
 		if (!modifyMember)
 			throw new NotFoundException('Member not found');
 		this.checkModifyPermissions(requestingMember, modifyMember, options);
 		if (options.role) {
 			if (modifyMember.role == options.role)
-				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.role}`)
+				throw new ForbiddenException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.role}`)
 			modifyMember.role = options.role
 		}
 		if (options.ban !== undefined) {
 			if (modifyMember.banned == options.ban)
-				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.ban ? 'banned' : 'unbanned'}}`)
+				throw new ForbiddenException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.ban ? 'banned' : 'unbanned'}}`)
 			modifyMember.banned = options.ban
 		}
 		if (options.kick) {
 			if (modifyMember.left == options.kick)
-				throw new BadRequestException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.kick ? 'kicked' : 'unkicked'}`)
+				throw new ForbiddenException(`modifyMembers : channeld with id ${channelId} : ${memberId} is already ${options.kick ? 'kicked' : 'unkicked'}`)
 			modifyMember.left = options.kick
 		}
 		if (options.mute) {
@@ -480,11 +480,11 @@ export class ChatService implements OnModuleInit {
 		if (!channel)
 			throw new NotFoundException('Channel not found');
 		if (channel.directMessage)
-			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
+			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
 		if (changeChannelData.name && changeChannelData.name === channel.name)
-			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is already named ${changeChannelData.name}`)
+			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is already named ${changeChannelData.name}`)
 		if (changeChannelData.password && changeChannelData.password === channel.password)
-			throw new BadRequestException(`modifyChannel : channeld with id ${channelId} is already passworded ${changeChannelData.password}`)
+			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is already passworded ${changeChannelData.password}`)
 		if (changeChannelData.name)
 			channel.name = changeChannelData.name
 		if (changeChannelData.password)

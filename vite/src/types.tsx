@@ -178,3 +178,10 @@ export interface PublicChannel {
 	membersLength: number;
 	owner: ShortUser | undefined;
 }
+
+
+
+export type Error = {
+	message: string,
+	status: number,
+}

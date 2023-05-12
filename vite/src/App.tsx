@@ -21,6 +21,9 @@ import ChatMenu from './component/chat/ChatMenu';
 import { CircularProgress, Paper, Stack } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { ErrorProviderContext } from './ErrorProvider/ErrorProvider';
+import { MyError } from './component/Error';
+import { InterceptorAxios } from './auth/interceptor.axios';
 
 export interface Destinations {
 	name: string,
@@ -78,77 +81,91 @@ function BackLoader() {
 	)
 }
 
+const Layout = ({ children }: { children: JSX.Element }) => {
+	return (
+		<>
+			{children}
+			<MyError />
+		</>
+	)
+};
+
 
 function App() {
-
 	return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-		<AuthService>
-			<SocketProvider>
-				<RequireAuth>
-					<MenuBar />
-				</RequireAuth>
+		<LocalizationProvider dateAdapter={AdapterDayjs}>
+			<AuthService>
+				<InterceptorAxios>
+					<Layout>
 
-				<Routes>
-					<Route>
-						<Route path="/" element={<Navigate to='/game' replace />} />
-						<Route path="game/">
-							<Route path=":idGame" element={
-								<RequireAuth>
-									<GamePage />
-								</RequireAuth>
-							} />
-							<Route path="" element={
-								<RequireAuth>
-									<GamePage />
-								</RequireAuth>
-							} />
-						</Route>
+						<SocketProvider>
+							<RequireAuth>
+								<MenuBar />
+							</RequireAuth>
 
-						<Route path='/public' element={<div>Public</div>} />
-						<Route path="chat/:channelId?" element={
-							<RequireAuth>
-								<>
-									<ChatPage />
-								</>
-							</RequireAuth>
-						} />
-						<Route path="/Login" element={<LoginForm />} />
-						<Route path="/Register" element={<RegisterForm />} />
-						<Route path="/leaderboard" element={
-							<>
-								<ListUsers />
-								<br />
-								<FakeGames />
-							</>
-						} />
-						<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
-						<Route path="/player/">
-							<Route path=":idPlayer" element={
-								<RequireAuth>
-									<UserDataProvider>
-										<ProfilPlayer />
-									</UserDataProvider>
-								</RequireAuth>
-							} />
-						</Route>
-						<Route path="/friends" element={
-							<RequireAuth>
-								<FriendList />
-							</RequireAuth>
-						} />
-						<Route path="/blocked" element={
-							<RequireAuth>
-								<BlockedList />
-							</RequireAuth>
-						} />
-						<Route path="/dfa" element={<DfaForm />} />
-						<Route path='*' element={<div>404</div>} />
-					</Route>
-				</Routes>
-			</SocketProvider>
-		</AuthService>
-    </LocalizationProvider>
+							<Routes>
+								<Route>
+									<Route path="/" element={<Navigate to='/game' replace />} />
+									<Route path="game/">
+										<Route path=":idGame" element={
+											<RequireAuth>
+												<GamePage />
+											</RequireAuth>
+										} />
+										<Route path="" element={
+											<RequireAuth>
+												<GamePage />
+											</RequireAuth>
+										} />
+									</Route>
+
+									<Route path='/public' element={<div>Public</div>} />
+									<Route path="chat/:channelId?" element={
+										<RequireAuth>
+											<>
+												<ChatPage />
+											</>
+										</RequireAuth>
+									} />
+									<Route path="/Login" element={<LoginForm />} />
+									<Route path="/Register" element={<RegisterForm />} />
+									<Route path="/leaderboard" element={
+										<>
+											<ListUsers />
+											<br />
+											<FakeGames />
+										</>
+									} />
+									<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
+									<Route path="/player/">
+										<Route path=":idPlayer" element={
+											<RequireAuth>
+												<UserDataProvider>
+													<ProfilPlayer />
+												</UserDataProvider>
+											</RequireAuth>
+										} />
+									</Route>
+									<Route path="/friends" element={
+										<RequireAuth>
+											<FriendList />
+										</RequireAuth>
+									} />
+									<Route path="/blocked" element={
+										<RequireAuth>
+											<BlockedList />
+										</RequireAuth>
+									} />
+									<Route path="/dfa" element={<DfaForm />} />
+									<Route path='*' element={<div>404</div>} />
+								</Route>
+							</Routes>
+						</SocketProvider>
+					</Layout>
+				</InterceptorAxios>
+			</AuthService>
+
+		</LocalizationProvider>
 	);
 }
 
