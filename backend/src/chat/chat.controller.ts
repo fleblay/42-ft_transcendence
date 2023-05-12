@@ -132,7 +132,7 @@ export class ChatController {
 		let members = await this.chatService.getChannelMembers(channelId);
 		return Promise.all(members.map(async (member: Member) => {
 
-			member.user = {...member.user, friendId : (await this.friendsService.getFriendsList(member.user)).map((friend: Friend) => friend.id)}
+			//member.user = {...member.user, friendId : (await this.friendsService.getFriendsList(member.user)).map((friend: Friend) => friend.id)}
 			return {
 				...member,
 				isConnected: this.userService.isConnected(member.user.id),

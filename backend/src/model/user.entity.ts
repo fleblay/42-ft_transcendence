@@ -1,11 +1,12 @@
 
-import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, OneToMany, EventSubscriber, EntitySubscriberInterface, InsertEvent } from 'typeorm';
 import { SavedGame } from './saved-game.entity';
 import { FriendRequest } from './friend-request.entity';
 import { Member } from './member.entity';
 
 @Entity()
-export class User {
+export class User{
+
 	@PrimaryGeneratedColumn()
 	id: number;
 

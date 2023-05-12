@@ -1,6 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { AfterInsert, Column, CreateDateColumn, Entity, InsertEvent, ManyToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
-
 
 @Entity()
 export class SavedGame {
@@ -18,4 +17,5 @@ export class SavedGame {
 
 	@ManyToOne(() => User, (user) => user.wonGames, {eager: true})
 	winner : User;
+
 }

@@ -78,7 +78,8 @@ export class ChatService implements OnModuleInit {
 						id: true,
 						username: true,
 						blockedId: true,
-						friendId: true
+						friendId: true,
+						rank: true
 					},
 				},
 			}
@@ -124,7 +125,8 @@ export class ChatService implements OnModuleInit {
 						id: true,
 						username: true,
 						blockedId: true,
-						friendId: true
+						friendId: true,
+						rank: true
 					}
 				}
 			}
@@ -224,7 +226,8 @@ export class ChatService implements OnModuleInit {
 					id: true,
 					username: true,
 					blockedId: true,
-					friendId: true
+					friendId: true,
+					rank: true
 				}
 			},
 		});
@@ -317,7 +320,7 @@ export class ChatService implements OnModuleInit {
 				gameId: true,
 				content: true,
 				createdAt: true,
-				owner: { user: { id: true, username: true, blockedId: true, friendId: true}, role: true, banned: true, left: true, muteTime: true },
+				owner: { user: { id: true, username: true, blockedId: true, friendId: true, rank: true}, role: true, banned: true, left: true, muteTime: true },
 			},
 			skip: offset,
 			take: 10,
@@ -342,7 +345,7 @@ export class ChatService implements OnModuleInit {
 				banned: true,
 				muteTime: true,
 				left: true,
-				user: { id: true, username: true, blockedId: true, friendId: true},
+				user: { id: true, username: true, blockedId: true, friendId: true, rank: true},
 			},
 		});
 		return members
@@ -415,7 +418,8 @@ export class ChatService implements OnModuleInit {
 						id: true,
 						username: true,
 						blockedId: true,
-						friendId: true
+						friendId: true,
+						rank: true
 					}
 				}
 			}
@@ -545,7 +549,7 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
-					user: { id: true, username: true },
+					user: { id: true, username: true},
 					left: true,
 				},
 			},
@@ -572,7 +576,7 @@ export class ChatService implements OnModuleInit {
 					id: true,
 					left: true,
 					role: true,
-					user: { id: true, username: true, blockedId: true, friendId : true},
+					user: { id: true, username: true, blockedId: true, friendId : true, rank: true},
 				},
 			},
 			relationLoadStrategy: "query",
@@ -598,7 +602,7 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
-					user: { id: true, username: true, blockedId: true, friendId: true},
+					user: { id: true, username: true, blockedId: true, friendId: true, rank: true},
 					left: true,
 				},
 			},
@@ -669,7 +673,7 @@ export class ChatService implements OnModuleInit {
 					directMessage: true,
 					members: {
 						id: true,
-						user: { id: true, username: true, blockedId: true, friendId: true},
+						user: { id: true, username: true, blockedId: true, friendId: true, rank: true},
 					},
 				},
 			},

@@ -9,6 +9,7 @@ import { RefreshToken } from '../model/refresh-token.entity';
 import {GameModule} from '../game/game.module'
 import { FriendsModule } from 'src/friends/friends.module';
 import { ChatModule } from '../chat/chat.module';
+import { SavedGameSubscriber } from 'src/model/saved-game.subscriber';
 
 @Module({
 	imports: [
@@ -22,7 +23,7 @@ import { ChatModule } from '../chat/chat.module';
 		forwardRef(() => ChatModule),
 	],
 	controllers: [UsersController],
-	providers: [AuthService, UsersService],
+	providers: [AuthService, UsersService, SavedGameSubscriber],
 	exports: [AuthService, UsersService],
 })
 export class UsersModule { }

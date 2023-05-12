@@ -378,7 +378,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 	}
 
 	function GenerateMemberGroup({ groupname, groupMembers, me }: { groupname: string, groupMembers: Member[], me: Member | null }): JSX.Element {
-		console.log('rendering membergroup, me is : ', me)
+		//console.log('rendering membergroup, me is : ', me)
 		return (<>
 			<Typography component="div">{groupname}</Typography>
 			<List disablePadding>
