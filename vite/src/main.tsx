@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import { Paper, ThemeProvider, createTheme } from '@mui/material';
+import { ErrorProvider } from './ErrorProvider/ErrorProvider';
 
 export const RouterContext = React.createContext<{ to: string, from: string }>(null!!);
 
@@ -55,13 +56,15 @@ const themeDark = createTheme({
 });
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-		<BrowserRouter>
-			<RouterProvider>
-				<ThemeProvider theme={true ? themeLight : themeDark}>
+	<BrowserRouter>
+		<RouterProvider>
+			<ThemeProvider theme={true ? themeLight : themeDark}>
+				<ErrorProvider>
 					<App />
-				</ThemeProvider>
-			</RouterProvider>
-		</BrowserRouter>
+				</ErrorProvider>
+			</ThemeProvider>
+		</RouterProvider>
+	</BrowserRouter>
 )
 
 /*
