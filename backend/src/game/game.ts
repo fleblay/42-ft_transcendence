@@ -4,7 +4,7 @@ import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 import { SavedGame } from '../model/saved-game.entity';
 
-const paddleWidth = 5
+const paddleWidth = 10
 const canvasHeight = 600
 const canvasWidth = 800
 const BounceAngleLimiter = Math.PI / 12 //No more than Pi/2
