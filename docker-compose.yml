@@ -47,6 +47,7 @@ services:
   nginx:
     build:
       context: ./nginx
+      target: ${NODE_ENV}
     restart: always
     ports:
       - 8080:8080

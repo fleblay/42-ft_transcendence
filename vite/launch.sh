@@ -15,8 +15,8 @@ fi
 
 if [ "$NODE_ENV" == "development" ]
 then
-	echo "buildw"
-	npm run build-w
+	echo "dev"
+	npm run dev
 else
 	echo "build"
 	npm run build
