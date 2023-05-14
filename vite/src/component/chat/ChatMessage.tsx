@@ -45,7 +45,7 @@ export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username, bl
 					</Typography>
 				)}
 				{!showBlocked && (
-					<Message
+					<Msg
 						side={side}
 						index={0}
 						lastIndex={0}
@@ -63,12 +63,12 @@ export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username, bl
 						)}
 						</Typography>
 
-					</Message>
+					</Msg>
 				)}
 
 				{showBlocked && messages.map((msg: Message, index: number) => {
 					return (
-						<Message
+						<Msg
 							key={index}
 							side={side}
 							index={index}
@@ -88,7 +88,7 @@ export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username, bl
 									>Join Game</Button>
 								}
 							</>
-						</Message>
+						</Msg>
 					)
 				})}
 			</Grid>
@@ -101,7 +101,8 @@ interface MessageProps {
 	index: number;
 	lastIndex: number;
 }
-const Message = styled('div')<MessageProps>(({ theme, side, index, lastIndex }) => {
+
+const Msg = styled('div')<MessageProps>(({ theme, side, index, lastIndex }) => {
 	const borderStyle = side === 'left' ? {
 		borderTopLeftRadius: index === 0 ? theme.shape.borderRadius : 5,
 		borderBottomLeftRadius: index === lastIndex ? theme.shape.borderRadius : 5,
