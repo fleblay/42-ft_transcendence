@@ -16,6 +16,9 @@ import { useAuthService } from '../auth/AuthService';
 interface UserInfoDisplayProps {
 	idPlayer: string | undefined;
 	displayBlocked: boolean;
+	setRender? : (render: boolean) => void ;
+	render? : boolean;
+
 
 }
 
@@ -40,7 +43,7 @@ export const handleBlockUser = (idPlayer: string | undefined) => {
 
 
 
-export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayProps) {
+export function UserInfoDisplay({ idPlayer, displayBlocked , setRender, render }: UserInfoDisplayProps) {
 
 	const [userData, setUserData] = useState<UserInfo | null>(null);
 	const imgPath = `/avatars/${idPlayer}.png`;
@@ -99,7 +102,11 @@ export function UserInfoDisplay({ idPlayer, displayBlocked }: UserInfoDisplayPro
 		customOn('page.player', (data: any) => {
 			console.log("data", data);
 			if (userData)
+			{
 				setDisplayUpdate(!displayUpdate);
+				if (setRender)
+					setRender(!render)
+			}
 		})
 		return (() => {
 			customOff('page.player');

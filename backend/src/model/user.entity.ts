@@ -3,6 +3,7 @@ import { AfterInsert, AfterRemove, AfterUpdate, Entity, Column, PrimaryGenerated
 import { SavedGame } from './saved-game.entity';
 import { FriendRequest } from './friend-request.entity';
 import { Member } from './member.entity';
+import { Notification } from './notification.entity';
 
 @Entity()
 export class User{
@@ -54,6 +55,10 @@ export class User{
 
 	@OneToMany(() => Member, (member) => member.user)
 	members: Member[];
+
+	@OneToMany(() => Notification , (notification) => notification.user)
+	@JoinTable({})
+	notifications: Notification[];
 /* 	@AfterInsert()
 	logInsert() {
 		console.log(`insert User with id ${this.id}`);

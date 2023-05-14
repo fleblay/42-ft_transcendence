@@ -10,6 +10,7 @@ import {GameModule} from '../game/game.module'
 import { FriendsModule } from 'src/friends/friends.module';
 import { ChatModule } from '../chat/chat.module';
 import { SavedGameSubscriber } from 'src/model/saved-game.subscriber';
+import { NotificationFriendRequest } from '../notification/notification.subscriber';
 
 @Module({
 	imports: [
@@ -23,8 +24,8 @@ import { SavedGameSubscriber } from 'src/model/saved-game.subscriber';
 		forwardRef(() => ChatModule),
 	],
 	controllers: [UsersController],
-	providers: [AuthService, UsersService, SavedGameSubscriber],
-	exports: [AuthService, UsersService, SavedGameSubscriber],
+	providers: [AuthService, UsersService, SavedGameSubscriber, NotificationFriendRequest ],
+	exports: [AuthService, UsersService, SavedGameSubscriber, NotificationFriendRequest],
 })
 export class UsersModule { }
 //

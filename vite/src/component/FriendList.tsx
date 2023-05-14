@@ -73,6 +73,10 @@ export function FriendList() {
 	const auth = useAuthService();
 	const navigate = useNavigate();
 	const [tabs, setTabs] = useState<'accepted' | 'pending'>('accepted');
+	const { customEmit, socket, customOn, customOff, addSubscription } = useContext(SocketContext);
+	const [render, setRender] = useState(false);
+
+
 
 	React.useEffect(() => {
 		if (!auth.user) return;
@@ -86,11 +90,8 @@ export function FriendList() {
 			console.error('Error fetching friends: ', error.response.data);
 		});
 
-	}, [auth.user, tabs]);
+	}, [auth.user, tabs,render]);
 
-	const handleViewProfil = (id: number) => {
-		navigate(`/player/${id}`);
-	}
 	if (!friendList) return null;
 
 	return (
@@ -117,7 +118,7 @@ export function FriendList() {
 
 							return (
 								<React.Fragment key={friend.id}>
-									<UserInfoDisplay idPlayer={`${friend.id}`} displayBlocked={false}  />
+									<UserInfoDisplay idPlayer={`${friend.id}`} displayBlocked={false} setRender={setRender} render={render}  />
 									{/* <div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
 
 										<Box sx={{ mr: '20px', ml: '20px' }}>

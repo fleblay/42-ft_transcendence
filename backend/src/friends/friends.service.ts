@@ -45,6 +45,7 @@ export class FriendsService {
 			receiver: friend,
 			status: 'pending'
 		});
+		console.log("new friend request :", newRequest)
 		this.friendReqRepo.save(newRequest);
 		this.usersService.unblockUser(user, friendId);
 		const newFriend = this.generateFriend(user, friend, newRequest);

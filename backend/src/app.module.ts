@@ -20,6 +20,7 @@ import { Message } from './model/message.entity';
 import { Channel } from './model/channel.entity';
 import { SavedGameSubscriber } from './model/saved-game.subscriber';
 import { NotificationModule } from './notification/notification.module';
+import { Notification } from './model/notification.entity';
 
 @Module({
 	imports: [
@@ -43,7 +44,8 @@ import { NotificationModule } from './notification/notification.module';
 					FriendRequest,
 					Member,
 					Message,
-					Channel
+					Channel,
+					Notification
 				],
 				//subscribers : [SavedGameSubscriber]
 			})

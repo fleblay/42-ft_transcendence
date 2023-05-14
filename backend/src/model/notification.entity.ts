@@ -4,23 +4,24 @@ import { Message } from "./message.entity";
 import { User } from "./user.entity";
 import { FriendRequest } from "./friend-request.entity";
 
+
+export type NotificationContent = FriendRequest | Message;
+export type NotificationType = "directMessage" | "invitation" | "invitationChat";
+
 @Entity()
 export class Notification {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => User, user => user.members)
+	@ManyToOne(() => User, (user) => user.notifications)
 	user: User;
 
     @Column()
-	type: "directMessage" | "invitation" | "invitationChat"
+	type: NotificationType;
 
-    @OneToOne(() => FriendRequest , (friendRequest) => friendRequest.receiver)
+	@OneToOne(() => Notification, { eager: true, nullable: true})
 	@JoinTable({})
-	receiveRequests: FriendRequest
-
-    @OneToOne(() => Message, message => message.owner)
-    newMessage : Message;
+	content: NotificationContent | null;
 
 	@Column({ default: false })
 	read: boolean;
