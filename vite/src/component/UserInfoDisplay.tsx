@@ -212,7 +212,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 
 					{itsMe ? <UpdateProfil /> : (
 						<>
-							{renderButton(relation)}
+							{auth.user && userData && !userData.blockedId.includes(auth.user?.id) && renderButton(relation) || <Box sx={{ml : 'auto', mr: 1, mt: 2, mb: 2}}></Box>}
 							{displayBlocked && isBlocked ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleUnblockUser(idPlayer)}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleBlockUser(idPlayer)}>block</Button>}
 						</>
 					)}

@@ -31,9 +31,12 @@ export class FriendsService {
 			console.log("User not found");
 			return null;
 		}
-
 		if (user.id === friendId) {
 			console.log("You can't add yourself as a friend");
+			return null;
+		}
+		if (friend.blockedId.includes(user.id)) {
+			console.log("You can't add as user that has blocked you");
 			return null;
 		}
 		if (await this.getFriendRequest(user, friendId)) {
