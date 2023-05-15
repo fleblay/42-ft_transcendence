@@ -29,13 +29,22 @@ export const ChannelBrowser: FC = () => {
 	useEffect(() => {
 		function onUpdateChannel(channel: PublicChannel) {
 			setPublicChannels((oldChannel) => {
-				return { ...oldChannel, [channel.id]: channel };
+				return { ...oldChannel, [channel.id]: { ...oldChannel[channel.id], ...channel} };
 			});
 		}
 
+		function onDeletedChannel(channelId: number) {
+			setPublicChannels((oldChannel) => {
+				let newChannel = { ...oldChannel };
+				delete newChannel[channelId];
+				return newChannel;
+			});
+		}
 		customOn("chat.public.update", onUpdateChannel);
+		customOn("chat.public.delete", onDeletedChannel);
 		return () => {
 			customOff("chat.public.update", onUpdateChannel);
+			customOff("chat.public.delete", onDeletedChannel);
 		};
 	}, [publicChannels])
 

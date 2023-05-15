@@ -491,9 +491,14 @@ export class ChatService implements OnModuleInit {
 		if (changeChannelData.password !== undefined)
 			channel.password = changeChannelData.password ? await hashPassword(changeChannelData.password) : ''
 		await this.channelsRepo.save(channel)
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });
-		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', await this.getChannelInfo(user, channelId));
+		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
+		this.wsServer.to('/chat/public').emit('chat.public.update', {
+			id: channel.id,
+			name: channel.name,
+			hasPassword: !!channel.password
+		} as PublicChannel);
 	}
 
 	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {
@@ -511,6 +516,10 @@ export class ChatService implements OnModuleInit {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
+		if (member.role === 'owner') {
+			await this.deleteChannel(member, channelId);
+			return;
+		}
 		member.left = true;
 		const leftMember = await this.membersRepo.save(member);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { leftMember });
@@ -529,6 +538,15 @@ export class ChatService implements OnModuleInit {
 				owner: channel.members.find(member => member.role === 'owner')?.user as ShortUser,
 			} as PublicChannel);
 		}
+	}
+
+	async deleteChannel(owner: Member, channelId: number) {
+		if (!owner || owner.role !== 'owner')
+			throw new ForbiddenException('You must be the owner of the channel to delete it');
+		await this.emitToAllMembers(channelId, 'chat.channel.leave', async () => (channelId));
+		this.wsServer.to('/chat/public').emit('chat.public.delete', channelId);
+		if (owner.channel?.id)
+			await this.channelsRepo.softRemove(owner.channel);
 	}
 
 	async getMyChannels(user: User): Promise<Channel[]> {

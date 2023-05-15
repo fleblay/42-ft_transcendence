@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import apiClient from '../../auth/interceptor.axios';
 import { MessageArea } from './MessageArea';
 import { SocketContext } from '../../socket/SocketProvider';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
 import { Channel, ChannelInfo } from '../../types'
 import ChatMenu from './ChatMenu';
@@ -89,11 +89,15 @@ export function ChatPage() {
 	const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
+	const auth = useAuthService();
 
 	useEffect(() => {
-		console.log('changing chat', channelId)
 		return addSubscription(`/chat/${channelId || ''}`);
 	}, [channelId]);
+
+	useEffect(() => {
+		return addSubscription(`/chat/myChannels/${auth.user?.id}`);
+	}, [auth.user?.id]);
 
 	useEffect(() => {
 		function onChannelModify(channel: Channel) {
