@@ -65,7 +65,7 @@ export class UsersController {
 		if (!token) {
 			throw new ForbiddenException('User not found');
 		}
-		let foundUser : User | null = await this.authService.validateAccessToken(token);
+		let foundUser: User | null = await this.authService.validateAccessToken(token);
 		/*
 		if (foundUser) {
 			const friendId: number[] = (await this.friendsService.getFriendsList(foundUser))
@@ -73,7 +73,7 @@ export class UsersController {
 			return {...foundUser, friendId}
 		}
 		*/
-	   return foundUser
+		return foundUser
 	}
 
 	@Patch('/me')
@@ -125,14 +125,6 @@ export class UsersController {
 			return ("turned-off")
 		}
 	};
-
-	// TODO: In user controller return all channels that user is in
-	@Get('/channels')
-	@UseGuards(ATGuard)
-	getChannels(@CurrentUser() user: User) {
-		return 'users/ channels'
-		return []
-	}
 
 	@Get('/:id')
 	@UseGuards(ATGuard)
