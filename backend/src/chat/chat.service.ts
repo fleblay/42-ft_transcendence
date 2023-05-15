@@ -512,6 +512,10 @@ export class ChatService implements OnModuleInit {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
+		if (member.role === 'owner') {
+			await this.deleteChannel(member, channelId);
+			return ;
+		}
 		member.left = true;
 		const leftMember = await this.membersRepo.save(member);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { leftMember });
@@ -530,6 +534,14 @@ export class ChatService implements OnModuleInit {
 				owner: channel.members.find(member => member.role === 'owner')?.user as ShortUser,
 			} as PublicChannel);
 		}
+	}
+
+	async deleteChannel(owner: Member, channelId: number) {
+		if (!owner || owner.role !== 'owner')
+			throw new ForbiddenException('You must be the owner of the channel to delete it');
+		await this.emitToAllMembers(channelId, 'chat.channel.leave', async () => (channelId));
+		if (owner.channel?.id)
+			await this.channelsRepo.softRemove(owner.channel);
 	}
 
 	async getMyChannels(user: User): Promise<Channel[]> {

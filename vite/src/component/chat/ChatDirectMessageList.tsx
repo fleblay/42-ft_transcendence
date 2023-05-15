@@ -85,12 +85,7 @@ export function MyDirectMessageList() {
 	const navigate = useNavigate();
 	const auth = useAuthService();
 	const [myDmList, setMyDmList] = useState<{ [id: number]: Channel }>({});
-	const { customOff, customOn, addSubscription } = useContext(SocketContext);
-
-	useEffect(() => {
-		return addSubscription(`/chat/myChannels/${auth.user?.id}`);
-	}, [auth.user?.id]);
-
+	const { customOff, customOn } = useContext(SocketContext);
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/dm`).then((response) => {
