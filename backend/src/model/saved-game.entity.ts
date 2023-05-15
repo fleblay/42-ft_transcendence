@@ -17,5 +17,4 @@ export class SavedGame {
 
 	@ManyToOne(() => User, (user) => user.wonGames, {eager: true})
 	winner : User;
-
 }
