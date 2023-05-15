@@ -9,8 +9,9 @@ import { RefreshToken } from '../model/refresh-token.entity';
 import {GameModule} from '../game/game.module'
 import { FriendsModule } from 'src/friends/friends.module';
 import { ChatModule } from '../chat/chat.module';
-import { SavedGameSubscriber } from 'src/model/saved-game.subscriber';
-import { NotificationFriendRequest } from '../notification/notification.subscriber';
+import { SavedGameSubscriber } from '../model/saved-game.subscriber';
+import { NotificationSubscriber } from '../notification/notification.subscriber';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
 	imports: [
@@ -22,10 +23,11 @@ import { NotificationFriendRequest } from '../notification/notification.subscrib
 		forwardRef(() => GameModule),
 		forwardRef(() => FriendsModule),
 		forwardRef(() => ChatModule),
+		forwardRef(() => NotificationModule),
 	],
 	controllers: [UsersController],
-	providers: [AuthService, UsersService, SavedGameSubscriber, NotificationFriendRequest ],
-	exports: [AuthService, UsersService, SavedGameSubscriber, NotificationFriendRequest],
+	providers: [AuthService, UsersService, SavedGameSubscriber, NotificationSubscriber ],
+	exports: [AuthService, UsersService, SavedGameSubscriber, NotificationSubscriber],
 })
 export class UsersModule { }
 //

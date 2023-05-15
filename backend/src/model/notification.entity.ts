@@ -6,7 +6,7 @@ import { FriendRequest } from "./friend-request.entity";
 
 
 export type NotificationContent = FriendRequest | Message;
-export type NotificationType = "directMessage" | "invitation" | "invitationChat";
+export type NotificationType = "directMessage" | "friendRequest" | "channelInvitation"
 
 @Entity()
 export class Notification {
@@ -19,9 +19,9 @@ export class Notification {
     @Column()
 	type: NotificationType;
 
-	@OneToOne(() => Notification, { eager: true, nullable: true})
+	@OneToOne(() => Notification, {nullable: true})
 	@JoinTable({})
-	content: NotificationContent | null;
+	content: NotificationContent| null;
 
 	@Column({ default: false })
 	read: boolean;

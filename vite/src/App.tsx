@@ -24,6 +24,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { ErrorProviderContext } from './ErrorProvider/ErrorProvider';
 import { MyError } from './component/Error';
 import { InterceptorAxios } from './auth/interceptor.axios';
+import { NotificationsList } from './component/notifications/notificationsList';
 
 export interface Destinations {
 	name: string,
@@ -40,6 +41,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
 	{ name: "Friends", path: "/friends", public: false },
 	{ name: "Blocked", path: "/blocked", public: false },
+	{ name: "notification", path: "/notification", public: false },
 ]
 
 function RequireAuth({ children }: { children: JSX.Element }) {
@@ -154,6 +156,11 @@ function App() {
 									<Route path="/blocked" element={
 										<RequireAuth>
 											<BlockedList />
+										</RequireAuth>
+									} />
+									<Route path="/notification" element={
+										<RequireAuth>
+											<NotificationsList />
 										</RequireAuth>
 									} />
 									<Route path="/dfa" element={<DfaForm />} />

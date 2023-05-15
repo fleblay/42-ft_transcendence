@@ -482,13 +482,11 @@ export class ChatService implements OnModuleInit {
 			throw new NotFoundException('Channel not found');
 		if (channel.directMessage)
 			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
-		if (changeChannelData.name && changeChannelData.name === channel.name)
-			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is already named ${changeChannelData.name}`)
-		if (changeChannelData.password && changeChannelData.password === channel.password)
-			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is already passworded ${changeChannelData.password}`)
+		if ((changeChannelData.name && changeChannelData.name === channel.name) && (changeChannelData.password && changeChannelData.password === channel.password))
+			return;
 		if (changeChannelData.name)
 			channel.name = changeChannelData.name
-		if (changeChannelData.password)
+		if (changeChannelData.password !== undefined)
 			channel.password = changeChannelData.password
 		await this.channelsRepo.save(channel)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });

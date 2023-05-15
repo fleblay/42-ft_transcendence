@@ -156,10 +156,8 @@ export function UserInfoDisplay({ idPlayer, displayBlocked , setRender, render }
 
 	const handleRemoveFriend = () => {
 		apiClient.post(`/api/friends/remove/${idPlayer}`).then((response) => {
-			console.log("remove", response.data);
-			if (response.data) {
+			console.log("reponseRemoveFriend", response.data);
 				setRelation(null);
-			}
 		}).catch((error) => {
 			console.log(error);
 		});
