@@ -87,13 +87,13 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 				//inverse de push ?
 
 				newBallTrailPositions.push(data.ball);
-				if (newBallTrailPositions.length > 20) {	
+				if (newBallTrailPositions.length > 20) {
 					newBallTrailPositions.shift();
 				}
 				return newBallTrailPositions;
 			});
 		}
-		
+
 		function onCountdown(data: number) {
 			//console.log('game.countdown', data);
 			setCountdown(data);
@@ -253,7 +253,6 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 		for (let i = 0; i < reverseBallTrailPositions.length; i++) {
 			const ballTrailPosition = reverseBallTrailPositions[i];
 			trailOpacity = (1 - (i + 1) * 0.1) * trailOpacity;
-			console.log("trailOpacity", trailOpacity);
 			context.current.fillStyle = `rgba(64, 80, 181, ${trailOpacity})`;
 			context.current.beginPath();
 		context.current.arc(ballTrailPosition.pos.x * canvasRatio, ballTrailPosition.pos.y * canvasRatio, ballTrailPosition.size * canvasRatio, 0, 2 * Math.PI)
