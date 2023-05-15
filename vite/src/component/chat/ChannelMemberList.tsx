@@ -157,12 +157,12 @@ export function MemberList({ channelId }: { channelId: string }) {
 	const navigate = useNavigate()
 	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 	const [memberList, setMemberList] = useState<memberList>(emptyMemberList);
-	const [memberListFetched, setMemberListFetched] = useState<boolean>(false);
+	const memberListFetched : MutableRefObject<boolean> = useRef(false)
 	const [me, setMe] = useState<Member | null>(null);
 	const unSubscribeFxArray : MutableRefObject<((() => void) | void)[]> = useRef([])
 
 	useEffect(() => {
-		if (!memberListFetched)
+		if (!memberListFetched.current)
 			return
 		function onMemberUpdate({ modifyMember: upDatedMember }: { modifyMember: Member }) {
 			console.log("onMemberUpdate", upDatedMember);
@@ -209,7 +209,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 					fx()
 			})
 		})
-	}, [memberListFetched])
+	}, [memberListFetched.current])
 
 
 	useEffect(() => {
@@ -233,7 +233,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 			console.log("Je suis : ", me)
 		}).catch((error) => {
 			console.log(error);
-		}).then(() => setMemberListFetched(true))
+		}).then(() => memberListFetched.current = true)
 	}, [channelId]);
 
 	function GenerateMemberActionList({ member }: { member: Member }): JSX.Element {
