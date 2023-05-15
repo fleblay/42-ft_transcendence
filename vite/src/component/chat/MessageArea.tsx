@@ -71,9 +71,38 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		setMessageToSend(event.target.value);
 	};
 
+	const checkMessageForGameURL = (message: string): { url?: string, pathname?: string } => {
+		const originRegex = new RegExp(`^${window.location.origin}`);
+		const urls = message.match(/\bhttps?:\/\/\S+/gi);
+
+		if (urls) {
+			for (let i = 0; i < urls.length; i++) {
+				const url = urls[i];
+
+				if (originRegex.test(url)) {
+					const urlObject = new URL(url);
+					const pathname = urlObject.pathname;
+					const uuidRegex = /^\/game\/([0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12})$/;
+					if (uuidRegex.test(pathname))
+						return { url, pathname };
+				}
+			}
+		}
+		return {};
+	};
+
 	const sendMessage = () => {
 		if (messageToSend.trim().length === 0) return;
-		apiClient.post(`/api/chat/channels/${channelId}/messages`, { content: messageToSend }).then((response) => {
+		const gameURL = checkMessageForGameURL(messageToSend);
+
+		const { url, pathname } = gameURL
+		const gameId = pathname?.split('/')[2];
+		const message = {
+			content: messageToSend.replace(url || '', ''),
+			gameId,
+		}
+
+		apiClient.post(`/api/chat/channels/${channelId}/messages`, message).then((response) => {
 			setMessageToSend("");
 		}).catch((error) => {
 			console.log(error);
