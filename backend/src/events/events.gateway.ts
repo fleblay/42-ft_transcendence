@@ -24,6 +24,7 @@ import { UsersService } from '../users/users.service'
 import { instrument } from '@socket.io/admin-ui';
 import { FriendsService } from '../friends/friends.service';
 import { ChatService } from '../chat/chat.service';
+import { NotificationService } from '../notification/notification.service';
 
 type SocketInfo = {
 	id: string,
@@ -52,7 +53,8 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		private authService: AuthService,
 		private usersServices: UsersService,
 		private friendsService: FriendsService,
-		private chatService: ChatService
+		private chatService: ChatService,
+		private notificationService: NotificationService
 	) {
 		setInterval(() => {
 			const info = this.connectedSockets.map((e) => {
@@ -74,6 +76,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.usersServices.setWsServer(server)
 		this.friendsService.setWsServer(server)
 		this.chatService.setWsServer(server)
+		this.notificationService.setWsServer(server)
 		instrument(this.server, {
 			auth: false
 		})

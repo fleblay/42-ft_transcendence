@@ -12,7 +12,6 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 
 	constructor(
 		private readonly connection: Connection,
-		private usersService: UsersService,
 		private notificationService: NotificationService)
 		{
 		connection.subscribers.push(this)
@@ -23,23 +22,25 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 	}
 
 	async afterInsert(event: InsertEvent<any>) {
-		console.log("after insert event", event.entity);
+		console.log("####strart after insert", event.entity);
 		if (event.entity instanceof FriendRequest) {
-			return this.afterInsertFriendRequest(event);
+			await this.afterInsertFriendRequest(event);
+			console.log("####after insert friend request");
+			return;
 		}
-		if (event.entity instanceof Message) {
-			return this.afterInsertMessages(event);
+		else if (event.entity instanceof Message) {
+			await this.afterInsertMessages(event);
+			console.log("####after insert message");
+			return;
 		}
-		
+
 	}
 
 	async afterInsertFriendRequest(event: InsertEvent<FriendRequest>) {
-		console.log("after insert event", event.entity);
-		const receiver = await this.usersService.findOne(event.entity.receiver.id);
-		if (receiver) {
-			const notification = await this.notificationService.generateNotification(receiver, "friendRequest", event.entity);	
-			console.log("notification generated", notification);
-		}
+		console.log("in InsertFrendRequest");
+		const notification = await this.notificationService.generateNotification(event.entity.receiver.id, "friendRequest", event.entity);	
+		console.log("notification generated", notification);
+		
 	}
 
 
@@ -47,12 +48,12 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 	async afterInsertMessages(event: InsertEvent<Message>) {
 		console.log("after insert event", event.entity);
 		if (event.entity.channel.directMessage) {
-			const receiver = event.entity.channel.members.find(member => member.user.id !== event.entity.owner.id);
+			const receiver= event.entity.channel.members.find(member => member.user.id !== event.entity.owner.id);
 			if (receiver) {
-				const notification = await this.notificationService.generateNotification(receiver.user, "directMessage", event.entity);
+				const notification = await this.notificationService.generateNotification(receiver.id, "directMessage", event.entity);
 				console.log("notification generated", notification);
 			}
 		}
 	}
-
+//
 }

@@ -168,6 +168,7 @@ export type ChannelInfo = {
 	id: number;
 	name: string;
 	private: boolean;
+	hasPassword: boolean;
 	directMessage: boolean;
 	ownerId: number | undefined;
 }
@@ -188,7 +189,7 @@ export type Error = {
 }
 
 export type NotificationContent = Friend | Message;
-	
+
 
 export type Notification = {
 	id: number,

@@ -50,6 +50,7 @@ export interface ChannelInfo {
 	id: number;
 	name: string;
 	private: boolean;
+	hasPassword: boolean;
 	directMessage: boolean;
 	ownerId?: number;
 }

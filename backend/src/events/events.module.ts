@@ -4,6 +4,7 @@ import {UsersModule } from '../users/users.module'
 import { GameModule } from '../game/game.module';
 import { FriendsModule } from '../friends/friends.module';
 import { ChatModule } from '../chat/chat.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
 	providers: [EventsGateway],
@@ -11,7 +12,8 @@ import { ChatModule } from '../chat/chat.module';
 		UsersModule,
 		GameModule,
 		FriendsModule,
-		ChatModule
+		ChatModule,
+		NotificationModule
 	]
 })
 export class EventsModule {}
