@@ -19,8 +19,6 @@ export function ProfilPlayer() {
 	const auth = useAuthService();
 	const [itsMe, setItsMe] = useState<boolean>(false);
 
-
-
 	React.useEffect(() => {
 		console.log("idPlayer", idPlayer);
 		if (!auth.user) return;

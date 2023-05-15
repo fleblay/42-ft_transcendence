@@ -53,6 +53,8 @@ export class UsersService implements OnModuleInit {
 		//console.log(`create user ${dataUser?.username} : ${dataUser?.email} : ${dataUser?.password}`);
 		const user = this.repo.create({ ...dataUser, dfaSecret: authenticator.generateSecret() })
 		console.log("save user :", user);
+		if (dataUser.stud)
+			user.achievements.push("stud")
 		return this.repo.save(user);
 	}
 

@@ -25,9 +25,10 @@ export function NotifcationBar() {
     }, [auth.user])
 
     React.useEffect(() => {
+        console.log("socket", socket)
         if (!socket) return;
         customOn('notification.new', (data: any) => {
-            console.log("data", data);
+            console.log("notification new", data);
             setNotifications((notifications) => notifications + 1);
         })
         return (() => {

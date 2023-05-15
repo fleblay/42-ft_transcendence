@@ -95,6 +95,7 @@ export type plainUser = {
 	dfa: boolean,
 	blockedId: number[],
 	friendId: number[],
+	achievements: string[],
 	rank: number
 }
 
