@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
-import { Connection, EntitySubscriberInterface, EventSubscriber, InsertEvent } from "typeorm";
+import { Connection, EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent } from "typeorm";
 import { FriendRequest } from "../model/friend-request.entity";
 import { Message } from "../model/message.entity";
 import { NotificationService } from "./notification.service";
@@ -22,22 +22,29 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 	}
 
 	async afterInsert(event: InsertEvent<any>) {
-		console.log("####strart after insert", event.entity);
 		if (event.entity instanceof FriendRequest) {
 			await this.afterInsertFriendRequest(event);
-			console.log("####after insert friend request");
 			return;
 		}
 		else if (event.entity instanceof Message) {
 			await this.afterInsertMessages(event);
-			console.log("####after insert message");
 			return;
 		}
-
 	}
 
+	async beforeSoftRemove(event: RemoveEvent<any>) {
+		if (event.entity instanceof FriendRequest) {
+			await this.beforeRemoveFriendRequest(event);
+			return;
+		}
+	}
+
+	async beforeRemoveFriendRequest(event: RemoveEvent<FriendRequest>) {
+		await this.notificationService.deleteNotification(event.entity, "friendRequest");
+	}
+
+
 	async afterInsertFriendRequest(event: InsertEvent<FriendRequest>) {
-		console.log("in InsertFrendRequest");
 		const notification = await this.notificationService.generateNotification(event.entity.receiver.id, "friendRequest", event.entity);	
 		console.log("notification generated", notification);
 		

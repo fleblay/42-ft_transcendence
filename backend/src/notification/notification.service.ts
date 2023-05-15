@@ -5,6 +5,7 @@ import { User } from '../model/user.entity';
 import { Repository } from 'typeorm';
 import { Server } from 'socket.io';
 import { UsersService } from '../users/users.service';
+import { FriendRequest } from 'src/model/friend-request.entity';
 
 @Injectable()
 export class NotificationService {
@@ -19,41 +20,69 @@ export class NotificationService {
 
     setWsServer(server: Server) {
 		this.wsServer = server;
-	}
+	} 
 
-    async create(data: Partial<Notification>) {
-        const notification = this.repo.create(data);
-        return await this.repo.save(notification);
-    }        
-
-    async generateNotification(receiverId : number, type: NotificationType, data: NotificationContent) : Promise<Notification | null> {
+    async generateNotification(receiverId : number, type: NotificationType, data : any) : Promise<Notification | null> {
         console.log("generate notification");
-        const receiver = await this.usersService.findOne(receiverId);
+        const receiver : User | null= await this.usersService.findOne(receiverId);
         if (!receiver) {
             console.log("receiver not found");
             return null;
         }
-        const notification = this.repo.create({
+        console.log("receiver found", receiver);
+        const name = (type === "friendRequest") ? data.sender.username : data.channel.name;
+        const id = (type === "friendRequest") ? data.sender.id : data.channel.id;
+        const notification : Notification = await this.repo.save({
            user : receiver,
            type : type,
-           content : data
+           contentId : id,
+           name : name,
         });
-        console.log("notification created");
+       
         this.wsServer.to(`/notification/${receiver.id}`).emit('notification.new', notification);
-        console.log("notification sent");
         return notification;
+
     }
+
+    async deleteNotification(data : any, type : NotificationType) {
+
+        if (type === "friendRequest") {
+             const notification = await this.repo.findOne({
+                where : {
+                type : "friendRequest",
+                contentId : data.sender.id,
+                user : { id : data.receiver.id}
+            }
+        });
+        if (!notification) {
+            return;
+        }
+        const notificationId = notification.id;
+        await this.repo.remove(notification);
+        console.log("notification deleted", notificationId);
+        this.wsServer.to(`/notification/${data.receiver.id}`).emit('notification.delete', notificationId);
+    }
+}
+
     //
-    async getNotifications(user: User) {
-        return await this.repo.find({
+    async getNotifications(user: User) : Promise<Notification[]> {
+        const notifications = await this.repo.find({
             where : {
                 user : { id : user.id}
             },
             relations : ['user']
         });
+        
+        notifications.forEach(notification => {
+            notification.read = true;
+            this.repo.save(notification);
+        });
+        console.log("notifications", notifications);
+        return notifications;
     }
 
     async getNoReadNotifications(user: User) : Promise<Number>{
+
         return await this.repo.count({
             where : {
                 user : { id : user.id},

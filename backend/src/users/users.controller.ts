@@ -1,4 +1,4 @@
-import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query, UsePipes } from '@nestjs/common';
+import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query, UsePipes, UnauthorizedException } from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -63,7 +63,7 @@ export class UsersController {
 	async getMe(@Request() req: ExpressRequest) {
 		const token = req.cookies['access_token'];
 		if (!token) {
-			throw new ForbiddenException('User not found');
+			throw new UnauthorizedException('User not found');
 		}
 		let foundUser : User | null = await this.authService.validateAccessToken(token);
 		/*

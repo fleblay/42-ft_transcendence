@@ -27,18 +27,20 @@ export function NotifcationBar() {
     React.useEffect(() => {
         console.log("socket", socket)
         if (!socket) return;
-        customOn('notification.new', (data: any) => {
-            console.log("notification new", data);
+        const addBellNotification = (data: Notification) => {
+            console.log("notification new bell", data);
             setNotifications((notifications) => notifications + 1);
-        })
+        }
+        customOn('notification.new', addBellNotification)
         return (() => {
-            customOff('notification.new');
+            customOff('notification.new', addBellNotification);
         })
     }, [socket]);
 
     
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setNotifications(0);
         navigate("/notification");
     };
 

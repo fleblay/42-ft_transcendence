@@ -1,7 +1,8 @@
 import {
 	CanActivate,
 	ExecutionContext,
-    Injectable
+    Injectable,
+	UnauthorizedException
 } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { Request } from 'express';
@@ -26,7 +27,7 @@ export class ATGuard implements CanActivate {
 		// console.log ("access token", bearerToken)
 		if (!bearerToken) {
 			console.log("ATGuard: no bearer token");
-			return false;
+			throw new UnauthorizedException('not connected');
 		}
 		let decoded = jwt_decode(bearerToken) as any;
 		if (decoded.exp < Date.now() / 1000)
@@ -35,7 +36,7 @@ export class ATGuard implements CanActivate {
 		//console.log("ATGuard: user", user);
 		if (!user || user === undefined) {
 			console.log("ATGuard: no user");
-			return false;
+			throw new UnauthorizedException('not connected');
 		}
 		(request as Request & {currentUser: User}).currentUser  = user;
 		return true;

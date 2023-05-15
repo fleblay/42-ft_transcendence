@@ -11,12 +11,13 @@ export class NotificationController {
     }
 
     @Get('/myNotifications')
-    getMyNotifications(@CurrentUser() user: User) {
-        return this.notificationService.getNotifications(user);
+    async getMyNotifications(@CurrentUser() user: User) {
+        return await this.notificationService.getNotifications(user);
     }
 
     @Get('/noRead')
-    getNoReadNotifications(@CurrentUser() user: User) {
-        return this.notificationService.getNoReadNotifications(user);
+    async getNoReadNotifications(@CurrentUser() user: User) {
+        console.log("get no read notifications");
+        return await this.notificationService.getNoReadNotifications(user);
     }
 }

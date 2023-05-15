@@ -187,13 +187,13 @@ export type Error = {
 	status: number,
 }
 
-export type NotificationContent = Friend | Message;
 	
 
 export type Notification = {
 	id: number,
 	type: string,
-	content : NotificationContent,
+	contentId : number,
+	name: string,
 	read: boolean,
-	date: string,
+	createdAt: Date,
 }
