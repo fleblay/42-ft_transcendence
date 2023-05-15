@@ -122,14 +122,12 @@ export class FriendsService {
 		//FriendId
 		const indexInUser = user.friendId.indexOf(friendId);
 		const indexInFriend = friend.friendId.indexOf(user.id);
-		if (indexInUser === -1 || indexInFriend === -1) {
-			console.log("FriendId missing an element");
-			return;
+		if (indexInUser !== -1 && indexInFriend !== -1) {
+			user.friendId.splice(indexInUser, 1);
+			friend.friendId.splice(indexInFriend, 1);
+			await this.usersService.update(user.id, user);
+			await this.usersService.update(friend.id, friend);
 		}
-		user.friendId.splice(indexInUser, 1);
-		friend.friendId.splice(indexInFriend, 1);
-		await this.usersService.update(user.id, user);
-		await this.usersService.update(friend.id, friend);
 		//FriendId
 
 
