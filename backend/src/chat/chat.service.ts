@@ -367,6 +367,7 @@ export class ChatService implements OnModuleInit {
 				name: true,
 				private: true,
 				directMessage: true,
+				password: true,
 				members: {
 					role: true,
 					user: { id: true },
@@ -380,9 +381,9 @@ export class ChatService implements OnModuleInit {
 			const otherMember = members.find((member) => (member.user.id != user.id))
 			if (!otherMember)
 				throw new NotFoundException('Channel not found');
-			return { id: channel.id, directMessage: true, name: (otherMember.user.username || 'Unknown'), private: channel.private };
+			return { id: channel.id, directMessage: true, name: (otherMember.user.username || 'Unknown'), private: channel.private, hasPassword: !!channel.password };
 		}
-		return { id: channel.id, name: channel.name, directMessage: false, ownerId: channel.members.find((member) => member.role === 'owner')?.user.id, private: channel.private };
+		return { id: channel.id, name: channel.name, directMessage: false, ownerId: channel.members.find((member) => member.role === 'owner')?.user.id, private: channel.private, hasPassword: !!channel.password };
 	}
 
 
