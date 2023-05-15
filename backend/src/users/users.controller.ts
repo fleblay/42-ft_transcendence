@@ -128,7 +128,8 @@ export class UsersController {
 
 	@Get('/:id')
 	@UseGuards(ATGuard)
-	async findOne(@Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
+	@Serialize(UserDto)
+	async findOne(@CurrentUser() me: User, @Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
 		const user = await this.usersService.findOne(id, true);
 		if (!user) {
 			throw new ForbiddenException('User not found');
@@ -143,6 +144,10 @@ export class UsersController {
 			...user,
 			...this.gameService.userState(user.id),
 			...userScore,
+			...(id !== me.id ? {
+				email: undefined as any,
+				dfa: undefined as any,
+			}: {}),
 			userConnected: this.usersService.isConnected(user.id)
 		});
 	}
