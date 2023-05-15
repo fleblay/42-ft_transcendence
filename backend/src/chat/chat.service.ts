@@ -115,6 +115,7 @@ export class ChatService implements OnModuleInit {
 				private: true,
 				name: true,
 				directMessage: true,
+				password: true,
 				members: {
 					id: true,
 					role: true,
@@ -134,7 +135,7 @@ export class ChatService implements OnModuleInit {
 		//console.log("joinChannel : ", channel, options)
 		if (!channel)
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} does not exist`)
-		if (channel.password && (!options?.password || options.password != channel.password))
+		if (channel.password && !options.owner && options.password != channel.password)
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
 		if (channel.private && (!options.owner && channel.members.find((member) => (member.user.id == user.id))?.role != "owner"))
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
@@ -481,13 +482,11 @@ export class ChatService implements OnModuleInit {
 			throw new NotFoundException('Channel not found');
 		if (channel.directMessage)
 			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
-		if (changeChannelData.name && changeChannelData.name === channel.name)
-			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is already named ${changeChannelData.name}`)
-		if (changeChannelData.password && changeChannelData.password === channel.password)
-			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is already passworded ${changeChannelData.password}`)
+		if ((changeChannelData.name && changeChannelData.name === channel.name) && (changeChannelData.password && changeChannelData.password === channel.password))
+			return;
 		if (changeChannelData.name)
 			channel.name = changeChannelData.name
-		if (changeChannelData.password)
+		if (changeChannelData.password !== undefined)
 			channel.password = changeChannelData.password
 		await this.channelsRepo.save(channel)
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });

@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthService } from '../auth/AuthService';
-import { NotifcationBar } from './notifcationBar';
+import { NotifcationBar } from './notifications/notifcationsBar';
 import { Link as LinkRouter } from "react-router-dom";
 
 const pages = ['Game', 'Leaderboard', 'Chat'];

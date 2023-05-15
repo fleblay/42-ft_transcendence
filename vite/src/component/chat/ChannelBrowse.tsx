@@ -7,6 +7,7 @@ import { SocketContext } from "../../socket/SocketProvider"
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useDebouncedValue } from "../Debounced"
 import { SearchBar } from "../SearchBar"
+import { PasswordDialog } from "./PasswordDialog"
 
 interface ChannelMap { [id: number]: PublicChannel };
 
@@ -14,6 +15,8 @@ export const ChannelBrowser: FC = () => {
 	const [publicChannels, setPublicChannels] = useState<ChannelMap>({});
 	const [searchChannel, setSearchChannel] = useState<string>("");
 	const [debouncedSearchChannel] = useDebouncedValue(searchChannel, 10);
+
+	const [passwordDialogChannel, setPasswordDialogChannel] = useState<number | undefined>(undefined);
 
 	const navigate = useNavigate();
 
@@ -50,8 +53,8 @@ export const ChannelBrowser: FC = () => {
 		});
 	}, []);
 
-	const joinChannel = (channelId: number) => {
-		apiClient.post(`/api/chat/channels/${channelId}/join`).then((response) => {
+	const joinChannel = (channelId: number, password?: string) => {
+		apiClient.post(`/api/chat/channels/${channelId}/join`, { password }).then((response) => {
 			console.log("joinChannel", response);
 			navigate(`/chat/${channelId}`);
 		}).catch((error) => {
@@ -114,10 +117,26 @@ export const ChannelBrowser: FC = () => {
 									</Box>
 								)
 							}
-							<Button onClick={() => joinChannel(channel.id)} variant='contained' color='success'>Join</Button>
+							<Button
+								onClick={() => {
+									if (channel.hasPassword)
+										setPasswordDialogChannel(channel.id);
+									else
+										joinChannel(channel.id)
+								}}
+								variant='contained' color='success'
+							>Join</Button>
 						</ListItem>
 					))}
 			</List>
+			<PasswordDialog
+				open={!!passwordDialogChannel}
+				handleClose={() => setPasswordDialogChannel(undefined)}
+				handleConfirm={(password) => {
+					if (!passwordDialogChannel) return;
+					joinChannel(passwordDialogChannel, password)
+				}}
+			/>
 		</Box>
 	)
 }

@@ -186,3 +186,14 @@ export type Error = {
 	message: string,
 	status: number,
 }
+
+export type NotificationContent = Friend | Message;
+	
+
+export type Notification = {
+	id: number,
+	type: string,
+	content : NotificationContent,
+	read: boolean,
+	date: string,
+}

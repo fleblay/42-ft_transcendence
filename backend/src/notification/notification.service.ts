@@ -3,13 +3,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Notification, NotificationContent, NotificationType } from '../model/notification.entity';
 import { User } from '../model/user.entity';
 import { Repository } from 'typeorm';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class NotificationService {
 
-    constructor(@InjectRepository(Notification) private repo: Repository<Notification>) {
+    private wsServer: Server;
+    constructor(@InjectRepository(Notification)
+    private repo: Repository<Notification>,
+    ) {
 
     }
+
+    setWsServer(server: Server) {
+		this.wsServer = server;
+	}
 
     async create(data: Partial<Notification>) {
         const notification = this.repo.create(data);
@@ -22,6 +30,7 @@ export class NotificationService {
            type : type,
            content : data
         });
+        this.wsServer.to(`notification/${receiver.id}`).emit('notification.new', notification);
         return await this.repo.save(notification);
     }
     
@@ -33,6 +42,17 @@ export class NotificationService {
             relations : ['user']
         });
     }
+
+    async getNoReadNotifications(user: User) : Promise<Number>{
+        return await this.repo.count({
+            where : {
+                user : { id : user.id},
+                read : false
+            },
+            relations : ['user']
+        });
+    }
+
 
     
 
