@@ -9,7 +9,7 @@ export interface SocketContextType {
 	socket: Socket | null
 	customEmit: (eventname: string, data: any, callback?: (response: any) => void) => Socket | null
 	customOn: (eventName: string, callback: (data: any) => void) => Socket | null
-	customOff: (eventName: string, callback?: (data: any) => void) => Socket | null
+	customOff: (eventName: string, callback: (data: any) => void) => Socket | null
 	addSubscription: (sub: string) => (() => void) | void
 }
 export let SocketContext = React.createContext<SocketContextType>(null!)
@@ -51,19 +51,12 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		return socket.on(eventName, callback)
 	}
 
-	function customOff(eventName: string, listener?: (data: any) => void) {
+	function customOff(eventName: string, listener: (data: any) => void) {
 		if (!socket) return null;
 
 		listOn.current = listOn.current.filter((event) => event !== eventName)
 		return socket.off(eventName, listener)
 	}
-
-	// const onConnect = React.useCallback(() => {
-	// 	console.log('Connected to socket')
-	// 	customEmit('ping', { message: "This is my first ping" }, (response: any) => {
-	// 		console.log(response)
-	// 	})
-	// }, [socket])
 
 	React.useEffect(() => {
 		if (!auth.user) return;
