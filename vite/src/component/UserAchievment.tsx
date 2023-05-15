@@ -25,37 +25,37 @@ function renderSwitch(achievement: string): JSX.Element {
 		case 'boss':
 			return (
 				<Tooltip title="Boss : Win 100 or more points">
-					<AutoAwesomeIcon fontSize={'large'} />
+					<AutoAwesomeIcon color="primary" fontSize={'large'} />
 				</Tooltip>
 			)
 		case 'quitter':
 			return (
 				<Tooltip title="Quitter : Leave a game before the end">
-					<ThumbDownOffAltIcon fontSize={'large'} />
+					<ThumbDownOffAltIcon color="error" fontSize={'large'} />
 				</Tooltip>
 			)
 		case 'friend':
 			return (
 				<Tooltip title="Friendly : Play a game with a friend">
-					<PeopleIcon fontSize={'large'} />
+					<PeopleIcon color="primary" fontSize={'large'} />
 				</Tooltip>
 			)
 		case 'perfect':
 			return (
 				<Tooltip title="Accurate : Win a game without loosing a single point">
-					<RadarIcon fontSize={'large'} />
+					<RadarIcon color="primary" fontSize={'large'} />
 				</Tooltip>
 			)
 		case 'number1':
 			return (
-				<Tooltip title="Xav : Be the first of the LeaderBoard at some point">
-					<EmojiEventsIcon fontSize={'large'} />
+				<Tooltip title="Xav, the boss of the game : Be the first of the LeaderBoard at some point">
+					<EmojiEventsIcon color="primary" fontSize={'large'} />
 				</Tooltip>
 			)
 		case 'stud':
 			return (
 				<Tooltip title="Stud : Login with 42">
-					<SchoolIcon fontSize={'large'} />
+					<SchoolIcon color="primary" fontSize={'large'} />
 				</Tooltip>
 			)
 		default:
