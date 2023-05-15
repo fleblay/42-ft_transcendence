@@ -1,4 +1,4 @@
-import React, { Dispatch, MutableRefObject, SetStateAction, useContext, useEffect, useState } from "react";
+import React, { Dispatch, MutableRefObject, SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { Avatar, Badge, List, ListItem, ListItemAvatar, ListItemButton, ListItemIcon, ListItemText, Typography, Menu, MenuItem, Button, Grid, IconButton, Modal, Box, Divider } from "@mui/material";
 import { Link as LinkRouter, useNavigate } from "react-router-dom";
@@ -106,6 +106,7 @@ function subscribeToMemberEvents(addSubscription: (sub: string) => (() => void) 
 
 	const fxArray: ((() => void) | void)[] = []
 
+	console.log("updating subscription list")
 	for (const [key, value] of Object.entries(memberList)) {
 		value.forEach((member) => {
 			fxArray.push(addSubscription(`/player/${member.user.id}`))
@@ -153,17 +154,15 @@ function addNewMember(newMember: Member, memberList: memberList): memberList {
 
 export function MemberList({ channelId }: { channelId: string }) {
 	const auth = useAuthService()
+	const navigate = useNavigate()
 	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 	const [memberList, setMemberList] = useState<memberList>(emptyMemberList);
-	const [memberListFetched, setMemberListFetched] = useState<boolean>(false);
+	const memberListFetched : MutableRefObject<boolean> = useRef(false)
 	const [me, setMe] = useState<Member | null>(null);
-	const navigate = useNavigate()
+	const unSubscribeFxArray : MutableRefObject<((() => void) | void)[]> = useRef([])
 
-	//On track sur memberList car au premier render, elle a la valeur emptyMemberList
-	//On ajout un on sur l'event chat.member.update
-	//Le call back prend en param la memberList qui est update apres le premier api.Client.get
 	useEffect(() => {
-		if (!memberListFetched)
+		if (!memberListFetched.current)
 			return
 		function onMemberUpdate({ modifyMember: upDatedMember }: { modifyMember: Member }) {
 			console.log("onMemberUpdate", upDatedMember);
@@ -180,6 +179,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 		function onMemberJoin({ joinedMember }: { joinedMember: Member }) {
 			console.log("onMemberJoin", joinedMember);
 			setMemberList(addNewMember(joinedMember, memberList))
+			unSubscribeFxArray.current = subscribeToMemberEvents(addSubscription, memberList)
 		}
 
 		function onMemberLeave({ leftMember }: { leftMember: Member }) {
@@ -198,18 +198,18 @@ export function MemberList({ channelId }: { channelId: string }) {
 		customOn("chat.member.new", onMemberJoin);
 		customOn("chat.member.leave", onMemberLeave);
 		customOn("page.player", onPlayerEvent);
-		const fxArray: ((() => void) | void)[] = subscribeToMemberEvents(addSubscription, memberList)
+		unSubscribeFxArray.current = subscribeToMemberEvents(addSubscription, memberList)
 		return (() => {
 			customOff("chat.modify.members", onMemberUpdate);
 			customOff("chat.member.new", onMemberJoin);
 			customOff("chat.member.leave", onMemberLeave);
 			customOff("page.player", onPlayerEvent);
-			fxArray.forEach(fx => {
+			unSubscribeFxArray.current.forEach(fx => {
 				if (typeof fx === "function")
 					fx()
 			})
 		})
-	}, [memberListFetched])
+	}, [memberListFetched.current])
 
 
 	useEffect(() => {
@@ -233,7 +233,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 			console.log("Je suis : ", me)
 		}).catch((error) => {
 			console.log(error);
-		}).then(() => setMemberListFetched(true))
+		}).then(() => memberListFetched.current = true)
 	}, [channelId]);
 
 	function GenerateMemberActionList({ member }: { member: Member }): JSX.Element {
@@ -402,7 +402,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 						</Badge>
 
 						<Box sx={{ display: "flex", alignContent: "center" }} >
-							{`${member.user.rank != -1 ? ("#" + member.user.rank) : ""} - ${member.user.username}`}
+							{`${member.user.username}`}
 							{member.role == "owner" && <MilitaryTechIcon />}
 							{(Date.parse(member.muteTime) > Date.now()) && <VolumeOffIcon />}
 							{member.states.includes("ingame") && <VideogameAssetIcon />}
