@@ -16,6 +16,7 @@ export class User{
 
 	@Column()
 	email: string;
+
 	@Column()
 	password: string;
 
@@ -30,6 +31,9 @@ export class User{
 
 	@Column({default : false})
 	stud : boolean;
+
+	@Column("text", { array: true, default: [] })
+	achievements : string[];
 
 	@Column({default : false})
 	dfa: boolean;
