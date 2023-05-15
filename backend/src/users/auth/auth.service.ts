@@ -7,13 +7,10 @@ import { LoginUserDto } from '../dtos/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from '../../model/refresh-token.entity';
 import { Repository } from 'typeorm';
-import { randomBytes, scrypt as _scrypt } from 'crypto';
-import { promisify } from 'util';
 import { toDataURL } from 'qrcode'
 import { authenticator } from 'otplib'
 import { Login42User, Tokens } from '../../type';
-
-const scrypt = promisify(_scrypt);
+import { hashPassword, verifyPassword } from './hashPassword';
 
 const access_token_options = { expiresIn: '1m', secret: 'access' };
 const refresh_token_options = { expiresIn: '7d', secret: 'refresh' };
@@ -99,10 +96,8 @@ export class AuthService {
 		if (user.stud && checkStud)
 			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
 
-		const [salt, storedHash] = user.password.split('.');
-		const hashedPassword = await this.hashPassword(dataUser.password, salt);
 
-		if (hashedPassword !== `${salt}.${storedHash}`)
+		if (await verifyPassword(user.password, dataUser.password) === false)
 			throw new ForbiddenException('Password not match');
 		if (user.dfa) {
 			// return dfa token
@@ -134,7 +129,7 @@ export class AuthService {
 		if (await this.usersService.findOneByUsername(dataUser.username))
 			throw new ForbiddenException('username is not unique');
 
-		dataUser.password = await this.hashPassword(dataUser.password);
+		dataUser.password = await hashPassword(dataUser.password);
 
 		const user = await this.usersService.create(dataUser);
 		const tokens = this.getTokens(user);
@@ -258,14 +253,5 @@ export class AuthService {
 		const report = await this.repo.findOne({ where: { refreshToken } });
 		if (!report) return;
 		await this.repo.delete(report.id);
-	}
-
-	private async hashPassword(password: string, salt?: string) {
-		if (!salt)
-			salt = randomBytes(8).toString('hex');
-		const buf = (await scrypt(password, salt, 32)) as Buffer;
-
-		const hashedPassword = `${salt}.${buf.toString('hex')}`;
-		return hashedPassword;
 	}
 }

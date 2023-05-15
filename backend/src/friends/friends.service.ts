@@ -31,9 +31,12 @@ export class FriendsService {
 			console.log("User not found");
 			return null;
 		}
-
 		if (user.id === friendId) {
 			console.log("You can't add yourself as a friend");
+			return null;
+		}
+		if (friend.blockedId.includes(user.id)) {
+			console.log("You can't add as user that has blocked you");
 			return null;
 		}
 		if (await this.getFriendRequest(user, friendId)) {
@@ -52,8 +55,8 @@ export class FriendsService {
 		this.usersService.unblockUser(user, friendId);
 		const newFriend = this.generateFriend(user, friend, newRequest);
 
-		this.server.to(`/player/${user.id}`).emit('page.player', {})
-		this.server.to(`/player/${friendId}`).emit('page.player', {})
+		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: friendId, event: "add" })
+		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId: friendId, event: "me-add" })
 		return newFriend;
 	}
 
@@ -67,6 +70,7 @@ export class FriendsService {
 			requestStatus: friendRequest.status
 		} as Friend
 	}
+
 	async acceptFriend(user: User, friendId: number) {
 		const friend = await this.usersService.findOne(friendId);
 		if (!friend) {
@@ -94,8 +98,8 @@ export class FriendsService {
 		await this.usersService.update(friend.id, friend);
 		//FriendId
 
-		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : friendId, event: "accept" })
-		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId : friendId, event: "me-accept" })
+		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: friendId, event: "accept" })
+		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId: friendId, event: "me-accept" })
 
 		const friendData = this.generateFriend(user, friend, friendRequest);
 		this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', {
@@ -131,10 +135,14 @@ export class FriendsService {
 			await this.usersService.update(friend.id, friend);
 		}
 		//FriendId
-
-
-		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId : friendId, event: "remove" })
-		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId : friendId, event: "me-remove" })
+		if (friendRequest.status == "pending") {
+			this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: friendId, event: "pending-delete" })
+			this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId: friendId, event: "me-pending-delete" })
+		}
+		else if (friendRequest.status == "accepted") {
+			this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: friendId, event: "remove" })
+			this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId: friendId, event: "me-remove" })
+		}
 		return {
 			friendId: friendId,
 			status: 'declined'

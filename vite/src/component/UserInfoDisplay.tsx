@@ -16,8 +16,8 @@ import { useAuthService } from '../auth/AuthService';
 interface UserInfoDisplayProps {
 	idPlayer: string | undefined;
 	displayBlocked: boolean;
-	setRender? : (render: boolean) => void ;
-	render? : boolean;
+	setRender?: (render: boolean) => void;
+	render?: boolean;
 
 
 }
@@ -43,7 +43,7 @@ export const handleBlockUser = (idPlayer: string | undefined) => {
 
 
 
-export function UserInfoDisplay({ idPlayer, displayBlocked , setRender, render }: UserInfoDisplayProps) {
+export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }: UserInfoDisplayProps) {
 
 	const [userData, setUserData] = useState<UserInfo | null>(null);
 	const imgPath = `/avatars/${idPlayer}.png`;
@@ -99,17 +99,17 @@ export function UserInfoDisplay({ idPlayer, displayBlocked , setRender, render }
 
 	React.useEffect(() => {
 		if (!socket) return;
-		customOn('page.player', (data: any) => {
+		function updateComponent(data: any) {
 			console.log("data", data);
-			if (userData)
-			{
+			if (userData) {
 				setDisplayUpdate(!displayUpdate);
 				if (setRender)
 					setRender(!render)
 			}
-		})
+		}
+		customOn('page.player', updateComponent)
 		return (() => {
-			customOff('page.player');
+			customOff('page.player', updateComponent);
 		})
 	}, [socket, userData]);
 
@@ -121,13 +121,14 @@ export function UserInfoDisplay({ idPlayer, displayBlocked , setRender, render }
 
 	React.useEffect(() => {
 		if (!socket) return;
-		customOn('page.player', (data: any) => {
+		function updateUserData(data: any) {
 			console.log("data", data);
 			if (userData)
 				setUserData({ ...userData, ...data });
-		})
+		}
+		customOn('page.player', updateUserData)
 		return (() => {
-			customOff('page.player');
+			customOff('page.player', updateUserData);
 		})
 	}, [socket, userData]);
 
@@ -157,7 +158,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked , setRender, render }
 	const handleRemoveFriend = () => {
 		apiClient.post(`/api/friends/remove/${idPlayer}`).then((response) => {
 			console.log("reponseRemoveFriend", response.data);
-				setRelation(null);
+			setRelation(null);
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -211,7 +212,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked , setRender, render }
 
 					{itsMe ? <UpdateProfil /> : (
 						<>
-							{renderButton(relation)}
+							{auth.user && userData && !userData.blockedId.includes(auth.user?.id) && renderButton(relation) || <Box sx={{ml : 'auto', mr: 1, mt: 2, mb: 2}}></Box>}
 							{displayBlocked && isBlocked ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleUnblockUser(idPlayer)}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleBlockUser(idPlayer)}>block</Button>}
 						</>
 					)}

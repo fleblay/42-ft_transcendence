@@ -65,7 +65,7 @@ export class UsersController {
 		if (!token) {
 			throw new UnauthorizedException('User not found');
 		}
-		let foundUser : User | null = await this.authService.validateAccessToken(token);
+		let foundUser: User | null = await this.authService.validateAccessToken(token);
 		/*
 		if (foundUser) {
 			const friendId: number[] = (await this.friendsService.getFriendsList(foundUser))
@@ -73,7 +73,7 @@ export class UsersController {
 			return {...foundUser, friendId}
 		}
 		*/
-	   return foundUser
+		return foundUser
 	}
 
 	@Patch('/me')
@@ -126,17 +126,10 @@ export class UsersController {
 		}
 	};
 
-	// TODO: In user controller return all channels that user is in
-	@Get('/channels')
-	@UseGuards(ATGuard)
-	getChannels(@CurrentUser() user: User) {
-		return 'users/ channels'
-		return []
-	}
-
 	@Get('/:id')
 	@UseGuards(ATGuard)
-	async findOne(@Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
+	@Serialize(UserDto)
+	async findOne(@CurrentUser() me: User, @Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
 		const user = await this.usersService.findOne(id, true);
 		if (!user) {
 			throw new ForbiddenException('User not found');
@@ -151,6 +144,10 @@ export class UsersController {
 			...user,
 			...this.gameService.userState(user.id),
 			...userScore,
+			...(id !== me.id ? {
+				email: undefined as any,
+				dfa: undefined as any,
+			}: {}),
 			userConnected: this.usersService.isConnected(user.id)
 		});
 	}

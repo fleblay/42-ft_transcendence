@@ -1,4 +1,4 @@
-import { AfterInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { AfterInsert, Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Member } from "./member.entity";
 import { Message } from "./message.entity";
 import { WebSocketServer } from "@nestjs/websockets";
@@ -8,7 +8,7 @@ import { Server} from 'socket.io'
 export class Channel {
 
 	private server : Server;
-	
+
 	setServer(server : Server) {
 		this.server = server;
 	}
@@ -34,12 +34,12 @@ export class Channel {
 	@Column({ default: false })
 	directMessage: boolean;
 
+	@DeleteDateColumn()
+	deletedAt: Date;
 
 	@AfterInsert()
 	afterInsert() {
 		console.log('Inserted Channel');
 		this.server.emit('chat.message.new', {content: this.name, id: this.id});
 	}
-
 }
-//

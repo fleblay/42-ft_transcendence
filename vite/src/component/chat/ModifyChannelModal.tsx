@@ -3,7 +3,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useState } from 'react';
 import { ChannelInfo } from '../../types';
 import apiClient from '../../auth/interceptor.axios';
-import { Box, Button, Container, Divider, FormControl, IconButton, Input, InputAdornment, InputLabel, Modal, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, Divider, FormControl, IconButton, Input, InputAdornment, InputLabel, Modal, TextField, Typography } from '@mui/material';
 
 export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, open: boolean, handleClose: () => void }> = ({ channelInfo, open, handleClose }) => {
 	const [error, setError] = useState<string | null>(null);
@@ -60,6 +60,11 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 
 					<form onSubmit={handleSubmit} style={{ width: '50%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
 						<TextField required label="name" type="name" name="name" defaultValue={channelInfo?.name} sx={{ flexGrow: 1, }} />
+						{
+							(!channelInfo?.private && channelInfo?.hasPassword && <Alert severity="warning">
+								Careful, leaving blank will delete the password
+							</Alert>)
+						}
 						{!channelInfo?.private && <TextField label="Password" type="password" name="password" sx={{ flexGrow: 1, }} />}
 						<Button variant="outlined" type='submit' sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>
 							Modify

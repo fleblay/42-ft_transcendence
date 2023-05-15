@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import apiClient from '../../auth/interceptor.axios';
 import { MessageArea } from './MessageArea';
 import { SocketContext } from '../../socket/SocketProvider';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MemberList } from './ChannelMemberList';
 import { Channel, ChannelInfo } from '../../types'
 import ChatMenu from './ChatMenu';
@@ -13,6 +13,7 @@ import { useAuthService } from '../../auth/AuthService';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import { ModifyChannelModal } from './ModifyChannelModal';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | null, channelId: string }) => {
 	const { user } = useAuthService()
@@ -30,8 +31,10 @@ const MyChannels = ({ channelInfo, channelId }: { channelInfo: ChannelInfo | nul
 					&& (
 						<>
 							<Grid item xs={8}>
-								<Typography textAlign={'center'}>
-									{!channelInfo.directMessage && channelInfo.private && <ShieldOutlinedIcon sx={{ color: (theme) => theme.palette.grey[500], marginRight: 1 }} />}
+								<Typography textAlign={'center'} >
+									{!channelInfo.directMessage && channelInfo.private && <ShieldOutlinedIcon style={{ verticalAlign: 'middle' }} sx={{ color: (theme) => theme.palette.grey[500], marginRight: 1, marginBottom: 0.5 }} />}
+									{!channelInfo.directMessage && channelInfo.hasPassword && <LockOutlinedIcon style={{ verticalAlign: 'middle' }} sx={{ color: (theme) => theme.palette.grey[500], marginRight: 1, marginBottom: 0.5 }} />}
+
 									{channelInfo.name}
 									{!channelInfo.directMessage
 										&& channelInfo.ownerId
@@ -86,11 +89,15 @@ export function ChatPage() {
 	const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
+	const auth = useAuthService();
 
 	useEffect(() => {
-		console.log('changing chat', channelId)
 		return addSubscription(`/chat/${channelId || ''}`);
 	}, [channelId]);
+
+	useEffect(() => {
+		return addSubscription(`/chat/myChannels/${auth.user?.id}`);
+	}, [auth.user?.id]);
 
 	useEffect(() => {
 		function onChannelModify(channel: Channel) {

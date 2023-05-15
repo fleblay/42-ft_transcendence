@@ -22,13 +22,8 @@ const joinChannel = (channelId: number) => {
 
 export function MyChannelsList() {
 	const navigate = useNavigate();
-	const auth = useAuthService();
 	const [myChannelsList, setMyChannelsList] = useState<{ [id: number]: Channel }>({});
 	const { customOff, customOn, addSubscription } = useContext(SocketContext);
-
-	useEffect(() => {
-		return addSubscription(`/chat/myChannels/${auth.user?.id}`);
-	}, [auth.user?.id]);
 
 	// event list :
 	// ban

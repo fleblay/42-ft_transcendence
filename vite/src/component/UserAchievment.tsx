@@ -1,6 +1,6 @@
 
 import React, { useContext, useState } from 'react';
-import { Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 
 
 import { Box } from '@mui/system';
@@ -12,6 +12,56 @@ import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 
 import { UserDataContext } from '../userDataProvider/userDataProvider';
+
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import PeopleIcon from '@mui/icons-material/People';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import RadarIcon from '@mui/icons-material/Radar';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import SchoolIcon from '@mui/icons-material/School';
+
+function renderSwitch(achievement: string): JSX.Element {
+	switch (achievement) {
+		case 'boss':
+			return (
+				<Tooltip title="Boss : Win 100 or more points">
+					<AutoAwesomeIcon color="primary" fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'quitter':
+			return (
+				<Tooltip title="Quitter : Leave a game before the end">
+					<ThumbDownOffAltIcon color="error" fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'friend':
+			return (
+				<Tooltip title="Friendly : Play a game with a friend">
+					<PeopleIcon color="primary" fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'perfect':
+			return (
+				<Tooltip title="Accurate : Win a game without loosing a single point">
+					<RadarIcon color="primary" fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'number1':
+			return (
+				<Tooltip title="Xav, the boss of the game : Be the first of the LeaderBoard at some point">
+					<EmojiEventsIcon color="primary" fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'stud':
+			return (
+				<Tooltip title="Stud : Login with 42">
+					<SchoolIcon color="primary" fontSize={'large'} />
+				</Tooltip>
+			)
+		default:
+			return (<></>)
+	}
+}
 
 
 export function UserAchivement() {
@@ -54,11 +104,11 @@ export function UserAchivement() {
 					Achievements :</Typography>
 				<div style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingBottom: '1rem' }}>
 					<Divider />
-					{userData?.achievements.map((achievement) => {
+					{userData?.achievements.map((achievement, index) => {
 						return (
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+							<div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									{achievement}
+									{renderSwitch(achievement)}
 								</Typography>
 
 							</div>

@@ -168,6 +168,7 @@ export type ChannelInfo = {
 	id: number;
 	name: string;
 	private: boolean;
+	hasPassword: boolean;
 	directMessage: boolean;
 	ownerId: number | undefined;
 }

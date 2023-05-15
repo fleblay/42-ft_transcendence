@@ -91,6 +91,10 @@ function userUpDateState(me: Member | null, setMe: Dispatch<SetStateAction<Membe
 						me.user.friendId = me.user.friendId.filter((friend) => friend != userId)
 					setMe(me)
 					break
+				case ("pending-delete"):
+					break
+				case ("me-pending-delete"):
+					break
 			}
 		}
 	}

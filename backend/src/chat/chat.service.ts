@@ -14,6 +14,7 @@ import { ChangeChannelDto } from './dto/change-channel.dto';
 import { GameService } from 'src/game/game.service';
 import { ChannelInfo, Friend, PublicChannel, ShortUser } from '../type';
 import { FriendsService } from 'src/friends/friends.service';
+import { hashPassword, verifyPassword } from '../users/auth/hashPassword';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -100,7 +101,7 @@ export class ChatService implements OnModuleInit {
 		const channel: Channel = await this.channelsRepo.save({
 			name: data.name,
 			private: data.private,
-			password: data.password,
+			password: data.password ? await hashPassword(data.password) : '',
 			directMessage: data.directMessage ? true : false
 		})
 		return channel.id
@@ -135,7 +136,7 @@ export class ChatService implements OnModuleInit {
 		//console.log("joinChannel : ", channel, options)
 		if (!channel)
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} does not exist`)
-		if (channel.password && !options.owner && options.password != channel.password)
+		if (channel.password && !options.owner && (!options.password || !await verifyPassword(channel.password, options.password)))
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
 		if (channel.private && (!options.owner && channel.members.find((member) => (member.user.id == user.id))?.role != "owner"))
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
@@ -321,7 +322,7 @@ export class ChatService implements OnModuleInit {
 				gameId: true,
 				content: true,
 				createdAt: true,
-				owner: { user: { id: true, username: true, blockedId: true, friendId: true, rank: true}, role: true, banned: true, left: true, muteTime: true },
+				owner: { user: { id: true, username: true, blockedId: true, friendId: true, rank: true }, role: true, banned: true, left: true, muteTime: true },
 			},
 			skip: offset,
 			take: 10,
@@ -346,7 +347,7 @@ export class ChatService implements OnModuleInit {
 				banned: true,
 				muteTime: true,
 				left: true,
-				user: { id: true, username: true, blockedId: true, friendId: true, rank: true},
+				user: { id: true, username: true, blockedId: true, friendId: true, rank: true },
 			},
 		});
 		return members
@@ -366,6 +367,7 @@ export class ChatService implements OnModuleInit {
 				name: true,
 				private: true,
 				directMessage: true,
+				password: true,
 				members: {
 					role: true,
 					user: { id: true },
@@ -379,9 +381,9 @@ export class ChatService implements OnModuleInit {
 			const otherMember = members.find((member) => (member.user.id != user.id))
 			if (!otherMember)
 				throw new NotFoundException('Channel not found');
-			return { id: channel.id, directMessage: true, name: (otherMember.user.username || 'Unknown'), private: channel.private };
+			return { id: channel.id, directMessage: true, name: (otherMember.user.username || 'Unknown'), private: channel.private, hasPassword: !!channel.password };
 		}
-		return { id: channel.id, name: channel.name, directMessage: false, ownerId: channel.members.find((member) => member.role === 'owner')?.user.id, private: channel.private };
+		return { id: channel.id, name: channel.name, directMessage: false, ownerId: channel.members.find((member) => member.role === 'owner')?.user.id, private: channel.private, hasPassword: !!channel.password };
 	}
 
 
@@ -482,16 +484,21 @@ export class ChatService implements OnModuleInit {
 			throw new NotFoundException('Channel not found');
 		if (channel.directMessage)
 			throw new ForbiddenException(`modifyChannel : channeld with id ${channelId} is a direct message channel`)
-		if ((changeChannelData.name && changeChannelData.name === channel.name) && (changeChannelData.password && changeChannelData.password === channel.password))
+		if ((changeChannelData.name && changeChannelData.name === channel.name) && (channel.password && changeChannelData.password && await verifyPassword(channel.password, changeChannelData.password)))
 			return;
 		if (changeChannelData.name)
 			channel.name = changeChannelData.name
 		if (changeChannelData.password !== undefined)
-			channel.password = changeChannelData.password
+			channel.password = changeChannelData.password ? await hashPassword(changeChannelData.password) : ''
 		await this.channelsRepo.save(channel)
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });
-		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', await this.getChannelInfo(user, channelId));
+		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
+		this.wsServer.to('/chat/public').emit('chat.public.update', {
+			id: channel.id,
+			name: channel.name,
+			hasPassword: !!channel.password
+		} as PublicChannel);
 	}
 
 	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {
@@ -509,6 +516,10 @@ export class ChatService implements OnModuleInit {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
+		if (member.role === 'owner') {
+			await this.deleteChannel(member, channelId);
+			return;
+		}
 		member.left = true;
 		const leftMember = await this.membersRepo.save(member);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.member.leave', { leftMember });
@@ -527,6 +538,15 @@ export class ChatService implements OnModuleInit {
 				owner: channel.members.find(member => member.role === 'owner')?.user as ShortUser,
 			} as PublicChannel);
 		}
+	}
+
+	async deleteChannel(owner: Member, channelId: number) {
+		if (!owner || owner.role !== 'owner')
+			throw new ForbiddenException('You must be the owner of the channel to delete it');
+		await this.emitToAllMembers(channelId, 'chat.channel.leave', async () => (channelId));
+		this.wsServer.to('/chat/public').emit('chat.public.delete', channelId);
+		if (owner.channel?.id)
+			await this.channelsRepo.softRemove(owner.channel);
 	}
 
 	async getMyChannels(user: User): Promise<Channel[]> {
@@ -548,7 +568,7 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
-					user: { id: true, username: true},
+					user: { id: true, username: true },
 					left: true,
 				},
 			},
@@ -575,7 +595,7 @@ export class ChatService implements OnModuleInit {
 					id: true,
 					left: true,
 					role: true,
-					user: { id: true, username: true, blockedId: true, friendId : true, rank: true},
+					user: { id: true, username: true, blockedId: true, friendId: true, rank: true },
 				},
 			},
 			relationLoadStrategy: "query",
@@ -601,7 +621,7 @@ export class ChatService implements OnModuleInit {
 				password: true,
 				members: {
 					id: true,
-					user: { id: true, username: true, blockedId: true, friendId: true, rank: true},
+					user: { id: true, username: true, blockedId: true, friendId: true, rank: true },
 					left: true,
 				},
 			},
@@ -672,7 +692,7 @@ export class ChatService implements OnModuleInit {
 					directMessage: true,
 					members: {
 						id: true,
-						user: { id: true, username: true, blockedId: true, friendId: true, rank: true},
+						user: { id: true, username: true, blockedId: true, friendId: true, rank: true },
 					},
 				},
 			},
@@ -718,7 +738,7 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
-	async leaveDirectMessage(user: User, friendId : number) {
+	async leaveDirectMessage(user: User, friendId: number) {
 		const channel = await this.getDMChannel(user, { id: friendId });
 		if (!channel)
 			return;
