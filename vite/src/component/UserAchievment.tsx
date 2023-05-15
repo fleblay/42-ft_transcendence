@@ -104,9 +104,9 @@ export function UserAchivement() {
 					Achievements :</Typography>
 				<div style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingBottom: '1rem' }}>
 					<Divider />
-					{userData?.achievements.map((achievement) => {
+					{userData?.achievements.map((achievement, index) => {
 						return (
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+							<div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
 									{renderSwitch(achievement)}
 								</Typography>
