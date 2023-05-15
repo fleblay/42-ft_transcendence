@@ -91,7 +91,6 @@ export function ChatPage() {
 	const { channelId } = useParams();
 
 	useEffect(() => {
-		console.log('changing chat', channelId)
 		return addSubscription(`/chat/${channelId || ''}`);
 	}, [channelId]);
 

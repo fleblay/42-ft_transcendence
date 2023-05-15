@@ -491,7 +491,8 @@ export class ChatService implements OnModuleInit {
 		if (changeChannelData.password !== undefined)
 			channel.password = changeChannelData.password ? await hashPassword(changeChannelData.password) : ''
 		await this.channelsRepo.save(channel)
-		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', { channel });
+
+		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', await this.getChannelInfo(user, channelId));
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
 	}
