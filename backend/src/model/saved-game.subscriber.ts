@@ -24,8 +24,8 @@ export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame>
 		if (game.players[0].id == user.id || game.players[1].id == user.id) {
 			if (rankArray[user.rank].points > 100 && !user.achievements.includes("boss"))
 				user.achievements.push("boss")
-			if (game.winner.id != user.id && game.score.includes(-42) && !user.achievements.includes("quiter"))
-				user.achievements.push("quiter")
+			if (game.winner.id != user.id && game.score.includes(-42) && !user.achievements.includes("quitter"))
+				user.achievements.push("quitter")
 			if (game.winner.id == user.id && game.score.includes(0) && !user.achievements.includes("perfect"))
 				user.achievements.push("perfect")
 			if (game.players[0].friendId.includes(game.players[1].id)
@@ -33,6 +33,8 @@ export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame>
 				&& !user.achievements.includes("friend"))
 				user.achievements.push("friend")
 		}
+		if (user.rank == 0 && !user.achievements.includes("number1"))
+			user.achievements.push("number1")
 		user.rank++
 	}
 

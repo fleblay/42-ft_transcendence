@@ -1,6 +1,6 @@
 
 import React, { useContext, useState } from 'react';
-import { Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 
 
 import { Box } from '@mui/system';
@@ -12,6 +12,56 @@ import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 
 import { UserDataContext } from '../userDataProvider/userDataProvider';
+
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import PeopleIcon from '@mui/icons-material/People';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import RadarIcon from '@mui/icons-material/Radar';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import SchoolIcon from '@mui/icons-material/School';
+
+function renderSwitch(achievement: string): JSX.Element {
+	switch (achievement) {
+		case 'boss':
+			return (
+				<Tooltip title="Boss : Win 100 or more points">
+					<AutoAwesomeIcon fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'quitter':
+			return (
+				<Tooltip title="Quitter : Leave a game before the end">
+					<ThumbDownOffAltIcon fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'friend':
+			return (
+				<Tooltip title="Friendly : Play a game with a friend">
+					<PeopleIcon fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'perfect':
+			return (
+				<Tooltip title="Accurate : Win a game without loosing a single point">
+					<RadarIcon fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'number1':
+			return (
+				<Tooltip title="Xav : Be the first of the LeaderBoard at some point">
+					<EmojiEventsIcon fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'stud':
+			return (
+				<Tooltip title="Stud : Login with 42">
+					<SchoolIcon fontSize={'large'} />
+				</Tooltip>
+			)
+		default:
+			return (<></>)
+	}
+}
 
 
 export function UserAchivement() {
@@ -58,7 +108,7 @@ export function UserAchivement() {
 						return (
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									{achievement}
+									{renderSwitch(achievement)}
 								</Typography>
 
 							</div>
