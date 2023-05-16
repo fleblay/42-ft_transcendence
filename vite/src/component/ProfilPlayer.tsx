@@ -82,7 +82,6 @@ export function ProfilPlayer() {
 						<GameHistory idPlayer={idPlayer} />
 					</Box>
 				</Box>
-				{itsMe && <FriendList />}
 			</Container>
 		</React.Fragment>
 	)

@@ -82,7 +82,9 @@ function InterceptorAxios({ children }: { children : JSX.Element}) {
 				else {
 					console.log("error in interceptor", error);
 					setError({ message, status });
-					if (status === 401)
+					if (status === 400)
+						return error;
+					else if (status === 401)
 						navigate("/login", { replace: true });
 					else if (config.url.includes("/chat"))
 						navigate("/chat", { replace: true })

@@ -15,6 +15,7 @@ import { GameService } from 'src/game/game.service';
 import { ChannelInfo, Friend, PublicChannel, ShortUser } from '../type';
 import { FriendsService } from 'src/friends/friends.service';
 import { hashPassword, verifyPassword } from '../users/auth/hashPassword';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -27,7 +28,6 @@ export class ChatService implements OnModuleInit {
 		@Inject(forwardRef(() => UsersService)) private usersService: UsersService,
 		@Inject(forwardRef(() => GameService)) private gameService: GameService,
 		@Inject(forwardRef(() => FriendsService)) private friendsService: FriendsService,
-
 	) { }
 
 	async onModuleInit() {
@@ -145,7 +145,7 @@ export class ChatService implements OnModuleInit {
 		if (options?.targetUsername) {
 			addedUser = await this.usersService.findOneByUsername(options.targetUsername) as User
 			if (!addedUser) {
-				throw new ForbiddenException(`joinChannel : the username ${options.targetUsername} matches no user in database`)
+				throw new BadRequestException(`joinChannel : the username ${options.targetUsername} matches no user in database`)
 			}
 		}
 		let joiner: Member;

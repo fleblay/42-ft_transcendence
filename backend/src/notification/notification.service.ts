@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification, NotificationContent, NotificationType } from '../model/notification.entity';
 import { User } from '../model/user.entity';
@@ -17,7 +17,8 @@ export class NotificationService {
     constructor(@InjectRepository(Notification)
     private repo: Repository<Notification>,
         private usersService: UsersService,
-        private chatService: ChatService,
+        @Inject(forwardRef(() => ChatService)) private chatService: ChatService,
+
     ) {
 
     }
@@ -38,6 +39,20 @@ export class NotificationService {
         //console.log("generate notification");
         return notification;
     }
+
+
+    async generateInvitationRequest(receiver: User, data: Member): Promise<Notification | null> {
+
+        const notification: Notification = await this.repo.save({
+            user: receiver,
+            type: "channelInvitation",
+            contentId: data.channel.id,
+            name: data.channel.name,
+        });
+        //console.log("generate notification");
+        return notification;
+    }
+
 
     async generateDirectMessageNotification(receiver: User, data: Message): Promise<Notification | null> {
         //console.log("generate notification");
@@ -82,6 +97,9 @@ export class NotificationService {
         }
         else if (type === "directMessage") {
             notification = await this.generateDirectMessageNotification(receiver, data);
+        }
+        else if (type === "channelInvitation") {
+            notification = await this.generateInvitationRequest(receiver, data);
         }
         if (notification)
             this.wsServer.to(`/notification/${receiver.id}`).emit('notification.new', notification);

@@ -17,7 +17,7 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 		apiClient.post(`/api/chat/channels/${channelInfo?.id}/info`, {
 			name: channelForm.get('name'),
 			password: channelForm.get('password') || ''
-		}).then(() => {
+		}).finally(() => {
 			handleClose()
 		})
 	}
@@ -27,7 +27,7 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 			username: memberInvite
 		}).then(() => {
 			setMemberInvite("")
-		})
+		});
 	}
 	return (
 		<Modal open={open} onClose={handleClose} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
