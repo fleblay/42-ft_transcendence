@@ -100,10 +100,13 @@ export function MyChannelsList() {
 							<Badge badgeContent={channel.unreadMessages} color="primary">
 								<ListItemText primary={channel.name} />
 							</Badge>
-							<AvatarGroup max={3} sx={{ ml: 'auto' }} total={channel.members?.length}>
-								{channel?.members?.map((member: Member) => (
-									<Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
-								))}
+							<AvatarGroup max={3} sx={{ ml: 'auto' }} total={channel.members?.filter((member)=> (!member.left)).length}>
+								{channel?.members?.map((member: Member) => {
+									if (member.left)
+										return null;
+								return (
+								 <Avatar key={member.id} src={`/avatars/${member.user.id}.png`} />
+								)})}
 							</AvatarGroup>
 						</ListItemButton>
 					</ListItem>

@@ -19,7 +19,7 @@ export function FinishGames() {
 	const [listGames, setListGames] = useState<SaveGame[] | null>(null);
 	const [gamePage, setGamePage] = useState(0);
 
-	useEffect(() => {
+	function getData() {
 		apiClient.get(`/api/game/list/${gamePage}`).then((response) => {
 			console.log("gameList :", response.data);
 			setListGames(response.data)
@@ -27,6 +27,14 @@ export function FinishGames() {
 			.catch(() => {
 				console.log("\x1b[32mError\x1b[0m")
 			})
+	}
+
+	useEffect(() => {
+		getData()
+		const refreshTimer = setInterval(getData, 1000)
+		return (
+			() => clearInterval(refreshTimer)
+		)
 	}, [gamePage])
 
 	if (listGames === null) return <div>Loading...</div>

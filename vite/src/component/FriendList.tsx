@@ -87,7 +87,11 @@ export function FriendList() {
 					borderRadius: '16px',
 					bgcolor: 'background.paper',
 				}}>
-					<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+					<AppBar position="static"
+					sx={({ shape }) => ({
+						borderRadius: `${shape.borderRadius}px ${shape.borderRadius}px 0 0`,
+						height: '80px'
+					})}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 							Friends
 						</Typography>
