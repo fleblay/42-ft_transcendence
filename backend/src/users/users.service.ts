@@ -51,7 +51,7 @@ export class UsersService implements OnModuleInit {
 
 	async create(dataUser: Partial<User>) {
 		//console.log(`create user ${dataUser?.username} : ${dataUser?.email} : ${dataUser?.password}`);
-		const user : User = await this.repo.save({ ...dataUser, dfaSecret: authenticator.generateSecret() })
+		const user: User = await this.repo.save({ ...dataUser, dfaSecret: authenticator.generateSecret() })
 		console.log("save user :", user);
 		if (dataUser.stud)
 			user.achievements.push("stud")
@@ -148,20 +148,16 @@ export class UsersService implements OnModuleInit {
 		this.changeStatus(id, { oldStatus: "online" })
 	}
 
-	uploadAvatar(user: User, file: Express.Multer.File) {
+	async uploadAvatar(user: User, file: Express.Multer.File) {
 		const path = '/usr/src/app/avatars/' + user.id + '.png';
-		sharp(file.buffer)
-			.resize(200, 200)
-			.toFile(path, (err, info) => {
-				if (err) {
-					console.log("error while resizing image", err)
-				}
-				else {
-					console.log("image resized", info)
-				}
-			})
-		console.log("path", path);
-		console.log("user", user);
+		try {
+			await sharp(file.buffer)
+				.resize(200, 200)
+				.toFile(path)
+		} catch (err) {
+			console.log("error while resizing image", err)
+			throw new BadRequestException("Unsupported format");
+		}
 		return this.repo.save(user);
 	}
 

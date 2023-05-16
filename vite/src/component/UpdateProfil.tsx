@@ -72,6 +72,10 @@ export function UpdateProfil() {
 			setResponseFile('File size must be less than 1MB');
 			return;
 		}
+		if (file?.size <= 0) {
+			setResponseFile('File is empty');
+			return;
+		}
 		const formData = new FormData();
 		console.log(file);
 		formData.append('image', fileToBlob(file as File));

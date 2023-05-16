@@ -33,7 +33,7 @@ export const NotificationRequestFriend: FC<NotificationRequestFriendProps> = ({ 
 
     React.useEffect(() => {
         return addSubscription(`/player/${notification.contentId}`);
-        
+
     }, [socket]);
 
     React.useEffect(() => {
@@ -90,11 +90,11 @@ export const NotificationRequestFriend: FC<NotificationRequestFriendProps> = ({ 
     }
     const RenderButton = () => {
         if (friend?.requestStatus === "accepted") {
-            return(
-            <>
-                <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={viewProfil}>View Profil</Button>
-            </>   )
-        } 
+            return (
+                <>
+                    <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={viewProfil}>View Profil</Button>
+                </>)
+        }
         else if (friend?.requestStatus === "pending") {
             return <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAcceptFriend}>Accept Request</Button>
         }
@@ -118,6 +118,10 @@ export const NotificationRequestFriend: FC<NotificationRequestFriendProps> = ({ 
 
                 <Avatar src={`/avatars/${notification.contentId}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
                 <ListItemText primary={notification.name} />
+                <ListItemText secondary={notification.createdAt.toLocaleString('fr-FR', {
+                    dateStyle: 'short',
+                    timeStyle: 'medium'
+                })} />
                 <RenderButton />
             </ListItem>
         </React.Fragment >

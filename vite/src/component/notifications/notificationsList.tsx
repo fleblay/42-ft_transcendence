@@ -1,6 +1,6 @@
 
 import React, { useContext, useState } from 'react';
-import { AppBar, Box, Container, List, Typography } from '@mui/material';
+import { AppBar, Box, Button, Container, Grid, List, Pagination, Typography } from '@mui/material';
 import { Notification } from '../../types';
 import apiClient from '../../auth/interceptor.axios';
 import { NotificationRequestFriend } from './notificationRequestFriend';
@@ -16,8 +16,11 @@ interface NotificationMap { [id: number]: Notification };
 export function NotificationsList() {
 	//send a post with image
 	const [notifications, setNotifications] = React.useState<NotificationMap | null >(null);
+	const [currentNotifications, setCurrentNotifications] = React.useState<Notification[] | null>(null); // notifications[currentPage
 	const { customEmit, socket, customOn, customOff, addSubscription } = useContext(SocketContext);
 	const auth = useAuthService();
+	const [currentPage, setCurrentPage] = useState(1);
+
 
 	React.useEffect(() => {
 		apiClient.get("/api/notification/myNotifications").then((response) => {
@@ -37,10 +40,26 @@ export function NotificationsList() {
     }, [auth.user])
 
 	React.useEffect(() => {
+		if (!notifications) return;
+		const indexOfLastItem = currentPage * 10;
+		const indexOfFirstItem = indexOfLastItem - 10;
+		setCurrentNotifications(Object.values(notifications)
+		.sort((a, b) => {
+			return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+		})	
+		.slice(indexOfFirstItem, indexOfLastItem));
+	}, [currentPage, notifications])
+
+	React.useEffect(() => {
         if (!socket) return;
 
 		const addNotification = (data: Notification) => {
 			console.log("notification new in list", data);
+			apiClient.post(`/api/notification/ack/${data.id}`).then((response) => {
+				console.log("notification ack", response);
+			}).catch((error) => {
+				console.log(error);
+			});
 			setNotifications((notifications) => {
 				return { ...notifications, [data.id]: data };
 			});
@@ -85,13 +104,13 @@ export function NotificationsList() {
 					overflowY: 'scroll'
 				})}>
 					<Box position="static" sx={{ height: 'auto' }}>
-						{!notifications ? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any notifications yet </Typography> : null}
+						{!currentNotifications? <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, p: '25px' }}> You don't have any notifications yet </Typography> : null}
 						<List
 							sx={{
 								overflow: 'auto',
 							}}
 						>
-							{notifications && Object.values(notifications)
+							{currentNotifications && Object.values(currentNotifications)
 								.sort((a, b) => {
 									return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 								})
@@ -102,7 +121,7 @@ export function NotificationsList() {
 											return (<NotificationRequestFriend key={notification.id} notification={notification} index={index} array={array} />)
 										case 'directMessage':
 											return (<NotificationDirectMessage key={notification.id} notification={notification} index={index} array={array} />)
-										case 'invitationChannel':
+										case 'channelInvitation':
 											return (<NotificationInvitation key={notification.id} notification={notification} index={index} array={array} />)
 										default
 											: return <Box key = {notification.id}></Box>;
@@ -112,6 +131,17 @@ export function NotificationsList() {
 						</List>
 					</Box>
 				</Box>
+				<Grid container justifyContent="flex-end">
+				{ currentPage !== 1 && <Button variant="outlined" onClick={() => {
+					if (currentPage > 0) {
+						setCurrentPage(currentPage - 1)
+					}
+				}}>Previous</Button>}
+				<label style={{ padding: '5px 15px' }}>{currentPage}</label>
+			{currentNotifications?.length === 10 && <Button variant="outlined" onClick={() => {
+						setCurrentPage(currentPage + 1)
+				}}>Next</Button>}
+			</Grid>
 			</Container>
 		</React.Fragment>
 	)
