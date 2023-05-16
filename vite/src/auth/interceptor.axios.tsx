@@ -45,7 +45,7 @@ function InterceptorAxios({ children }: { children : JSX.Element}) {
 			},
 			async (error) => {
 				console.log("error in interceptor", error);
-				const { config, response: { status, message } } = error;
+				const { config, response: { status, data: {message} } } = error;
 				const originalRequest = config;
 				if (status === 498) {
 					if (!isResfreshing) {

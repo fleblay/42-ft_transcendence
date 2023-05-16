@@ -2,7 +2,7 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
-import { Error } from '../types';
+import { CustomError } from '../types';
 import { ErrorProviderContext } from '../ErrorProvider/ErrorProvider';
 
 

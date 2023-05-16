@@ -6,7 +6,6 @@ import apiClient from '../../auth/interceptor.axios';
 import { Alert, Box, Button, Container, Divider, FormControl, IconButton, Input, InputAdornment, InputLabel, Modal, TextField, Typography } from '@mui/material';
 
 export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, open: boolean, handleClose: () => void }> = ({ channelInfo, open, handleClose }) => {
-	const [error, setError] = useState<string | null>(null);
 
 	const [memberInvite, setMemberInvite] = useState<string>("");
 
@@ -20,8 +19,6 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 			password: channelForm.get('password') || ''
 		}).then(() => {
 			handleClose()
-		}).catch((err) => {
-			setError(err.response.data.message)
 		})
 	}
 	function handleInviteMember() {
@@ -30,8 +27,6 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 			username: memberInvite
 		}).then(() => {
 			setMemberInvite("")
-		}).catch((err) => {
-			setError(err.response.data.message)
 		})
 	}
 	return (
@@ -52,11 +47,6 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 						Modify Channel
 					</Typography>
 					<Divider />
-					{error
-						&& <Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, mb: '10px' }} >
-							{error}
-						</Typography>
-					}
 
 					<form onSubmit={handleSubmit} style={{ width: '50%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
 						<TextField required label="name" type="name" name="name" defaultValue={channelInfo?.name} sx={{ flexGrow: 1, }} />
