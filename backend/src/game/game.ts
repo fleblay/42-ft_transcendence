@@ -215,8 +215,11 @@ export class Game {
 		return this.players.length < 2
 	}
 
-	updateInfo(payload: IgameInfo) {
-		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.update', payload)
+	updateInfo(payload: IgameInfo, volatile = true) {
+		if (volatile)
+			this.server.to(this.playerRoom).to(this.viewerRoom).volatile.emit('game.update', payload)
+		else
+			this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.update', payload)
 	}
 
 	generateGameInfo(): IgameInfo {
@@ -468,7 +471,7 @@ export class Game {
 		if (this.status == GameStatus.end) {
 			clearInterval(this.intervalId)
 			clearInterval(this.reduceInterval)
-			this.updateInfo(this.generateGameInfo())
+			this.updateInfo(this.generateGameInfo(), false)
 			clearInterval(this.infoInterval)
 		}
 
