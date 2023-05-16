@@ -38,6 +38,16 @@ const themeLight = createTheme({
 	shape: {
 		borderRadius: 16
 	},
+	components: {
+		MuiContainer: {
+			styleOverrides: {
+				root: {
+					marginTop: 25,
+					marginBottom: 25,
+				}
+			}
+		},
+	}
 });
 
 const themeDark = createTheme({
