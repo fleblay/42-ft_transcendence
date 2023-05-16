@@ -1,4 +1,4 @@
-import { UUID, SocketId } from '../type';
+import { UUID, SocketId, CurrentGame } from '../type';
 import { User } from '../model/user.entity'
 import { NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
@@ -292,6 +292,15 @@ export class Game {
 			client.join(this.viewerRoom)
 			joinType = "watching"
 		}
+		this.server.to('game.current').emit('game.current.update', {
+			id: this.gameId,
+			players: this.players.map((player) => ({
+				id: player.user.id,
+				username: player.user.username,
+				score: player.score,
+			})),
+			viewers: this.viewers.length,
+		} as CurrentGame)
 		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
 		return joinType
 	}
@@ -473,6 +482,7 @@ export class Game {
 			clearInterval(this.reduceInterval)
 			this.updateInfo(this.generateGameInfo(), false)
 			clearInterval(this.infoInterval)
+			this.server.to('game.current').emit('game.current.delete',this.gameId)
 		}
 
 		//Reset des momentum
