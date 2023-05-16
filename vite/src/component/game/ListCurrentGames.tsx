@@ -68,18 +68,25 @@ export const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) 
 							<TableCell component="th" scope="row" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-evenly' }}>
 								{game.players.map((player, index, arr) => (
 									<React.Fragment key={player.id}>
+										{
+											index !== 0 && <Typography variant="h6">{player.score}</Typography>
+										}
 										<Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
 											<Avatar sx={{ width: 24, height: 24, mb: 1 }} src={`/avatars/${player.id}.png`} />
 											{player.username}
 										</Box>
 										{
-											index === arr.length - 1 ? null : <Typography variant="h6">vs</Typography>
+											index === arr.length - 1 ? null
+												: <>
+													<Typography variant="h6">{player.score}</Typography>
+													<Typography variant="h6">vs</Typography>
+												</>
 										}
 									</React.Fragment>
 								))}
 							</TableCell>
 							<TableCell style={{ width: 25 }} align="right">
-								<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+								<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 									{<VisibilityIcon />}{game.viewers}
 								</Box>
 							</TableCell>
