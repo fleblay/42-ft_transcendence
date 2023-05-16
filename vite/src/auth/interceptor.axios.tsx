@@ -70,7 +70,6 @@ function InterceptorAxios({ children }: { children : JSX.Element}) {
 								});
 						});
 					}
-
 					const retryOriginalRequest = new Promise((resolve) => {
 						subscribeTokenRefresh(() => {
 							resolve(axios(originalRequest));
