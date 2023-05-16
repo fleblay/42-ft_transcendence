@@ -249,7 +249,7 @@ export class Game {
 	}
 
 
-	addUser(user: User, client: Socket) : string {
+	addUser(user: User, client: Socket): string {
 		// TODO: If player reconnect, check if he is in the game and change his socket
 		// Disconnect old socket
 		let joinType = ""
@@ -292,6 +292,14 @@ export class Game {
 			client.join(this.viewerRoom)
 			joinType = "watching"
 		}
+		if (this.players.length === 2) {
+			this.emitToCurrentList()
+		}
+		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
+		return joinType
+	}
+
+	private emitToCurrentList() {
 		this.server.to('game.current').emit('game.current.update', {
 			id: this.gameId,
 			players: this.players.map((player) => ({
@@ -301,8 +309,6 @@ export class Game {
 			})),
 			viewers: this.viewers.length,
 		} as CurrentGame)
-		setTimeout(() => this.updateInfo(this.generateGameInfo()), 100)
-		return joinType
 	}
 
 	//Todo : gere la taille de la balle !!!!
@@ -445,6 +451,7 @@ export class Game {
 	}
 
 	resetBallAndPlayers() {
+		this.emitToCurrentList()
 		this.status = GameStatus.start
 		this.countdown(3)
 		this.initBall()
@@ -482,7 +489,7 @@ export class Game {
 			clearInterval(this.reduceInterval)
 			this.updateInfo(this.generateGameInfo(), false)
 			clearInterval(this.infoInterval)
-			this.server.to('game.current').emit('game.current.delete',this.gameId)
+			this.server.to('game.current').emit('game.current.delete', this.gameId)
 		}
 
 		//Reset des momentum

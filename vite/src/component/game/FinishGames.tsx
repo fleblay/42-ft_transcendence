@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { getAccessToken } from "../../token/token";
 import apiClient from "../../auth/interceptor.axios";
 import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, Divider } from "@mui/material";
 import { Link as LinkRouter } from "react-router-dom";
 import { UserInfo } from "../../types";
+import { SocketContext } from "../../socket/SocketProvider";
 
 interface SaveGame {
 	date: string;
@@ -18,6 +19,7 @@ export function FinishGames() {
 
 	const [listGames, setListGames] = useState<SaveGame[] | null>(null);
 	const [gamePage, setGamePage] = useState(0);
+	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 
 	function getData() {
 		apiClient.get(`/api/game/list/${gamePage}`).then((response) => {
@@ -30,12 +32,16 @@ export function FinishGames() {
 	}
 
 	useEffect(() => {
+		return addSubscription('/leaderboard')
+	}, [])
+
+	useEffect(() => {
 		getData()
-		const refreshTimer = setInterval(getData, 1000)
+		customOn('leaderboard', getData)
 		return (
-			() => clearInterval(refreshTimer)
+			() => {customOff('leaderboard', getData)}
 		)
-	}, [gamePage])
+	}, [])
 
 	if (listGames === null) return <div>Loading...</div>
 
