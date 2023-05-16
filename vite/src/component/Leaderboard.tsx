@@ -10,10 +10,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { AppBar, Avatar, Box, Button, Container, Link, Typography } from '@mui/material';
+import { AppBar, Avatar, Box, Button, Container, Divider, Link, Typography } from '@mui/material';
 import { UserInfo } from "../types";
+import { FinishGames } from "./FinishGames";
 
-export function ListUsers() {
+export function Leaderboard() {
 
 	const [info, setInfo] = useState<string>("")
 	const [muiTable, setMuiTable] = useState<JSX.Element>(<div>Loading...</div>)
@@ -84,12 +85,10 @@ export function ListUsers() {
 									))}
 								</TableBody>
 							</Table>
-							<Typography textAlign="center">
-								<Button sx={{ margin: '10px' }} variant='contained' onClick={() => handleClick(true)}>
-									Manually Update Users list
-								</Button>
-							</Typography>
 						</TableContainer>
+						<Paper>
+							<FinishGames />
+						</Paper>
 					</Container>
 				)
 			})

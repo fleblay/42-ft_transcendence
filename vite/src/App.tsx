@@ -3,7 +3,7 @@ import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
-import { ListUsers } from './component/ListUsers'
+import { Leaderboard } from './component/Leaderboard'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { SocketContext, SocketProvider } from './socket/SocketProvider'
@@ -133,7 +133,7 @@ function App() {
 									<Route path="/Register" element={<RegisterForm />} />
 									<Route path="/leaderboard" element={
 										<>
-											<ListUsers />
+											<Leaderboard />
 											<br />
 											<FakeGames />
 										</>
