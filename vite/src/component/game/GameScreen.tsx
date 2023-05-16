@@ -81,7 +81,6 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 			return;
 		}
 		function onGameUpdate(data: IgameInfo) {
-			console.log('game.update', data);
 			setGameInfo(data);
 			setBallTrailPositions((ballTrailPositions) => {
 				const newBallTrailPositions = [...ballTrailPositions];
