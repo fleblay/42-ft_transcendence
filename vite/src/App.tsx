@@ -3,13 +3,12 @@ import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
-import { ListUsers } from './component/ListUsers'
+import { Leaderboard } from './component/Leaderboard'
 import { FakeGames } from './component/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { SocketContext, SocketProvider } from './socket/SocketProvider'
 import { MenuBar } from './component/Menu'
 import { ProfilPlayer } from './component/ProfilPlayer'
-import { AllRefreshToken } from './component/TokenView'
 import { UsernameDialog } from './component/UsernameDialog'
 import { FriendList } from './component/FriendList'
 import { BlockedList } from './component/BlockedList';
@@ -38,7 +37,6 @@ export const allRoutes: Destinations[] = [
 	{ name: "Chat", path: "/chat", public: false },
 	{ name: "Game", path: "/game", public: false },
 	{ name: "Leaderboard", path: "/leaderboard", public: false },
-	{ name: "AllRefreshToken", path: "/AllRefreshToken", public: true },
 	{ name: "Friends", path: "/friends", public: false },
 	{ name: "Blocked", path: "/blocked", public: false },
 	{ name: "notification", path: "/notification", public: false },
@@ -133,12 +131,11 @@ function App() {
 									<Route path="/Register" element={<RegisterForm />} />
 									<Route path="/leaderboard" element={
 										<>
-											<ListUsers />
+											<Leaderboard />
 											<br />
 											<FakeGames />
 										</>
 									} />
-									<Route path="/AllRefreshToken" element={<AllRefreshToken />} />
 									<Route path="/player/">
 										<Route path=":idPlayer" element={
 											<RequireAuth>

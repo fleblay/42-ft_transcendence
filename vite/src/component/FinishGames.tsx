@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getAccessToken } from "../token/token";
 import apiClient from "../auth/interceptor.axios";
-import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link } from "@mui/material";
+import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, Divider } from "@mui/material";
 import { Link as LinkRouter } from "react-router-dom";
 import { UserInfo } from "../types";
 
@@ -34,7 +34,7 @@ export function FinishGames() {
 	return (
 		<div>
 
-			<TableContainer component={Paper}>
+			<TableContainer>
 				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
 					<TableHead>
 						<TableRow>
@@ -73,7 +73,7 @@ export function FinishGames() {
 					</TableBody>
 				</Table>
 			</TableContainer>
-
+			<Divider />
 			<Grid container justifyContent="flex-end">
 				<Button variant="outlined" onClick={() => {
 					if (gamePage > 0) {

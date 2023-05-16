@@ -4,7 +4,6 @@ import { IgameInfo } from '../types';
 import { Box, Container, Step, StepLabel, Stepper } from '@mui/material';
 import { useLocation, useParams } from 'react-router-dom';
 
-import { FinishGames } from './FinishGames';
 import { CreateGame } from './CreateGame';
 import { GameModule } from './GameScreen';
 import { GameFinishedScreen } from './ResultGame';
@@ -103,7 +102,6 @@ export function GamePage() {
 						<GameFinishedScreen gameInfo={result} />
 					}
 				</Box>
-				<FinishGames />
 			</Container >
 		</>
 	);

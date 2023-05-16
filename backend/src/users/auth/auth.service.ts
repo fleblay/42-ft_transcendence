@@ -245,10 +245,6 @@ export class AuthService {
 		return user;
 	}
 
-	async findAllTokens() {
-		return await this.repo.find();
-	}
-
 	async deleteRefreshToken(refreshToken: string) {
 		const report = await this.repo.findOne({ where: { refreshToken } });
 		if (!report) return;
