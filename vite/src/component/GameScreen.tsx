@@ -396,6 +396,8 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 
 	return (
 		<div>
+		{
+			false && <>
 			<button onClick={handleClick}>{(displayInfo) ? "Hide" : "Show" + " Info"}</button>
 			<div> {displayInfo ?
 				<>
@@ -415,6 +417,8 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 					<div> date: {gameInfo?.date.toString()} </div>
 				</> : <></>}
 			</div>
+			</>
+		}
 			<Box display="flex" justifyContent="flex-end" alignItems="center">
 				<Typography>
 					{gameInfo?.viewers || 0}
