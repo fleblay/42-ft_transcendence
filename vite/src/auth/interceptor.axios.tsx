@@ -10,7 +10,8 @@ let isResfreshing = false;
 let subscribers = [] as any;
 
 function onRefreshed() {
-	subscribers.map((cb: any) => cb())}
+	subscribers.map((cb: any) => cb())
+}
 
 function subscribeTokenRefresh(cb: any) {
 	subscribers.push(cb);
@@ -20,7 +21,7 @@ const apiClient = axios.create({});
 
 
 
-function InterceptorAxios({ children }: { children : JSX.Element}) {
+function InterceptorAxios({ children }: { children: JSX.Element }) {
 
 	const { error, setError } = useContext(ErrorProviderContext);
 	const navigate = useNavigate();
@@ -40,12 +41,12 @@ function InterceptorAxios({ children }: { children : JSX.Element}) {
 		);
 
 		apiClient.interceptors.response.use(
-			(response : any) => {
+			(response: any) => {
 				return response;
 			},
 			async (error) => {
 				console.log("error in interceptor", error);
-				const { config, response: { status, data: {message} } } = error;
+				const { config, response: { status, data: { message } } } = error;
 				const originalRequest = config;
 				if (status === 498) {
 					if (!isResfreshing) {
@@ -83,30 +84,29 @@ function InterceptorAxios({ children }: { children : JSX.Element}) {
 					console.log("error in interceptor", error);
 					setError({ message, status });
 					if (status === 400)
-						return error;
+						return Promise.reject(error)
 					else if (status === 401)
 						navigate("/login", { replace: true });
 					else if (config.url.includes("/chat"))
 						navigate("/chat", { replace: true })
 					else
 						navigate("/", { replace: true });
-					return error;
+					return Promise.reject(error)
 				}
-				return error;
 			}
 		);
 
 
-        const interceptor = apiClient.interceptors.response.use();
+		const interceptor = apiClient.interceptors.response.use();
 
-        return () => apiClient.interceptors.response.eject(interceptor);
+		return () => apiClient.interceptors.response.eject(interceptor);
 
-    }, [])
-    return children;
+	}, [])
+	return children;
 
 }
 export default apiClient;
-export { InterceptorAxios}
+export { InterceptorAxios }
 
 /* const apiClient = axios.create({});
 
