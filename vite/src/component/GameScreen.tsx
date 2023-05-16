@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { useAuthService } from '../auth/AuthService'
 import { Box, CircularProgress, CssBaseline, Typography } from "@mui/material";
 import { ContentCutSharp } from "@mui/icons-material";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface Iprops {
 	gameInfo: IgameInfo,
@@ -81,6 +82,7 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 			return;
 		}
 		function onGameUpdate(data: IgameInfo) {
+			console.log('game.update', data);
 			setGameInfo(data);
 			setBallTrailPositions((ballTrailPositions) => {
 				const newBallTrailPositions = [...ballTrailPositions];
@@ -139,8 +141,8 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 								position: 'absolute',
 								top: 0,
 								left: 0,
-								width: '100%',
-								height: '100%',
+								width: '100vw',
+								height: '100vh',
 								backgroundColor: 'rgba(0, 0, 0, 0.5)',
 								zIndex: 1,
 								transition: 'all 0.5s'
@@ -417,6 +419,12 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 					<div> date: {gameInfo?.date.toString()} </div>
 				</> : <></>}
 			</div>
+			<Box display="flex" justifyContent="flex-end" alignItems="center">
+				<Typography>
+					{gameInfo?.viewers || 0}
+				</Typography>
+				<VisibilityIcon />
+			</Box>
 			<div>
 				<CssBaseline />
 				<canvas width={canvasWidth * canvasRatio} height={canvasHeight * canvasRatio} style={{

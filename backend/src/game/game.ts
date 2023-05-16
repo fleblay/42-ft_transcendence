@@ -77,7 +77,8 @@ export interface IgameInfo {
 	assets: gameAsset[],
 	ball: projectile,
 	status: GameStatus,
-	date: Date
+	date: Date,
+	viewers: number,
 }
 
 interface PlayerInput {
@@ -215,7 +216,7 @@ export class Game {
 	}
 
 	updateInfo(payload: IgameInfo) {
-		this.server.to(this.playerRoom).to(this.viewerRoom).volatile.emit('game.update', payload)
+		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.update', payload)
 	}
 
 	generateGameInfo(): IgameInfo {
@@ -228,7 +229,8 @@ export class Game {
 			assets: this.assets,
 			ball: this.ball,
 			status: this.status,
-			date: new Date()
+			date: new Date(),
+			viewers: this.viewers.length,
 		}
 	}
 
@@ -418,10 +420,10 @@ export class Game {
 
 	private countdown(timeSecond: number) {
 		let countdown = timeSecond
-		this.server.to(this.playerRoom).to(this.viewerRoom).volatile.emit('game.countdown', countdown)
+		this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 		let intervalId = setInterval(() => {
 			countdown -= 1
-			this.server.to(this.playerRoom).to(this.viewerRoom).volatile.emit('game.countdown', countdown)
+			this.server.to(this.playerRoom).to(this.viewerRoom).emit('game.countdown', countdown)
 			if (countdown <= 0) {
 				clearInterval(intervalId)
 				if (this.status !== GameStatus.end)
