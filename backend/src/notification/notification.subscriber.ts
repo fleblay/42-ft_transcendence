@@ -12,16 +12,13 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 
 	constructor(
 		private readonly connection: Connection,
-		private notificationService: NotificationService)
-		{
+		private notificationService: NotificationService) {
 		connection.subscribers.push(this)
 	}
 
-	listenTo() {
-		return FriendRequest || Message;
-	}
 
 	async afterInsert(event: InsertEvent<any>) {
+		console.log("after insert", event.entity);
 		if (event.entity instanceof FriendRequest) {
 			await this.afterInsertFriendRequest(event);
 			return;
@@ -45,22 +42,21 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 
 
 	async afterInsertFriendRequest(event: InsertEvent<FriendRequest>) {
-		const notification = await this.notificationService.generateNotification(event.entity.receiver.id, "friendRequest", event.entity);	
-		console.log("notification generated", notification);
-		
+		const notification = await this.notificationService.generateNotification( "friendRequest", event.entity, event.entity.receiver.id);
+		//console.log("notification generated", notification);
+
 	}
 
 
 
 	async afterInsertMessages(event: InsertEvent<Message>) {
-		console.log("after insert event", event.entity);
+		console.log("after insert Message", event.entity);
 		if (event.entity.channel.directMessage) {
-			const receiver= event.entity.channel.members.find(member => member.user.id !== event.entity.owner.id);
-			if (receiver) {
-				const notification = await this.notificationService.generateNotification(receiver.id, "directMessage", event.entity);
-				console.log("notification generated", notification);
-			}
+			await this.notificationService.generateNotification("directMessage", event.entity);
+			//console.log("notification generated", notification);
 		}
 	}
-//
+
+	//
 }
+//

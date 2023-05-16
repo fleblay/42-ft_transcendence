@@ -516,7 +516,7 @@ export class ChatService implements OnModuleInit {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
-		if (member.role === 'owner') {
+		if (member.role === 'owner' && !member.channel.directMessage) {
 			await this.deleteChannel(member, channelId);
 			return;
 		}
@@ -664,10 +664,10 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async getDMChannel(me: User, friend: Partial<User>): Promise<Channel | null> {
-		////console.log("getDMChannel : ", me, friend);
+		console.log("getDMChannel : ", me, friend);
 		if (!friend.id || friend.id === me.id)
 			return null;
-		//console.log("getDMChannel :searching channel");
+		console.log("getDMChannel :searching channel");
 		return await this.membersRepo.findOne({
 			where: {
 				user: {
@@ -709,9 +709,11 @@ export class ChatService implements OnModuleInit {
 		console.log("joinDirectMessage : ", user, targetUser);
 		// check if channel exists
 		const channel = await this.getDMChannel(user, { id: targetUser });
+		console.log("joinDirectMessage : ", channel);
 		if (channel) {
 			channel.members.forEach((member) => {
 				member.left = false;
+				this.membersRepo.save(member);
 			});
 			await this.channelsRepo.save(channel);
 			return channel.id;

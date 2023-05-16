@@ -6,6 +6,7 @@ import apiClient from '../../auth/interceptor.axios';
 import { NotificationRequestFriend } from './notificationRequestFriend';
 import { useAuthService } from '../../auth/AuthService';
 import { SocketContext } from '../../socket/SocketProvider';
+import { NotificationDirectMessage } from './notificationDirectMessage';
 
 
 
@@ -98,6 +99,8 @@ export function NotificationsList() {
 									switch (notification.type) {
 										case 'friendRequest':
 											return (<NotificationRequestFriend key={notification.id} notification={notification} index={index} array={array} />)
+										case 'directMessage':
+											return (<NotificationDirectMessage key={notification.id} notification={notification} index={index} array={array} />)
 										default
 											: return <Box key = {notification.id}></Box>;
 									}

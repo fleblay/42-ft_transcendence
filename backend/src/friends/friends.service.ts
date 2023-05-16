@@ -123,6 +123,8 @@ export class FriendsService {
 			return null;
 		}
 		const removeFriend = this.generateFriend(user, friendRequest.sender.id === user.id ? friendRequest.receiver : friendRequest.sender, friendRequest);
+		
+		this.chatService.leaveDirectMessage(user, friendId);
 		this.friendReqRepo.softRemove(friendRequest);
 
 		//FriendId

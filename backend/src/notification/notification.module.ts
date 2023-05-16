@@ -5,6 +5,7 @@ import { UsersModule } from 'src/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Notification } from '../model/notification.entity';
 import { NotificationSubscriber } from './notification.subscriber';
+import { ChatModule } from 'src/chat/chat.module';
 
 @Module({
   providers: [NotificationService, NotificationSubscriber],
@@ -12,6 +13,7 @@ import { NotificationSubscriber } from './notification.subscriber';
   exports: [NotificationService, NotificationSubscriber],
   imports: [
     forwardRef(()=>UsersModule),
+    ChatModule,
   TypeOrmModule.forFeature([Notification])],
 })
 export class NotificationModule {

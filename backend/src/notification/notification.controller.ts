@@ -17,7 +17,7 @@ export class NotificationController {
 
     @Get('/noRead')
     async getNoReadNotifications(@CurrentUser() user: User) {
-        console.log("get no read notifications");
+        //console.log("get no read notifications");
         return await this.notificationService.getNoReadNotifications(user);
     }
 }
