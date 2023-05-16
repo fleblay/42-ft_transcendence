@@ -61,7 +61,7 @@ export class GameCluster {
 	listAllCurrent() {
 		const ar: CurrentGame[] = []
 		this.gamesMap.forEach((game, gameId) => {
-			if (game.status === GameStatus.playing || game.status === GameStatus.start) {
+			if (!game.privateGame && (game.status === GameStatus.playing || game.status === GameStatus.start)) {
 				ar.push({
 					id: gameId,
 					players: game.players.map((player) => ({
