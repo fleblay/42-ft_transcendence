@@ -73,7 +73,7 @@ export const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) 
 											{player.username}
 										</Box>
 										{
-											index === arr.length - 1 ? null : <Typography variant="body1">vs</Typography>
+											index === arr.length - 1 ? null : <Typography variant="h6">vs</Typography>
 										}
 									</React.Fragment>
 								))}
