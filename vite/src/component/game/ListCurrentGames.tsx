@@ -77,7 +77,7 @@ export const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) 
 				return prev;
 			}, {}));
 		});
-		return addSubscription('listGames');
+		return addSubscription('game.current');
 	}, []);
 
 	React.useEffect(() => {
@@ -89,9 +89,17 @@ export const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) 
 				}
 			});
 		}
-		customOn('game.update', updateCurrentGame);
+		function onDeleteCurrentGame(gameId: string) {
+			setListGames((prev) => {
+				const { [gameId]: _, ...rest } = prev;
+				return rest;
+			});
+		}
+		customOn('game.current.update', updateCurrentGame);
+		customOn('game.current.delete', onDeleteCurrentGame);
 		return () => {
-			customOff('game.update', updateCurrentGame);
+			customOff('game.current.update', updateCurrentGame);
+			customOff('game.current.delete', onDeleteCurrentGame);
 		};
 	}, [listGames]);
 
