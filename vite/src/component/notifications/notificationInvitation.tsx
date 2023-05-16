@@ -45,11 +45,14 @@ export const NotificationInvitation: FC<NotificationInvitationProps> = ({ notifi
                 borderTop: 1,
                 borderColor: (theme: Theme) => theme.palette.grey[300]
             }}>
-                <Avatar sx={{ margin: 1, width: '40px', height: '40px' }}>
-                    <Announcement/>
+                <Avatar sx={{ bgcolor: '#3F51B5', margin: 1, width: '40px', height: '40px' }}>
+                    <Announcement />
                 </Avatar>
-             <ListItemText primary={"you are invited to " + notification.name}/>
-                <ListItemText primary={notification.createdAt.toString()} />
+                <ListItemText primary={"you are invited to " + notification.name} />
+                <ListItemText secondary={notification.createdAt.toLocaleString('fr-FR', {
+                    dateStyle: 'short',
+                    timeStyle: 'medium'
+                })} />
                 <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={viewMessage}>View Channel</Button>
             </ListItem>
         </React.Fragment >

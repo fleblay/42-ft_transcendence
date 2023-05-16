@@ -2,15 +2,23 @@ import { Badge, Button, IconButton, Menu, MenuItem, MenuList, Typography } from 
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import React, { useContext } from "react";
 import apiClient from "../../auth/interceptor.axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SocketContext } from "../../socket/SocketProvider";
 import { useAuthService } from "../../auth/AuthService";
+import { Notification } from "../../types";
 
 export function NotifcationBar() {
     const [notifications, setNotifications] = React.useState<number>(0);
     const navigate = useNavigate();
     const { socket, customEmit, customOn, customOff, addSubscription } = useContext(SocketContext);
     const auth = useAuthService();
+    const [currentLocation, setCurrentLocation] = React.useState("");
+    const location = useLocation();
+
+
+    React.useEffect(() => {
+        setCurrentLocation(location.pathname);
+    }, [location])
 
     React.useEffect(() => {
         apiClient.get("/api/notification/noRead").then((response) => {
@@ -29,13 +37,34 @@ export function NotifcationBar() {
         if (!socket) return;
         const addBellNotification = (data: Notification) => {
             console.log("notification new bell", data);
+            console.log("location", currentLocation);
+            if (currentLocation === `/chat/${data.contentId}` && data.type === "directMessage")
+            {
+                console.log("ack");
+                apiClient.post(`/api/notification/ack/${data.id}`).then((response) => {
+                    console.log("notification ack", response);
+                }
+                ).catch((error) => {
+                    console.log(error);
+                });
+                return;
+            }
+            if (currentLocation === "/notification")
+                return;
             setNotifications((notifications) => notifications + 1);
         }
+        const dellBellNotification = (data: Notification) => {
+            console.log("notification dell bell", data);
+            if (notifications > 0)
+                setNotifications((notifications) => notifications - 1);
+        }
         customOn('notification.new', addBellNotification)
+        customOn('notification.ack', dellBellNotification)
+
         return (() => {
             customOff('notification.new', addBellNotification);
         })
-    }, [socket]);
+    }, [socket, currentLocation]);
 
     
 

@@ -53,7 +53,7 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 	}
 
 	async afterInsertMember(event: InsertEvent<Member>) {
-		if (event.entity.role !== "owner" && event.entity.channel.private) {
+		if (event.entity.role !== "owner" && event.entity.channel.private && event.entity.channel.directMessage === false) {
 			await this.notificationService.generateNotification("channelInvitation", event.entity, event.entity.user.id);
 	}
 	}

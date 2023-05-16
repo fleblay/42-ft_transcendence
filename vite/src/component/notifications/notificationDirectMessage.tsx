@@ -42,11 +42,14 @@ export const NotificationDirectMessage: FC<NotificationDirectMessageProps> = ({ 
                 borderTop: 1,
                 borderColor: (theme: Theme) => theme.palette.grey[300]
             }}>
-                <Avatar sx={{ margin: 1, width: '40px', height: '40px' }}>
+                <Avatar sx={{ bgcolor: '#3F51B5', margin: 1, width: '40px', height: '40px' }}>
                     <MessageOutlinedIcon />
                 </Avatar>
                 <ListItemText primary={notification.name + " sent you a message"} />
-                <ListItemText primary={notification.createdAt.toString()} />
+                <ListItemText secondary={notification.createdAt.toLocaleString('fr-FR', {
+                    dateStyle: 'short',
+                    timeStyle: 'medium'
+                })} />
                 <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={viewMessage}>View Message</Button>
             </ListItem>
         </React.Fragment >
