@@ -47,6 +47,19 @@ export default function ChatMenu() {
 		navigate(`/chat/friends`);
 	}
 
+	const handleRoomMenu = () => {
+		setRoomsMenu(!roomsMenu);
+		if (friendMenu)
+			setFriendMenu(false);
+	}
+
+	const handleFriendMenu = () => {
+		setFriendMenu(!friendMenu);
+		if (roomsMenu)
+			setRoomsMenu(false);
+	}
+
+
 
 	return (
 		<>
@@ -73,7 +86,7 @@ export default function ChatMenu() {
 					<ListItemText primary="Create Channel" />
 				</ListItemButton>
 
-				<ListItemButton onClick={() => setRoomsMenu(!roomsMenu)}>
+				<ListItemButton onClick={handleRoomMenu}>
 					<ListItemIcon>
 						<StarBorder />
 					</ListItemIcon>
@@ -85,7 +98,7 @@ export default function ChatMenu() {
 					<MyChannelsList />
 				</Collapse>
 
-				<ListItemButton onClick={() => setFriendMenu(!friendMenu)}>
+				<ListItemButton onClick={handleFriendMenu}>
 					<ListItemIcon>
 						<PeopleAltOutlinedIcon />
 					</ListItemIcon>

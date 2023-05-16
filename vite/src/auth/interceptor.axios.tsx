@@ -64,6 +64,7 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 									console.log("Error refreshing access token", error);
 									delAccessToken()
 									delRefreshToken()
+									navigate("/login", { replace: true });
 									reject(error);
 								})
 								.finally(() => {
