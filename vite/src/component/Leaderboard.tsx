@@ -38,12 +38,12 @@ export function Leaderboard() {
 				//Mui elements
 				setMuiTable(
 					<Container maxWidth="lg" >
-						<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+						<AppBar position="static" sx={{ borderTopLeftRadius: theme => theme.shape.borderRadius, borderTopRightRadius: theme => theme.shape.borderRadius, height: '80px' }}>
 							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 								Leaderboard
 							</Typography>
 						</AppBar>
-						<TableContainer component={Paper}>
+						<TableContainer component={Paper} sx={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
 							<Table sx={{ minWidth: 650 }} aria-label="simple table">
 								<TableHead>
 									<TableRow>
