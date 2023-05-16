@@ -153,11 +153,19 @@ export class NotificationService {
         });
     }
 
-    async getMessageReceiver(message: Message): Promise<User | null> {
-    return null;
+    async ackNotification(user: User, notificationId: number) {
+        const notification = await this.repo.findOne(
+            {
+                where: {
+                    id: notificationId,
+                    user: { id: user.id }
+                }
+            });
+        if (!notification) {
+            return;
+        }
+        notification.read = true;
+        await this.repo.save(notification);
+        this.wsServer.to(`/notification/${user.id}`).emit('notification.ack', notificationId);
     }
-
-
-
-
 }
