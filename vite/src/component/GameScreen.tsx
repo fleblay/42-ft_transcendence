@@ -13,10 +13,11 @@ interface Iprops {
 	bottomRef: React.RefObject<HTMLInputElement>;
 	width: number;
 	ballTrailPositions: projectile[];
+	countdown: number
 }
 
-const canvasHeight = 600
-const canvasWidth = 800
+const canvasHeight = 480
+const canvasWidth = 848
 
 enum LoadingStatus {
 	Loading,
@@ -135,25 +136,7 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 
 						</div>
 					}
-					{countdown !== 0 &&
-						<div style={
-							{
-								position: 'absolute',
-								top: 0,
-								left: 0,
-								width: '100vw',
-								height: '100vh',
-								backgroundColor: 'rgba(0, 0, 0, 0.5)',
-								zIndex: 1,
-								transition: 'all 0.5s'
-							}
-						}>
-							<div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '50px', color: 'white' }}>
-								{countdown}
-							</div>
-						</div>
-					}
-					<GameScreen gameInfo={gameInfo} gameId={idGame} bottomRef={bottomRef} width={width} ballTrailPositions={ballTrailPositions} />
+					<GameScreen gameInfo={gameInfo} gameId={idGame} bottomRef={bottomRef} width={width} ballTrailPositions={ballTrailPositions} countdown={countdown} />
 				</>
 			)
 		}
@@ -171,7 +154,7 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 
 
 
-export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositions}: Iprops): JSX.Element {
+export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositions, countdown }: Iprops): JSX.Element {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const context = useRef<CanvasRenderingContext2D | null>(null);
 	const { customEmit } = useContext(SocketContext);
@@ -247,7 +230,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 
 	}, []); // 1 seul call quand le return est fait
 
-	 const drawBallTrail = () => {
+	const drawBallTrail = () => {
 		const reverseBallTrailPositions = [...ballTrailPositions].reverse();
 		if (!context.current || !ballTrailPositions) return;
 		let trailOpacity = 0.5;
@@ -257,8 +240,8 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 			trailOpacity = (1 - (i + 1) * 0.1) * trailOpacity;
 			context.current.fillStyle = `rgba(64, 80, 181, ${trailOpacity})`;
 			context.current.beginPath();
-		context.current.arc(ballTrailPosition.pos.x * canvasRatio, ballTrailPosition.pos.y * canvasRatio, ballTrailPosition.size * canvasRatio, 0, 2 * Math.PI)
-		context.current.fill();
+			context.current.arc(ballTrailPosition.pos.x * canvasRatio, ballTrailPosition.pos.y * canvasRatio, ballTrailPosition.size * canvasRatio, 0, 2 * Math.PI)
+			context.current.fill();
 		}
 	}
 	useEffect(() => {
@@ -266,6 +249,7 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 
 		const player1color = "#4050B5"
 		const player2color = "rgba(180, 180, 255, 1.0)"
+		const tranparentBlankColor = "rgba(255, 255, 255, 0.5)"
 		const assetcolor = "#4050B5"
 		const ballcolor = "#4050B5"
 		const backgroundColor = "#ffffff"
@@ -396,7 +380,19 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 			context.current.fillText(player2info, canvasWidth * canvasRatio - (12 * canvasRatio + context.current.measureText(player2info).width), 20 * canvasRatio)
 		}
 
-	}, [gameInfo.players, gameInfo.ball.pos]);
+		//CountDown
+		if (countdown !== 0) {
+			context.current.fillStyle = tranparentBlankColor;
+			context.current.fillRect(0, 0, canvasWidth * canvasRatio, canvasHeight * canvasRatio);
+			context.current.fillStyle = strokeColor;
+			context.current.font = `${72 * canvasRatio}px Roboto`
+			const countDownText = countdown.toString()
+			context.current.fillText(countDownText, (canvasWidth * canvasRatio - context.current.measureText(countDownText).width) * 0.5, canvasHeight * canvasRatio * 0.5)
+			return
+		}
+
+
+	}, [gameInfo.players, gameInfo.ball.pos, countdown]);
 
 	return (
 		<div>

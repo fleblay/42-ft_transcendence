@@ -5,8 +5,8 @@ import { Server, Socket } from 'socket.io'
 import { SavedGame } from '../model/saved-game.entity';
 
 const paddleWidth = 10
-const canvasHeight = 600
-const canvasWidth = 800
+const canvasHeight = 480
+const canvasWidth = 848
 const BounceAngleLimiter = Math.PI / 12 //No more than Pi/2
 
 export type Pos2D = {
@@ -131,7 +131,7 @@ export class Game {
 
 		this.ballSpeed = options?.ballSpeed || 1
 		this.victoryRounds = options?.victoryRounds || 5
-		this.paddleLength = options?.paddleLength || 300
+		this.paddleLength = options?.paddleLength || 200
 		this.paddleLengthMin = options?.paddleLengthMin || 100
 		//Change because paddleReduce can be set to 0
 		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 1

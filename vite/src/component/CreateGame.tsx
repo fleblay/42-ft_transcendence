@@ -52,7 +52,7 @@ export function CreateGame() {
 	const [ballSpeed, setballSpeed] = useState<number>(1);
 	const [victoryRounds, setVictoryRounds] = useState<number>(5);
 	const [paddleReduce, setPaddleReduce] = useState<number>(1);
-	const [paddleLen, setPaddleLen] = useState<number[]>([100, 300])
+	const [paddleLen, setPaddleLen] = useState<number[]>([100, 200])
 
 	const [maxBounce, setMaxBounce] = useState<number>(5);
 	const [startAmo, setStartAmo] = useState<number>(3);
@@ -68,10 +68,10 @@ export function CreateGame() {
 			return
 		if (val[1] - val[0] < minDist) {
 			if (thumb == 0) {
-				if (val[0] + minDist <= 600)
+				if (val[0] + minDist <= 480)
 					setPaddleLen([val[0], val[0] + minDist])
 				else
-					setPaddleLen([600 - minDist, 600])
+					setPaddleLen([480 - minDist, 480])
 			}
 			else {
 				if (val[1] - minDist >= 0)
@@ -214,12 +214,12 @@ export function CreateGame() {
 						valueLabelDisplay="on"
 						step={10}
 						min={10}
-						max={600}
+						max={480}
 						marks={[
 							{ value: 10, label: "10" },
 							{ value: 100, label: "default min" },
-							{ value: 300, label: "default len" },
-							{ value: 600, label: "600" }
+							{ value: 200, label: "default len" },
+							{ value: 480, label: "480" }
 						]}
 						disableSwap
 						onChange={(e, val, thumb) => handlePaddleLenChange(e, val, thumb)}
