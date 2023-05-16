@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
-import { IgameInfo } from "../types";
-import { useAuthService } from "../auth/AuthService";
+import { IgameInfo } from "../../types";
+import { useAuthService } from "../../auth/AuthService";
 
 export function GameFinishedScreen({ gameInfo }: { gameInfo: IgameInfo | null}) {
 	const auth = useAuthService()

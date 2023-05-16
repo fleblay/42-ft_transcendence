@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { getAccessToken } from "../token/token";
-import apiClient from "../auth/interceptor.axios";
+import { getAccessToken } from "../../token/token";
+import apiClient from "../../auth/interceptor.axios";
 import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link, Divider } from "@mui/material";
 import { Link as LinkRouter } from "react-router-dom";
-import { UserInfo } from "../types";
+import { UserInfo } from "../../types";
 
 interface SaveGame {
 	date: string;

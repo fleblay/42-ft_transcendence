@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import apiClient from "../auth/interceptor.axios";
+import apiClient from "../../auth/interceptor.axios";
 import { Paper, Table, TableCell, TableContainer, TableHead, TableRow, TableBody, Button, Grid, Link } from "@mui/material";
 import { Link as LinkRouter } from "react-router-dom";
 import { TablePagination } from "@mui/material";
 
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { UserInfo } from "../types";
+import { UserInfo } from "../../types";
 
 interface SaveGame {
 	date: string;

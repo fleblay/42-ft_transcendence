@@ -88,6 +88,12 @@ export type Games = {
 	score: number[]
 }
 
+export interface CurrentGame {
+	id: string;
+	players: (ShortUser & { score: number })[];
+	viewers: number;
+}
+
 export type plainUser = {
 	id: number,
 	username: string,
@@ -182,14 +188,10 @@ export interface PublicChannel {
 	owner: ShortUser | undefined;
 }
 
-
-
 export type CustomError = {
 	message: string,
 	status: number,
 }
-
-
 
 export type Notification = {
 	id: number,

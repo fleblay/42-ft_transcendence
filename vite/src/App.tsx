@@ -4,7 +4,7 @@ import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 
 import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
 import { Leaderboard } from './component/Leaderboard'
-import { FakeGames } from './component/FakeGame'
+import { FakeGames } from './component/game/FakeGame'
 import { AuthService, useAuthService } from './auth/AuthService'
 import { SocketContext, SocketProvider } from './socket/SocketProvider'
 import { MenuBar } from './component/Menu'
@@ -14,7 +14,7 @@ import { FriendList } from './component/FriendList'
 import { BlockedList } from './component/BlockedList';
 import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
-import { GamePage } from './component/GamePage';
+import { GamePage } from './component/game/GamePage';
 import { ChatPage } from './component/chat/ChatPage';
 import ChatMenu from './component/chat/ChatMenu';
 import { CircularProgress, Paper, Stack } from '@mui/material';

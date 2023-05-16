@@ -62,3 +62,9 @@ export interface PublicChannel {
 	membersLength: number;
 	owner: ShortUser | undefined;
 }
+
+export interface CurrentGame {
+	id: string;
+	players: (ShortUser & { score: number })[];
+	viewers: number;
+}

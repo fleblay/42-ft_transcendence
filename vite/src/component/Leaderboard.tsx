@@ -12,7 +12,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { AppBar, Avatar, Box, Button, Container, Divider, Link, Typography } from '@mui/material';
 import { UserInfo } from "../types";
-import { FinishGames } from "./FinishGames";
+import { FinishGames } from "./game/FinishGames";
 
 export function Leaderboard() {
 

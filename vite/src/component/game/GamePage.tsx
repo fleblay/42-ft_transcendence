@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-import { IgameInfo } from '../types';
+import { IgameInfo } from '../../types';
 import { Box, Container, Step, StepLabel, Stepper } from '@mui/material';
 import { useLocation, useParams } from 'react-router-dom';
 

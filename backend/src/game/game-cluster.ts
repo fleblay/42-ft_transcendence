@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Game, Player, GameOptions } from './game';
 import { v4 as uuidv4 } from 'uuid';
-import { SocketId, UUID, UserState, UserStatus } from '../type';
+import { CurrentGame, SocketId, UUID, UserState, UserStatus } from '../type';
 import { Server, Socket } from 'socket.io'
 import { GameStatus } from './game';
 
@@ -59,10 +59,19 @@ export class GameCluster {
 	}
 
 	listAllCurrent() {
-		const ar : string [] = []
+		const ar: CurrentGame[] = []
 		this.gamesMap.forEach((game, gameId) => {
-			if (game.status === GameStatus.playing || game.status === GameStatus.start)
-				ar.push(JSON.stringify(gameId))
+			if (game.status === GameStatus.playing || game.status === GameStatus.start) {
+				ar.push({
+					id: gameId,
+					players: game.players.map((player) => ({
+						id: player.user.id,
+						username: player.user.username as string,
+						score: player.score,
+					})),
+					viewers: game.viewers.length,
+				});
+			}
 		})
 		return ar;
 	}
@@ -129,7 +138,7 @@ export class GameCluster {
 
 		if (!game) return null;
 		//if (!game.players) return;
- 
+
 		const player = game.players.find(player => player.user.id === userId);
 		const viewer = game.viewers.find(viewer => viewer.user.id === userId);
 		const userToFind = player || viewer

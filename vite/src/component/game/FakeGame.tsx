@@ -1,5 +1,5 @@
 import { useState } from "react";
-import apiClient from '../auth/interceptor.axios'
+import apiClient from '../../auth/interceptor.axios'
 import { Button, Typography } from '@mui/material';
 
 export function FakeGames() {

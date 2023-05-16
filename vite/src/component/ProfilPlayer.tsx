@@ -4,7 +4,7 @@ import { AppBar, Container, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
 import { Box } from '@mui/system';
 import { useParams } from 'react-router-dom';
-import { GameHistory } from './GameHistory';
+import { GameHistory } from './game/GameHistory';
 import { UserDataContext } from '../userDataProvider/userDataProvider';
 import { UserInfoDisplay } from './UserInfoDisplay';
 import { UserAchivement } from './UserAchievment';
