@@ -25,7 +25,7 @@ export function LoginForm() {
 
 	let navigate = useNavigate();
 	let auth = useAuthService();
-	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "No info yet...")
+	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "")
 
 
 

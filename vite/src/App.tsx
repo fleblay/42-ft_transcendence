@@ -36,7 +36,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "Login", path: "/login", public: true },
 	{ name: "Chat", path: "/chat", public: false },
 	{ name: "Game", path: "/game", public: false },
-	{ name: "Leaderboard", path: "/leaderboard", public: false },
+	{ name: "Leaderboard", path: "/leaderboard", public: true },
 	{ name: "Friends", path: "/friends", public: false },
 	{ name: "Blocked", path: "/blocked", public: false },
 	{ name: "notification", path: "/notification", public: false },
@@ -52,10 +52,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 		// trying to go to when they were redirected. This allows us to send them
 		// along to that page after they login, which is a nicer user experience
 		// than dropping them off on the home page.
-		return <>
-			<Link to="/login">Login Page</Link>;
-			<Link to="/register">Register Page</Link>;
-		</>
+		return <></>
 	}
 	if (!auth.user.username) {
 		return (

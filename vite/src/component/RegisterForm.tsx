@@ -18,7 +18,7 @@ export function RegisterForm() {
 	let navigate = useNavigate();
 	let location = useLocation();
 	let auth = useAuthService();
-	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "No info yet...")
+	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "")
 
 	let from = location.state?.from?.pathname || "/";
 
