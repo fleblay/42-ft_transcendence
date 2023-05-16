@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import apiClient from '../auth/interceptor.axios'
 import { Link as LinkRouter } from "react-router-dom";
 
@@ -13,17 +13,23 @@ import Paper from '@mui/material/Paper';
 import { AppBar, Avatar, Box, Button, Container, Divider, Link, Typography } from '@mui/material';
 import { UserInfo } from "../types";
 import { FinishGames } from "./game/FinishGames";
+import { SocketContext } from "../socket/SocketProvider";
 
 export function Leaderboard() {
 
 	const [info, setInfo] = useState<string>("")
 	const [muiTable, setMuiTable] = useState<JSX.Element>(<div>Loading...</div>)
+	const { customOn, customOff, addSubscription } = useContext(SocketContext);
 
 	useEffect(() => {
-		setTimeout(handleClick, 50)
-		const refreshTimer = setInterval(handleClick, 1000)
+		return addSubscription('/leaderboard')
+	}, [])
+
+	useEffect(() => {
+		handleClick()
+		customOn('leaderboard', handleClick)
 		return (
-			() => clearInterval(refreshTimer)
+			() => {customOff('leaderboard', handleClick)}
 		)
 	}, [])
 
