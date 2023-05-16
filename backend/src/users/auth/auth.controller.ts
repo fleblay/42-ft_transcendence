@@ -55,12 +55,6 @@ export class AuthController {
 		}
 	};
 
-	@Get('/allTokens')
-	async findAll() {
-		const allUser = await this.authService.findAllTokens();
-		return allUser;
-	}
-
 	@Get('/logout')
 	@UseGuards(ATGuard)
 	async logout(@Request() req: ExpressRequest, @Response({ passthrough: true }) res: ExpressResponse) {
