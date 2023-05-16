@@ -87,8 +87,8 @@ export class UsersController {
 	@UseGuards(FileSizeGuard)
 	@Post('/uploadAvatar')
 	@UseInterceptors(FileInterceptor('image'))
-	uploadAvatar(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File) {
-		this.usersService.uploadAvatar(user, file);
+	async uploadAvatar(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File) {
+		await this.usersService.uploadAvatar(user, file);
 	}
 
 	@UseGuards(ATGuard)
