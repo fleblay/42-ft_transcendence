@@ -20,7 +20,7 @@ export function MyError() {
             setOpen(true);
             switch (error.status) {
                 case 400:
-                    setMessage("Bad request");
+                    setMessage(`Bad request : ${error.message}`);
                     setSeverity("error");
                     break;
                 case 401:
@@ -36,7 +36,7 @@ export function MyError() {
                     setSeverity("warning");
                     break;
                 default:
-                    setMessage("An error occured, for more explication call the admin Mbraets on discord");
+                    setMessage(`An error occured : ${error.message}`);
                     setSeverity("error");
                     break;
         }

@@ -1,9 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { Error } from '../types';
 
-
-
-
 export interface ErrorContextType {
 	setError: (error: Error | null) => void | null;
 	error: Error | null;

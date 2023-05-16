@@ -49,9 +49,9 @@ export class UsersService implements OnModuleInit {
 		}
 	}
 
-	create(dataUser: Partial<User>) {
+	async create(dataUser: Partial<User>) {
 		//console.log(`create user ${dataUser?.username} : ${dataUser?.email} : ${dataUser?.password}`);
-		const user = this.repo.create({ ...dataUser, dfaSecret: authenticator.generateSecret() })
+		const user : User = await this.repo.save({ ...dataUser, dfaSecret: authenticator.generateSecret() })
 		console.log("save user :", user);
 		if (dataUser.stud)
 			user.achievements.push("stud")
