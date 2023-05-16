@@ -125,7 +125,7 @@ export function MenuBar() {
 							textDecoration: 'none',
 						}}
 					>
-						CYBER PONG
+						FACEPONG
 					</Typography>
 
 

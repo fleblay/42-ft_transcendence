@@ -38,18 +38,6 @@ export function ProfilPlayer() {
 		});
 	}, [idPlayer])
 
-	/* React.useEffect(() => {
-		if (!socket) return;
-		customOn('page.player', (data: any) => {
-			console.log("data", data);
-			if (userData)
-				setUserData({ ...userData, ...data });
-		})
-		return (() => {
-			customOff('page.player');
-		})
-	}, [socket, userData]);
- */
 
 	if (!userData) return (<div>Loading data</div>);
 
@@ -63,7 +51,11 @@ export function ProfilPlayer() {
 					borderRadius: '16px',
 					bgcolor: 'background.paper',
 				}}>
-					<AppBar position="static" sx={{ borderTopLeftRadius: '16px', borderTopRightRadius: '16px', height: '80px' }}>
+					<AppBar position="static"
+					sx={({ shape }) => ({
+						borderRadius: `${shape.borderRadius}px ${shape.borderRadius}px 0 0`,
+						height: '80px'
+					})}>
 						<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
 							{userData?.username}
 						</Typography>
