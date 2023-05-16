@@ -7,6 +7,7 @@ import { NotificationRequestFriend } from './notificationRequestFriend';
 import { useAuthService } from '../../auth/AuthService';
 import { SocketContext } from '../../socket/SocketProvider';
 import { NotificationDirectMessage } from './notificationDirectMessage';
+import { NotificationInvitation } from './notificationInvitation';
 
 
 
@@ -101,6 +102,8 @@ export function NotificationsList() {
 											return (<NotificationRequestFriend key={notification.id} notification={notification} index={index} array={array} />)
 										case 'directMessage':
 											return (<NotificationDirectMessage key={notification.id} notification={notification} index={index} array={array} />)
+										case 'invitationChannel':
+											return (<NotificationInvitation key={notification.id} notification={notification} index={index} array={array} />)
 										default
 											: return <Box key = {notification.id}></Box>;
 									}

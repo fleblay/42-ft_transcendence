@@ -48,10 +48,6 @@ export function GamePage() {
 
 	useEffect(() => {
 		window.addEventListener("resize", handleResize)
-		if (bottomRef.current) {
-			bottomRef.current.scrollIntoView({ behavior: "smooth" })
-			console.log("Going down")
-		}
 		return (() => {
 			window.removeEventListener("resize", handleResize)
 		})

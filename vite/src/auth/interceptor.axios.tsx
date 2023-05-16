@@ -45,7 +45,7 @@ function InterceptorAxios({ children }: { children : JSX.Element}) {
 			},
 			async (error) => {
 				console.log("error in interceptor", error);
-				const { config, response: { status, message } } = error;
+				const { config, response: { status, data: {message} } } = error;
 				const originalRequest = config;
 				if (status === 498) {
 					if (!isResfreshing) {
@@ -80,17 +80,19 @@ function InterceptorAxios({ children }: { children : JSX.Element}) {
 
 				}
 				else {
-					error = { message, status };
 					console.log("error in interceptor", error);
-					setError(error);
-					if (status === 401)
+					setError({ message, status });
+					if (status === 400)
+						return error;
+					else if (status === 401)
 						navigate("/login", { replace: true });
 					else if (config.url.includes("/chat"))
-						navigate("/chat", { replace: true });					
-					else 
+						navigate("/chat", { replace: true })
+					else
 						navigate("/", { replace: true });
-					return Promise.reject(error);
+					return error;
 				}
+				return error;
 			}
 		);
 

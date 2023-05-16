@@ -13,7 +13,7 @@ import { ChatModule } from 'src/chat/chat.module';
   exports: [NotificationService, NotificationSubscriber],
   imports: [
     forwardRef(()=>UsersModule),
-    ChatModule,
+    forwardRef(()=>ChatModule),
   TypeOrmModule.forFeature([Notification])],
 })
 export class NotificationModule {

@@ -1,9 +1,9 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { Error } from '../types';
+import { CustomError } from '../types';
 
 export interface ErrorContextType {
-	setError: (error: Error | null) => void | null;
-	error: Error | null;
+	setError: (error: CustomError | null) => void | null;
+	error: CustomError | null;
 }
 
 export let ErrorProviderContext = createContext<ErrorContextType>({
@@ -12,7 +12,7 @@ export let ErrorProviderContext = createContext<ErrorContextType>({
 });
 
 export function ErrorProvider({ children }: { children: React.ReactNode }) {
-	const [error, setError] = useState<Error | null>(null);
+	const [error, setError] = useState<CustomError | null>(null);
 	return (
 		<ErrorProviderContext.Provider value={{ setError, error }}>
 			{children}

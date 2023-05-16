@@ -12,9 +12,12 @@ import apiClient from '../../auth/interceptor.axios';
 import { StyledBadge } from '../chat/ChatFriendsBrowser';
 import { useNavigate } from 'react-router-dom';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
+import { blue } from '@mui/material/colors';
+import AnnouncementIcon from '@mui/icons-material/Announcement';
+import { Announcement } from '@mui/icons-material';
 
 
-interface NotificationDirectMessageProps {
+interface NotificationInvitationProps {
     notification: Notification,
     index: number;
     array: Notification[];
@@ -25,7 +28,7 @@ interface NotificationDirectMessageProps {
 
 
 
-export const NotificationDirectMessage: FC<NotificationDirectMessageProps> = ({ notification, index, array }) => {
+export const NotificationInvitation: FC<NotificationInvitationProps> = ({ notification, index, array }) => {
     const navigate = useNavigate();
 
     const viewMessage = () => {
@@ -43,11 +46,11 @@ export const NotificationDirectMessage: FC<NotificationDirectMessageProps> = ({ 
                 borderColor: (theme: Theme) => theme.palette.grey[300]
             }}>
                 <Avatar sx={{ margin: 1, width: '40px', height: '40px' }}>
-                    <MessageOutlinedIcon />
+                    <Announcement/>
                 </Avatar>
-                <ListItemText primary={notification.name + " sent you a message"} />
+             <ListItemText primary={"you are invited to " + notification.name}/>
                 <ListItemText primary={notification.createdAt.toString()} />
-                <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={viewMessage}>View Message</Button>
+                <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={viewMessage}>View Channel</Button>
             </ListItem>
         </React.Fragment >
     )

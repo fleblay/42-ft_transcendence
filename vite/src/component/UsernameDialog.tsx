@@ -40,7 +40,6 @@ export const UsernameDialog: React.FC<UsernameDialogProps> = ({ open = true, qui
 			})
 			.catch((error) => {
 				console.log("error is :", error)
-				setError(error.response.data.message)
 			});
 	}
 
