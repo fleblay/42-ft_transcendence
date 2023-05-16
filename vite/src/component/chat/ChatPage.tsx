@@ -90,6 +90,22 @@ export function ChatPage() {
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 	const { channelId } = useParams();
 	const auth = useAuthService();
+	const [containerHeight, setContainerHeight] = useState(0);
+
+	useEffect(() => {
+	  const handleResize = () => {
+		const windowHeight = window.innerHeight;
+		setContainerHeight(windowHeight);
+	  };
+  
+	  handleResize();
+  
+	  window.addEventListener('resize', handleResize);
+  
+	  return () => {
+		window.removeEventListener('resize', handleResize);
+	  };
+	}, []);
 
 	useEffect(() => {
 		return addSubscription(`/chat/${channelId || ''}`);
@@ -128,7 +144,7 @@ export function ChatPage() {
 
 	return (
 		<>
-			<Container maxWidth="xl" sx={{ maxHeight: '100px', minHeight: '100px' }}>
+			<Container maxWidth="xl" style={{ height: containerHeight }} sx={{minHeight: '100px' }}>
 				<AppBar position="static"
 					sx={({ shape }) => ({
 						borderRadius: `${shape.borderRadius}px ${shape.borderRadius}px 0 0`,

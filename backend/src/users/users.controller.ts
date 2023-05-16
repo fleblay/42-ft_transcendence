@@ -132,7 +132,7 @@ export class UsersController {
 	async findOne(@CurrentUser() me: User, @Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
 		const user = await this.usersService.findOne(id, true);
 		if (!user) {
-			throw new ForbiddenException('User not found');
+			throw new UnauthorizedException('User not found');
 		}
 		const userScore: UserScore = {
 			totalplayedGames: user.savedGames.length,

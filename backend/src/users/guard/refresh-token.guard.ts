@@ -1,7 +1,8 @@
 import {
 	CanActivate,
 	ExecutionContext,
-	Injectable
+	Injectable,
+	UnauthorizedException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../auth/auth.service';
@@ -25,7 +26,7 @@ export class RTGuard implements CanActivate {
 		const user = await this.authService.validateRefreshToken(refreshToken);
 		//console.log("user:" , user);
 		if (!user) {
-			return false;
+			throw new UnauthorizedException('not connected');
 		}
 		//console.log("RTGuard return true");
 		return true;
