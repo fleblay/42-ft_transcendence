@@ -79,13 +79,14 @@ export class GameService {
 
 	}
 
-	quitGame(userId: number, gameId: UUID) {
+	async quitGame(userId: number, gameId: UUID) {
 		this.server.to(`/player/${userId}`).emit('page.player', {userId, event: "leave"})
 		const game = this.gameCluster.playerQuit(gameId, userId);
 		if (game) {
 			const savedGame = game.generateSavedGameInfo();
 			let saveObject = this.repo.create(savedGame);
-			this.repo.save(savedGame);
+			await this.repo.save(savedGame);
+			this.server.to(`/leaderboard`).emit('leaderboard', {})
 			return "Succes in leaving and saving game as last user"
 		}
 		else

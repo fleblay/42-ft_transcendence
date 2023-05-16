@@ -34,11 +34,11 @@ export class GameController {
 
 	@UseGuards(ATGuard)
 	@Get("/quit/:gameId")
-	quitGame(@Param('gameId') gameId: UUID, @CurrentUser() user: User) {
+	async quitGame(@Param('gameId') gameId: UUID, @CurrentUser() user: User) {
 		if (!user) {
 			throw new Error("No user");
 		}
-		return this.gameService.quitGame(user.id, gameId)
+		return await this.gameService.quitGame(user.id, gameId)
 	}
 
 	@UseGuards(ATGuard)
