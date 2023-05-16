@@ -96,7 +96,6 @@ export class AuthService {
 		if (user.stud && checkStud)
 			throw new ForbiddenException('Stud accout detected : You must login with 42 !');
 
-
 		if (await verifyPassword(user.password, dataUser.password) === false)
 			throw new ForbiddenException('Password not match');
 		if (user.dfa) {
@@ -142,6 +141,7 @@ export class AuthService {
 		if (await this.usersService.findOneByEmail(dataUser.email))
 			return this.login(dataUser, false)
 		else {
+			dataUser.password = await hashPassword(dataUser.password);
 			const user = await this.usersService.create(dataUser);
 			const tokens = this.getTokens(user);
 			await this.saveRefreshToken(user.id, tokens.refreshToken);
