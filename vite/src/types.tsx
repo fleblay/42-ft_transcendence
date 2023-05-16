@@ -72,6 +72,7 @@ export interface IgameInfo {
 	ball: projectile,
 	status: GameStatus,
 	date: Date,
+	viewers: number,
 }
 
 export enum Move { "Up" = 1, "Down" }
@@ -188,7 +189,7 @@ export type Error = {
 	status: number,
 }
 
-	
+
 
 export type Notification = {
 	id: number,

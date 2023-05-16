@@ -77,7 +77,8 @@ export interface IgameInfo {
 	assets: gameAsset[],
 	ball: projectile,
 	status: GameStatus,
-	date: Date
+	date: Date,
+	viewers: number,
 }
 
 interface PlayerInput {
@@ -228,7 +229,8 @@ export class Game {
 			assets: this.assets,
 			ball: this.ball,
 			status: this.status,
-			date: new Date()
+			date: new Date(),
+			viewers: this.viewers.length,
 		}
 	}
 
