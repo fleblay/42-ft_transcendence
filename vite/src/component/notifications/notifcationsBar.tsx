@@ -63,6 +63,7 @@ export function NotifcationBar() {
 
         return (() => {
             customOff('notification.new', addBellNotification);
+            customOff('notification.ack', dellBellNotification);
         })
     }, [socket, currentLocation]);
 
