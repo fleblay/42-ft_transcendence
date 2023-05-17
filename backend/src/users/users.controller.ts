@@ -35,16 +35,10 @@ export class UsersController {
 	@Get('/all')
 	@Serialize(RestrictedUserDto)
 	async findAll(): Promise<UserInfo[]> {
-		const allUsers = (await this.usersService.getAll()).map((user: User) => {
-			const userScore: UserScore = {
-				totalplayedGames: user.savedGames.length,
-				totalwonGames: user.wonGames.length,
-				points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
-			}
+		const allUsers = (await this.usersService.getAllLight()).map((user: User) => {
 			return ({
 				...user,
 				...this.gameService.userState(user.id),
-				...userScore,
 				userConnected: this.usersService.isConnected(user.id)
 			})
 		});
@@ -120,20 +114,14 @@ export class UsersController {
 	@UseGuards(ATGuard)
 	@Serialize(UserDto)
 	async findOne(@CurrentUser() me: User, @Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
-		const user = await this.usersService.findOne(id, true);
+		const user = await this.usersService.findOne(id, false);
 		if (!user) {
 			throw new NotFoundException('User not found');
-		}
-		const userScore: UserScore = {
-			totalplayedGames: user.savedGames.length,
-			totalwonGames: user.wonGames.length,
-			points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
 		}
 
 		return ({
 			...user,
 			...this.gameService.userState(user.id),
-			...userScore,
 			...(id !== me.id ? {
 				email: undefined as any,
 				dfa: undefined as any,

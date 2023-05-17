@@ -106,9 +106,9 @@ export function Leaderboard() {
 												<Link key={elem.id} component={LinkRouter} to={`/player/${elem.id}`}>{elem.username}</Link>
 											</TableCell>
 											<TableCell align="right">{elem.points}</TableCell>
-											<TableCell align="right">{elem.totalplayedGames ? (elem.totalwonGames / elem.totalplayedGames).toPrecision(2) : 0}</TableCell>
-											<TableCell align="right">{elem.totalwonGames}</TableCell>
-											<TableCell align="right">{elem.totalplayedGames}</TableCell>
+											<TableCell align="right">{elem.totalPlayedGames ? (elem.totalWonGames / elem.totalPlayedGames).toPrecision(2) : 0}</TableCell>
+											<TableCell align="right">{elem.totalWonGames}</TableCell>
+											<TableCell align="right">{elem.totalPlayedGames}</TableCell>
 											<TableCell align="right">{elem.id}</TableCell>
 											<TableCell align="right">{elem.stud ? "Yes" : "No"}</TableCell>
 											<TableCell align="right">

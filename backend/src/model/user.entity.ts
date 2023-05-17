@@ -35,6 +35,15 @@ export class User{
 	@Column("text", { array: true, default: [] })
 	achievements : string[];
 
+	@Column({default : 0})
+	totalPlayedGames: number;
+
+	@Column({default : 0})
+	totalWonGames: number;
+
+	@Column({default : 0})
+	points: number;
+
 	@Column({default : false})
 	dfa: boolean;
 
