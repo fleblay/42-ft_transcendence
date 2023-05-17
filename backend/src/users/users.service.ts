@@ -60,6 +60,12 @@ export class UsersService implements OnModuleInit {
 		return savedUser
 	}
 
+	getAllLight(): Promise<User[]> {
+		const allDB = this.repo.createQueryBuilder("user")
+			.getMany()
+		return allDB
+	}
+
 	getAll(): Promise<User[]> {
 		const allDB = this.repo.createQueryBuilder("user")
 			.leftJoinAndSelect("user.savedGames", "savedgames")
