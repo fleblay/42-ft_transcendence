@@ -127,11 +127,13 @@ function App() {
 									<Route path="/Login" element={<LoginForm />} />
 									<Route path="/Register" element={<RegisterForm />} />
 									<Route path="/leaderboard" element={
+										<RequireAuth>
 										<>
 											<Leaderboard />
 											<br />
 											<FakeGames />
 										</>
+										</RequireAuth>
 									} />
 									<Route path="/player/">
 										<Route path=":idPlayer" element={
