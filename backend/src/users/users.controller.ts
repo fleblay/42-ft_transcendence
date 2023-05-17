@@ -19,6 +19,7 @@ import { FriendRequestStatus } from '../model/friend-request.entity';
 import { Request as ExpressRequest } from 'express';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 import { FriendsService } from '../friends/friends.service';
+import { RestrictedUserDto } from './dtos/user-restricted.dto';
 
 @Controller('users')
 export class UsersController {
@@ -32,6 +33,7 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/all')
+	@Serialize(RestrictedUserDto)
 	async findAll(): Promise<UserInfo[]> {
 		const allUsers = (await this.usersService.getAll()).map((user: User) => {
 			const userScore: UserScore = {
