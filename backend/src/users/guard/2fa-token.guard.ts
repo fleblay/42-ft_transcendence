@@ -20,7 +20,12 @@ export class DfaGuard implements CanActivate {
 		if (!dfaToken) {
 			return false;
 		}
-		let decoded = jwt_decode(dfaToken) as any;
+		let decoded;
+		try {
+			decoded = jwt_decode(dfaToken) as any;
+		} catch (e) {
+			throw new UnauthorizedException('DFA Token invalid');
+		}
 		if (decoded.exp < Date.now() / 1000)
 			throw new UnauthorizedException('DFA Token expired');
 		return true;
