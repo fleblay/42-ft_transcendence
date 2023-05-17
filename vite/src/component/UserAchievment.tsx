@@ -20,6 +20,7 @@ import RadarIcon from '@mui/icons-material/Radar';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SchoolIcon from '@mui/icons-material/School';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
+import LaptopMacIcon from '@mui/icons-material/LaptopMac';
 
 function renderSwitch(achievement: string): JSX.Element {
 	switch (achievement) {
@@ -63,6 +64,12 @@ function renderSwitch(achievement: string): JSX.Element {
 			return (
 				<Tooltip title="Sub-zero : Have a negative amount of points at some point">
 					<AcUnitIcon color="error" fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'the-answer':
+			return (
+				<Tooltip title="42, the answer : Play a game with an id containing the number '42'">
+					<LaptopMacIcon color="primary" fontSize={'large'} />
 				</Tooltip>
 			)
 		default:

@@ -44,6 +44,8 @@ export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame>
 			|| game.players[1].friendId.includes(game.players[0].id)
 			&& !user.achievements.includes("friend"))
 			user.achievements.push("friend")
+		if (game.id.includes("42") && !user.achievements.includes("the-answer"))
+			user.achievements.push("the-answer")
 	}
 
 	async afterInsert(event: InsertEvent<SavedGame>) {
