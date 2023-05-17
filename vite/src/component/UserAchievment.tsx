@@ -61,8 +61,8 @@ function renderSwitch(achievement: string): JSX.Element {
 			)
 		case 'sub-zero':
 			return (
-				<Tooltip title="Sub-zwro : Have a negative amount of points at some point">
-					<AcUnitIcon color="primary" fontSize={'large'} />
+				<Tooltip title="Sub-zero : Have a negative amount of points at some point">
+					<AcUnitIcon color="error" fontSize={'large'} />
 				</Tooltip>
 			)
 		default:
