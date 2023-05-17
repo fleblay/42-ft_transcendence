@@ -55,7 +55,9 @@ export class UsersService implements OnModuleInit {
 		console.log("save user :", user);
 		if (dataUser.stud)
 			user.achievements.push("stud")
-		return this.repo.save(user);
+		const savedUser : User = await this.repo.save(user);
+		this.server.to(`/user`).emit('user.new', {})
+		return savedUser
 	}
 
 	getAll(): Promise<User[]> {
@@ -172,7 +174,9 @@ export class UsersService implements OnModuleInit {
 		if (await this.findOneByUsername(newUsername))
 			throw new BadRequestException("Username already taken");
 		user.username = newUsername;
-		return this.repo.save(user);
+		const savedUser : User = await this.repo.save(user);
+		this.server.to(`/user`).emit('user.modify', {})
+		return savedUser
 	}
 
 

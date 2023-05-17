@@ -85,6 +85,7 @@ export function GamePage() {
 							</Step>
 						))}
 					</Stepper>
+					
 
 					{activeStep === 0 &&
 						<CreateGame />

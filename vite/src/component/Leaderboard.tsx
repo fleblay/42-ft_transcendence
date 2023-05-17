@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef, MutableRefObject } from "react";
 import apiClient from '../auth/interceptor.axios'
 import { Link as LinkRouter } from "react-router-dom";
 
@@ -17,30 +17,54 @@ import { SocketContext } from "../socket/SocketProvider";
 
 export function Leaderboard() {
 
-	const [info, setInfo] = useState<string>("")
 	const [muiTable, setMuiTable] = useState<JSX.Element>(<div>Loading...</div>)
 	const { customOn, customOff, addSubscription } = useContext(SocketContext);
+	const userListFetched: MutableRefObject<boolean> = useRef(false)
+	const userList: MutableRefObject<UserInfo[] | null> = useRef(null)
+	const unSubscribeFxArray: MutableRefObject<((() => void) | void)[]> = useRef([])
+
+	useEffect(() => {
+		handleClick()
+	}, [])
+
+	useEffect(() => {
+		return addSubscription('/user')
+	}, [])
 
 	useEffect(() => {
 		return addSubscription('/leaderboard')
 	}, [])
 
 	useEffect(() => {
-		handleClick()
+		if (!userList.current)
+			return
 		customOn('leaderboard', handleClick)
+		customOn('page.player', handleClick)
+		customOn('user.new', handleClick)
+		customOn('user.modify', handleClick)
+		userList.current.forEach((user) => {
+			unSubscribeFxArray.current.push(addSubscription(`/player/${user.id}`))
+		})
 		return (
-			() => {customOff('leaderboard', handleClick)}
+			() => {
+				customOff('leaderboard', handleClick)
+				customOff('page.player', handleClick)
+				customOff('user.new', handleClick)
+				customOff('user.modify', handleClick)
+				unSubscribeFxArray.current.forEach(fx => {
+					if (typeof fx === "function")
+						fx()
+				})
+			}
 		)
-	}, [])
+	}, [userListFetched.current])
 
 	function handleClick(verbose: boolean = false): void {
-		verbose && setInfo("Waiting for backend to send User Database...")
 		apiClient
 			.get("/api/users/all")
 			.then(({ data }) => {
-				let rank = 1
-				console.log("response from all: ", data)
-				verbose && setInfo("Successfully retrieved infos !")
+				userList.current = data
+				userListFetched.current = true
 				//Mui elements
 				setMuiTable(
 					<Container maxWidth="lg" >
@@ -67,12 +91,12 @@ export function Leaderboard() {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{data.map((elem: UserInfo) => (
+									{userList.current && userList.current.map((elem: UserInfo) => (
 										<TableRow
 											key={elem.username}
 											sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 										>
-											<TableCell component="th" scope="row">#{rank++}</TableCell>
+											<TableCell component="th" scope="row">#{(elem.rank != -1 )? elem.rank : ""}</TableCell>
 											<TableCell align="right">
 												<Link key={elem.id} component={LinkRouter} to={`/player/${elem.id}`}>{elem.username}</Link>
 											</TableCell>
@@ -100,19 +124,12 @@ export function Leaderboard() {
 			})
 			.catch((error) => {
 				console.log(error)
-				if (error?.response?.status === 502)
-					setInfo("Backend not ready yet. Try again in a few seconds")
-				else
-					setInfo("Error")
 			})
 	}
 
 	return (
 		<div>
 			{muiTable}
-			<Typography textAlign="center">
-				{info}
-			</Typography>
 		</div>
 	);
 }
