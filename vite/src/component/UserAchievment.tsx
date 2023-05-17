@@ -19,6 +19,8 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import RadarIcon from '@mui/icons-material/Radar';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SchoolIcon from '@mui/icons-material/School';
+import AcUnitIcon from '@mui/icons-material/AcUnit';
+import LaptopMacIcon from '@mui/icons-material/LaptopMac';
 
 function renderSwitch(achievement: string): JSX.Element {
 	switch (achievement) {
@@ -58,6 +60,18 @@ function renderSwitch(achievement: string): JSX.Element {
 					<SchoolIcon color="primary" fontSize={'large'} />
 				</Tooltip>
 			)
+		case 'sub-zero':
+			return (
+				<Tooltip title="Sub-zero : Have a negative amount of points at some point">
+					<AcUnitIcon color="error" fontSize={'large'} />
+				</Tooltip>
+			)
+		case 'the-answer':
+			return (
+				<Tooltip title="42, the answer : Play a game with an id containing the number '42'">
+					<LaptopMacIcon color="primary" fontSize={'large'} />
+				</Tooltip>
+			)
 		default:
 			return (<></>)
 	}
@@ -80,19 +94,19 @@ export function UserAchivement() {
 					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 						<EmojiEventsOutlinedIcon sx={{ ml: 2 }} color="primary" />
 						<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-							Win : {userData?.totalwonGames}
+							Win : {userData?.totalWonGames}
 						</Typography>
 					</div>
 					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 						<ThumbDownAltOutlinedIcon sx={{ ml: 2 }} color="primary" />
 						<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-							Loose : {userData?.totalplayedGames ? userData.totalplayedGames - userData?.totalwonGames : 0}
+							Loose : {userData?.totalPlayedGames ? userData.totalPlayedGames - userData?.totalWonGames : 0}
 						</Typography>
 					</div>
 					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
 						<AutoAwesomeOutlinedIcon sx={{ ml: 2 }} color="primary" />
 						<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-							Ratio : {userData?.totalplayedGames ? (userData?.totalwonGames / userData?.totalplayedGames).toFixed(2) : 0}
+							Ratio : {userData?.totalPlayedGames ? (userData?.totalWonGames / userData?.totalPlayedGames).toFixed(2) : 0}
 						</Typography>
 					</div>
 				</div>

@@ -12,8 +12,8 @@ export type UserState = {
 
 export type UserScore = {
 	points: number,
-	totalplayedGames: number,
-	totalwonGames: number,
+	totalPlayedGames: number,
+	totalWonGames: number,
 }
 
 export type UserInfo = User & UserState & UserScore & { userConnected: boolean }

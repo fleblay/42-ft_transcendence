@@ -42,8 +42,8 @@ export class FriendsController {
 
 	@UseGuards(ATGuard)
 	@Get('/:id')
-	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
-		return this.friendsService.getFriend(user, parseInt(id));
+	async getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
+		return await this.friendsService.getFriend(user, parseInt(id));
 	}
 
 }

@@ -35,16 +35,10 @@ export class UsersController {
 	@Get('/all')
 	@Serialize(RestrictedUserDto)
 	async findAll(): Promise<UserInfo[]> {
-		const allUsers = (await this.usersService.getAll()).map((user: User) => {
-			const userScore: UserScore = {
-				totalplayedGames: user.savedGames.length,
-				totalwonGames: user.wonGames.length,
-				points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
-			}
+		const allUsers = (await this.usersService.getAllLight()).map((user: User) => {
 			return ({
 				...user,
 				...this.gameService.userState(user.id),
-				...userScore,
 				userConnected: this.usersService.isConnected(user.id)
 			})
 		});
@@ -83,26 +77,26 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/blocked/:id')
-	getBlockedUsersList(@Param("id", ValideIdPipe) id: number) {
-		return this.usersService.getBlockedUsersList(id);
+	async getBlockedUsersList(@Param("id", ValideIdPipe) id: number) {
+		return 	await this.usersService.getBlockedUsersList(id);
 	}
 
 	@UseGuards(ATGuard)
 	@Get('/getBlocked/:id')
-	getBlockedUser(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
-		return this.usersService.getBlocked(user, id);
+	async getBlockedUser(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		return await this.usersService.getBlocked(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/blockUser/:id')
-	block(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
-		this.usersService.blockUser(user, id);
+	async block(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		await this.usersService.blockUser(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/unblockUser/:id')
-	unblock(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
-		this.usersService.unblockUser(user, id);
+	async unblock(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		await this.usersService.unblockUser(user, id);
 	}
 
 	@UseGuards(ATGuard)
@@ -120,20 +114,14 @@ export class UsersController {
 	@UseGuards(ATGuard)
 	@Serialize(UserDto)
 	async findOne(@CurrentUser() me: User, @Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
-		const user = await this.usersService.findOne(id, true);
+		const user = await this.usersService.findOne(id, false);
 		if (!user) {
 			throw new NotFoundException('User not found');
-		}
-		const userScore: UserScore = {
-			totalplayedGames: user.savedGames.length,
-			totalwonGames: user.wonGames.length,
-			points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
 		}
 
 		return ({
 			...user,
 			...this.gameService.userState(user.id),
-			...userScore,
 			...(id !== me.id ? {
 				email: undefined as any,
 				dfa: undefined as any,
