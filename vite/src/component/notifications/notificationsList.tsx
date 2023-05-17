@@ -131,7 +131,7 @@ export function NotificationsList() {
 						</List>
 					</Box>
 				</Box>
-				<Grid container justifyContent="flex-end">
+				{notifications && <Grid container justifyContent="flex-end">
 				{ currentPage !== 1 && <Button variant="outlined" onClick={() => {
 					if (currentPage > 0) {
 						setCurrentPage(currentPage - 1)
@@ -141,7 +141,7 @@ export function NotificationsList() {
 			{currentNotifications?.length === 10 && <Button variant="outlined" onClick={() => {
 						setCurrentPage(currentPage + 1)
 				}}>Next</Button>}
-			</Grid>
+			</Grid>}
 			</Container>
 		</React.Fragment>
 	)
