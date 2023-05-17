@@ -5,6 +5,8 @@ import { SocketContext } from '../../socket/SocketProvider';
 import { GameOptions } from '../../types';
 import { ListCurrentGames } from './ListCurrentGames';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PrivateImage from '../../assets/private.png';
+import PublicImage from '../../assets/public.png';
 
 export function CreateGame() {
 	const navigate = useNavigate();
@@ -93,7 +95,7 @@ export function CreateGame() {
 							<CardMedia
 								component="img"
 								height="240"
-								image="/avatars/public.png"
+								image={PublicImage}
 							/>
 							<CardContent sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
 								<Button variant='contained' onClick={() => {
@@ -108,7 +110,7 @@ export function CreateGame() {
 							<CardMedia
 								component="img"
 								height="240"
-								image="/avatars/private.png"
+								image={PrivateImage}
 							/>
 							<CardContent sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
 								<Button variant='contained' onClick={() => {
