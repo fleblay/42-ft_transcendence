@@ -3,7 +3,7 @@ import axios from "axios";
 import TextField from '@mui/material/TextField';
 import Button, { buttonClasses } from '@mui/material/Button';
 import { Container } from "@mui/system";
-import { Paper, Box, Typography, Grid, SvgIcon } from '@mui/material';
+import { Paper, Box, Typography, Grid, SvgIcon, Alert } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthService } from "../auth/AuthService";
 
@@ -63,7 +63,6 @@ export function LoginForm() {
 					<Box sx={{ my: 5 }}>
 						<Typography variant="h4" align="center"> Login </Typography>
 					</Box>
-					<div>{info}</div>
 					<form onSubmit={handleSubmit}>
 
 						<Grid container spacing={2} alignItems="center">
@@ -86,6 +85,9 @@ export function LoginForm() {
 					<Box sx={{ my: 3 }}>
 						<Link to="/register">No account ? Register</Link>
 					</Box>
+
+					{ info && <Alert severity="warning">{info}</Alert>}
+
 
 
 				</Paper>
