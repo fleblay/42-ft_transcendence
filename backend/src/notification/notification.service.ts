@@ -36,7 +36,7 @@ export class NotificationService {
             contentId: data.sender.id,
             name: data.sender.username,
         });
-        //console.log("generate notification");
+        ////console.log("generate notification");
         return notification;
     }
 
@@ -49,13 +49,13 @@ export class NotificationService {
             contentId: data.channel.id,
             name: data.channel.name,
         });
-        //console.log("generate notification");
+        ////console.log("generate notification");
         return notification;
     }
 
 
     async generateDirectMessageNotification(receiver: User, data: Message): Promise<Notification | null> {
-        //console.log("generate notification");
+        ////console.log("generate notification");
         const notification : Notification | undefined = (await this.repo.find({
             where: {
                 type: "directMessage",
@@ -64,7 +64,7 @@ export class NotificationService {
             }
         }))?.find(notification => notification.read === false);
 
-        console.log("notification find", notification);
+        //console.log("notification find", notification);
         if (notification && notification.read === false) {
             return null;
         }
@@ -80,7 +80,7 @@ export class NotificationService {
     }
 
     async generateNotification( type: NotificationType, data: any, receiverId?: number): Promise<void> {
-        //console.log("generate notification");
+        ////console.log("generate notification");
         let receiver  = null;
         if (!receiverId && type === "directMessage") {
             receiver  = (await this.chatService.getChannelMembers(data.channel.id)).find(member => member.id !== data.owner.id)?.user;
@@ -120,7 +120,7 @@ export class NotificationService {
             }
             const notificationId = notification.id;
             await this.repo.remove(notification);
-            //console.log("notification deleted", notificationId);
+            ////console.log("notification deleted", notificationId);
             this.wsServer.to(`/notification/${data.receiver.id}`).emit('notification.delete', notificationId);
         }
     }
@@ -138,7 +138,7 @@ export class NotificationService {
             notification.read = true;
             this.repo.save(notification);
         });
-        //console.log("notifications", notifications);
+        ////console.log("notifications", notifications);
         return notifications;
     }
 

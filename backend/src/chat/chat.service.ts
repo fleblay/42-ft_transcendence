@@ -668,7 +668,7 @@ export class ChatService implements OnModuleInit {
 		if (!friend.id || friend.id === me.id)
 			return null;
 		console.log("getDMChannel :searching channel");
-		return await this.membersRepo.findOne({
+		const member = await this.membersRepo.findOne({
 			where: {
 				user: {
 					id: me.id,
@@ -686,23 +686,29 @@ export class ChatService implements OnModuleInit {
 			select: {
 				channel: {
 					id: true,
-					name: true,
-					private: true,
-					password: true,
-					directMessage: true,
-					members: {
-						id: true,
-						user: { id: true, username: true, blockedId: true, friendId: true, rank: true },
-					},
 				},
 			},
-		}).then((member) => {
-			if (!member)
-				return null;
-			return member.channel;
-		}
-
-		);
+		})
+		if (!member)
+			return null;
+		return await this.channelsRepo.findOne({
+			where: {
+				id: member.channel.id,
+			},
+			relations: ['members', 'members.user'],
+			select: {
+				id: true,
+				name: true,
+				private: true,
+				password: true,
+				directMessage: true,
+				members: {
+					id: true,
+					left: true,
+					user: { id: true, username: true, blockedId: true, friendId: true },
+				},
+			},
+		});
 	}
 
 	async joinDirectMessage(user: User, targetUser: number) {
@@ -747,10 +753,9 @@ export class ChatService implements OnModuleInit {
 		channel.members.forEach((member) => {
 			this.wsServer.to(`/chat/myChannels/${member.user.id}`).emit('chat.channel.leave', channel.id);
 			member.left = true;
+			this.membersRepo.save(member);
 		});
 		await this.channelsRepo.save(channel);
-
-		this.emitToAllMembers(channel.id, 'chat.modify.channel', this.cbEmitAll);
 	}
 }
 

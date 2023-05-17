@@ -19,7 +19,6 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 
 
 	async afterInsert(event: InsertEvent<any>) {
-		console.log("after insert", event.entity);
 		if (event.entity instanceof FriendRequest) {
 			await this.afterInsertFriendRequest(event);
 			return;
@@ -48,7 +47,7 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 
 	async afterInsertFriendRequest(event: InsertEvent<FriendRequest>) {
 		const notification = await this.notificationService.generateNotification( "friendRequest", event.entity, event.entity.receiver.id);
-		//console.log("notification generated", notification);
+		////console.log("notification generated", notification);
 
 	}
 
@@ -64,10 +63,8 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 
 
 	async afterInsertMessages(event: InsertEvent<Message>) {
-		console.log("after insert Message", event.entity);
 		if (event.entity.channel.directMessage) {
 			await this.notificationService.generateNotification("directMessage", event.entity);
-			//console.log("notification generated", notification);
 		}
 	}
 
