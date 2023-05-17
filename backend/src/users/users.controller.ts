@@ -83,26 +83,26 @@ export class UsersController {
 
 	@UseGuards(ATGuard)
 	@Get('/blocked/:id')
-	getBlockedUsersList(@Param("id", ValideIdPipe) id: number) {
-		return this.usersService.getBlockedUsersList(id);
+	async getBlockedUsersList(@Param("id", ValideIdPipe) id: number) {
+		return 	await this.usersService.getBlockedUsersList(id);
 	}
 
 	@UseGuards(ATGuard)
 	@Get('/getBlocked/:id')
-	getBlockedUser(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
-		return this.usersService.getBlocked(user, id);
+	async getBlockedUser(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		return await this.usersService.getBlocked(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/blockUser/:id')
-	block(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
-		this.usersService.blockUser(user, id);
+	async block(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		await this.usersService.blockUser(user, id);
 	}
 
 	@UseGuards(ATGuard)
 	@Post('/unblockUser/:id')
-	unblock(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
-		this.usersService.unblockUser(user, id);
+	async unblock(@CurrentUser() user: User, @Param("id", ValideIdPipe) id: number) {
+		await this.usersService.unblockUser(user, id);
 	}
 
 	@UseGuards(ATGuard)

@@ -12,8 +12,8 @@ import { authenticator } from 'otplib'
 import { Login42User, Tokens } from '../../type';
 import { hashPassword, verifyPassword } from './hashPassword';
 
-const access_token_options = { expiresIn: '1s', secret: 'access' };
-const refresh_token_options = { expiresIn: '3m', secret: 'refresh' };
+const access_token_options = { expiresIn: '1d', secret: 'access' };
+const refresh_token_options = { expiresIn: '10d', secret: 'refresh' };
 const dfa_token_options = { expiresIn: '1h', secret: 'dfa_secret' };
 
 @Injectable()
