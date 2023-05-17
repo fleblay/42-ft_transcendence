@@ -33,7 +33,7 @@ export function ProfilPlayer() {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
 			console.log("response", response);
 			setUserData(response.data);
-			console.log("userData", userData);
+			console.log("userData in profil player", userData);
 		}).catch((error) => {
 			navigate('/404');
 			console.log(error);

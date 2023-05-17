@@ -24,7 +24,7 @@ interface UserInfoDisplayProps {
 
 export const handleUnblockUser = (idPlayer: string | undefined) => {
 	apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
-		console.log(response);
+		console.log("unblockUser", response);
 		//setChangeRelation(!changeRelation);
 	}).catch((error) => {
 		console.log(error);
@@ -33,7 +33,7 @@ export const handleUnblockUser = (idPlayer: string | undefined) => {
 
 export const handleBlockUser = (idPlayer: string | undefined) => {
 	apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
-		console.log(response);
+		console.log("block user", response);
 		//setChangeRelation(!changeRelation);
 
 	}).catch((error) => {
@@ -58,7 +58,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
 			console.log("response", response);
 			setUserData(response.data);
-			console.log("userData", userData);
+			console.log("userData in user info display", userData);
 		}).catch((error) => {
 			console.log(error);
 		});
@@ -80,6 +80,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 					console.log(error);
 
 				});
+				console.log("idPlayer fetch blocked", idPlayer);
 				apiClient.get(`/api/users/getBlocked/${idPlayer}`).then((response) => {
 					if (response.data) {
 						console.log("response blocked:", response.data);
@@ -100,7 +101,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 	React.useEffect(() => {
 		if (!socket) return;
 		function updateComponent(data: any) {
-			console.log("data", data);
+			console.log("custom on data", data);
 			if (userData) {
 				setDisplayUpdate(!displayUpdate);
 				if (setRender)
@@ -131,6 +132,24 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 			customOff('page.player', updateUserData);
 		})
 	}, [socket, userData]);
+
+	const handleUnblockUser = (idPlayer: string | undefined) => {
+		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
+			console.log("unblockUser", response);
+			setIsBlocked(false);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}
+	
+	const handleBlockUser = (idPlayer: string | undefined) => {
+		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
+			console.log("block user", response);
+			setIsBlocked(true);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}
 
 
 	const handleAddFriend = () => {
