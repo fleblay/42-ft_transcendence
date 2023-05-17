@@ -349,8 +349,10 @@ export function CreateGame() {
 					}}>
 						{privateGame ? "Create a private game" : "Join a game"}
 					</Button>
+				</Box>
+
+			}
 					<ListCurrentGames joinGame={joinGame} />
-				</Box>}
 		</>
 	);
 }

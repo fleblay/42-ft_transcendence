@@ -57,7 +57,7 @@ export const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) 
 
 	const arrayGames = Object.values(listGames);
 
-	if (!arrayGames.length) return null;
+	// if (!arrayGames.length) return null;
 
 	return (
 		<TableContainer component={Paper} sx={{ width: '50%' }}>
