@@ -24,6 +24,7 @@ import { ErrorProviderContext } from './ErrorProvider/ErrorProvider';
 import { MyError } from './component/Error';
 import { InterceptorAxios } from './auth/interceptor.axios';
 import { NotificationsList } from './component/notifications/notificationsList';
+import { NotFound } from './component/404';
 
 export interface Destinations {
 	name: string,
@@ -160,7 +161,7 @@ function App() {
 										</RequireAuth>
 									} />
 									<Route path="/dfa" element={<DfaForm />} />
-									<Route path='*' element={<div>404</div>} />
+									<Route path='*' element={<NotFound/>} />
 								</Route>
 							</Routes>
 						</SocketProvider>
