@@ -35,7 +35,7 @@ export class UsersController {
 	@Get('/all')
 	@Serialize(RestrictedUserDto)
 	async findAll(): Promise<UserInfo[]> {
-		const allUsers = (await this.usersService.getAll()).map((user: User) => {
+		const allUsers = (await this.usersService.getAllLight()).map((user: User) => {
 			return ({
 				...user,
 				...this.gameService.userState(user.id),
