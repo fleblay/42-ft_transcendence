@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import { AppBar, Container, Typography } from '@mui/material';
 import apiClient from '../auth/interceptor.axios';
 import { Box } from '@mui/system';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { GameHistory } from './game/GameHistory';
 import { UserDataContext } from '../userDataProvider/userDataProvider';
 import { UserInfoDisplay } from './UserInfoDisplay';
@@ -18,6 +18,7 @@ export function ProfilPlayer() {
 	const { userData, setUserData } = useContext(UserDataContext);
 	const auth = useAuthService();
 	const [itsMe, setItsMe] = useState<boolean>(false);
+	const navigate = useNavigate();
 
 	React.useEffect(() => {
 		console.log("idPlayer", idPlayer);
@@ -34,6 +35,7 @@ export function ProfilPlayer() {
 			setUserData(response.data);
 			console.log("userData", userData);
 		}).catch((error) => {
+			navigate('/404');
 			console.log(error);
 		});
 	}, [idPlayer])

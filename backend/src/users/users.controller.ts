@@ -1,4 +1,4 @@
-import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query, UsePipes, UnauthorizedException } from '@nestjs/common';
+import { Get, Body, Controller, UseGuards, Request, ForbiddenException, Param, Headers, UseInterceptors, forwardRef, Inject, Patch, Query, UsePipes, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -62,20 +62,8 @@ export class UsersController {
 	@Get('/me')
 	@UseGuards(ATGuard)
 	@Serialize(UserDto)
-	async getMe(@Request() req: ExpressRequest) {
-		const token = req.cookies['access_token'];
-		if (!token) {
-			throw new UnauthorizedException('User not found');
-		}
-		let foundUser: User | null = await this.authService.validateAccessToken(token);
-		/*
-		if (foundUser) {
-			const friendId: number[] = (await this.friendsService.getFriendsList(foundUser))
-				.map((friend : Friend) => friend.id)
-			return {...foundUser, friendId}
-		}
-		*/
-		return foundUser
+	async getMe(@CurrentUser() user: User, @Request() req: ExpressRequest) {
+		return user
 	}
 
 	@Patch('/me')
@@ -134,7 +122,7 @@ export class UsersController {
 	async findOne(@CurrentUser() me: User, @Param("id", ValideIdPipe) id: number): Promise<UserInfo> {
 		const user = await this.usersService.findOne(id, true);
 		if (!user) {
-			throw new UnauthorizedException('User not found');
+			throw new NotFoundException('User not found');
 		}
 		const userScore: UserScore = {
 			totalplayedGames: user.savedGames.length,
