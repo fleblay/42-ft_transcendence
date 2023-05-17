@@ -36,7 +36,7 @@ export const allRoutes: Destinations[] = [
 	{ name: "Login", path: "/login", public: true },
 	{ name: "Chat", path: "/chat", public: false },
 	{ name: "Game", path: "/game", public: false },
-	{ name: "Leaderboard", path: "/leaderboard", public: true },
+	{ name: "Leaderboard", path: "/leaderboard", public: false },
 	{ name: "Friends", path: "/friends", public: false },
 	{ name: "Blocked", path: "/blocked", public: false },
 	{ name: "notification", path: "/notification", public: false },
@@ -128,11 +128,11 @@ function App() {
 									<Route path="/Register" element={<RegisterForm />} />
 									<Route path="/leaderboard" element={
 										<RequireAuth>
-										<>
-											<Leaderboard />
-											<br />
-											<FakeGames />
-										</>
+											<>
+												<Leaderboard />
+												<br />
+												<FakeGames />
+											</>
 										</RequireAuth>
 									} />
 									<Route path="/player/">

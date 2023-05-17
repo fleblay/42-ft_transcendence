@@ -36,7 +36,7 @@ export function Leaderboard() {
 	}, [])
 
 	useEffect(() => {
-		if (!userList.current)
+		if (!userList.current || !userListFetched.current)
 			return
 		customOn('leaderboard', handleClick)
 		customOn('page.player', handleClick)
@@ -59,7 +59,7 @@ export function Leaderboard() {
 		)
 	}, [userListFetched.current])
 
-	function handleClick(verbose: boolean = false): void {
+	function handleClick(): void {
 		apiClient
 			.get("/api/users/all")
 			.then(({ data }) => {

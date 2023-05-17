@@ -31,15 +31,22 @@ export function FinishGames() {
 			})
 	}
 
+	function resetGamePage() {
+		setGamePage(0)
+	}
+
+	useEffect(() => {
+		getData()
+	}, [gamePage])
+
 	useEffect(() => {
 		return addSubscription('/leaderboard')
 	}, [])
 
 	useEffect(() => {
-		getData()
-		customOn('leaderboard', getData)
+		customOn('leaderboard', resetGamePage)
 		return (
-			() => {customOff('leaderboard', getData)}
+			() => {customOff('leaderboard', resetGamePage)}
 		)
 	}, [])
 
@@ -47,7 +54,6 @@ export function FinishGames() {
 
 	return (
 		<div>
-
 			<TableContainer>
 				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
 					<TableHead>
