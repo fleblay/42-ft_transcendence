@@ -115,8 +115,8 @@ export type UserInfo = plainUser & {
 	gameIds: string[],
 
 	points: number,
-	totalwonGames: number,
-	totalplayedGames: number,
+	totalWonGames: number,
+	totalPlayedGames: number,
 	userConnected: boolean,
 	twoFactorEnable: boolean,
 }

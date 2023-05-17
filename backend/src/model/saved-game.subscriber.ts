@@ -21,6 +21,16 @@ export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame>
 
 	updateUserInfo(user: User, game: SavedGame, rankArray: { userId: number, points: number }[]) {
 		user.rank = rankArray.findIndex((rank) => rank.userId == user.id)
+		user.totalWonGames += (game.winner.id == user.id) ? 1 : 0
+		if (game.players[0].id == user.id) {
+			user.points += game.score[0]
+			user.totalPlayedGames++
+		}
+		else if (game.players[1].id == user.id) {
+			user.points += game.score[1]
+			user.totalPlayedGames++
+		}
+
 		if (game.players[0].id == user.id || game.players[1].id == user.id) {
 			if (rankArray[user.rank].points > 100 && !user.achievements.includes("boss"))
 				user.achievements.push("boss")
@@ -42,11 +52,11 @@ export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame>
 	async afterInsert(event: InsertEvent<SavedGame>) {
 		console.log("ZZZ-Before saved Game insert", event.entity)
 		const game: SavedGame = event.entity
-		const allUserDB: User[] = await this.usersService.getAll()
+		const allUserDB: User[] = await this.usersService.getAllLight()
 		const rankArray: { userId: number, points: number }[] = allUserDB.map((user) => {
 			return {
 				userId: user.id,
-				points: user.wonGames.reduce((acc, curr) => acc + Math.max(...curr.score), 0)
+				points: user.points
 			}
 		})
 		rankArray.sort((a, b) => b.points - a.points)
