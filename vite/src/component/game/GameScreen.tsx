@@ -7,6 +7,7 @@ import { Channel, GameStatus, IgameInfo, Member, ShortUser, projectile } from ".
 import { PersonAdd } from '@mui/icons-material';
 import apiClient from '../../auth/interceptor.axios';
 import { useAuthService } from '../../auth/AuthService';
+import { FriendList } from '../FriendList';
 
 interface Iprops {
 	gameInfo: IgameInfo,
@@ -111,24 +112,28 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 		}
 	}, [window.location.pathname])
 
-	type ShortDMChannel = {id: number, friend: Member}
+	type ShortDMChannel = { id: number, friend: Member }
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [dmChannelsList, setDMChannelsList] = useState<null | ShortDMChannel[]>(null);
+	const [invitedFriends, setInvitedFriends] = useState<{ [id: number]: boolean }>({});
 
 	function inviteFriendToGame(dmChannel: ShortDMChannel) {
 		if (!idGame || !dmChannel) return;
-		console.log('inviteFriendToGame', idGame);
 		apiClient.post(`/api/chat/channels/${dmChannel.id}/messages`, { content: `Join my private game.`, gameId: idGame })
+
+		setInvitedFriends({ ...invitedFriends, [dmChannel.friend.user.id]: true })
 		closeFriendsList();
 	}
 	function fetchFriendsList() {
-		console.log('fetchFriendsList');
 		apiClient.get<Channel[]>('/api/chat/channels/dm').then(({ data }) => {
-			const friendsList: ShortDMChannel[] = data.map((channel) => ({
+			const channelsList: ShortDMChannel[] = data.map((channel) => ({
 				id: channel.id,
 				friend: channel.members.find((member) => member.user.id !== auth.user?.id),
-			})).filter(channel => channel.friend) as ShortDMChannel[];
-			setDMChannelsList(friendsList);
+			})).filter(channel => channel.friend) as ShortDMChannel[]
+			console.log('friendsList', invitedFriends, channelsList);
+			setDMChannelsList(channelsList
+				.filter(channel => channel.friend.isConnected)
+			);
 		})
 	}
 
@@ -138,7 +143,6 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 	}
 	function closeFriendsList() {
 		setAnchorEl(null);
-		setDMChannelsList(null);
 	}
 
 	if (loading === LoadingStatus.Loading) {
@@ -166,20 +170,27 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 							<Typography sx={{ pl: 2 }}>Waiting for players</Typography>
 							{
 								gameInfo.private &&
-								<IconButton sx={{ ml: 2 }} size='large' onClick={handleFriendsList}>
+								<IconButton sx={{ ml: 2 }} size='small' onClick={handleFriendsList}>
+									Invite a connected friend
 									<PersonAdd />
 								</IconButton>
 							}
 							<Menu
 								anchorEl={anchorEl}
-								open={dmChannelsList !== null}
+								open={anchorEl !== null}
 								onClose={closeFriendsList}
-								TransitionComponent={Fade}
 							>
 								{
-									dmChannelsList?.map((channel) => (
-										<MenuItem key={channel.friend.user.id} onClick={() => inviteFriendToGame(channel)}>{channel.friend.user.username}</MenuItem>
-									))
+									dmChannelsList?.length
+										? dmChannelsList.map((channel) => (
+											<MenuItem key={channel.friend.user.id}
+												disabled={invitedFriends[channel.friend.user.id]}
+												onClick={() => inviteFriendToGame(channel)}
+											>{`Invite ${channel.friend.user.username}`}
+
+											</MenuItem>
+										))
+										: <MenuItem disabled>No connected friends</MenuItem>
 								}
 							</Menu>
 
