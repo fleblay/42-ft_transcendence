@@ -18,31 +18,23 @@ export class ATGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext){
 		const request = context.switchToHttp().getRequest() as Request;
-		console.log("ATGuard: before replace", request.headers.authorization);
         const bearerToken = request.cookies['access_token'];
 		if (!bearerToken && request.cookies['refresh_token']) {
 			throw new HttpException('Token invalid', 498);
 		}
-		console.log("ATGuard: after replace", request.headers.authorization);
-		console.log ("ATGuard access token", bearerToken)
 		if (!bearerToken) {
-			console.log("ATGuard: no bearer token");
 			throw new UnauthorizedException('not connected');
 		}
 		let decoded;
 		try {
 			decoded = jwt_decode(bearerToken) as any;
 		} catch (e) {
-			console.log("ATGuard: jwt_decode error");
 			throw new UnauthorizedException('not connected');
 		}
-		console.log("ATGuard: decoded", decoded)
 		if (decoded.exp < Date.now() / 1000)
 			throw new HttpException('Token expired', 498);
         const user = await this.authService.validateAccessToken(bearerToken);
-		console.log("ATGuard: user", user);
 		if (!user || user === undefined) {
-			console.log("ATGuard: no user");
 			throw new UnauthorizedException('not connected');
 		}
 		(request as Request & {currentUser: User}).currentUser  = user;

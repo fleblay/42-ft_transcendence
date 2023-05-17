@@ -34,17 +34,4 @@ export class Member {
 
 	@DeleteDateColumn()
 	deletedAt: Date;
-
-	@AfterInsert()
-	logInsert() {
-		console.log('Inserted Member', this);
-	}
-	@AfterUpdate()
-	logUpdate() {
-		console.log('Updated Member', this);
-	}
-	@AfterRemove()
-	logRemove() {
-		console.log('Removed Member', this);
-	}
 }
