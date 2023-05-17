@@ -28,13 +28,6 @@ export class ChatController {
 		private friendsService: FriendsService
 	) { }
 
-	// NOTE: DEBUG PURPOSES ONLY !
-	@Get('/channels/all')
-	getAll(): Promise<Channel[]> {
-		return this.chatService.getAllChannels()
-	}
-	// Return all channels public and protected
-	// NOTE: A TESTER
 	@Get('/channels/public')
 	getAllPublic() {
 		return this.chatService.getAllPublicChannels()

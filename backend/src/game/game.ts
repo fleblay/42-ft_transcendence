@@ -79,6 +79,7 @@ export interface IgameInfo {
 	status: GameStatus,
 	date: Date,
 	viewers: number,
+	private: boolean,
 }
 
 interface PlayerInput {
@@ -234,6 +235,7 @@ export class Game {
 			status: this.status,
 			date: new Date(),
 			viewers: this.viewers.length,
+			private: this.privateGame,
 		}
 	}
 

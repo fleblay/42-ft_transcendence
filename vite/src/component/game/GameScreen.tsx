@@ -1,9 +1,12 @@
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Box, CircularProgress, CssBaseline, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, CssBaseline, Fade, IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { SocketContext } from '../../socket/SocketProvider';
-import { GameStatus, IgameInfo, projectile } from "../../types";
+import { Channel, GameStatus, IgameInfo, Member, ShortUser, projectile } from "../../types";
+import { PersonAdd } from '@mui/icons-material';
+import apiClient from '../../auth/interceptor.axios';
+import { useAuthService } from '../../auth/AuthService';
 
 interface Iprops {
 	gameInfo: IgameInfo,
@@ -38,6 +41,7 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 	const { socket, customEmit } = useContext(SocketContext);
 	const [gameInfo, setGameInfo] = useState<IgameInfo | null>(null);
 	const [countdown, setCountdown] = useState<number>(0);
+	const auth = useAuthService();
 
 	const { idGame } = useParams<{ idGame: string }>();
 	const [ballTrailPositions, setBallTrailPositions] = useState<projectile[]>([]);
@@ -107,6 +111,36 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 		}
 	}, [window.location.pathname])
 
+	type ShortDMChannel = {id: number, friend: Member}
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const [dmChannelsList, setDMChannelsList] = useState<null | ShortDMChannel[]>(null);
+
+	function inviteFriendToGame(dmChannel: ShortDMChannel) {
+		if (!idGame || !dmChannel) return;
+		console.log('inviteFriendToGame', idGame);
+		apiClient.post(`/api/chat/channels/${dmChannel.id}/messages`, { content: `Join my private game.`, gameId: idGame })
+		closeFriendsList();
+	}
+	function fetchFriendsList() {
+		console.log('fetchFriendsList');
+		apiClient.get<Channel[]>('/api/chat/channels/dm').then(({ data }) => {
+			const friendsList: ShortDMChannel[] = data.map((channel) => ({
+				id: channel.id,
+				friend: channel.members.find((member) => member.user.id !== auth.user?.id),
+			})).filter(channel => channel.friend) as ShortDMChannel[];
+			setDMChannelsList(friendsList);
+		})
+	}
+
+	function handleFriendsList(event: React.MouseEvent<HTMLButtonElement>) {
+		fetchFriendsList();
+		setAnchorEl(event.currentTarget);
+	}
+	function closeFriendsList() {
+		setAnchorEl(null);
+		setDMChannelsList(null);
+	}
+
 	if (loading === LoadingStatus.Loading) {
 		return (
 			<div style={{ display: 'flex', alignItems: 'center', paddingTop: '2rem', paddingBottom: '2rem', justifyContent: 'flex-start' }}>
@@ -130,6 +164,24 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 								<CircularProgress />
 							</Box>
 							<Typography sx={{ pl: 2 }}>Waiting for players</Typography>
+							{
+								gameInfo.private &&
+								<IconButton sx={{ ml: 2 }} size='large' onClick={handleFriendsList}>
+									<PersonAdd />
+								</IconButton>
+							}
+							<Menu
+								anchorEl={anchorEl}
+								open={dmChannelsList !== null}
+								onClose={closeFriendsList}
+								TransitionComponent={Fade}
+							>
+								{
+									dmChannelsList?.map((channel) => (
+										<MenuItem key={channel.friend.user.id} onClick={() => inviteFriendToGame(channel)}>{channel.friend.user.username}</MenuItem>
+									))
+								}
+							</Menu>
 
 						</div>
 					}

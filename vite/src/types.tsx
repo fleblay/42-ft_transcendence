@@ -73,6 +73,7 @@ export interface IgameInfo {
 	status: GameStatus,
 	date: Date,
 	viewers: number,
+	private: boolean,
 }
 
 export enum Move { "Up" = 1, "Down" }

@@ -34,17 +34,16 @@ export class FriendsController {
 	}
 
 	@UseGuards(ATGuard)
+	@Get('/received')
+	async getPendingRequests(@CurrentUser() user: User)
+	{
+		return await this.friendsService.getFriendReceiveRequests(user);
+	}
+
+	@UseGuards(ATGuard)
 	@Get('/:id')
 	getRelationShip(@CurrentUser() user: User, @Param("id") id: string) {
 		return this.friendsService.getFriend(user, parseInt(id));
 	}
-
-	@UseGuards(ATGuard)
-	@Get('/received')
-	async getPendingRequests(@CurrentUser() user: User) 
-	{	
-		return await this.friendsService.getFriendReceiveRequests(user);
-	}
-
 
 }
