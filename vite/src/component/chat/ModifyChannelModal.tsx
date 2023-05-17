@@ -8,17 +8,24 @@ import { Alert, Box, Button, Container, Divider, FormControl, IconButton, Input,
 export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, open: boolean, handleClose: () => void }> = ({ channelInfo, open, handleClose }) => {
 
 	const [memberInvite, setMemberInvite] = useState<string>("");
+	const [error, setError] = useState<string>("")
+
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 
 		const channelForm = new FormData(event.currentTarget);
+		const name = channelForm.get('name') as string;
+		if (name.length < 1 || name.length > 15) {
+			setError("Name must be between 1 and 15 characters")
+			return
+		}
 
 		apiClient.post(`/api/chat/channels/${channelInfo?.id}/info`, {
-			name: channelForm.get('name'),
+			name: name,
 			password: channelForm.get('password') || ''
-		}).finally(() => {
-			handleClose()
+		}).then(() => {
+			handleClose();
 		})
 	}
 	function handleInviteMember() {
@@ -83,6 +90,7 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 
 					}
 					<Button onClick={handleClose}>Close</Button>
+					{ error && <Alert severity="warning">{error}</Alert>}
 				</Box>
 			</Container>
 		</Modal>

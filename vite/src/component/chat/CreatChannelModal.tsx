@@ -1,5 +1,5 @@
-import { Box, Button, Container, CssBaseline, Divider, FormControl, FormControlLabel, FormLabel, Grid, Input, Modal, Radio, RadioGroup, TextField, Typography } from "@mui/material";
-import React, { FormEvent } from "react";
+import { Alert, Box, Button, Container, CssBaseline, Divider, FormControl, FormControlLabel, FormLabel, Grid, Input, Modal, Radio, RadioGroup, TextField, Typography } from "@mui/material";
+import React, { FormEvent, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +7,8 @@ export function CreateChannelModal({ openCreateChannel, handleClose }: { openCre
 
     const [channelType, setChannelType] = React.useState('public');
     const navigate = useNavigate();
+    const [error, setError] = useState<string>("")
+
 
     const handleChangeChannelType = (event: React.ChangeEvent<HTMLInputElement>) => {
         setChannelType((event.target as HTMLInputElement).value);
@@ -18,6 +20,13 @@ export function CreateChannelModal({ openCreateChannel, handleClose }: { openCre
         const ChannelForm = new FormData(event.currentTarget);
 
         console.log("createChannel");
+
+        const name = ChannelForm.get('name') as string;
+        if (name.length < 1 || name.length > 15) {
+            setError("Name must be between 1 and 15 characters")
+            return
+        }
+
         const channelParams = {
             name: ChannelForm.get("name") as string,
             private: (channelType === 'private') ? true : false,
@@ -27,6 +36,7 @@ export function CreateChannelModal({ openCreateChannel, handleClose }: { openCre
             console.log("channels/create", "ok");
             console.log(response.data);
             handleClose();
+            setError("");
             navigate(`/chat/${response.data}`);
         }
         ).catch((error) => {
@@ -70,6 +80,8 @@ export function CreateChannelModal({ openCreateChannel, handleClose }: { openCre
                         <Divider />
                     </form>
                     <Button onClick={handleClose}>Close</Button>
+                    { error && <Alert severity="warning">{error}</Alert>}
+
                 </Box>
             </Container>
         </Modal>
