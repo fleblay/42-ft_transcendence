@@ -1,9 +1,10 @@
-import { Box, Button, Checkbox, Slider, Typography } from '@mui/material';
+import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Checkbox, Divider, Icon, IconButton, Slider, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from '../../socket/SocketProvider';
 import { GameOptions } from '../../types';
 import { ListCurrentGames } from './ListCurrentGames';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export function CreateGame() {
 	const navigate = useNavigate();
@@ -50,6 +51,11 @@ export function CreateGame() {
 		}
 	}
 
+	function setPrivateAndAdvanced() {
+		setPrivateGame(true)
+		setAdvanced(true)
+	}
+
 
 	function joinGame(options: GameOptions, gameId?: string) {
 		if (gameId) {
@@ -71,224 +77,278 @@ export function CreateGame() {
 	}, []);
 
 	return (
+		<>
+			{!advanced &&
+				<>
+					<Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', margin: theme => `${theme.spacing(4)} 0` }}>
+						<Typography paddingBottom={2} color='primary' variant="h3">Let's Play !</Typography>
+					</Box>
+					<Box sx={{
+						width: '100%',
+						display: 'flex',
+						flexDirection: { xs: 'column', lg: 'row' },
+						alignItems: 'center'
+					}}>
+						<Card sx={{ maxWidth: 600, padding: 3, margin: 2 }}>
+							<CardMedia
+								component="img"
+								height="240"
+								image="/avatars/public.png"
+							/>
+							<CardContent sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+								<Button variant='contained' onClick={() => {
+									joinGame({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect })
+								}}>
+									join game
+								</Button>
 
-		<Box sx={{
-			width: '100%',
-			display: 'flex',
-			flexDirection: 'column',
-			alignItems: 'center'
-		}}>
-			<Typography>
-				Private
-				<Checkbox onChange={(e) => { setPrivateGame(e.target.checked) }} />
-			</Typography>
-			{
-				privateGame && <Typography>
-					Advanced settings /!\
-					<Checkbox checked={advanced} onChange={(e) => { setAdvanced(e.target.checked) }} />
-				</Typography>
+							</CardContent>
+						</Card>
+						<Card sx={{ maxWidth: 600, padding: 3, margin: 2 }}>
+							<CardMedia
+								component="img"
+								height="240"
+								image="/avatars/private.png"
+							/>
+							<CardContent sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+								<Button variant='contained' onClick={() => {
+									setPrivateAndAdvanced()
+								}}>
+									create private custom game
+								</Button>
+
+							</CardContent>
+						</Card>
+					</Box>
+				</>
 			}
-
-			<Button variant='contained' onClick={() => {
-				joinGame({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect })
-			}}>
-				{privateGame ? "Create a private game" : "Join a game"}
-			</Button>
-			<Box sx={{
-				display: advanced ? 'flex' : 'none',
-				width: '50%',
-				flexDirection: 'column',
-				alignItems: 'center',
-				'& > *': {
+			{advanced &&
+				<Box sx={{
 					width: '100%',
-				},
-			}}>
-				<div>Obstacles
-					<Checkbox defaultChecked onChange={(e) => { setObsctacles(e.target.checked) }} />
-				</div>
-				<div>Shoot
-					<Checkbox defaultChecked onChange={(e) => { setShoot(e.target.checked) }} />
-				</div>
-				<div>BallSpeed
-					<Slider
-						aria-label="Ball Speed"
-						defaultValue={1}
-						valueLabelDisplay="on"
-						step={0.1}
-						min={0.1}
-						max={2}
-						marks={[
-							{ value: 0.1, label: "slow" },
-							{ value: 1, label: "normal" },
-							{ value: 2, label: "fast" }
-						]}
-						onChange={(_, val) => setballSpeed(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>ShootSpeed
-					<Slider
-						aria-label="Shoots Speed"
-						defaultValue={1.5}
-						valueLabelDisplay="on"
-						step={0.1}
-						min={0.1}
-						max={2}
-						marks={[
-							{ value: 0.1, label: "slow" },
-							{ value: 1.5, label: "normal" },
-							{ value: 2, label: "fast" }
-						]}
-						onChange={(_, val) => setShootSpeed(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>Victory
-					<Slider
-						aria-label="Victory Rounds"
-						defaultValue={5}
-						valueLabelDisplay="on"
-						step={1}
-						min={1}
-						max={10}
-						marks={[
-							{ value: 1, label: "1" },
-							{ value: 5, label: "5" },
-							{ value: 10, label: "10" }
-						]}
-						onChange={(_, val) => setVictoryRounds(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>Paddle Reduce Speed
-					<Slider
-						aria-label="Paddle Reduce"
-						defaultValue={1}
-						valueLabelDisplay="auto"
-						step={1}
-						min={0}
-						max={10}
-						marks={[
-							{ value: 0, label: "off" },
-							{ value: 1, label: "normal" },
-							{ value: 10, label: "expert" }
-						]}
-						onChange={(_, val) => setPaddleReduce(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>Paddle Length
-					<Slider
-						//aria-label="Paddle Length"
-						value={paddleLen}
-						valueLabelDisplay="on"
-						step={10}
-						min={10}
-						max={480}
-						marks={[
-							{ value: 10, label: "10" },
-							{ value: 100, label: "default min" },
-							{ value: 200, label: "default len" },
-							{ value: 480, label: "480" }
-						]}
-						disableSwap
-						onChange={(e, val, thumb) => handlePaddleLenChange(e, val, thumb)}
-					/>
-				</div>
-				<div>Max Bouncing of shoots
-					<Slider
-						aria-label="MaxBounce Rounds"
-						defaultValue={5}
-						valueLabelDisplay="on"
-						step={1}
-						min={0}
-						max={10}
-						marks={[
-							{ value: 0, label: "off" },
-							{ value: 3, label: "3" },
-							{ value: 10, label: "10" }
-						]}
-						onChange={(_, val) => setMaxBounce(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>Starting Amo per player
-					<Slider
-						aria-label="Start Amo"
-						defaultValue={3}
-						valueLabelDisplay="on"
-						step={1}
-						min={1}
-						max={10}
-						marks={[
-							{ value: 1, label: "1" },
-							{ value: 3, label: "3" },
-							{ value: 10, label: "10" }
-						]}
-						onChange={(_, val) => setStartAmo(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>Ball size
-					<Slider
-						aria-label="ball Size"
-						defaultValue={5}
-						valueLabelDisplay="on"
-						step={1}
-						min={1}
-						max={10}
-						marks={[
-							{ value: 1, label: "1" },
-							{ value: 5, label: "5" },
-							{ value: 10, label: "10" }
-						]}
-						onChange={(_, val) => setBallSize(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>Shoot size
-					<Slider
-						aria-label="shoot Size"
-						defaultValue={2}
-						valueLabelDisplay="on"
-						step={1}
-						min={1}
-						max={10}
-						marks={[
-							{ value: 1, label: "1" },
-							{ value: 5, label: "5" },
-							{ value: 10, label: "10" }
-						]}
-						onChange={(_, val) => setShootSize(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>Player Speed
-					<Slider
-						aria-label="Player speed"
-						defaultValue={3}
-						valueLabelDisplay="on"
-						step={1}
-						min={1}
-						max={10}
-						marks={[
-							{ value: 1, label: "1" },
-							{ value: 3, label: "3" },
-							{ value: 10, label: "10" }
-						]}
-						onChange={(_, val) => setPlayerSpeed(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-				<div>Lift Effect
-					<Slider
-						aria-label="Lift effect"
-						defaultValue={1}
-						valueLabelDisplay="on"
-						step={0.1}
-						min={0}
-						max={5}
-						marks={[
-							{ value: 0, label: "off" },
-							{ value: 1, label: "default" },
-							{ value: 5, label: "5" }
-						]}
-						onChange={(_, val) => setLiftEffect(Array.isArray(val) ? val[0] : val)}
-					/>
-				</div>
-			</Box>
-			<ListCurrentGames joinGame={joinGame} />
-		</Box>
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					margin: theme => `${theme.spacing(4)} 0`,
+				}}>
+					<Box
+						sx={{
+							width: '100%',
+							display: 'flex',
+							flexDirection: 'row',
+							alignItems: 'center',
+							justifyContent: 'center',
+							margin: (theme) => `${theme.spacing(4)} 0`,
+						}}
+					>
+						<IconButton onClick={() => setAdvanced(false)} color="primary" aria-label="back">
+							<ArrowBackIcon />
+						</IconButton>
+						<Typography color='primary' variant="h5">Choose your parameter !</Typography>
+
+					</Box>
+					<Divider sx={{ width: '100%' }} />
+					<Box sx={{
+						display: advanced ? 'flex' : 'none',
+						width: '50%',
+						flexDirection: 'column',
+						alignItems: 'center',
+						'& > *': {
+							width: '100%',
+							margin: (theme) => `${theme.spacing(2)} 0`,
+						},
+					}}>
+						<div>Obstacles
+							<Checkbox defaultChecked onChange={(e) => { setObsctacles(e.target.checked) }} />
+						</div>
+						<div>Shoot
+							<Checkbox defaultChecked onChange={(e) => { setShoot(e.target.checked) }} />
+						</div>
+						<div>BallSpeed
+							<Slider
+								aria-label="Ball Speed"
+								defaultValue={1}
+								valueLabelDisplay="on"
+								step={0.1}
+								min={0.1}
+								max={2}
+								marks={[
+									{ value: 0.1, label: "slow" },
+									{ value: 1, label: "normal" },
+									{ value: 2, label: "fast" }
+								]}
+								onChange={(_, val) => setballSpeed(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>ShootSpeed
+							<Slider
+								aria-label="Shoots Speed"
+								defaultValue={1.5}
+								valueLabelDisplay="on"
+								step={0.1}
+								min={0.1}
+								max={2}
+								marks={[
+									{ value: 0.1, label: "slow" },
+									{ value: 1.5, label: "normal" },
+									{ value: 2, label: "fast" }
+								]}
+								onChange={(_, val) => setShootSpeed(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>Victory
+							<Slider
+								aria-label="Victory Rounds"
+								defaultValue={5}
+								valueLabelDisplay="on"
+								step={1}
+								min={1}
+								max={10}
+								marks={[
+									{ value: 1, label: "1" },
+									{ value: 5, label: "5" },
+									{ value: 10, label: "10" }
+								]}
+								onChange={(_, val) => setVictoryRounds(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>Paddle Reduce Speed
+							<Slider
+								aria-label="Paddle Reduce"
+								defaultValue={1}
+								valueLabelDisplay="auto"
+								step={1}
+								min={0}
+								max={10}
+								marks={[
+									{ value: 0, label: "off" },
+									{ value: 1, label: "normal" },
+									{ value: 10, label: "expert" }
+								]}
+								onChange={(_, val) => setPaddleReduce(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>Paddle Length
+							<Slider
+								//aria-label="Paddle Length"
+								value={paddleLen}
+								valueLabelDisplay="on"
+								step={10}
+								min={10}
+								max={480}
+								marks={[
+									{ value: 10, label: "10" },
+									{ value: 100, label: "default min" },
+									{ value: 200, label: "default len" },
+									{ value: 480, label: "480" }
+								]}
+								disableSwap
+								onChange={(e, val, thumb) => handlePaddleLenChange(e, val, thumb)}
+							/>
+						</div>
+						<div>Max Bouncing of shoots
+							<Slider
+								aria-label="MaxBounce Rounds"
+								defaultValue={5}
+								valueLabelDisplay="on"
+								step={1}
+								min={0}
+								max={10}
+								marks={[
+									{ value: 0, label: "off" },
+									{ value: 3, label: "3" },
+									{ value: 10, label: "10" }
+								]}
+								onChange={(_, val) => setMaxBounce(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>Starting Amo per player
+							<Slider
+								aria-label="Start Amo"
+								defaultValue={3}
+								valueLabelDisplay="on"
+								step={1}
+								min={1}
+								max={10}
+								marks={[
+									{ value: 1, label: "1" },
+									{ value: 3, label: "3" },
+									{ value: 10, label: "10" }
+								]}
+								onChange={(_, val) => setStartAmo(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>Ball size
+							<Slider
+								aria-label="ball Size"
+								defaultValue={5}
+								valueLabelDisplay="on"
+								step={1}
+								min={1}
+								max={10}
+								marks={[
+									{ value: 1, label: "1" },
+									{ value: 5, label: "5" },
+									{ value: 10, label: "10" }
+								]}
+								onChange={(_, val) => setBallSize(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>Shoot size
+							<Slider
+								aria-label="shoot Size"
+								defaultValue={2}
+								valueLabelDisplay="on"
+								step={1}
+								min={1}
+								max={10}
+								marks={[
+									{ value: 1, label: "1" },
+									{ value: 5, label: "5" },
+									{ value: 10, label: "10" }
+								]}
+								onChange={(_, val) => setShootSize(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>Player Speed
+							<Slider
+								aria-label="Player speed"
+								defaultValue={3}
+								valueLabelDisplay="on"
+								step={1}
+								min={1}
+								max={10}
+								marks={[
+									{ value: 1, label: "1" },
+									{ value: 3, label: "3" },
+									{ value: 10, label: "10" }
+								]}
+								onChange={(_, val) => setPlayerSpeed(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div>Lift Effect
+							<Slider
+								aria-label="Lift effect"
+								defaultValue={1}
+								valueLabelDisplay="on"
+								step={0.1}
+								min={0}
+								max={5}
+								marks={[
+									{ value: 0, label: "off" },
+									{ value: 1, label: "default" },
+									{ value: 5, label: "5" }
+								]}
+								onChange={(_, val) => setLiftEffect(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+					</Box>
+					<Button variant='contained' onClick={() => {
+						joinGame({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect })
+					}}>
+						{privateGame ? "Create a private game" : "Join a game"}
+					</Button>
+					<ListCurrentGames joinGame={joinGame} />
+				</Box>}
+		</>
 	);
 }
