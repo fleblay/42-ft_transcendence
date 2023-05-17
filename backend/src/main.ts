@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 const session = require('express-session');
 import * as cookieParser from 'cookie-parser';
 import { TypeOrmFilter } from './typeorm.filter';
+import { UnauthorizedExceptionFilter } from './unauthorizedException.filter';
 
 // doc express-session: https://www.npmjs.com/package/express-session
 
@@ -18,6 +19,7 @@ async function bootstrap() {
 	);
 	app.use(cookieParser())
 	app.useGlobalFilters(new TypeOrmFilter);
+	app.useGlobalFilters(new UnauthorizedExceptionFilter);
 	await app.listen(3000);
 }
 bootstrap();
