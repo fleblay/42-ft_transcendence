@@ -35,6 +35,7 @@ export class SavedGameSubscriber implements EntitySubscriberInterface<SavedGame>
 		}
 		if (user.rank == 0 && !user.achievements.includes("number1"))
 			user.achievements.push("number1")
+		user.achievements = [...new Set(user.achievements)]
 		user.rank++
 	}
 
