@@ -56,7 +56,7 @@ export class UsersService implements OnModuleInit {
 		if (dataUser.stud)
 			user.achievements.push("stud")
 		const savedUser : User = await this.repo.save(user);
-		this.server.to(`/user`).emit('user.new', {})
+		this.server.to(`/user`).emit('user.new', {userId: savedUser.id})
 		return savedUser
 	}
 

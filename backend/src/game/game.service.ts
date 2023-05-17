@@ -116,7 +116,7 @@ export class GameService {
 		const game = new SavedGame()
 		const playersList: User[] = await this.usersService.getAll()
 		if (playersList.length < 2)
-			throw new NotFoundException('Only one useer in DB');
+			throw new NotFoundException('Only one user in DB');
 		let randUser1: User = playersList[Math.floor(Math.random() * playersList.length)]
 		let randUser2: User = playersList[Math.floor(Math.random() * playersList.length)]
 
@@ -131,7 +131,9 @@ export class GameService {
 		game.score = [score1, score2]
 		game.winner = (score1 > score2) ? randUser1 : randUser2
 		let saveObject = this.repo.create(game);
-		return this.repo.save(saveObject);
+		const savedGame = await this.repo.save(saveObject);
+		this.server.to(`/leaderboard`).emit('leaderboard', {})
+		return savedGame
 	}
 
 }

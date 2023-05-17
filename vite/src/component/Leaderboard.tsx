@@ -23,6 +23,11 @@ export function Leaderboard() {
 	const userList: MutableRefObject<UserInfo[] | null> = useRef(null)
 	const unSubscribeFxArray: MutableRefObject<((() => void) | void)[]> = useRef([])
 
+	function handleNewPlayer({userId} : {userId: number}){
+			unSubscribeFxArray.current.push(addSubscription(`/player/${userId}`))
+			handleClick()
+		}
+
 	useEffect(() => {
 		handleClick()
 	}, [])
@@ -36,11 +41,11 @@ export function Leaderboard() {
 	}, [])
 
 	useEffect(() => {
-		if (!userList.current)
+		if (!userList.current || !userListFetched.current)
 			return
 		customOn('leaderboard', handleClick)
 		customOn('page.player', handleClick)
-		customOn('user.new', handleClick)
+		customOn('user.new', handleNewPlayer)
 		customOn('user.modify', handleClick)
 		userList.current.forEach((user) => {
 			unSubscribeFxArray.current.push(addSubscription(`/player/${user.id}`))
@@ -49,7 +54,7 @@ export function Leaderboard() {
 			() => {
 				customOff('leaderboard', handleClick)
 				customOff('page.player', handleClick)
-				customOff('user.new', handleClick)
+				customOff('user.new', handleNewPlayer)
 				customOff('user.modify', handleClick)
 				unSubscribeFxArray.current.forEach(fx => {
 					if (typeof fx === "function")
@@ -59,7 +64,7 @@ export function Leaderboard() {
 		)
 	}, [userListFetched.current])
 
-	function handleClick(verbose: boolean = false): void {
+	function handleClick(): void {
 		apiClient
 			.get("/api/users/all")
 			.then(({ data }) => {

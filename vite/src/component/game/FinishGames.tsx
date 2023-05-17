@@ -32,22 +32,30 @@ export function FinishGames() {
 	}
 
 	useEffect(() => {
+		getData()
+	}, [gamePage])
+
+	useEffect(() => {
 		return addSubscription('/leaderboard')
 	}, [])
 
 	useEffect(() => {
-		getData()
-		customOn('leaderboard', getData)
+		function resetGamePage() {
+			console.log("event received")
+			setGamePage(0)
+			getData()
+		}
+
+		customOn('leaderboard', resetGamePage)
 		return (
-			() => {customOff('leaderboard', getData)}
+			() => { customOff('leaderboard', resetGamePage) }
 		)
-	}, [])
+	}, [gamePage])
 
 	if (listGames === null) return <div>Loading...</div>
 
 	return (
 		<div>
-
 			<TableContainer>
 				<Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
 					<TableHead>
