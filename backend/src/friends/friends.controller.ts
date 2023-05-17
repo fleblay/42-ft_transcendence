@@ -4,8 +4,11 @@ import { FriendRequestStatus } from '../model/friend-request.entity';
 import { ATGuard } from '../users/guard/access-token.guard';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../model/user.entity';
+import { RestrictedUserDto } from '../users/dtos/user-restricted.dto';
+import { Serialize } from '../interceptors/serialize.interceptor';
 
 @Controller('friends')
+@Serialize(RestrictedUserDto)
 export class FriendsController {
 	constructor(private friendsService: FriendsService) { }
 
