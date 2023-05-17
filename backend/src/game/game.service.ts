@@ -131,7 +131,9 @@ export class GameService {
 		game.score = [score1, score2]
 		game.winner = (score1 > score2) ? randUser1 : randUser2
 		let saveObject = this.repo.create(game);
-		return await this.repo.save(saveObject);
+		const savedGame = await this.repo.save(saveObject);
+		this.server.to(`/leaderboard`).emit('leaderboard', {})
+		return savedGame
 	}
 
 }

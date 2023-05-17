@@ -31,10 +31,6 @@ export function FinishGames() {
 			})
 	}
 
-	function resetGamePage() {
-		setGamePage(0)
-	}
-
 	useEffect(() => {
 		getData()
 	}, [gamePage])
@@ -44,11 +40,17 @@ export function FinishGames() {
 	}, [])
 
 	useEffect(() => {
+		function resetGamePage() {
+			console.log("event received")
+			setGamePage(0)
+			getData()
+		}
+
 		customOn('leaderboard', resetGamePage)
 		return (
-			() => {customOff('leaderboard', resetGamePage)}
+			() => { customOff('leaderboard', resetGamePage) }
 		)
-	}, [])
+	}, [gamePage])
 
 	if (listGames === null) return <div>Loading...</div>
 
