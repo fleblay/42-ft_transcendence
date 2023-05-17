@@ -12,8 +12,8 @@ import { authenticator } from 'otplib'
 import { Login42User, Tokens } from '../../type';
 import { hashPassword, verifyPassword } from './hashPassword';
 
-const access_token_options = { expiresIn: '1m', secret: 'access' };
-const refresh_token_options = { expiresIn: '7d', secret: 'refresh' };
+const access_token_options = { expiresIn: '1s', secret: 'access' };
+const refresh_token_options = { expiresIn: '3m', secret: 'refresh' };
 const dfa_token_options = { expiresIn: '1h', secret: 'dfa_secret' };
 
 @Injectable()
@@ -53,9 +53,9 @@ export class AuthService {
 	async validateAccessToken(bearerToken: string): Promise<User | null> {
 		try {
 			// console.log(`Bearer token in validate access token is ${bearerToken}`)
-			const jwtResponse = this.jwtService.verify(bearerToken, access_token_options) // compliant to security rules of year 3000
+			const jwtResponse = this.jwtService.verify<{ sub: number, email: string }>(bearerToken, access_token_options) // compliant to security rules of year 3000
 			//console.log(`User id is `, jwtResponse)
-			return this.usersService.findOne(jwtResponse.sub)
+			return await this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
 			console.log(`Error in validate Token access is ${e}`)
 			return null
@@ -65,7 +65,7 @@ export class AuthService {
 	async validateDfaToken(dfaToken: string): Promise<User | null> {
 		try {
 			const jwtResponse = this.jwtService.verify(dfaToken, dfa_token_options) // compliant to security rules of year 3000
-			return this.usersService.findOne(jwtResponse.sub)
+			return await this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
 			console.log(`Error in validate Dfa access is ${e}`)
 			return null
@@ -81,7 +81,7 @@ export class AuthService {
 				return null
 			}
 			//console.log(`Decode :  `, jwtResponse);
-			return this.usersService.findOne(jwtResponse.sub);
+			return await this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
 			console.log("Error in decode Token is :", e)
 			return null
