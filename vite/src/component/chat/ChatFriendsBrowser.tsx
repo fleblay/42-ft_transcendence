@@ -1,13 +1,13 @@
-import { Avatar, Box, IconButton, List, ListItem, ListItemText, Theme, Typography, styled } from "@mui/material"
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined'
+import { Avatar, Box, IconButton, Link, List, ListItem, ListItemText, Theme, Typography, styled } from "@mui/material"
+import Badge from '@mui/material/Badge'
 import { FC, useContext, useEffect, useState } from "react"
-import { Friend } from "../../types"
-import { useNavigate } from "react-router-dom"
+import { Link as LinkRouter, useNavigate } from "react-router-dom"
+import { useAuthService } from "../../auth/AuthService"
 import apiClient from "../../auth/interceptor.axios"
 import { SocketContext } from "../../socket/SocketProvider"
+import { Friend } from "../../types"
 import { useDebouncedValue } from "../Debounced"
-import { useAuthService } from "../../auth/AuthService"
-import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
-import Badge from '@mui/material/Badge';
 import { SearchBar } from "../SearchBar"
 
 export const StyledBadge = styled(Badge)(({ theme, color }) => ({
@@ -47,14 +47,14 @@ interface FriendDisplayProps {
 }
 
 
-const FriendDisplay : FC<FriendDisplayProps> = ({ originalFriend, index, array }) => {
+const FriendDisplay: FC<FriendDisplayProps> = ({ originalFriend, index, array }) => {
 	const navigate = useNavigate();
 	const [friend, setFriend] = useState<Friend>(originalFriend);
 	const { addSubscription, customOn, customOff } = useContext(SocketContext);
 
 	useEffect(() => {
-			return addSubscription(`/player/${friend.id}`);
-		}, []);
+		return addSubscription(`/player/${friend.id}`);
+	}, []);
 
 	useEffect(() => {
 		function onFriendUpdate({ userId, event }: { userId: number, event: string }) {
@@ -72,7 +72,7 @@ const FriendDisplay : FC<FriendDisplayProps> = ({ originalFriend, index, array }
 					break;
 				default:
 					break;
-				
+
 			}
 		}
 		customOn("page.player", onFriendUpdate);
@@ -105,7 +105,11 @@ const FriendDisplay : FC<FriendDisplayProps> = ({ originalFriend, index, array }
 			>
 				<Avatar src={`/avatars/${friend.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
 			</StyledBadge>
-			<ListItemText primary={friend.username} />
+
+				<ListItemText primary={
+					<Link component={LinkRouter} to={`/player/${friend.id}`}>{friend.username}</Link>
+				} />
+
 			<IconButton onClick={() => joinDm(friend.id)}><MessageOutlinedIcon /></IconButton>
 		</ListItem>
 	)
@@ -129,7 +133,7 @@ export const FriendsBrowser: FC = () => {
 
 	useEffect(() => {
 		function onFriendUpdate({ status, friend }: { status: 'removed' | 'update', friend: Friend }) {
-			console.log("onFriendUpdate status" , status, friend);
+			console.log("onFriendUpdate status", status, friend);
 			if (status === 'removed') {
 				setFriendList((oldFriendList) => {
 					const newFriendList = new Map(oldFriendList);
@@ -164,7 +168,7 @@ export const FriendsBrowser: FC = () => {
 
 	}, [auth.user]);
 
-	
+
 
 	return (
 		<Box>
@@ -183,11 +187,11 @@ export const FriendsBrowser: FC = () => {
 					.filter((friend: Friend) => friend.username.includes(debouncedSearchFriends))
 					.map((friend: Friend, index, array) => {
 
-							return (
-							<FriendDisplay key={friend.id} originalFriend={friend} index={index} array={array}/>
-							)
-						})
-					}
+						return (
+							<FriendDisplay key={friend.id} originalFriend={friend} index={index} array={array} />
+						)
+					})
+				}
 			</List>
 		</Box>
 	)

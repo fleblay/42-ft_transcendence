@@ -1,11 +1,11 @@
-import React, { FC, useContext, useEffect, useState } from "react";
+import { Avatar, Badge, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { FC, useContext, useEffect, useState } from "react";
+import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import apiClient from "../../auth/interceptor.axios";
-import { List, ListItem, ListItemButton, ListItemText, Avatar, Badge } from "@mui/material";
-import { Link as LinkRouter, NavigateFunction, useNavigate, useParams } from "react-router-dom";
 import { SocketContext } from '../../socket/SocketProvider';
 
-import { Channel, Friend, Member } from "../../types";
 import { useAuthService } from "../../auth/AuthService";
+import { Channel, Member } from "../../types";
 import { StyledBadge } from "./ChatFriendsBrowser";
 
 
