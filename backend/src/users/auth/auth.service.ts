@@ -11,6 +11,10 @@ import { toDataURL } from 'qrcode'
 import { authenticator } from 'otplib'
 import { Login42User, Tokens } from '../../type';
 import { hashPassword, verifyPassword } from './hashPassword';
+import * as sharp from 'sharp';
+
+var http = require('http');
+var fs = require('fs');
 
 const access_token_options = { expiresIn: '1d', secret: 'access' };
 const refresh_token_options = { expiresIn: '10d', secret: 'refresh' };
@@ -137,7 +141,7 @@ export class AuthService {
 		return tokens;
 	}
 
-	async login42API(dataUser: Login42User) {
+	async login42API(dataUser: Login42User): Promise<Partial<Tokens> & { newUserId?: number }> {
 		if (await this.usersService.findOneByEmail(dataUser.email))
 			return this.login(dataUser, false)
 		else {
@@ -145,7 +149,7 @@ export class AuthService {
 			const user = await this.usersService.create(dataUser);
 			const tokens = this.getTokens(user);
 			await this.saveRefreshToken(user.id, tokens.refreshToken);
-			return tokens
+			return { ...tokens, newUserId: user.id }
 		}
 
 	}
@@ -190,7 +194,17 @@ export class AuthService {
 		console.log("Other keys", Object.keys(rest))
 
 		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
-		return await this.login42API({ stud: true, email, password: "42" })
+		const { refreshToken, accessToken, dfaToken, newUserId } = await this.login42API({ stud: true, email, password: "42" })
+		if (newUserId) {
+			try {
+				const img = await fetch(imageURL.link).then((response) => response.arrayBuffer())
+				console.log("img is : >\x1b[33m", img, "\x1b[0m<")
+				await sharp(img).resize(200, 200).toFile(`/usr/src/app/avatars/${newUserId}.png`)
+			} catch (e) {
+				console.log("Failed to sharp intra img url : ", e)
+			}
+		}
+		return { refreshToken, accessToken, dfaToken }
 	}
 
 	async saveRefreshToken(userId: number, refreshToken: string) {
