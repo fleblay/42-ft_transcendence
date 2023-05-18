@@ -15,6 +15,10 @@ import { CurrentUser } from '../decorators/current-user.decorator';
 import { User } from 'src/model/user.entity';
 
 
+const RefreshTokenTime = 1000 * 60 * 60 * 24 * 7; // 7 days
+const AccessTokenTime = 1000 * 60 * 60 * 24; // 1 day
+const DfaTokenTime = 1000 * 60 * 5; // 5 minutes
+
 @Controller('auth')
 export class AuthController {
 
@@ -27,8 +31,8 @@ export class AuthController {
 		// token dans X-Refresh-Token
 		const refreshToken = req.cookies['refresh_token'];
 		const tokens = await this.authService.refreshToken(refreshToken) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { maxAge: 60 * 60 * 24 * 7 });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7});
+		res.cookie('access_token', tokens.accessToken, { maxAge: AccessTokenTime });
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: RefreshTokenTime});
 		return { ok: true };
 	}
 
@@ -36,8 +40,8 @@ export class AuthController {
 	@Post('/register')
 	async createUser(@Body() body: CreateUserDto, @Response({ passthrough: true }) res: ExpressResponse) {
 		const tokens = await this.authService.register(body) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7});
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7});
+		res.cookie('access_token', tokens.accessToken, { maxAge: RefreshTokenTime});
+		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: RefreshTokenTime});
 		return;
 	}
 
@@ -46,12 +50,12 @@ export class AuthController {
 
 		const tokens = await this.authService.login(body);
 		if (tokens.dfaToken) {
-			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: 1000 * 60 * 5 });
+			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: DfaTokenTime });
 			return { needDfa: true }
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
-			res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7});
-			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7 });
+			res.cookie('access_token', tokens.accessToken, { maxAge: RefreshTokenTime});
+			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: RefreshTokenTime });
 		}
 	};
 
@@ -77,7 +81,7 @@ export class AuthController {
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
 		const tokens = await this.authService.validate42Code(query.code)
 		if (tokens.dfaToken) {
-			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: 1000 * 60 * 5 });
+			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: DfaTokenTime });
 			res.redirect(302, '/dfa')
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
@@ -114,8 +118,8 @@ export class AuthController {
 		const tokens = this.authService.getTokens(user);
 		if (tokens.accessToken && tokens.refreshToken) {
 			this.authService.saveRefreshToken(user.id, tokens.refreshToken);
-			res.cookie('access_token', tokens.accessToken, { maxAge: 1000 * 60 * 60 * 24 * 7});
-			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 7});
+			res.cookie('access_token', tokens.accessToken, { maxAge: RefreshTokenTime});
+			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: RefreshTokenTime});
 			res.cookie('dfa_token', '', { httpOnly: false, maxAge: 0 });
 		}
 	}
