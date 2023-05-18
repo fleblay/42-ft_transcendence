@@ -105,7 +105,7 @@ export function MenuBar() {
 							}}
 						>
 							{pages.map((page) => (
-								<MenuItem key={page.label} onClick={() => handleNavigate(page.path)}>
+								<MenuItem key={page.label} onClick={() => { handleNavigate(page.path); handleCloseNavMenu(); }}>
 									<Typography textAlign="center">{page.label}</Typography>
 								</MenuItem>
 							))}
@@ -175,7 +175,7 @@ export function MenuBar() {
 							onClose={handleCloseUserMenu}
 						>
 							{menu.map((menu) => (
-								<MenuItem key={menu.label} onClick={() => handleNavigate(menu.path)}>
+								<MenuItem key={menu.label} onClick={() => { handleNavigate(menu.path); handleCloseUserMenu() } }>
 									<Typography textAlign="center">{menu.label}</Typography>
 								</MenuItem>
 							))}
