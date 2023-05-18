@@ -55,8 +55,8 @@ export class UsersService implements OnModuleInit {
 		console.log("save user :", user);
 		if (dataUser.stud)
 			user.achievements.push("stud")
-		const savedUser : User = await this.repo.save(user);
-		this.server.to(`/user`).emit('user.new', {userId: savedUser.id})
+		const savedUser: User = await this.repo.save(user);
+		this.server.to(`/user`).emit('user.new', { userId: savedUser.id })
 		return savedUser
 	}
 
@@ -111,7 +111,7 @@ export class UsersService implements OnModuleInit {
 		throw new BadRequestException("secureUpdate : id does not match any User");
 	}
 
-	//WARNING, THIS IS UPDATE IS BROKEN IN TYPEORM 
+	//WARNING, THIS IS UPDATE IS BROKEN IN TYPEORM
 	async update(id: number, partialUser: Partial<User>) {
 		await this.repo.update(id, partialUser);
 		return this.findOne(id);
@@ -177,10 +177,10 @@ export class UsersService implements OnModuleInit {
 			throw new BadRequestException("Username is the same");
 		if (newUsername.length < 3 || newUsername.length > 10)
 			throw new BadRequestException("Username must be between 3 and 10 characters");
-		if (await this.findOneByUsername(newUsername))
+		if (await this.findOneByUsername(newUsername.toLocaleLowerCase('en-US')))
 			throw new BadRequestException("Username already taken");
 		user.username = newUsername;
-		const savedUser : User = await this.repo.save(user);
+		const savedUser: User = await this.repo.save(user);
 		this.server.to(`/user`).emit('user.modify', {})
 		return savedUser
 	}

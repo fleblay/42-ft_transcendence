@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UsersService } from '../users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -127,11 +127,18 @@ export class AuthService {
 	async register(dataUser: CreateUserDto) {
 		if (dataUser.email.endsWith('@student.42.fr'))
 			throw new ForbiddenException('You can\'t register with a 42 email');
-		if (await this.usersService.findOneByEmail(dataUser.email))
+		if (await this.usersService.findOneByEmail(dataUser.email.toLocaleLowerCase('en-US')))
 			throw new ForbiddenException('Email is not unique');
-		if (await this.usersService.findOneByUsername(dataUser.username))
-			throw new ForbiddenException('username is not unique');
+		let username = dataUser.username;
+		if (!username)
+			throw new BadRequestException('Username is required');
+		username = username.replace(/\s/g, '');
+		if (username.length < 3 || username.length > 10)
+			throw new BadRequestException('Username must be between 3 and 10 characters');
+		if (await this.usersService.findOneByUsername(username.toLocaleLowerCase('en-US')))
+			throw new ForbiddenException('Username is not unique');
 
+		dataUser.username = username;
 		dataUser.password = await hashPassword(dataUser.password);
 
 		const user = await this.usersService.create(dataUser);
