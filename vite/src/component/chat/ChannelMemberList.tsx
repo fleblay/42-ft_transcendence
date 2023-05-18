@@ -217,6 +217,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 
 
 	useEffect(() => {
+		memberListFetched.current = false
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
 			console.log("memberlist fetched is: ", data);
 			const newMemberList: memberList = {
