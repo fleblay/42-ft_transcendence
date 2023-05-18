@@ -1,5 +1,5 @@
 
-import React, { useContext, useState } from 'react';
+import React, { ReactNode, useContext, useState } from 'react';
 import { Tooltip, Typography } from '@mui/material';
 
 import { Box } from '@mui/system';
@@ -20,60 +20,37 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SchoolIcon from '@mui/icons-material/School';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 import LaptopMacIcon from '@mui/icons-material/LaptopMac';
+import { UserInfo } from '../types';
 
-function renderSwitch(achievement: string): JSX.Element {
-	switch (achievement) {
-		case 'boss':
-			return (
-				<Tooltip title="Boss : Win 100 or more points">
-					<AutoAwesomeIcon color="primary" fontSize={'large'} />
-				</Tooltip>
-			)
-		case 'quitter':
-			return (
-				<Tooltip title="Quitter : Leave a game before the end">
-					<ThumbDownOffAltIcon color="error" fontSize={'large'} />
-				</Tooltip>
-			)
-		case 'friend':
-			return (
-				<Tooltip title="Friendly : Play a game with a friend">
-					<PeopleIcon color="primary" fontSize={'large'} />
-				</Tooltip>
-			)
-		case 'perfect':
-			return (
-				<Tooltip title="Accurate : Win a game without loosing a single point">
-					<RadarIcon color="primary" fontSize={'large'} />
-				</Tooltip>
-			)
-		case 'number1':
-			return (
-				<Tooltip title="Xav, the boss of the game : Be the first of the LeaderBoard at some point">
-					<EmojiEventsIcon color="primary" fontSize={'large'} />
-				</Tooltip>
-			)
-		case 'stud':
-			return (
-				<Tooltip title="Stud : Login with 42">
-					<SchoolIcon color="primary" fontSize={'large'} />
-				</Tooltip>
-			)
-		case 'sub-zero':
-			return (
-				<Tooltip title="Sub-zero : Have a negative amount of points at some point">
-					<AcUnitIcon color="error" fontSize={'large'} />
-				</Tooltip>
-			)
-		case 'the-answer':
-			return (
-				<Tooltip title="42, the answer : Play a game with an id containing the number '42'">
-					<LaptopMacIcon color="primary" fontSize={'large'} />
-				</Tooltip>
-			)
-		default:
-			return (<></>)
-	}
+const achievementArray: { name: string, text: string, color: string, icon: React.ElementType }[] =
+	[
+		{ name: "boss", text: "Boss : Win 100 or more points", color: "primary", icon: AutoAwesomeIcon },
+		{ name: "quitter", text: "Quitter : Leave a game before the end", color: "error", icon: ThumbDownOffAltIcon },
+		{ name: "friend", text: "Friendly : Play a game with a friend", color: "primary", icon: PeopleIcon },
+		{ name: "perfect", text: "Accurate : Win a game without loosing a single point", color: "primary", icon: RadarIcon },
+		{ name: "number1", text: "Xav, the boss of the game : Be the first of the LeaderBoard at some point", color: "primary", icon: EmojiEventsIcon },
+		{ name: "stud", text: "Stud : Login with 42", color: "primary", icon: SchoolIcon },
+		{ name: "sub-zero", text: "Sub-zero : Have a negative amount of points at some point", color: "error", icon: AcUnitIcon },
+		{ name: "the-answer", text: "42, the answer : Play a game with an id containing the number '42'", color: "primary", icon: LaptopMacIcon },
+	]
+
+function RenderSwitch({ userData }: { userData: UserInfo | null }): JSX.Element {
+	if (!userData)
+		return (<></>)
+	return (
+		<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+			{
+				achievementArray.map((ach) => {
+					return (
+						<Tooltip key={ach.name} title={ach.text}>
+							<ach.icon color={userData.achievements.includes(ach.name)? ach.color : "disabled"} fontSize={'large'} />
+						</Tooltip>
+					)
+				})
+			}
+
+		</Box>
+	)
 }
 
 
@@ -116,16 +93,7 @@ export function UserAchivement() {
 					Achievements :</Typography>
 				<div style={{ display: 'flex', alignItems: 'center', paddingTop: '1rem', paddingBottom: '1rem' }}>
 					<Divider />
-					{userData?.achievements.map((achievement, index) => {
-						return (
-							<div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-								<Typography variant="h6" noWrap style={{ textOverflow: 'ellipsis', maxWidth: '200px' }} sx={{ flexGrow: 1, ml: '10px', mr: '20px' }}>
-									{renderSwitch(achievement)}
-								</Typography>
-
-							</div>
-						)
-					})}
+					<RenderSwitch userData={userData} />
 				</div>
 			</Box>
 			<Divider />
