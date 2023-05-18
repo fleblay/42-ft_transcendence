@@ -27,7 +27,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 	const messageAreaRef = useRef<HTMLUListElement>(null);
 
 	const requestMessages = useCallback((overwriteOffset?: number) => {
-		apiClient.get<Message[]>(`/api/chat/channels/${channelId}/messages?offset=${overwriteOffset || offset}`).then(({ data }) => {
+		apiClient.get<Message[]>(`/api/chat/channels/${channelId}/messages?offset=${overwriteOffset !== undefined ? overwriteOffset : offset}`).then(({ data }) => {
 			setMessages((messages) => {
 				return [...data, ...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 			});
