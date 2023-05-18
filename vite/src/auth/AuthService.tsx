@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { allRoutes } from "../App";
 import { LoginData } from "../component/LoginForm";
-import { delAccessToken, delRefreshToken, getAccessToken } from "../token/token";
+import { delAccessToken, getAccessToken } from "../token/token";
 import axios from "axios";
 import { RegisterData } from "../component/RegisterForm";
 import { plainUser, userToken } from "../types";
 import apiClient from "./interceptor.axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ErrorProviderContext } from "../ErrorProvider/ErrorProvider";
 
 //0.Definit l'interface pour le type de contexte passe au provider
 interface AuthContextType {
@@ -25,22 +26,32 @@ let AuthContext = React.createContext<AuthContextType>(null!);
 export function AuthService({ children }: { children: React.ReactNode }) {
 	let [user, setUser] = React.useState<any | null>(null);
 	const nav = useNavigate();
+	const location = useLocation();
+	const { setError } = useContext(ErrorProviderContext);
 
 	const getUser = async () => {
 		try {
-			const response = await apiClient.get('/api/users/me');
+			// @ts-ignore
+			const response = await apiClient({
+				method: 'get',
+				url: '/api/users/me',
+				noRedirect: allRoutes.find(el => el.path === window.location.pathname)?.public
+			})
 			if (response.status === 200) {
 				setUser(response.data);
 				console.log("AuthService : me is :", response.data)
+				if (allRoutes.find(el => el.path === window.location.pathname)?.public) {
+					setError({ status: 200, message: 'Already logged in' })
+					nav('/game', { replace: true })
+				}
 			}
 		} catch (error) {
 			console.log("Not connected", error);
-			//navigate("/login", { replace: true });
 		}
 	}
 
 	useEffect(() => {
-		if (!user && !allRoutes.find((el) => el.path === location.pathname)?.public) {
+		if (!user) {
 			getUser()
 		}
 	}, [])
@@ -49,7 +60,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 		return new Promise((resolve, reject) => {
 			axios
 				.post("/api/auth/register", registerData)
-				.then(async (response) => {
+				.then(async () => {
 					await getUser()
 					resolve();
 				})
@@ -64,11 +75,15 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 		return new Promise((resolve, reject) => {
 			axios
 				.post("/api/auth/login", loginData)
-				.then(async (response) => {
-					console.log('login response', response);
-					if (response.data.needDfa) {
+				.then(async ({ data }) => {
+					if (data.needDfa) {
 						nav("/dfa", { replace: true });
 						reject("needDfa");
+					}
+					else {
+						const { from } = location.state || {}
+						console.log('im login, redirect to', from?.pathname);
+						nav(from?.pathname || '/', { replace: true })
 					}
 					await getUser()
 					resolve();

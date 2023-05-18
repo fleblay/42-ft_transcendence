@@ -55,7 +55,6 @@ export function GamePage() {
 
 	useEffect(() => {
 		console.log("id", idGame);
-		console.log("window.location.pathname", window.location.pathname);
 
 		if (idGame) {
 			setActiveStep(1);

@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect, useContext } from "react";
 import axios from "axios";
 import TextField from '@mui/material/TextField';
 import Button, { buttonClasses } from '@mui/material/Button';
@@ -8,6 +8,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthService } from "../auth/AuthService";
 import AuthCode from "react-auth-code-input";
 import './DfaForm.css'
+import { getAccessToken, getDfaToken } from "../token/token";
+import { ErrorProviderContext } from "../ErrorProvider/ErrorProvider";
 
 export interface LoginData {
     email: string;
@@ -18,13 +20,21 @@ export function DfaForm() {
 
     let navigate = useNavigate();
     let auth = useAuthService();
-    const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "No info yet...")
+    const [info, setInfo] = useState<string>("")
+    const { setError } = useContext(ErrorProviderContext)
 
 
     const [result, setResult] = useState<string>("");
     const handleOnChange = (res: string) => {
         setResult(res);
     };
+    
+    useEffect(() => {
+        if (!getDfaToken()) {
+            setError({ status: 400, message: 'Wrong dfa process. Need login before.' })
+            navigate('/login', { replace: true })
+        }
+    }, [])
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -67,12 +77,6 @@ export function DfaForm() {
                             </Grid>
                         </Grid>
                     </form>
-
-                    <Box sx={{ my: 3 }}>
-                        <Link to="/register">No account ? Register</Link>
-                    </Box>
-
-
                 </Paper>
             </Container>
         </div>

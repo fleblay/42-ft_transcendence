@@ -1,5 +1,5 @@
 import axios, { AxiosHeaders } from 'axios';
-import { getAccessToken, getRefreshToken, delAccessToken, delRefreshToken } from '../token/token';
+import { getAccessToken, delAccessToken } from '../token/token';
 import { MyError } from '../component/Error';
 import { useContext, useEffect, useMemo } from 'react';
 import { ErrorProviderContext } from '../ErrorProvider/ErrorProvider';
@@ -63,7 +63,6 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 								.catch((error) => {
 									console.log("Error refreshing access token", error);
 									delAccessToken()
-									delRefreshToken()
 									navigate("/login", { replace: true });
 									reject(error);
 								})
@@ -84,6 +83,8 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 				else {
 					console.log("error in interceptor", error);
 					setError({ message, status });
+					if (error.response.config.noRedirect)
+						return Promise.reject(error)
 					if (status === 400)
 						return Promise.reject(error)
 					else if (status === 401)

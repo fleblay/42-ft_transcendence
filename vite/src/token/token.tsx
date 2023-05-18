@@ -30,14 +30,14 @@ export function getAccessToken() {
 	return getCookieValue("access_token")
 }
 
-export function getRefreshToken() {
-	return getCookieValue("refresh_token")
+export function getDfaToken() {
+	return getCookieValue("dfa_token")
 }
 
 export function delAccessToken() {
 	removeCookie('access_token')
 }
 
-export function delRefreshToken() {
-	removeCookie('refresh_token')
+export function delDfaToken() {
+	removeCookie('dfa_token')
 }

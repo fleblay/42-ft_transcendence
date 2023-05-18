@@ -46,7 +46,7 @@ export class AuthController {
 
 		const tokens = await this.authService.login(body);
 		if (tokens.dfaToken) {
-			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: 60 * 60 * 1000 });
+			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: 1000 * 60 * 5 });
 			return { needDfa: true }
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
@@ -77,7 +77,7 @@ export class AuthController {
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
 		const tokens = await this.authService.validate42Code(query.code)
 		if (tokens.dfaToken) {
-			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: 1000 * 60 * 60 });
+			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: 1000 * 60 * 5 });
 			res.redirect(302, '/dfa')
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {

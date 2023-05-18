@@ -14,8 +14,17 @@ import { useAuthService } from '../auth/AuthService';
 import { NotifcationBar } from './notifications/notifcationsBar';
 import { Link as LinkRouter } from "react-router-dom";
 
-const pages = ['Game', 'Leaderboard', 'Chat'];
-const menu = ['My profil', 'Friends', 'Blocked', 'Logout'];
+const pages = [
+	{ label: 'Game', path: 'game' },
+	{ label: 'Leaderboard', path: 'leaderboard' },
+	{ label: 'Chat', path: 'chat' }
+];
+const menu = [
+	{ label: 'My profil', path: 'myprofil' },
+	{ label: 'Friends', path: 'friends' },
+	{ label: 'Blocked', path: 'blocked' },
+	{ label: 'Logout', path: 'logout' }
+];
 
 export function MenuBar() {
 
@@ -47,21 +56,19 @@ export function MenuBar() {
 		setAnchorElUser(null);
 	};
 
-	const handleNavigate = (page: string) => {
-		page = page.toLowerCase();
-		if (page === 'logout') {
+	const handleNavigate = (path: string) => {
+		if (path === 'logout') {
 			auth.logout();
+			navigate('/login')
 		}
-		else if (page === 'my profil') {
+		else if (path === 'myprofil') {
 			const path = `/player/${auth.user?.id}`;
 			navigate(path);
 		}
 		else {
-			const path = page.replace(/\s/g, '');
 			navigate("/" + path);
 		}
 	};
-
 	return (
 		<React.Fragment>
 			<CssBaseline />
@@ -98,8 +105,8 @@ export function MenuBar() {
 							}}
 						>
 							{pages.map((page) => (
-								<MenuItem key={page} onClick={() => handleNavigate(page)}>
-									<Typography textAlign="center">{page}</Typography>
+								<MenuItem key={page.label} onClick={() => handleNavigate(page.path)}>
+									<Typography textAlign="center">{page.label}</Typography>
 								</MenuItem>
 							))}
 						</Menu>
@@ -136,11 +143,11 @@ export function MenuBar() {
 						sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, position: 'absolute', left: '50%', transform: 'translate(-50%, 0%)' }}>
 						{pages.map((page) => (
 							<Button
-								key={page}
-								onClick={() => handleNavigate(page)}
+								key={page.label}
+								onClick={() => handleNavigate(page.path)}
 								sx={{ my: 4, color: 'white', display: 'block', fontWeight: 700 }}
 							>
-								{page}
+								{page.label}
 							</Button>
 						))}
 
@@ -168,8 +175,8 @@ export function MenuBar() {
 							onClose={handleCloseUserMenu}
 						>
 							{menu.map((menu) => (
-								<MenuItem key={menu} onClick={() => handleNavigate(menu)}>
-									<Typography textAlign="center">{menu}</Typography>
+								<MenuItem key={menu.label} onClick={() => handleNavigate(menu.path)}>
+									<Typography textAlign="center">{menu.label}</Typography>
 								</MenuItem>
 							))}
 						</Menu>

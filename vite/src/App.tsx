@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 import { LoginData, LoginForm } from './component/LoginForm'
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import axios from "axios";
 import { RegisterForm } from './component/RegisterForm'
 import { Leaderboard } from './component/Leaderboard'
 import { FakeGames } from './component/game/FakeGame'
@@ -16,11 +15,9 @@ import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
 import { GamePage } from './component/game/GamePage';
 import { ChatPage } from './component/chat/ChatPage';
-import ChatMenu from './component/chat/ChatMenu';
 import { CircularProgress, Paper, Stack } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { ErrorProviderContext } from './ErrorProvider/ErrorProvider';
 import { MyError } from './component/Error';
 import { InterceptorAxios } from './auth/interceptor.axios';
 import { NotificationsList } from './component/notifications/notificationsList';
@@ -41,11 +38,12 @@ export const allRoutes: Destinations[] = [
 	{ name: "Friends", path: "/friends", public: false },
 	{ name: "Blocked", path: "/blocked", public: false },
 	{ name: "notification", path: "/notification", public: false },
+	{ name: "dfa", path: "/dfa", public: true },
 ]
 
 function RequireAuth({ children }: { children: JSX.Element }) {
 	let auth = useAuthService();
-	let location = useLocation();
+	const location = useLocation();
 	const { socket } = useContext(SocketContext)
 
 	if (!auth.user) {
@@ -103,6 +101,9 @@ function App() {
 
 							<Routes>
 								<Route>
+									<Route path="/login" element={<LoginForm />} />
+									<Route path="/register" element={<RegisterForm />} />
+									<Route path="/dfa" element={<DfaForm />} />
 									<Route path="/" element={<Navigate to='/game' replace />} />
 									<Route path="game/">
 										<Route path=":idGame" element={
@@ -117,16 +118,11 @@ function App() {
 										} />
 									</Route>
 
-									<Route path='/public' element={<div>Public</div>} />
 									<Route path="chat/:channelId?" element={
 										<RequireAuth>
-											<>
-												<ChatPage />
-											</>
+											<ChatPage />
 										</RequireAuth>
 									} />
-									<Route path="/Login" element={<LoginForm />} />
-									<Route path="/Register" element={<RegisterForm />} />
 									<Route path="/leaderboard" element={
 										<RequireAuth>
 											<>
@@ -160,8 +156,7 @@ function App() {
 											<NotificationsList />
 										</RequireAuth>
 									} />
-									<Route path="/dfa" element={<DfaForm />} />
-									<Route path='*' element={<NotFound/>} />
+									<Route path='*' element={<NotFound />} />
 								</Route>
 							</Routes>
 						</SocketProvider>

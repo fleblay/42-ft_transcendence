@@ -19,6 +19,10 @@ export function MyError() {
             console.log("error in my error", error);
             setOpen(true);
             switch (error.status) {
+                case 200:
+                    setMessage(error.message)
+                    setSeverity('info')
+                    break;
                 case 400:
                     setMessage(`Bad request : ${error.message}`);
                     setSeverity("error");
@@ -39,7 +43,7 @@ export function MyError() {
                     setMessage(`An error occured : ${error.message}`);
                     setSeverity("error");
                     break;
-        }
+            }
         }
 
     }, [error, message]);

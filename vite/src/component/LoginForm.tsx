@@ -1,3 +1,4 @@
+
 import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import TextField from '@mui/material/TextField';
@@ -38,10 +39,7 @@ export function LoginForm() {
 		};
 		console.log("About to start logging process")
 
-		auth.login(loginData).then(() => {
-			console.log('/game')
-			navigate("/game", { replace: true });
-		}).catch((error) => {
+		auth.login(loginData).catch((error) => {
 			let errorInfo = {
 				status: error?.response?.status,
 				statusText: error?.response?.statusText,
