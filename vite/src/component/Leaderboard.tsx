@@ -98,7 +98,7 @@ export function Leaderboard() {
 								<TableBody>
 									{userList.current && userList.current.map((elem: UserInfo) => (
 										<TableRow
-											key={elem.username}
+											key={elem.id}
 											sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 										>
 											<TableCell component="th" scope="row">#{(elem.rank != -1 )? elem.rank : ""}</TableCell>
