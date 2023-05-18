@@ -148,6 +148,14 @@ export function CreateGame() {
 						<Typography color='primary' variant="h5">Choose your parameter !</Typography>
 
 					</Box>
+					<Button variant='contained'
+						sx={{ marginY: 2}}
+						onClick={() => {
+							joinGame({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect })
+						}}
+						>
+						{privateGame ? "Create a private game" : "Join a game"}
+					</Button>
 					<Divider sx={{ width: '100%' }} />
 					<Box sx={{
 						display: advanced ? 'flex' : 'none',
@@ -344,11 +352,6 @@ export function CreateGame() {
 							/>
 						</div>
 					</Box>
-					<Button variant='contained' onClick={() => {
-						joinGame({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect })
-					}}>
-						{privateGame ? "Create a private game" : "Join a game"}
-					</Button>
 				</Box>
 
 			}
