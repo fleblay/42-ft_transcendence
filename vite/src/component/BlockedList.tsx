@@ -18,7 +18,7 @@ export function BlockedList() {
 		console.log('useEffect');
 		console.log(auth.user);
 		if (!auth.user) return;
-		apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
+		apiClient.get(`/api/users/blocked`).then((response) => {
 			setBlockedList(response.data);
 			console.log('blockedlist');
 			console.log(response.data);
@@ -29,7 +29,7 @@ export function BlockedList() {
 	const handleUnblockUser = (idPlayer: number) => {
 		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
 			if (!auth.user) return;
-			apiClient.get(`/api/users/blocked/${auth.user.id}`).then((response) => {
+			apiClient.get(`/api/users/blocked`).then((response) => {
 				setBlockedList(response.data);
 				console.log('blockedlist');
 				console.log(response.data);

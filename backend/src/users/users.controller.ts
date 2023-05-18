@@ -76,10 +76,10 @@ export class UsersController {
 	}
 
 	@UseGuards(ATGuard)
-	@Get('/blocked/:id')
+	@Get('/blocked')
 	@Serialize(RestrictedUserDto)
-	async getBlockedUsersList(@Param("id", ValideIdPipe) id: number) {
-		return 	await this.usersService.getBlockedUsersList(id);
+	async getBlockedUsersList(@CurrentUser() user: User) {
+		return await this.usersService.getBlockedUsersList(user);
 	}
 
 	@UseGuards(ATGuard)
