@@ -15,8 +15,6 @@ export function BlockedList() {
 	const navigate = useNavigate();
 
 	React.useEffect(() => {
-		console.log('useEffect');
-		console.log(auth.user);
 		if (!auth.user) return;
 		apiClient.get(`/api/users/blocked`).then((response) => {
 			setBlockedList(response.data);

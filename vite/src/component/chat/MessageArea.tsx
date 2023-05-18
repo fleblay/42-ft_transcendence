@@ -1,5 +1,5 @@
 import { Box, Button, Divider, List, TextField } from "@mui/material";
-import { Message } from "../../types";
+import { Message, plainUser } from "../../types";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { SocketContext } from "../../socket/SocketProvider";
@@ -133,6 +133,33 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		}
 	}
 
+	const [blockedList, setBlockedList] = useState<number[]>([]);
+	useEffect(() => {
+		apiClient.get<plainUser[]>(`/api/users/blocked`).then(({ data }) => {
+			setBlockedList(data.map((user) => user.id));
+		}).catch((error) => {
+			console.log(error);
+		});
+		function onBlockUser({ userId, targetId, event }: { userId: number, targetId: number, event: string }) {
+			setBlockedList((blockedList) => {
+				if (event === "unblocked")
+					return blockedList.filter((id) => id !== targetId);
+				else if (event === "blocked")
+					return [...blockedList, targetId];
+				return blockedList;
+			});
+		}
+		customOn("page.player", onBlockUser);
+		return () => {
+			customOff("page.player", onBlockUser);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (!user) return;
+		return addSubscription(`/player/${user.id}`);
+	}, [user]);
+
 	return (
 		<>
 			<List sx={{ height: '50vh', overflow: 'auto' }} ref={messageAreaRef} onScroll={onScroll}>
@@ -157,7 +184,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 								avatar={`/avatars/${messages[0].owner.user.id}.png`}
 								messages={messages}
 								username={messages[0].owner.user.username}
-								blocked={user?.blockedId.includes(messages[0].owner.user.id)}
+								blocked={blockedList.includes(messages[0].owner.user.id)}
 							/>
 						);
 					})

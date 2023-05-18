@@ -24,7 +24,7 @@ let AuthContext = React.createContext<AuthContextType>(null!);
 //2.Definit la value passe pour tous les enfants du AuthContext.Provider
 //3.Renvoie la balise AuthContext.Provider
 export function AuthService({ children }: { children: React.ReactNode }) {
-	let [user, setUser] = React.useState<any | null>(null);
+	let [user, setUser] = React.useState<plainUser | null>(null);
 	const nav = useNavigate();
 	const location = useLocation();
 	const { setError } = useContext(ErrorProviderContext);

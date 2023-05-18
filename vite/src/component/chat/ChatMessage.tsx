@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'clsx';
 import Grid from '@mui/material/Grid';
@@ -18,6 +18,10 @@ interface ChatMsgProps {
 
 export const ChatMsg: FC<ChatMsgProps> = ({ side, avatar, messages, username, blocked = false }) => {
 	const [showBlocked, setShowBlocked] = useState<boolean>(!blocked);
+
+	useEffect(() => {
+		setShowBlocked(!blocked);
+	}, [blocked]);
 
 	return (
 		<Grid
