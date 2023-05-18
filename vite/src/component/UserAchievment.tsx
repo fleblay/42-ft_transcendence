@@ -20,6 +20,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import SchoolIcon from '@mui/icons-material/School';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 import LaptopMacIcon from '@mui/icons-material/LaptopMac';
+import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import { UserInfo } from '../types';
 
 const achievementArray: { name: string, text: string, color: string, icon: React.ElementType }[] =
@@ -32,6 +33,7 @@ const achievementArray: { name: string, text: string, color: string, icon: React
 		{ name: "stud", text: "Stud : Login with 42", color: "primary", icon: SchoolIcon },
 		{ name: "sub-zero", text: "Sub-zero : Have a negative amount of points at some point", color: "error", icon: AcUnitIcon },
 		{ name: "the-answer", text: "42, the answer : Play a game with an id containing the number '42'", color: "primary", icon: LaptopMacIcon },
+		{ name: "picture", text: "Say Cheese ! : Upload a profile picture", color: "primary", icon: AddAPhotoIcon}
 	]
 
 function RenderSwitch({ userData }: { userData: UserInfo | null }): JSX.Element {
@@ -43,7 +45,7 @@ function RenderSwitch({ userData }: { userData: UserInfo | null }): JSX.Element 
 				achievementArray.map((ach) => {
 					return (
 						<Tooltip key={ach.name} title={ach.text}>
-							<ach.icon color={userData.achievements.includes(ach.name)? ach.color : "disabled"} fontSize={'large'} />
+							<ach.icon color={userData.achievements.includes(ach.name) ? ach.color : "disabled"} fontSize={'large'} />
 						</Tooltip>
 					)
 				})

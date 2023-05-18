@@ -166,7 +166,11 @@ export class UsersService implements OnModuleInit {
 			console.log("error while resizing image", err)
 			throw new BadRequestException("Unsupported format");
 		}
-		return this.repo.save(user);
+		if (!user.achievements.includes("picture"))
+			user.achievements.push("picture")
+		this.server.to(`/user`).emit('user.modify', {})
+		const savedUser = await this.repo.save(user);
+		return savedUser
 	}
 
 	async changeUsername(user: User, newUsername: string) {
