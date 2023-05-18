@@ -1,13 +1,12 @@
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Box, Button, CircularProgress, CssBaseline, Fade, IconButton, Menu, MenuItem, Typography } from "@mui/material";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { SocketContext } from '../../socket/SocketProvider';
-import { Channel, GameStatus, IgameInfo, Member, ShortUser, projectile } from "../../types";
 import { PersonAdd } from '@mui/icons-material';
-import apiClient from '../../auth/interceptor.axios';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Box, CircularProgress, CssBaseline, IconButton, Link, Menu, MenuItem, Typography } from "@mui/material";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Link as RouterLink, useParams } from "react-router-dom";
 import { useAuthService } from '../../auth/AuthService';
-import { FriendList } from '../FriendList';
+import apiClient from '../../auth/interceptor.axios';
+import { SocketContext } from '../../socket/SocketProvider';
+import { Channel, GameStatus, IgameInfo, Member, projectile } from "../../types";
 
 interface Iprops {
 	gameInfo: IgameInfo,
@@ -200,15 +199,20 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 				</>
 			)
 		}
-		// if (gameInfo.status === GameStatus.end) {
-		// 	return <GameFinishedScreen gameInfo={gameInfo} />
-		// }
 	}
 
 	return (
-		<div>
-			Failed to load game (game not found)
-		</div>
+		<Box>
+			<Typography
+				variant='h5'
+				sx={{ textAlign: 'center', paddingTop: '2rem', paddingBottom: '2rem' }}
+			>Failed to load game (game not found)</Typography>
+			<Link
+				component={RouterLink}
+				to='/'
+				sx={{ textAlign: 'center', paddingBottom: '2rem', width: '100%', display: 'block' }}
+			>Go back to home</Link>
+		</Box>
 	);
 };
 
