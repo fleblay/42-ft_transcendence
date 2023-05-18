@@ -99,7 +99,7 @@ export function CreateGame() {
 							/>
 							<CardContent sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
 								<Button variant='contained' onClick={() => {
-									joinGame({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect })
+									joinGame({})
 								}}>
 									join game
 								</Button>
@@ -352,7 +352,7 @@ export function CreateGame() {
 				</Box>
 
 			}
-					<ListCurrentGames joinGame={joinGame} />
+			<ListCurrentGames joinGame={joinGame} />
 		</>
 	);
 }

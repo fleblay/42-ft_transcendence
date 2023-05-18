@@ -130,14 +130,13 @@ export class Game {
 				{ x: canvasWidth - 250 - 70, y: canvasHeight - 200 - 80, width: 70, height: 70 },
 			])
 
-		this.ballSpeed = options?.ballSpeed || 1
+		this.ballSpeed = options?.ballSpeed || 1.25
 		this.victoryRounds = options?.victoryRounds || 5
 		this.paddleLength = options?.paddleLength || 200
 		this.paddleLengthMin = options?.paddleLengthMin || 100
-		//Change because paddleReduce can be set to 0
-		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 1
+		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 0
 		this.maxBounce = (options?.maxBounce !== undefined) ? options.maxBounce : 5
-		this.startAmmo = (options?.startAmo !== undefined) ? options.startAmo : 3
+		this.startAmmo = (options?.startAmo !== undefined) ? options.startAmo : 0
 		this.liftEffect = (options?.liftEffect !== undefined) ? options.liftEffect : 1
 		this.ballSize = options?.ballSize || 5
 		this.playerSpeed = options?.playerSpeed || 3
