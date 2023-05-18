@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Checkbox, Divider, Icon, IconButton, Slider, Typography } from '@mui/material';
+import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Checkbox, Divider, Icon, IconButton, Slider, Stack, Tooltip, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from '../../socket/SocketProvider';
@@ -7,6 +7,7 @@ import { ListCurrentGames } from './ListCurrentGames';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PrivateImage from '../../assets/private.png';
 import PublicImage from '../../assets/public.png';
+import { KeyboardArrowDown, KeyboardArrowUp, KeyboardArrowRight } from '@mui/icons-material';
 
 export function CreateGame() {
 	const navigate = useNavigate();
@@ -79,17 +80,27 @@ export function CreateGame() {
 	}, []);
 
 	return (
-		<>
+		<Box sx={{
+			display: 'flex',
+			flexDirection: 'column',
+			alignItems: 'center',
+		}}>
 			{!advanced &&
 				<>
 					<Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', margin: theme => `${theme.spacing(4)} 0` }}>
 						<Typography paddingBottom={2} color='primary' variant="h3">Let's Play !</Typography>
 					</Box>
+					<Box >
+						<Typography color='primary' sx={{ display: 'flex', alignItems: 'center' }} variant="h6" textAlign={'center'}>
+							Controls: <KeyboardArrowUp /> <KeyboardArrowDown />
+						</Typography>
+					</Box>
 					<Box sx={{
 						width: '100%',
 						display: 'flex',
 						flexDirection: { xs: 'column', lg: 'row' },
-						alignItems: 'center'
+						alignItems: 'center',
+						justifyContent: 'center'
 					}}>
 						<Card sx={{ maxWidth: 600, padding: 3, margin: 2 }}>
 							<CardMedia
@@ -121,7 +132,9 @@ export function CreateGame() {
 
 							</CardContent>
 						</Card>
+
 					</Box>
+
 				</>
 			}
 			{advanced &&
@@ -140,23 +153,25 @@ export function CreateGame() {
 							alignItems: 'center',
 							justifyContent: 'center',
 							margin: (theme) => `${theme.spacing(4)} 0`,
+							position: 'relative'
 						}}
 					>
-						<IconButton onClick={() => setAdvanced(false)} color="primary" aria-label="back">
-							<ArrowBackIcon />
+						<IconButton sx={{ position: 'absolute', left: 0 }} onClick={() => setAdvanced(false)} color="primary" aria-label="back">
+							<ArrowBackIcon /> Back
 						</IconButton>
-						<Typography color='primary' variant="h5">Choose your parameter !</Typography>
+						<Typography color='primary' variant="h4">Pimp my pong</Typography>
 
 					</Box>
 					<Button variant='contained'
-						sx={{ marginY: 2}}
+						sx={{ marginY: 2 }}
 						onClick={() => {
 							joinGame({ obstacles, shoot, ballSpeed, victoryRounds, paddleReduce, paddleLength: paddleLen[1], paddleLengthMin: paddleLen[0], maxBounce, startAmo, ballSize, playerSpeed, shootSize, shootSpeed, liftEffect })
 						}}
-						>
+					>
 						{privateGame ? "Create a private game" : "Join a game"}
 					</Button>
 					<Divider sx={{ width: '100%' }} />
+					<Typography color='primary' variant="h5">Choose your parameters !</Typography>
 					<Box sx={{
 						display: advanced ? 'flex' : 'none',
 						width: '50%',
@@ -167,12 +182,19 @@ export function CreateGame() {
 							margin: (theme) => `${theme.spacing(2)} 0`,
 						},
 					}}>
-						<div>Obstacles
-							<Checkbox defaultChecked onChange={(e) => { setObsctacles(e.target.checked) }} />
-						</div>
-						<div>Shoot
-							<Checkbox defaultChecked onChange={(e) => { setShoot(e.target.checked) }} />
-						</div>
+						<Stack direction="row" spacing={2} justifyContent={'center'}>
+							<Tooltip title="Add some obstacles to spice up the game!">
+								<Button onClick={(e) => { setObsctacles((obstacles) => !obstacles) }} size='large' sx={{ fontWeight: 900, color: obstacles ? undefined : 'grey' }}>Obstacles</Button>
+							</Tooltip>
+							<Tooltip title="Shoot at your opponent with Right Arrow">
+								<Button onClick={(e) => { setShoot((shoot) => !shoot) }} size='large' sx={{ fontWeight: 900, color: shoot ? undefined : 'grey' }}>Shoot</Button>
+							</Tooltip>
+							<Tooltip title="Shrink the paddle length every second">
+								<Button onClick={(e) => {
+									setPaddleReduce((shrink) => Number(!shrink))
+								}} size='large' sx={{ fontWeight: 900, color: !!paddleReduce ? undefined : 'grey' }}>Shrink paddle</Button>
+							</Tooltip>
+						</Stack>
 						<div>BallSpeed
 							<Slider
 								aria-label="Ball Speed"
@@ -229,6 +251,7 @@ export function CreateGame() {
 								step={1}
 								min={0}
 								max={10}
+								value={paddleReduce}
 								marks={[
 									{ value: 0, label: "off" },
 									{ value: 1, label: "normal" },
@@ -240,7 +263,7 @@ export function CreateGame() {
 						<div>Paddle Length
 							<Slider
 								//aria-label="Paddle Length"
-								value={paddleLen}
+								value={paddleReduce ? paddleLen : paddleLen[1]}
 								valueLabelDisplay="on"
 								step={10}
 								min={10}
@@ -255,7 +278,7 @@ export function CreateGame() {
 								onChange={(e, val, thumb) => handlePaddleLenChange(e, val, thumb)}
 							/>
 						</div>
-						<div>Max Bouncing of shoots
+						<div style={{ display: shoot ? 'block' : 'none' }}>Max Bouncing of shoots
 							<Slider
 								aria-label="MaxBounce Rounds"
 								defaultValue={5}
@@ -265,13 +288,13 @@ export function CreateGame() {
 								max={10}
 								marks={[
 									{ value: 0, label: "off" },
-									{ value: 3, label: "3" },
+									{ value: 5, label: "5" },
 									{ value: 10, label: "10" }
 								]}
 								onChange={(_, val) => setMaxBounce(Array.isArray(val) ? val[0] : val)}
 							/>
 						</div>
-						<div>Starting Amo per player
+						<div style={{ display: shoot ? 'block' : 'none' }}>Starting Ammo per player
 							<Slider
 								aria-label="Start Amo"
 								defaultValue={3}
@@ -285,6 +308,22 @@ export function CreateGame() {
 									{ value: 10, label: "10" }
 								]}
 								onChange={(_, val) => setStartAmo(Array.isArray(val) ? val[0] : val)}
+							/>
+						</div>
+						<div style={{ display: shoot ? 'block' : 'none' }}>Shoot size
+							<Slider
+								aria-label="shoot Size"
+								defaultValue={3}
+								valueLabelDisplay="on"
+								step={1}
+								min={1}
+								max={10}
+								marks={[
+									{ value: 1, label: "1" },
+									{ value: 3, label: "3" },
+									{ value: 10, label: "10" }
+								]}
+								onChange={(_, val) => setShootSize(Array.isArray(val) ? val[0] : val)}
 							/>
 						</div>
 						<div>Ball size
@@ -301,22 +340,6 @@ export function CreateGame() {
 									{ value: 10, label: "10" }
 								]}
 								onChange={(_, val) => setBallSize(Array.isArray(val) ? val[0] : val)}
-							/>
-						</div>
-						<div>Shoot size
-							<Slider
-								aria-label="shoot Size"
-								defaultValue={2}
-								valueLabelDisplay="on"
-								step={1}
-								min={1}
-								max={10}
-								marks={[
-									{ value: 1, label: "1" },
-									{ value: 5, label: "5" },
-									{ value: 10, label: "10" }
-								]}
-								onChange={(_, val) => setShootSize(Array.isArray(val) ? val[0] : val)}
 							/>
 						</div>
 						<div>Player Speed
@@ -356,6 +379,6 @@ export function CreateGame() {
 
 			}
 			<ListCurrentGames joinGame={joinGame} />
-		</>
+		</Box>
 	);
 }
