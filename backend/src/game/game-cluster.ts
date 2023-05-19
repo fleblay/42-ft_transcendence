@@ -88,11 +88,11 @@ export class GameCluster {
 				continue
 			if (game.players.find(player => player.user.id === id && player.leaving === false)) {
 				states.push("ingame")
-				gameIds.push(game.id)
+				gameIds.push(!game.privateGame ? game.id : "private")
 			}
 			if (game.viewers.find(viewer => viewer.user.id === id)) {
 				states.push("watching")
-				gameIds.push(game.id)
+				gameIds.push(!game.privateGame ? game.id : "private")
 			}
 		}
 		return { states, gameIds }
