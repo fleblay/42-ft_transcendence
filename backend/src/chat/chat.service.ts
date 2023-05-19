@@ -210,7 +210,7 @@ export class ChatService implements OnModuleInit {
 		};
 	}
 
-	private getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
+	async getMemberOfChannel(user: User, channelId: number): Promise<Member | null> {
 		return this.membersRepo.findOne({
 			where: { user: { id: user.id }, channel: { id: channelId } },
 			relations: ['channel', 'user'],

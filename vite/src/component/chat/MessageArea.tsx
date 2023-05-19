@@ -1,5 +1,5 @@
 import { Box, Button, Divider, List, TextField } from "@mui/material";
-import { Message, plainUser } from "../../types";
+import { Member, Message, plainUser } from "../../types";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
 import { SocketContext } from "../../socket/SocketProvider";
@@ -155,10 +155,36 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		}
 	}, []);
 
+	const [mutedState, setMutedState] = useState<boolean>(false)
+	useEffect(() => {
+		if (!user)
+			return
+		apiClient.get<Member | null>(`/api/chat/channels/${channelId}/me`).then(({ data: me }) => {
+			if (me)
+				setMutedState(Date.parse(me.muteTime) > Date.now())
+		}).catch((error) => {
+			console.log(error);
+		});
+
+		function onBeingMuted({ modifyMember: upDatedMember }: { modifyMember: Member }) {
+			if (user && upDatedMember.user.id == user.id)
+				setMutedState(Date.parse(upDatedMember.muteTime) > Date.now())
+		}
+		customOn("chat.modify.members", onBeingMuted);
+		return () => {
+			customOn("chat.modify.members", onBeingMuted);
+		}
+	}, [user, channelId]);
+
 	useEffect(() => {
 		if (!user) return;
 		return addSubscription(`/player/${user.id}`);
 	}, [user]);
+
+	useEffect(() => {
+		if (!channelId) return;
+		return addSubscription(`/chat/${channelId}`);
+	}, [channelId]);
 
 	return (
 		<>
@@ -207,8 +233,8 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 						}
 					}}
 				/>
-				<Button variant="contained" onClick={sendGameMessage}><SportsTennisIcon /></Button>
-				<Button variant="contained" onClick={sendMessage}><SendIcon /></Button>
+				<Button variant="contained" onClick={sendGameMessage} disabled={mutedState}><SportsTennisIcon /></Button>
+				<Button variant="contained" onClick={sendMessage} disabled={mutedState}><SendIcon /></Button>
 			</Box>
 		</>
 	)

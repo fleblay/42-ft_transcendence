@@ -33,6 +33,7 @@ export class ChatController {
 		return this.chatService.getAllPublicChannels()
 	}
 
+
 	@Get('/channels/my')
 	async getMyChannels(@CurrentUser() user: User) {
 		const channels = await this.chatService.getMyChannels(user);
@@ -158,6 +159,12 @@ export class ChatController {
 	@Post('channels/:id/info')
 	async modifyChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: ChangeChannelDto): Promise<void> {
 		await this.chatService.modifyChannel(user, channelId, body);
+	}
+
+	@Get('/channels/:id/me')
+	async getMyMembership(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number) : Promise<Member | null> {
+		const me : Member | null = await this.chatService.getMemberOfChannel(user, channelId)
+		return me
 	}
 
 }
