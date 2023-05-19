@@ -23,10 +23,10 @@ export function Leaderboard() {
 	const userList: MutableRefObject<UserInfo[] | null> = useRef(null)
 	const unSubscribeFxArray: MutableRefObject<((() => void) | void)[]> = useRef([])
 
-	function handleNewPlayer({userId} : {userId: number}){
-			unSubscribeFxArray.current.push(addSubscription(`/player/${userId}`))
-			handleClick()
-		}
+	function handleNewPlayer({ userId }: { userId: number }) {
+		unSubscribeFxArray.current.push(addSubscription(`/player/${userId}`))
+		handleClick()
+	}
 
 	useEffect(() => {
 		handleClick()
@@ -101,7 +101,7 @@ export function Leaderboard() {
 											key={elem.id}
 											sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 										>
-											<TableCell component="th" scope="row">#{(elem.rank != -1 )? elem.rank : ""}</TableCell>
+											<TableCell component="th" scope="row">#{(elem.rank != -1) ? elem.rank : ""}</TableCell>
 											<TableCell align="right">
 												<Link key={elem.id} component={LinkRouter} to={`/player/${elem.id}`}>{elem.username}</Link>
 											</TableCell>
@@ -115,7 +115,9 @@ export function Leaderboard() {
 												<Avatar sx={{ bgcolor: elem.userConnected ? 'green' : 'red' }} style={{ width: '15px', height: '15px' }}> </Avatar>
 											</TableCell>
 											<TableCell align="right">{(elem.states.join('-') == "") ? "none" : elem.states.join('-')}</TableCell>
-											<TableCell align="right">{(elem.gameIds.join('-') == "") ? "---" : elem.gameIds.join('-')}</TableCell>
+											<TableCell align="right">{(elem.gameIds.join('-') == "" || elem.gameIds.join('-').includes('private')) ? `${elem.gameIds.join('-').includes('private') ? "private" : "---"}` :
+												<Link key={elem.id} component={LinkRouter} to={`/game/${elem.gameIds.join('-')}`}>{elem.gameIds.join('-')}</Link>}
+											</TableCell>
 										</TableRow>
 									))}
 								</TableBody>
