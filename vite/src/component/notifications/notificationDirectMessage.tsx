@@ -13,6 +13,9 @@ import { StyledBadge } from '../chat/ChatFriendsBrowser';
 import { useNavigate } from 'react-router-dom';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 
+import dayjs, { Dayjs } from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
 
 interface NotificationDirectMessageProps {
     notification: Notification,
@@ -20,10 +23,6 @@ interface NotificationDirectMessageProps {
     array: Notification[];
 
 }
-
-
-
-
 
 export const NotificationDirectMessage: FC<NotificationDirectMessageProps> = ({ notification, index, array }) => {
     const navigate = useNavigate();
@@ -46,10 +45,7 @@ export const NotificationDirectMessage: FC<NotificationDirectMessageProps> = ({ 
                     <MessageOutlinedIcon />
                 </Avatar>
                 <ListItemText primary={notification.name + " sent you a message"} />
-                <ListItemText secondary={notification.createdAt.toLocaleString('fr-FR', {
-                    dateStyle: 'short',
-                    timeStyle: 'medium'
-                })} />
+				<ListItemText secondary={ dayjs(notification.createdAt).fromNow() } />
                 <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={viewMessage}>View Message</Button>
             </ListItem>
         </React.Fragment >

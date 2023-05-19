@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { DatePicker, DateTimePicker } from "@mui/x-date-pickers";
 import { Member } from "../../types";
 import dayjs, { Dayjs } from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
 
 export function MuteMemberModal({ openModal, onClose, channelId, member }: { openModal: boolean, onClose: () => void, channelId: string, member: Member }) {
 
@@ -51,7 +53,7 @@ export function MuteMemberModal({ openModal, onClose, channelId, member }: { ope
 							!mutedState && <DateTimePicker value={muteEnd} onChange={handleChangeValue} label="Select end of mute period" />
 						}
 						<Button onClick={handleSubmit} variant="outlined" sx={{ flexGrow: 1, mt: '10px', width: '100%', height: '30px' }}>
-							{ mutedState ? "Umute" : `Mute ${member.user.username} for ${muteEnd!.diff(dayjs(), 'hours')} hour(s) and ${muteEnd!.diff(dayjs(), 'minutes') % 60} minute(s)`}
+							{ mutedState ? "Umute" : `Mute ${member.user.username} for ${muteEnd!.toNow(true)}`}
 						</Button>
 						<Divider />
 					</form>

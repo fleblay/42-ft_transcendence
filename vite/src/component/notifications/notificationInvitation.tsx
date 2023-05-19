@@ -16,6 +16,9 @@ import { blue } from '@mui/material/colors';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 import { Announcement } from '@mui/icons-material';
 
+import dayjs, { Dayjs } from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
 
 interface NotificationInvitationProps {
     notification: Notification,
@@ -23,10 +26,6 @@ interface NotificationInvitationProps {
     array: Notification[];
 
 }
-
-
-
-
 
 export const NotificationInvitation: FC<NotificationInvitationProps> = ({ notification, index, array }) => {
     const navigate = useNavigate();
@@ -49,10 +48,7 @@ export const NotificationInvitation: FC<NotificationInvitationProps> = ({ notifi
                     <Announcement />
                 </Avatar>
                 <ListItemText primary={"you are invited to " + notification.name} />
-                <ListItemText secondary={notification.createdAt.toLocaleString('fr-FR', {
-                    dateStyle: 'short',
-                    timeStyle: 'medium'
-                })} />
+				<ListItemText secondary={ dayjs(notification.createdAt).fromNow() } />
                 <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={viewMessage}>View Channel</Button>
             </ListItem>
         </React.Fragment >
