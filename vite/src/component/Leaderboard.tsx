@@ -123,9 +123,7 @@ export function Leaderboard() {
 								</TableBody>
 							</Table>
 						</TableContainer>
-						<Paper>
-							<FinishGames />
-						</Paper>
+					
 					</Container>
 				)
 			})
@@ -137,6 +135,16 @@ export function Leaderboard() {
 	return (
 		<div>
 			{muiTable}
+			<Container maxWidth="lg" >
+			<AppBar position="static" sx={{ borderTopLeftRadius: theme => theme.shape.borderRadius, borderTopRightRadius: theme => theme.shape.borderRadius, height: '80px' }}>
+							<Typography textAlign="center" variant="h6" sx={{ flexGrow: 1, paddingTop: '25px' }}>
+								Finished Games
+							</Typography>
+						</AppBar>
+						<Paper sx={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+				<FinishGames />
+				</Paper>
+			</Container>
 		</div>
 	);
 }

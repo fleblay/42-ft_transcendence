@@ -87,7 +87,7 @@ export function FinishGames() {
 											if (b.id === game.winner.id) return 1;
 											return 1;
 										}).map((player) => {
-											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
+											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username} </Link>
 										})
 									}
 								</TableCell>

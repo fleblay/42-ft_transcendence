@@ -1,6 +1,6 @@
 
 import React, { useContext, useState } from 'react';
-import { Avatar, Button, Typography } from '@mui/material';
+import { Avatar, Button, IconButton, Typography } from '@mui/material';
 
 
 import { Box } from '@mui/system';
@@ -12,6 +12,8 @@ import apiClient from '../auth/interceptor.axios';
 import { Friend, UserInfo, } from '../types';
 import { SocketContext } from '../socket/SocketProvider';
 import { useAuthService } from '../auth/AuthService';
+import EmailIcon from '@mui/icons-material/Email';
+import { useNavigate } from 'react-router-dom';
 
 interface UserInfoDisplayProps {
 	idPlayer: string | undefined;
@@ -53,6 +55,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 	const auth = useAuthService();
 	const [itsMe, setItsMe] = useState<boolean>(false);
 	const [displayUpdate, setDisplayUpdate] = useState<boolean>(false);
+	const navigate = useNavigate();
 
 	React.useEffect(() => {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
@@ -132,6 +135,18 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 			customOff('page.player', updateUserData);
 		})
 	}, [socket, userData]);
+	
+	
+	const joinDm = () => {
+		apiClient.post(`/api/chat/dm/${idPlayer}/join`).then((response) => {
+			console.log("joinChannel", response);
+			navigate(`/chat/${response.data}`);
+		}).catch((error) => {
+			console.log(error);
+		});
+	}
+	
+	
 
 	const handleUnblockUser = (idPlayer: string | undefined) => {
 		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
@@ -228,9 +243,9 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 						</div>
 						{userData && userData.states.join("-") != "" ? <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{userData.states[0]}</Typography> : <Typography sx={{ flexGrow: 1, marginTop: '5px' }}>{userData?.userConnected ? "online" : "offline"}</Typography>}
 					</Box>
-
 					{itsMe ? <UpdateProfil /> : (
 						<>
+							{relation?.requestStatus === "accepted" && <IconButton color='primary' sx={{ mr: 'auto', marginTop: '5px' }} onClick={joinDm}><EmailIcon /></IconButton>}			
 							{auth.user && userData && !userData.blockedId.includes(auth.user?.id) && renderButton(relation) || <Box sx={{ml : 'auto', mr: 1, mt: 2, mb: 2}}></Box>}
 							{displayBlocked && isBlocked ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleUnblockUser(idPlayer)}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleBlockUser(idPlayer)}>block</Button>}
 						</>
