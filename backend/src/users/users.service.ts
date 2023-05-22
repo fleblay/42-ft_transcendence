@@ -232,7 +232,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 
-	async getBlockedUsersList(user: User): Promise<ShortUser[]> {
+	async getBlockedUsersList(user: User): Promise<ShortUser[] | null> {
 		if (!user)
 			throw new NotFoundException("User not found");
 		const BlockedList = await this.repo.find({
