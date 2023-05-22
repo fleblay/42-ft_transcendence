@@ -18,10 +18,10 @@ export function CreateGame() {
 	const [privateGame, setPrivateGame] = useState<boolean>(false);
 	const [obstacles, setObsctacles] = useState<boolean>(true);
 	const [shoot, setShoot] = useState<boolean>(true);
-	const [ballSpeed, setballSpeed] = useState<number>(1);
+	const [ballSpeed, setballSpeed] = useState<number>(1.3);
 	const [victoryRounds, setVictoryRounds] = useState<number>(5);
 	const [paddleReduce, setPaddleReduce] = useState<number>(1);
-	const [paddleLen, setPaddleLen] = useState<number[]>([100, 200])
+	const [paddleLen, setPaddleLen] = useState<number[]>([80, 160])
 
 	const [maxBounce, setMaxBounce] = useState<number>(5);
 	const [startAmo, setStartAmo] = useState<number>(3);
@@ -198,14 +198,14 @@ export function CreateGame() {
 						<div>BallSpeed
 							<Slider
 								aria-label="Ball Speed"
-								defaultValue={1}
+								defaultValue={1.3}
 								valueLabelDisplay="on"
 								step={0.1}
 								min={0.1}
 								max={2}
 								marks={[
 									{ value: 0.1, label: "slow" },
-									{ value: 1, label: "normal" },
+									{ value: 1.3, label: "normal" },
 									{ value: 2, label: "fast" }
 								]}
 								onChange={(_, val) => setballSpeed(Array.isArray(val) ? val[0] : val)}
@@ -270,8 +270,8 @@ export function CreateGame() {
 								max={480}
 								marks={[
 									{ value: 10, label: "10" },
-									{ value: 100, label: "default min" },
-									{ value: 200, label: "default len" },
+									{ value: 80, label: "default min" },
+									{ value: 160, label: "default len" },
 									{ value: 480, label: "480" }
 								]}
 								disableSwap

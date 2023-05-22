@@ -435,12 +435,14 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 			context.current.fillText(`${gameInfo.players[1].score}`, (canvasWidth / 2 + 60) * canvasRatio, 80 * canvasRatio)
 
 		// Player Info
+		const p1AmmoInfo : string = Array.from(Array(gameInfo.players[0].ammo)).map(()=> "o").join(' ')
 		context.current.font = `${20 * canvasRatio}px  Roboto`
 		context.current.fillStyle = player1color
-		context.current.fillText(`${gameInfo.players[0].user.username} : ${gameInfo.players[0].ammo}`, 12 * canvasRatio, 20 * canvasRatio)
+		context.current.fillText(`${gameInfo.players[0].user.username}${(p1AmmoInfo.length) ? " : " + p1AmmoInfo : ""}`, 12 * canvasRatio, 20 * canvasRatio)
 		context.current.fillStyle = player2color
 		if (gameInfo.players[1]) {
-			const player2info = `${gameInfo.players[1].user.username} : ${gameInfo.players[1].ammo}`
+			const p2AmmoInfo : string = Array.from(Array(gameInfo.players[1].ammo)).map(()=> "o").join(' ')
+			const player2info = `${gameInfo.players[1].user.username}${(p2AmmoInfo.length) ? " : " + p2AmmoInfo : ""}`
 			context.current.fillText(player2info, canvasWidth * canvasRatio - (12 * canvasRatio + context.current.measureText(player2info).width), 20 * canvasRatio)
 		}
 

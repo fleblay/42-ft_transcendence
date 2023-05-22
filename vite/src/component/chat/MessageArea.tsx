@@ -1,4 +1,4 @@
-import { Box, Button, Divider, List, TextField } from "@mui/material";
+import { Box, Button, Divider, List, TextField, Tooltip } from "@mui/material";
 import { Member, Message, plainUser } from "../../types";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import apiClient from "../../auth/interceptor.axios";
@@ -229,12 +229,16 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 					onKeyDown={(ev) => {
 						if (ev.key === 'Enter') {
 							ev.preventDefault();
-							sendMessage();
+							!mutedState && sendMessage();
 						}
 					}}
 				/>
-				<Button variant="contained" onClick={sendGameMessage} disabled={mutedState}><SportsTennisIcon /></Button>
-				<Button variant="contained" onClick={sendMessage} disabled={mutedState}><SendIcon /></Button>
+				<Tooltip title={"Send an invite to play a game"}>
+					<Button variant="contained" onClick={sendGameMessage} disabled={mutedState}><SportsTennisIcon /></Button>
+				</Tooltip>
+				<Tooltip title={"Send message"}>
+					<Button variant="contained" onClick={sendMessage} disabled={mutedState}><SendIcon /></Button>
+				</Tooltip>
 			</Box>
 		</>
 	)

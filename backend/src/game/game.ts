@@ -130,10 +130,10 @@ export class Game {
 				{ x: canvasWidth - 250 - 70, y: canvasHeight - 200 - 80, width: 70, height: 70 },
 			])
 
-		this.ballSpeed = options?.ballSpeed || 1.25
+		this.ballSpeed = options?.ballSpeed || 1.30
 		this.victoryRounds = options?.victoryRounds || 5
-		this.paddleLength = options?.paddleLength || 200
-		this.paddleLengthMin = options?.paddleLengthMin || 100
+		this.paddleLength = options?.paddleLength || 160
+		this.paddleLengthMin = options?.paddleLengthMin || 80
 		this.paddleReduce = (options?.paddleReduce !== undefined) ? options.paddleReduce : 0
 		this.maxBounce = (options?.maxBounce !== undefined) ? options.maxBounce : 5
 		this.startAmmo = (options?.startAmo !== undefined) ? options.startAmo : 0
@@ -520,7 +520,7 @@ export class Game {
 	play() {
 		this.intervalId = setInterval(() => { this.gameLoop() }, 5)
 		//Envoi des infosk
-		this.infoInterval = setInterval(() => { this.updateInfo(this.generateGameInfo()) }, 1000 / 60)
+		this.infoInterval = setInterval(() => { this.updateInfo(this.generateGameInfo()) }, 1000 / 60 )
 	}
 
 	get id(): UUID {
