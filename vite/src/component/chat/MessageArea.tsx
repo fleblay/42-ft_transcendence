@@ -229,7 +229,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 					onKeyDown={(ev) => {
 						if (ev.key === 'Enter') {
 							ev.preventDefault();
-							sendMessage();
+							!mutedState && sendMessage();
 						}
 					}}
 				/>
