@@ -22,7 +22,6 @@ const pages = [
 const menu = [
 	{ label: 'My profil', path: 'myprofil' },
 	{ label: 'Friends', path: 'friends' },
-	{ label: 'Blocked', path: 'blocked' },
 	{ label: 'Logout', path: 'logout' }
 ];
 

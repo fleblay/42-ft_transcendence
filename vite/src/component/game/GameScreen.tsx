@@ -140,6 +140,7 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 		fetchFriendsList();
 		setAnchorEl(event.currentTarget);
 	}
+	
 	function closeFriendsList() {
 		setAnchorEl(null);
 	}
