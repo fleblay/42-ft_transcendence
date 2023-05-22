@@ -86,12 +86,15 @@ export function FinishGames() {
 											if (a.id === game.winner.id) return -1;
 											if (b.id === game.winner.id) return 1;
 											return 1;
-										}).map((player) => {
-											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username} </Link>
+										}).map((player: Partial<UserInfo>, index, players) => {
+											return <>
+											<Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
+											{index != players.length - 1 ? " - " : ""}
+											</>
 										})
 									}
 								</TableCell>
-								<TableCell align="right">{game.score.sort((a: number, b: number) => b - a).map((score: number) => score.toString()).join(' ')}</TableCell>
+								<TableCell align="right">{game.score.sort((a: number, b: number) => b - a).map((score: number) => score.toString()).join(' : ')}</TableCell>
 								<TableCell align="right">{dayjs(game.date).fromNow()}</TableCell>
 								<TableCell align="right">{game.winner?.username}</TableCell>
 							</TableRow>
