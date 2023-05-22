@@ -6,7 +6,7 @@ export class SavedGame {
     @PrimaryColumn()
     id: string;
 
-    @ManyToMany(() => User, (user) => user.savedGames, {eager: true})
+    @ManyToMany(() => User, (user) => user.savedGames)
     players: User[];
 
 	@Column("int", { array: true })
@@ -15,6 +15,6 @@ export class SavedGame {
 	@CreateDateColumn()
 	date : Date;
 
-	@ManyToOne(() => User, (user) => user.wonGames, {eager: true})
+	@ManyToOne(() => User, (user) => user.wonGames)
 	winner : User;
 }

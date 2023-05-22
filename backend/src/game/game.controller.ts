@@ -5,6 +5,8 @@ import { ATGuard } from '../users/guard/access-token.guard';
 import { CurrentUser } from '../users/decorators/current-user.decorator';
 import { User } from '../model/user.entity';
 import { ValideIdPipe } from '../pipe/validateID.pipe';
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { RestrictedUserDto } from '../users/dtos/user-restricted.dto';
 
 @Controller('game')
 export class GameController {
@@ -42,6 +44,7 @@ export class GameController {
 	}
 
 	@UseGuards(ATGuard)
+	@Serialize(RestrictedUserDto)
 	@Get('/list/:page')
 	async getLeaderboard(@Param('page', ValideIdPipe) page: number) {
 		const pageNumber = +page;
