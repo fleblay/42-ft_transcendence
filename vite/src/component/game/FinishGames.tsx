@@ -72,9 +72,9 @@ export function FinishGames() {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{listGames.map((game) => (
+						{listGames.map((game, index) => (
 							<TableRow
-								key={game.id}
+								key={game.id+'-'+index}
 								sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 							>
 								<TableCell component="th" scope="row">
@@ -87,10 +87,10 @@ export function FinishGames() {
 											if (b.id === game.winner.id) return 1;
 											return 1;
 										}).map((player: Partial<UserInfo>, index, players) => {
-											return <>
-											<Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
+											return <React.Fragment key={player.id}>
+											<Link component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
 											{index != players.length - 1 ? " - " : ""}
-											</>
+											</React.Fragment>
 										})
 									}
 								</TableCell>

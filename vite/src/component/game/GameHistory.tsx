@@ -94,10 +94,10 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 								<TableCell component="th" scope="row">
 									{
 										row.players.map((player: Partial<UserInfo>, index) => {
-											return <>
-											<Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
+											return <React.Fragment key={player.id} >
+											<Link component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
 											{index != row.players.length - 1 ? " - " : ""}
-											</>
+											</React.Fragment>
 										})
 									}
 								</TableCell>
