@@ -53,15 +53,19 @@ export function NotifcationBar() {
                 return;
             setNotifications((notifications) => notifications + 1);
         }
-        const dellBellNotification = (data: Notification) => {
-            console.log("notification dell bell", data);
-            if (notifications > 0)
-                setNotifications((notifications) => notifications - 1);
+        const dellBellNotification = (data: Notification | number) => {
+            setNotifications((notifications) => {
+                    if (notifications === 0)
+                        return notifications;
+                    return notifications - 1;});
         }
         customOn('notification.new', addBellNotification)
         customOn('notification.ack', dellBellNotification)
+        customOn('notification.delete', dellBellNotification);
+
 
         return (() => {
+            customOff('notification.delete', dellBellNotification);
             customOff('notification.new', addBellNotification);
             customOff('notification.ack', dellBellNotification);
         })
