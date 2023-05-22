@@ -21,7 +21,7 @@ export function NotifcationBar() {
     }, [location])
 
     React.useEffect(() => {
-        apiClient.get("/api/notification/noRead").then((response) => {
+        apiClient.get("/api/notification/noread").then((response) => {
             console.log("notifications no read", response);
             setNotifications(response.data);
                 return;

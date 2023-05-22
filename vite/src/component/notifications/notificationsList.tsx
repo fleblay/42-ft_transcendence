@@ -23,7 +23,7 @@ export function NotificationsList() {
 
 
 	React.useEffect(() => {
-		apiClient.get("/api/notification/myNotifications").then((response) => {
+		apiClient.get("/api/notification/mynotifications").then((response) => {
 			console.log("notification : ", response);
 			if (response.data.length === 0) {
 				setNotifications(null);
