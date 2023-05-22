@@ -151,7 +151,7 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		try {
 			console.log('trying to find or create game', data)
 			//const gameId = this.gameService.findOrCreate(data[0].map)
-			const gameId = this.gameService.findOrCreate(data.options)
+			const gameId = this.gameService.findOrCreate(user, data.options)
 			console.log('After log', gameId)
 			//console.log("Game id is : ", gameId);
 			return gameId

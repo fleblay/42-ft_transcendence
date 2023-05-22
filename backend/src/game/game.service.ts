@@ -35,8 +35,8 @@ export class GameService {
 		return game.id
 	}
 
-	findOrCreate(options: GameOptions): UUID {
-		let game = this.gameCluster.findAvailable()
+	findOrCreate(user: User, options: GameOptions): UUID {
+		let game = this.gameCluster.findAvailable(user)
 		if (game === null)
 			game = this.gameCluster.createGame(false, options);
 		return game.id

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CurrentGame, SocketId, UUID, UserState, UserStatus } from '../type';
 import { Server, Socket } from 'socket.io'
 import { GameStatus } from './game';
+import { User } from 'src/model/user.entity';
 
 //server.to(gameId).emit('message')
 
@@ -42,9 +43,9 @@ export class GameCluster {
 		return this.gamesMap.get(gameId)
 	}
 
-	findAvailable() {
+	findAvailable(user: User): Game | null {
 		for (const game of this.gamesMap.values()) {
-			if (!game.privateGame && game.freeSlot)
+			if (!game.privateGame && game.freeSlot && game.status === GameStatus.waiting && !game.players.find((player) => player.user.id === user.id))
 				return game;
 		}
 		return null;
