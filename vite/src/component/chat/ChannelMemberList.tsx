@@ -312,11 +312,12 @@ export function MemberList({ channelId }: { channelId: string }) {
 		};
 
 		const handleClickBan = () => {
-			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { ban: (!member.banned) }).
+			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { ban: (!member.banned), kick: (!member.banned ? true : undefined)}).
 				then(() => console.log("Ban : OK"))
 				.catch((error) => {
 					console.log(error);
 				});
+				/*
 			if (!member.banned) {
 				apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { kick: true }).
 					then(() => console.log("Ban : OK"))
@@ -324,6 +325,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 						console.log(error);
 					});
 			}
+			*/
 			setAnchorEl(null);
 		};
 
