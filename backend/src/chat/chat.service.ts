@@ -300,7 +300,7 @@ export class ChatService implements OnModuleInit {
 		await this.membersRepo.save(member);
 	}
 
-	async getMessages(user: User, channelId: number, offset: number = 0): Promise<Message[]> {
+	async getMessages(user: User, channelId: number): Promise<Message[]> {
 		const member = await this.getMemberOfChannel(user, channelId);
 		if (!member)
 			throw new NotFoundException('Member not found, the channel may have been deleted');
@@ -324,8 +324,6 @@ export class ChatService implements OnModuleInit {
 				createdAt: true,
 				owner: { user: { id: true, username: true, blockedId: true, friendId: true, rank: true }, role: true, banned: true, left: true, muteTime: true },
 			},
-			skip: offset,
-			take: 10,
 		});
 		await this.ackChannel(user, channelId);
 		return messages;

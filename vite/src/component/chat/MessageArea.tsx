@@ -17,8 +17,6 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 	const { user } = useAuthService()
 	const { customEmit, customOn, customOff, addSubscription } = useContext(SocketContext);
 
-	const [offset, setOffset] = useState(0);
-
 	const navigate = useNavigate();
 
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -26,31 +24,27 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 
 	const messageAreaRef = useRef<HTMLUListElement>(null);
 
-	const requestMessages = useCallback((overwriteOffset?: number) => {
-		apiClient.get<Message[]>(`/api/chat/channels/${channelId}/messages?offset=${overwriteOffset !== undefined ? overwriteOffset : offset}`).then(({ data }) => {
-			setMessages((messages) => {
-				return [...data, ...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-			});
-			if (data && data.length > 0)
-				setOffset((offset) => overwriteOffset || offset + 10);
+	const requestMessages = useCallback(() => {
+		apiClient.get<Message[]>(`/api/chat/channels/${channelId}/messages`).then(({ data }) => {
+			setMessages(data.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()));
 		}).catch((error) => {
 			console.log(error);
 		});
-	}, [channelId, offset]);
+	}, [channelId]);
 
 	useEffect(() => {
-		setOffset(0);
 		setMessages([]);
-		requestMessages(0);
-		if (messageAreaRef.current) {
-			messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'auto' });
-		}
+		requestMessages();
 		return addSubscription(`/chat/${channelId}`);
 	}, [channelId]);
 
 	useEffect(() => {
 		if (messageAreaRef.current) {
 			const element = messageAreaRef.current;
+
+			if (element.scrollTop === 0) {
+				element.scrollTo({ top: element.scrollHeight, behavior: 'auto' });
+			}
 			if (Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) <= 250)
 				element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' });
 		}
@@ -124,15 +118,6 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		});
 	}
 
-
-	function onScroll(event: React.UIEvent<HTMLUListElement, UIEvent>) {
-		const element = event.currentTarget;
-		if (element.scrollTop === 0) {
-			requestMessages();
-			element.scrollTo({ top: 1, behavior: 'auto' });
-		}
-	}
-
 	const [blockedList, setBlockedList] = useState<number[]>([]);
 	useEffect(() => {
 		apiClient.get<plainUser[]>(`/api/users/blocked`).then(({ data }) => {
@@ -188,7 +173,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 
 	return (
 		<>
-			<List sx={{ height: '50vh', overflow: 'auto' }} ref={messageAreaRef} onScroll={onScroll}>
+			<List sx={{ height: '50vh', overflow: 'auto' }} ref={messageAreaRef} >
 				{
 					messages.reduce((acc: Message[][], message: Message) => {
 						if (acc.length === 0) {

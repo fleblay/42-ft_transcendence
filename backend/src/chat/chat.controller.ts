@@ -105,8 +105,8 @@ export class ChatController {
 	}
 
 	@Get('channels/:id/messages')
-	getMessages(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Query('offset', ValideIdPipe) offset: number): Promise<Message[]> {
-		return this.chatService.getMessages(user, channelId, offset || 0);
+	getMessages(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): Promise<Message[]> {
+		return this.chatService.getMessages(user, channelId);
 	}
 
 	// NOTE: A TESTER
