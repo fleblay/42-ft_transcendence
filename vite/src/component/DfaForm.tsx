@@ -3,7 +3,7 @@ import axios from "axios";
 import TextField from '@mui/material/TextField';
 import Button, { buttonClasses } from '@mui/material/Button';
 import { Container } from "@mui/system";
-import { Paper, Box, Typography, Grid } from '@mui/material';
+import { Paper, Box, Typography, Grid, Alert } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthService } from "../auth/AuthService";
 import AuthCode from "react-auth-code-input";
@@ -63,7 +63,6 @@ export function DfaForm() {
                     <Box sx={{ my: 5 }}>
                         <Typography variant="h4" align="center"> Two Factor Authentification</Typography>
                     </Box>
-                    <div>{info}</div>
                     <form onSubmit={handleSubmit}>
 
                         <Grid container spacing={2} alignItems="center">
@@ -77,6 +76,8 @@ export function DfaForm() {
                             </Grid>
                         </Grid>
                     </form>
+                    { info && <Alert severity="warning">{info}</Alert>}
+
                 </Paper>
             </Container>
         </div>
