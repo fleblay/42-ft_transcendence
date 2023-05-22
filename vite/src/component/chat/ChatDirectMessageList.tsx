@@ -32,7 +32,7 @@ const FriendDisplay: FC<FriendDisplayProps> = ({ originalMember, channel, mooveT
 
 	useEffect(() => {
 		return addSubscription(`/player/${member.user.id}`);
-	}, []);
+	}, [member]);
 
 	useEffect(() => {
 		function onFriendUpdate({ userId, event }: { userId: number, event: string }) {

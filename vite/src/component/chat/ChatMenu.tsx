@@ -90,7 +90,7 @@ export default function ChatMenu() {
 					<ListItemIcon>
 						<StarBorder />
 					</ListItemIcon>
-					<ListItemText primary="My channel" />
+					<ListItemText primary="My subscribed channels" />
 					{roomsMenu ? <ExpandLess /> : <ExpandMore />}
 				</ListItemButton>
 				<Collapse in={roomsMenu} timeout="auto">
