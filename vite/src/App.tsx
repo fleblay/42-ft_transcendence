@@ -10,7 +10,6 @@ import { MenuBar } from './component/Menu'
 import { ProfilPlayer } from './component/ProfilPlayer'
 import { UsernameDialog } from './component/UsernameDialog'
 import { FriendList } from './component/FriendList'
-import { BlockedList } from './component/BlockedList';
 import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
 import { GamePage } from './component/game/GamePage';
