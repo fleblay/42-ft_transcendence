@@ -131,7 +131,7 @@ export function NotificationsList() {
 						</List>
 					</Box>
 				</Box>
-				{notifications && <Grid container justifyContent="flex-end">
+				{notifications && Object.values(notifications).length > 10 &&  <Grid container justifyContent="flex-end">
 				{ currentPage !== 1 && <Button variant="outlined" onClick={() => {
 					if (currentPage > 0) {
 						setCurrentPage(currentPage - 1)
