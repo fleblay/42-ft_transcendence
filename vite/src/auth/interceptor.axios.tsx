@@ -82,7 +82,8 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 				}
 				else {
 					console.log("error in interceptor", error);
-					setError({ message, status });
+					if (!error.response.config.noError)
+						setError({ message, status });
 					if (error.response.config.noRedirect)
 						return Promise.reject(error)
 					if (status === 400)

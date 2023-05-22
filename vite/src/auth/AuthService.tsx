@@ -15,7 +15,7 @@ interface AuthContextType {
 	register: (user: RegisterData) => Promise<void>;
 	login: (user: LoginData) => Promise<void>;
 	logout: () => void;
-	getUser: () => Promise<void>;
+	getUser: (ignoreLogMsg?: boolean) => Promise<void>;
 }
 
 //1.Definit la value passe pour tous les enfants du AuthContext.Provider
@@ -29,19 +29,21 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	const location = useLocation();
 	const { setError } = useContext(ErrorProviderContext);
 
-	const getUser = async () => {
+	const getUser = async (ignoreLogMsg?: boolean) => {
 		try {
 			// @ts-ignore
 			const response = await apiClient({
 				method: 'get',
 				url: '/api/users/me',
-				noRedirect: allRoutes.find(el => el.path === window.location.pathname)?.public
+				noRedirect: allRoutes.find(el => el.path === window.location.pathname)?.public,
+				noError: allRoutes.find(el => el.path === window.location.pathname)?.public
 			})
 			if (response.status === 200) {
 				setUser(response.data);
 				console.log("AuthService : me is :", response.data)
 				if (allRoutes.find(el => el.path === window.location.pathname)?.public) {
-					setError({ status: 200, message: 'Already logged in' })
+					if (!ignoreLogMsg)
+						setError({ status: 200, message: 'Already logged in' })
 					nav('/game', { replace: true })
 				}
 			}
@@ -61,7 +63,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 			axios
 				.post("/api/auth/register", registerData)
 				.then(async () => {
-					await getUser()
+					await getUser(true)
 					resolve();
 				})
 				.catch((error) => {
@@ -85,7 +87,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 						console.log('im login, redirect to', from?.pathname);
 						nav(from?.pathname || '/', { replace: true })
 					}
-					await getUser()
+					await getUser(true)
 					resolve();
 				})
 				.catch((error) => {

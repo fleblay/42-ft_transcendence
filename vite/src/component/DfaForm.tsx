@@ -42,7 +42,7 @@ export function DfaForm() {
         axios.post('/api/auth/validate-dfa', { code: result })
             .then(async (response) => {
                 console.log('/game')
-                await auth.getUser()
+                await auth.getUser(true)
                 navigate("/game", { replace: true });
             }).catch((error) => {
                 let errorInfo = {
