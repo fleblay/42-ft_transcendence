@@ -19,7 +19,6 @@ export class Notification {
     @Column()
 	type: NotificationType;
 
-
 	// user or channel id
 	@Column()
 	contentId : number;

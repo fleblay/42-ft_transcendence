@@ -56,16 +56,21 @@ export class NotificationService {
 
 	async generateDirectMessageNotification(receiver: User, data: Message): Promise<Notification | null> {
 		////console.log("generate notification");
-		const notification: Notification | undefined = (await this.repo.find({
+		const notification: Notification | null = (await this.repo.findOne({
 			where: {
 				type: "directMessage",
 				contentId: data.channel.id,
-				user: { id: receiver.id }
+				user: { id: receiver.id },
+				read: false
+			},
+			select: {
+				id: true, contentId: true, createdAt: true, deletedAt: true, name: true, read: true, type: true,
+				user: { id: true, username: true }
 			}
-		}))?.find(notification => notification.read === false);
+		}))
 
-		//console.log("notification find", notification);
-		if (notification && notification.read === false) {
+		console.log("notification find", notification);
+		if (notification) {
 			return null;
 		}
 		else {
@@ -86,7 +91,7 @@ export class NotificationService {
 			receiver = (await this.chatService.getChannelMembers(data.channel.id)).find(member => member.id !== data.owner.id)?.user;
 		}
 		else if (receiverId) {
-			receiver = await this.usersService.findOne(receiverId);
+			receiver = await this.usersService.restrictFindOne(receiverId);
 		}
 		let notification: Notification | null = null;
 		if (!receiver) {

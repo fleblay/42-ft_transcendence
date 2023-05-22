@@ -87,6 +87,16 @@ export class UsersService implements OnModuleInit {
 		return foundUser
 	}
 
+	async restrictFindOne(id: number) : Promise<User | null> {
+		if (!id || typeof id !== 'number') return null;
+		if (id < 0 || id > 2147483647) return null;
+		let foundUser: User | null = await this.repo.findOne({
+			where: { id },
+			select: { username: true, id: true }
+		})
+		return foundUser
+	}
+
 	async findOneByUsername(username: string) {
 		if (!username) return null;
 		try {

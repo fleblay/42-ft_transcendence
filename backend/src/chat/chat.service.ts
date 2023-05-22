@@ -164,7 +164,7 @@ export class ChatService implements OnModuleInit {
 		// If not, create a new member
 		else {
 			joiner = this.membersRepo.create({
-				user: addedUser,
+				user: {id: addedUser.id, username: addedUser.username},
 				channel,
 				messages: [],
 				role: (options?.owner) ? "owner" : "regular"

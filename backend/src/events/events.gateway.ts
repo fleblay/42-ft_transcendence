@@ -77,9 +77,11 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 		this.friendsService.setWsServer(server)
 		this.chatService.setWsServer(server)
 		this.notificationService.setWsServer(server)
-		instrument(this.server, {
-			auth: false
-		})
+		if (process.env.NODE_ENV == "development") {
+			instrument(this.server, {
+				auth: false
+			})
+		}
 	}
 
 	async handleConnection(socket: Socket) {
