@@ -7,6 +7,7 @@ import { useAuthService } from '../../auth/AuthService';
 import apiClient from '../../auth/interceptor.axios';
 import { SocketContext } from '../../socket/SocketProvider';
 import { Channel, GameStatus, IgameInfo, Member, projectile } from "../../types";
+import { InvitedFriends } from '../InvitedFriends';
 
 interface Iprops {
 	gameInfo: IgameInfo,
@@ -169,30 +170,9 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 							</Box>
 							<Typography sx={{ pl: 2 }}>Waiting for players</Typography>
 							{
-								gameInfo.private &&
-								<IconButton sx={{ ml: 2 }} size='small' onClick={handleFriendsList}>
-									Invite a connected friend
-									<PersonAdd />
-								</IconButton>
+								gameInfo.private && <InvitedFriends type='game' isConnected/>
 							}
-							<Menu
-								anchorEl={anchorEl}
-								open={anchorEl !== null}
-								onClose={closeFriendsList}
-							>
-								{
-									dmChannelsList?.length
-										? dmChannelsList.map((channel) => (
-											<MenuItem key={channel.friend.user.id}
-												disabled={invitedFriends[channel.friend.user.id]}
-												onClick={() => inviteFriendToGame(channel)}
-											>{`Invite ${channel.friend.user.username}`}
-
-											</MenuItem>
-										))
-										: <MenuItem disabled>No connected friends</MenuItem>
-								}
-							</Menu>
+					
 
 						</div>
 					}

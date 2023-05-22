@@ -1,15 +1,23 @@
 
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChannelInfo } from '../../types';
 import apiClient from '../../auth/interceptor.axios';
 import { Alert, Box, Button, Container, Divider, FormControl, IconButton, Input, InputAdornment, InputLabel, Modal, TextField, Typography } from '@mui/material';
+import { InvitedFriends } from '../InvitedFriends';
 
 export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, open: boolean, handleClose: () => void }> = ({ channelInfo, open, handleClose }) => {
 
-	const [memberInvite, setMemberInvite] = useState<string>("");
 	const [error, setError] = useState<string>("")
+	const [listMembers, setListMembers] = useState<number[]>([])
 
+	useEffect(() => {
+		if (!open) return;
+		if (!channelInfo) return;
+		apiClient.get(`/api/chat/channels/${channelInfo.id}/members`).then((response) => {
+			setListMembers(response.data.map((member: any) => member.user.id))
+		})
+	}, [channelInfo, open])
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -28,14 +36,7 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 			handleClose();
 		})
 	}
-	function handleInviteMember() {
-		if (memberInvite.length < 3) return;
-		apiClient.post(`/api/chat/channels/${channelInfo?.id}/join`, {
-			username: memberInvite
-		}).then(() => {
-			setMemberInvite("")
-		});
-	}
+
 	return (
 		<Modal open={open} onClose={handleClose} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 			<Container maxWidth="sm" className="centered-container" >
@@ -70,23 +71,7 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 
 					{
 						channelInfo?.private
-						&& <FormControl sx={{ m: 1, width: '25ch' }} variant="standard">
-							<InputLabel>Invite members</InputLabel>
-							<Input
-								type='text'
-								value={memberInvite}
-								onChange={(e) => setMemberInvite(e.target.value)}
-								endAdornment={
-									<InputAdornment position="end">
-										<IconButton
-											onClick={handleInviteMember}
-										>
-											<PersonAddIcon />
-										</IconButton>
-									</InputAdornment>
-								}
-							/>
-						</FormControl>
+						&& <InvitedFriends type='chat' invited={listMembers.reduce<{[index:number]: boolean}>((acc, id) => { acc[id] = true; return acc }, {})} />
 
 					}
 					<Button onClick={handleClose}>Close</Button>
