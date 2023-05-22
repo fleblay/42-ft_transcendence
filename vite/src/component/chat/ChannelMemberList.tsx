@@ -10,7 +10,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import BlockIcon from '@mui/icons-material/Block';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import PeopleIcon from '@mui/icons-material/People';
 import { useAuthService } from '../../auth/AuthService'
 import { SocketContext } from "../../socket/SocketProvider";
 import { MuteMemberModal } from "./MuteMemberModal";
@@ -413,7 +413,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 							{member.states.includes("ingame") && <VideogameAssetIcon />}
 							{member.states.includes("watching") && <VisibilityIcon />}
 							{me?.user.blockedId.includes(member.user.id) && <BlockIcon />}
-							{me?.user.friendId.includes(member.user.id) && <FavoriteBorderIcon />}
+							{me?.user.friendId.includes(member.user.id) && <PeopleIcon />}
 						</Box>
 						<Box sx={{ marginLeft: "auto" }}>
 							<GenerateMemberActionList member={member} />
