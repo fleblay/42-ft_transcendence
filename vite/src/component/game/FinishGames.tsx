@@ -7,6 +7,10 @@ import { Link as LinkRouter } from "react-router-dom";
 import { UserInfo } from "../../types";
 import { SocketContext } from "../../socket/SocketProvider";
 
+import dayjs, { Dayjs } from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
+
 interface SaveGame {
 	date: string;
 	id: string;
@@ -88,7 +92,7 @@ export function FinishGames() {
 									}
 								</TableCell>
 								<TableCell align="right">{game.score.sort((a: number, b: number) => b - a).map((score: number) => score.toString()).join(' ')}</TableCell>
-								<TableCell align="right">{game.date}</TableCell>
+								<TableCell align="right">{dayjs(game.date).fromNow()}</TableCell>
 								<TableCell align="right">{game.winner?.username}</TableCell>
 							</TableRow>
 						))}
