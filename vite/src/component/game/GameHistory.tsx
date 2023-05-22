@@ -35,7 +35,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
         return {
 			id: game.id,
             players: game.players,
-            score: game.score.sort((a: number, b: number) => b - a).join(' '),
+            score: game.score.sort((a: number, b: number) => b - a).join(' : '),
             date: formattedDate(game.date),
             winner: game.players[0].username,
         }
@@ -93,8 +93,11 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 							>
 								<TableCell component="th" scope="row">
 									{
-										row.players.map((player: Partial<UserInfo>) => {
-											return <Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username} </Link>
+										row.players.map((player: Partial<UserInfo>, index) => {
+											return <>
+											<Link key={player.id} component={LinkRouter} to={`/player/${player.id}`}>{player.username}</Link>
+											{index != row.players.length - 1 ? " - " : ""}
+											</>
 										})
 									}
 								</TableCell>
