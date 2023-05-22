@@ -8,6 +8,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { UserInfo } from "../../types";
 
+import dayjs, { Dayjs } from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
+
 interface SaveGame {
 	date: string;
 	id: string;
@@ -95,7 +99,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 									}
 								</TableCell>
 								<TableCell align="right">{row.score}</TableCell>
-								<TableCell align="right">{row.date}</TableCell>
+								<TableCell align="right">{dayjs(row.date).fromNow()}</TableCell>
 								<TableCell align="right">
                                 <Link key={row.players[0].id} component={LinkRouter} to={`/player/${row.players[0].id}`}>{row.players[0].username} </Link>
                                 </TableCell>
