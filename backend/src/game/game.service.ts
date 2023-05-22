@@ -108,6 +108,7 @@ export class GameService {
 		const fullDB = await this.repo.createQueryBuilder("game")
 			.leftJoin("game.players", "player")
 			.addSelect(['player.id', 'player.username'])
+			.orderBy("date", "DESC")
 			.getMany()
 		return fullDB.filter((element: SavedGame) => element.players.find((player) => player.id == id) != undefined);
 	}
