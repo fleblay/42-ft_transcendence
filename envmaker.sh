@@ -19,6 +19,11 @@ then
 	EXTENSION=".backup"
 fi
 
+if [ "$1" == "dev" ]
+then
+	sed -i $EXTENSION "s/\(NODE_ENV=\).*/\1development/" .env
+fi
+
 sed -i $EXTENSION "s/\(POSTGRES_USER=\).*/\1${RANDOMINPUT[0]}/" .env
 sed -i $EXTENSION "s/\(POSTGRES_PASSWORD=\).*/\1${RANDOMINPUT[1]}/" .env
 sed -i $EXTENSION "s/\(COOKIE_KEY=\).*/\1${RANDOMINPUT[2]}/" .env

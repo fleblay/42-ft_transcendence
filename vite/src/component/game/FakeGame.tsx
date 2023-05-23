@@ -16,26 +16,27 @@ export function FakeGames() {
 			}
 		}
 	}
-
 	return (
-		<div>
-			<Typography textAlign="center">
-				<Button variant='contained' onClick={()=>handleClick(1)}>
-					Generate 1 fake game
-				</Button>
-				<Button variant='contained' onClick={()=>handleClick(10)}>
-					Generate 10 fake games
-				</Button>
-				<Button variant='contained' onClick={()=>handleClick(100)}>
-					Generate 100 fake games
-				</Button>
-				<Button variant='contained' onClick={()=>handleClick(1000)}>
-					Generate 1000 fake games
-				</Button>
-				<label>{info}</label>
-			</Typography>
-		</div>
+		<>
+		</>
+		/*
+			<div>
+				<Typography textAlign="center">
+					<Button variant='contained' onClick={() => handleClick(1)}>
+						Generate 1 fake game
+					</Button>
+					<Button variant='contained' onClick={() => handleClick(10)}>
+						Generate 10 fake games
+					</Button>
+					<Button variant='contained' onClick={() => handleClick(100)}>
+						Generate 100 fake games
+					</Button>
+					<Button variant='contained' onClick={() => handleClick(1000)}>
+						Generate 1000 fake games
+					</Button>
+					<label>{info}</label>
+				</Typography>
+			</div>
+	*/
 	)
 }
-
-
