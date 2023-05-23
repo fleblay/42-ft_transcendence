@@ -157,6 +157,8 @@ export class AuthService {
 
 	async validate42Code(code: string): Promise<Partial<Tokens>> {
 		//Fetch a token of type grant_type
+		if (!process.env.API_CLIENT_ID || !process.env.API_CLIENT_SECRET)
+			throw new BadRequestException('Missing API_CLIENT_ID or API_CLIENT_SECRET')
 		const formData = new FormData()
 		formData.append("grant_type", "authorization_code")
 		formData.append("client_id", `${process.env.API_CLIENT_ID}`)
@@ -168,6 +170,8 @@ export class AuthService {
 			method: "POST",
 			body: formData
 		}).then(response => response.json())
+		if (!tokenRequest.access_token || tokenRequest.error)
+			throw new BadRequestException('Invalid 42 code')
 
 		//Fetch info about the received token
 		const tokenInfo = await fetch('https://api.intra.42.fr/oauth/token/info', {
@@ -182,7 +186,8 @@ export class AuthService {
 				"Authorization": `Bearer ${tokenRequest.access_token}`
 			}
 		}).then(response => response.json())
-
+		if (!userId || !email || !username || !imageURL)
+			throw new BadRequestException('Invalid 42 user')
 		//Proof the token is valid
 		/*
 		console.log(`

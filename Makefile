@@ -5,8 +5,8 @@ ALL_NETWORK			:= $(shell docker network ls --filter type=custom -q)
 
 #docker compose exec -ti postgres /bin/bash
 #export PGPASSWORD="$POSTGRES_PASSWORD" ; psql -d postgres -U $POSTGRES_USER
-#/d to list tables
-#select id, username, password from "user";
+#\d to list tables
+#select id, email, username, password from "user";
 
 
 all: build
