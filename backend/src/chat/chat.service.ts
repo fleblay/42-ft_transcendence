@@ -494,11 +494,14 @@ export class ChatService implements OnModuleInit {
 
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', await this.getChannelInfo(user, channelId));
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
+		if (!channel.private)
+		{
 		this.wsServer.to('/chat/public').emit('chat.public.update', {
 			id: channel.id,
 			name: channel.name,
 			hasPassword: !!channel.password
 		} as PublicChannel);
+	}
 	}
 
 	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {

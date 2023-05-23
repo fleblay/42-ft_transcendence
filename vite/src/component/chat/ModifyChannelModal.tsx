@@ -1,7 +1,7 @@
 
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useEffect, useState } from 'react';
-import { ChannelInfo } from '../../types';
+import { ChannelInfo, Member } from '../../types';
 import apiClient from '../../auth/interceptor.axios';
 import { Alert, Box, Button, Container, Divider, FormControl, IconButton, Input, InputAdornment, InputLabel, Modal, TextField, Typography } from '@mui/material';
 import { InvitedFriends } from '../InvitedFriends';
@@ -15,7 +15,9 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 		if (!open) return;
 		if (!channelInfo) return;
 		apiClient.get(`/api/chat/channels/${channelInfo.id}/members`).then((response) => {
-			setListMembers(response.data.map((member: any) => member.user.id))
+			setListMembers(response.data
+				.filter((member: Member) => member.left === false)
+				.map((member: Member) => member.user.id))
 		})
 	}, [channelInfo, open])
 
@@ -71,7 +73,7 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 
 					{
 						channelInfo?.private
-						&& <InvitedFriends type='chat' invited={listMembers.reduce<{[index:number]: boolean}>((acc, id) => { acc[id] = true; return acc }, {})} />
+						&& <InvitedFriends type='chat' invited={listMembers.reduce<{[index:number]: boolean}>((acc, id) => {acc[id] = true; return acc }, {})} />
 
 					}
 					<Button onClick={handleClose}>Close</Button>
