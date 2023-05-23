@@ -35,14 +35,16 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		return socket.emit(eventname, { ...data, _access_token: access_token }, usedCallback)
 	}
 
+/*
 	useEffect(() => {
 		function displayListEvent() {
-			//console.log('List of events on', listOn.current)
-			//console.log('List of subscriptions', subscription)
+			console.log('List of events on', listOn.current)
+			console.log('List of subscriptions', subscription)
 		}
 		const intervalId = setInterval(displayListEvent, 5000)
 		return () => clearInterval(intervalId)
 	}, [listOn.current, subscription])
+*/
 
 	function customOn(eventName: string, callback: (data: any) => void) {
 		if (!socket) return null;

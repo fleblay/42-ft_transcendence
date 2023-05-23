@@ -20,6 +20,7 @@ import { Request as ExpressRequest } from 'express';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
 import { FriendsService } from '../friends/friends.service';
 import { RestrictedUserDto } from './dtos/user-restricted.dto';
+import { UsernameDto } from './dtos/username.dto';
 
 @Controller('users')
 export class UsersController {
@@ -63,7 +64,7 @@ export class UsersController {
 	@Patch('/me')
 	@UseGuards(ATGuard)
 	@Serialize(UserDto)
-	changeUsername(@CurrentUser() user: User, @Body() body: { username: string }) {
+	changeUsername(@CurrentUser() user: User, @Body() body: UsernameDto) {
 		return this.usersService.changeUsername(user, body.username);
 	}
 

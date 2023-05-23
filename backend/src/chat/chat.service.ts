@@ -159,7 +159,7 @@ export class ChatService implements OnModuleInit {
 		// If not, create a new member
 		else {
 			joiner = this.membersRepo.create({
-				user: {id: addedUser.id, username: addedUser.username},
+				user: { id: addedUser.id, username: addedUser.username },
 				channel,
 				messages: [],
 				role: (options?.owner) ? "owner" : "regular"
@@ -486,14 +486,13 @@ export class ChatService implements OnModuleInit {
 
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.modify.channel', await this.getChannelInfo(user, channelId));
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
-		if (!channel.private)
-		{
-		this.wsServer.to('/chat/public').emit('chat.public.update', {
-			id: channel.id,
-			name: channel.name,
-			hasPassword: !!channel.password
-		} as PublicChannel);
-	}
+		if (!channel.private) {
+			this.wsServer.to('/chat/public').emit('chat.public.update', {
+				id: channel.id,
+				name: channel.name,
+				hasPassword: !!channel.password
+			} as PublicChannel);
+		}
 	}
 
 	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channel?: Channel) => Promise<any>) {
