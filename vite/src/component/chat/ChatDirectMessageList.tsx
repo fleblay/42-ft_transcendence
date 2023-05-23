@@ -109,7 +109,6 @@ export function MyDirectMessageList() {
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
 			console.log("onModifyChannel dm", data)
-
 			if (!data)
 				return;
 			if (data.members.length != 2)
@@ -158,6 +157,7 @@ export function MyDirectMessageList() {
 			{Object.values(myDmList)
 				.sort((a: Channel, b: Channel) => b.unreadMessages - a.unreadMessages)
 				.map((channel: Channel) => {
+					console.log("channel", channel);
 					const friend = channel.members[0].user.id == auth.user?.id ? channel.members[1] : channel.members[0];
 					return (
 						<FriendDisplay key={channel.id} originalMember={friend} channel={channel} mooveToChannel={mooveToChannel} />

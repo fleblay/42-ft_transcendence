@@ -182,6 +182,7 @@ export class ChatService implements OnModuleInit {
 			}
 		});
 		this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
+		console.log("emit To all Members in join channel : ", channelId, "chat.modify.channel");
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
 		if (!channel.private) {
@@ -263,9 +264,10 @@ export class ChatService implements OnModuleInit {
 			content: messageData.content
 		});
 		await this.messagesRepo.save(newMessage);
-		console.log("newMessage : ", newMessage);
+		//console.log("newMessage : ", newMessage);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
 		const nameOfEmmiter = newMessage.channel.directMessage ? "unreadMessage.dm" : "unreadMessage.channel";
+		console.log("Emit newMessage : ", nameOfEmmiter)
 		this.emitToAllMembers(channelId, nameOfEmmiter, async (member: Member) => {
 			const unreadMessages = await this.getUnreadMessages(member.user, channelId);
 			return {
@@ -501,7 +503,7 @@ export class ChatService implements OnModuleInit {
 
 	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {
 		const channel = await this.getOneChannel(channelId);
-
+		console.log("emitToAllMembers : ", channel, event);
 		if (!channel)
 			return;
 		for (const member of channel.members) {
@@ -647,7 +649,7 @@ export class ChatService implements OnModuleInit {
 		});
 		if (!member || !member.lastRead)
 			return 0;
-		console.log("getUnreadMessages : ", member.lastRead);
+		//console.log("getUnreadMessages : ", member.lastRead);
 
 
 		return await this.messagesRepo.count({
@@ -662,10 +664,10 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async getDMChannel(me: User, friend: Partial<User>): Promise<Channel | null> {
-		console.log("getDMChannel : ", me, friend);
+		//console.log("getDMChannel : ", me, friend);
 		if (!friend.id || friend.id === me.id)
 			return null;
-		console.log("getDMChannel :searching channel");
+		//console.log("getDMChannel :searching channel");
 		const member = await this.membersRepo.findOne({
 			where: {
 				user: {
@@ -720,6 +722,7 @@ export class ChatService implements OnModuleInit {
 				this.membersRepo.save(member);
 			});
 			await this.channelsRepo.save(channel);
+			this.emitToAllMembers(channel.id, 'chat.modify.channel', this.cbEmitAll);
 			return channel.id;
 		}
 		else {
