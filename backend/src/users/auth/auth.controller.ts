@@ -27,12 +27,11 @@ export class AuthController {
 	@Get('/refresh')
 	@UseGuards(RTGuard)
 	async refresh(@Request() req: ExpressRequest, @Response({ passthrough: true }) res: ExpressResponse) {
-		//console.log('refresh');
 		// token dans X-Refresh-Token
 		const refreshToken = req.cookies['refresh_token'];
 		const tokens = await this.authService.refreshToken(refreshToken) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { maxAge: AccessTokenTime });
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: RefreshTokenTime});
+		res.cookie('access_token', tokens.accessToken, { sameSite: true, maxAge: AccessTokenTime });
+		res.cookie('refresh_token', tokens.refreshToken, { sameSite: true, httpOnly: true, maxAge: RefreshTokenTime});
 		return { ok: true };
 	}
 
@@ -40,8 +39,8 @@ export class AuthController {
 	@Post('/register')
 	async createUser(@Body() body: CreateUserDto, @Response({ passthrough: true }) res: ExpressResponse) {
 		const tokens = await this.authService.register(body) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { maxAge: RefreshTokenTime});
-		res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: RefreshTokenTime});
+		res.cookie('access_token', tokens.accessToken, { sameSite: 'lax', maxAge: RefreshTokenTime});
+		res.cookie('refresh_token', tokens.refreshToken, { sameSite: 'lax', httpOnly: true, maxAge: RefreshTokenTime});
 		return;
 	}
 
@@ -50,12 +49,12 @@ export class AuthController {
 
 		const tokens = await this.authService.login(body);
 		if (tokens.dfaToken) {
-			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: DfaTokenTime });
+			res.cookie('dfa_token', tokens.dfaToken, { sameSite: 'lax', httpOnly: false, maxAge: DfaTokenTime });
 			return { needDfa: true }
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
-			res.cookie('access_token', tokens.accessToken, { maxAge: RefreshTokenTime});
-			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: RefreshTokenTime });
+			res.cookie('access_token', tokens.accessToken, { sameSite: 'lax', maxAge: RefreshTokenTime});
+			res.cookie('refresh_token', tokens.refreshToken, { sameSite: 'lax', httpOnly: true, maxAge: RefreshTokenTime });
 		}
 	};
 
@@ -63,8 +62,8 @@ export class AuthController {
 	@UseGuards(ATGuard)
 	async logout(@Request() req: ExpressRequest, @Response({ passthrough: true }) res: ExpressResponse) {
 		const refreshToken = req.cookies['refresh_token'];
-		res.cookie('access_token', '', { maxAge: 0 });
-		res.cookie('refresh_token', '', { httpOnly: true, maxAge: 0 });
+		res.cookie('access_token', '', { sameSite: 'lax', maxAge: 0 });
+		res.cookie('refresh_token', '', { sameSite: 'lax', httpOnly: true, maxAge: 0 });
 		return this.authService.deleteRefreshToken(refreshToken);
 	}
 	@Get('/42externalauth')
@@ -80,12 +79,12 @@ export class AuthController {
 		console.log("\x1b[32mReceived code is :\x1b[0m", query.code)
 		const tokens = await this.authService.validate42Code(query.code)
 		if (tokens.dfaToken) {
-			res.cookie('dfa_token', tokens.dfaToken, { httpOnly: false, maxAge: DfaTokenTime });
+			res.cookie('dfa_token', tokens.dfaToken, { sameSite: 'lax', httpOnly: false, maxAge: DfaTokenTime });
 			res.redirect(302, '/dfa')
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
-			res.cookie('access_token', `${tokens.accessToken}`)
-			res.cookie('refresh_token', `${tokens.refreshToken}`)
+			res.cookie('access_token', `${tokens.accessToken}`,  { sameSite: 'lax', httpOnly: false, maxAge: AccessTokenTime })
+			res.cookie('refresh_token', `${tokens.refreshToken}`,  { sameSite: 'lax', httpOnly: true, maxAge: RefreshTokenTime })
 			res.redirect(302, '/')
 		}
 	}
@@ -115,9 +114,9 @@ export class AuthController {
 		const tokens = this.authService.getTokens(user);
 		if (tokens.accessToken && tokens.refreshToken) {
 			this.authService.saveRefreshToken(user.id, tokens.refreshToken);
-			res.cookie('access_token', tokens.accessToken, { maxAge: RefreshTokenTime});
-			res.cookie('refresh_token', tokens.refreshToken, { httpOnly: true, maxAge: RefreshTokenTime});
-			res.cookie('dfa_token', '', { httpOnly: false, maxAge: 0 });
+			res.cookie('access_token', tokens.accessToken, { sameSite: 'lax', maxAge: RefreshTokenTime});
+			res.cookie('refresh_token', tokens.refreshToken, { sameSite: 'lax', httpOnly: true, maxAge: RefreshTokenTime});
+			res.cookie('dfa_token', '', { sameSite: 'lax', httpOnly: false, maxAge: 0 });
 		}
 	}
 }
