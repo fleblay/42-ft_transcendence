@@ -31,14 +31,6 @@ export function MenuBar() {
 	const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 	const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 	const navigate = useNavigate();
-	const [imgPath, setImgPath] = React.useState<string>("/avatars/default.png");
-
-	React.useEffect(() => {
-		if (!auth.user) return;
-		const userId = auth.user.id;
-		setImgPath(`/avatars/${userId}.png`);
-	}, [auth.user])
-
 
 	const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
 		setAnchorElNav(event.currentTarget);
@@ -154,7 +146,7 @@ export function MenuBar() {
 
 					<Box display="flex" sx={{ flexGrow: 0, marginLeft: 'auto' }}>
 						<Button onClick={handleOpenUserMenu} sx={{ color: 'white', display: 'flex', gap: 1, fontWeight: 700 }}>
-							<Avatar alt={auth.user?.username} src={imgPath} />
+							<Avatar alt={auth.user?.username} src={`/avatars/${auth.user?.id}.png`} />
 							{auth.user?.username}
 						</Button>
 						<Menu
