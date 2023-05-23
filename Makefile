@@ -3,6 +3,10 @@ ALL_CONTAINERS		:= $(shell docker ps -a -q)
 ALL_VOLUMES			:= $(shell docker volume ls -q)
 ALL_NETWORK			:= $(shell docker network ls --filter type=custom -q)
 
+#export PGPASSWORD="$POSTGRES_PASSWORD" ; psql -d postgres -U $POSTGRES_USER
+#/d to list tables
+#select id, username, password from "user";
+
 
 all: build
 	docker-compose up --no-build
