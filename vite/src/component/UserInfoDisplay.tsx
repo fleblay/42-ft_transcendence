@@ -185,7 +185,8 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 					else
 						return <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAcceptFriend}>Accept Request</Button>;
 				}
-
+			default:
+				return <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend}>Add Friend</Button>;	
 		}
 	}
 
