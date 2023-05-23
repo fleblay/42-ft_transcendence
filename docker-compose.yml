@@ -5,7 +5,6 @@ volumes:
 
 networks:
   backend:
-  frontend:
 
 services:
   postgres:
@@ -55,13 +54,3 @@ services:
       - ./nginx/avatars:/www/avatars
     networks:
       - backend
-
-  pgadmin:
-    image: dpage/pgadmin4
-    env_file:
-      - .env
-    networks:
-      - backend
-    ports:
-      - 5050:80
-    restart: always

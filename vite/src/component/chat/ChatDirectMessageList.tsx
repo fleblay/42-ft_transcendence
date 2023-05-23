@@ -137,7 +137,7 @@ export function MyDirectMessageList() {
 			customOff('chat.channel.leave', onDeleteChannel);
 			customOff('unreadMessage.dm', onUnreadMessage);
 		};
-	}, [channelId]);
+	}, [channelId, myDmList]);
 
 
 	const mooveToChannel = (channelId: number) => {

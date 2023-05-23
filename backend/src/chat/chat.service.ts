@@ -40,8 +40,6 @@ export class ChatService implements OnModuleInit {
 			const channelId = await this.createChannel({ name: "general", private: false })
 			await this.joinChannel(adminUser, channelId, { owner: true })
 			await this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
-			await this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
-			await this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
 		}
 	}
 
@@ -498,7 +496,7 @@ export class ChatService implements OnModuleInit {
 	}
 	}
 
-	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {
+	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channel?: Channel) => Promise<any>) {
 		const channel = await this.getOneChannel(channelId);
 		if (!channel)
 			return;

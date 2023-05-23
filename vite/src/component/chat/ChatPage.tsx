@@ -118,6 +118,8 @@ export function ChatPage() {
 
 	useEffect(() => {
 		function onChannelModify(channel: Channel) {
+			if (channelId && channel.id !== +channelId)
+				return;
 			setChannelInfo((prev) => {
 				if (!prev)
 					return null;
@@ -128,7 +130,7 @@ export function ChatPage() {
 		return () => {
 			customOff('chat.modify.channel', onChannelModify);
 		}
-	}, []);
+	}, [channelId, channelInfo]);
 
 	useEffect(() => {
 		if (!channelId || channelId === 'friends')

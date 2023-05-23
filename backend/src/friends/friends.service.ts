@@ -44,8 +44,7 @@ export class FriendsService {
 			receiver: friend,
 			status: 'pending'
 		});
-		const save_request = await  this.friendReqRepo.save(newRequest);
-
+		const save_request = await this.friendReqRepo.save(newRequest);
 		this.usersService.unblockUser(user, friendId);
 		const newFriend = this.generateFriend(user, friend, newRequest);
 
@@ -92,14 +91,19 @@ export class FriendsService {
 		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: friendId, event: "accept" })
 		this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId: friendId, event: "me-accept" })
 
-		const friendData = this.generateFriend(user, friend, friendRequest);
+		const friendSender = this.generateFriend(user, friend, friendRequest);
 		this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', {
 			status: 'update',
-			friend: friendData,
+			friend: friendSender,
+		})
+		const friendReceiver = this.generateFriend(friend, user, friendRequest);
+		this.server.to(`/chat/friends/${friendId}`).emit('chat.friends.update', {
+			status: 'update',
+			friend: friendReceiver,
 		})
 
 		await this.chatService.joinDirectMessage(user, friendId);
-		return friendData
+		return friendSender;
 	}
 
 	async removeFriend(user: User, friendId: number) {
@@ -135,6 +139,18 @@ export class FriendsService {
 		else if (friendRequest.status == "accepted") {
 			this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: friendId, event: "remove" })
 			this.server.to(`/player/${friendId}`).emit('page.player', { userId: user.id, targetId: friendId, event: "me-remove" })
+
+			const friendRemove = this.generateFriend(user, friend, friendRequest);
+			this.server.to(`/chat/friends/${user.id}`).emit('chat.friends.update', {
+				status: 'removed',
+				friend: friendRemove,
+			})
+			const friendmeRemove = this.generateFriend(friend, user, friendRequest);
+			this.server.to(`/chat/friends/${friendId}`).emit('chat.friends.update', {
+				status: 'removed',
+				friend: friendmeRemove
+			})
+
 		}
 		return {
 			friendId: friendId,
