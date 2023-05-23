@@ -385,8 +385,6 @@ export class ChatService implements OnModuleInit {
 			throw new ForbiddenException('You must be owner or admin to do this');
 		if (modifyMember.role === 'owner')
 			throw new ForbiddenException('You can\'t modify owner');
-		if (modifyMember.role === 'admin' && requestingMember.role !== 'owner')
-			throw new ForbiddenException('You can\'t modify admin, only owner can do this');
 		if (options.role && options.role === 'owner' && requestingMember.role !== 'owner')
 			throw new ForbiddenException('You can\'t set owner, only owner can do this');
 	}

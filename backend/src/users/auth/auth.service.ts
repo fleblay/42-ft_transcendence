@@ -41,7 +41,7 @@ export class AuthService {
 
 
 	is2faCodeValid(dfaCode: string, user: User) {
-		
+
 		return authenticator.verify({ token: dfaCode, secret: user.dfaSecret })
 	}
 
@@ -122,7 +122,7 @@ export class AuthService {
 	async register(dataUser: CreateUserDto) {
 		if (dataUser.email.endsWith('@student.42.fr'))
 			throw new ForbiddenException('You can\'t register with a 42 email');
-		if (await this.usersService.findOneByEmail(dataUser.email.toLocaleLowerCase('en-US')))
+		if (await this.usersService.findOneByEmail(dataUser.email))
 			throw new ForbiddenException('Email is not unique');
 		let username = dataUser.username;
 		if (!username)
@@ -130,7 +130,7 @@ export class AuthService {
 		username = username.replace(/\s/g, '');
 		if (username.length < 3 || username.length > 10)
 			throw new BadRequestException('Username must be between 3 and 10 characters');
-		if (await this.usersService.findOneByUsername(username.toLocaleLowerCase('en-US')))
+		if (await this.usersService.findOneByUsername(username))
 			throw new ForbiddenException('Username is not unique');
 
 		dataUser.username = username;
