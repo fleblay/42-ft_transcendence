@@ -14,6 +14,7 @@ import { FriendsService } from '../friends/friends.service';
 import { ChatService } from '../chat/chat.service';
 import { authenticator } from 'otplib';
 import { ValideIdPipe } from 'src/pipe/validateID.pipe';
+import { hashPassword } from './auth/hashPassword';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -44,7 +45,7 @@ export class UsersService implements OnModuleInit {
 			const admin = this.create({
 				username: "admin",
 				email: "admin@42.fr",
-				password: process.env.RANDOM_NUMBER1,
+				password: await hashPassword(process.env.RANDOM_NUMBER1 as string),
 			})
 		}
 	}
@@ -200,7 +201,7 @@ export class UsersService implements OnModuleInit {
 			console.log("User is already blocked");
 			return;
 		}
-		this.friendsService.removeFriend(user, blockedId);
+		await this.friendsService.removeFriend(user, blockedId);
 		user.blockedId.push(blockedId);
 		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: blockedId, event: "blocked" })
 		this.server.to(`/player/${blockedId}`).emit('page.player', { userId: user.id, targetId: blockedId, event: "me-blocked" })
