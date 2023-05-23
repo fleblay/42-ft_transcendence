@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Game, Player, GameOptions } from './game';
 import { v4 as uuidv4 } from 'uuid';
 import { CurrentGame, SocketId, UUID, UserState, UserStatus } from '../type';
@@ -17,14 +17,15 @@ export class GameCluster {
 	private server: Server
 
 	constructor() {
+		return;
 		setInterval(() => {
-			/*
-			const info = []
+
+			const info: any[] = []
 			this.gamesMap.forEach((e) => {
 				info.push(e.players.map((e) => e.user.id).join('-'))
 			})
-			*/
-			//console.log("This is the game cluster", info)
+
+			console.log("This is the game cluster", info)
 		}, 5000)
 	}
 
@@ -150,7 +151,7 @@ export class GameCluster {
 		const client = this.getClientFromSocketId(userToFind.clientId);
 
 		if (!client) {
-			console.warn("\x1b[31mMISSING CLIENT\x1b[0m")
+			console.warn("\x1b[31mMissing client. This is due to a restart of the server?\x1b[0m")
 		}
 		if (viewer) {
 			if (client)

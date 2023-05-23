@@ -47,14 +47,12 @@ export class NotificationSubscriber implements EntitySubscriberInterface {
 
 	async afterInsertFriendRequest(event: InsertEvent<FriendRequest>) {
 		const notification = await this.notificationService.generateNotification( "friendRequest", event.entity, event.entity.receiver.id);
-		////console.log("notification generated", notification);
-
 	}
 
 	async afterInsertMember(event: InsertEvent<Member>) {
 		if (event.entity.role !== "owner" && event.entity.channel.private && event.entity.channel.directMessage === false) {
 			await this.notificationService.generateNotification("channelInvitation", event.entity, event.entity.user.id);
-	}
+		}
 	}
 
 

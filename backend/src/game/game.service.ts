@@ -61,8 +61,6 @@ export class GameService {
 	}
 
 	handlePlayerInput(client: Socket, user: User, data: PlayerInputDto) {
-		//console.log("service input handle")
-		//console.log("data is : ", data)
 		this.gameCluster.findOne(data.gameId)?.applyPlayerInput(user.id, { move: data.move, powerUp: data.powerup })
 	}
 
@@ -80,6 +78,7 @@ export class GameService {
 	}
 
 	async quitGame(userId: number, gameId: UUID) {
+		if (!gameId || typeof gameId !== 'string') return null;
 		this.server.to(`/player/${userId}`).emit('page.player', { userId, event: "leave" })
 		const game = this.gameCluster.playerQuit(gameId, userId);
 		if (game) {

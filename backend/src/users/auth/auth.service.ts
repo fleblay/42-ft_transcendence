@@ -41,7 +41,6 @@ export class AuthService {
 
 
 	is2faCodeValid(dfaCode: string, user: User) {
-		console.log("is2facodevalid")
 		return authenticator.verify({ token: dfaCode, secret: user.dfaSecret })
 	}
 
@@ -56,9 +55,7 @@ export class AuthService {
 
 	async validateAccessToken(bearerToken: string): Promise<User | null> {
 		try {
-			// console.log(`Bearer token in validate access token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.verify<{ sub: number, email: string }>(bearerToken, access_token_options) // compliant to security rules of year 3000
-			//console.log(`User id is `, jwtResponse)
 			return await this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
 			console.log(`Error in validate Token access is ${e}`)
@@ -78,13 +75,11 @@ export class AuthService {
 
 	async decodeToken(bearerToken: string): Promise<User | null> {
 		try {
-			// console.log(`Bearer token is ${bearerToken}`)
 			const jwtResponse = this.jwtService.decode(bearerToken);
 			if (jwtResponse == null) {
 				console.log(`error in decode token`)
 				return null
 			}
-			//console.log(`Decode :  `, jwtResponse);
 			return await this.usersService.findOne(jwtResponse.sub);
 		} catch (e) {
 			console.log("Error in decode Token is :", e)
@@ -110,7 +105,6 @@ export class AuthService {
 		}
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refreshToken);
-		// console.log(`tokens are ${tokens accessToken}`);
 		return tokens;
 	}
 
@@ -144,7 +138,6 @@ export class AuthService {
 		const user = await this.usersService.create(dataUser);
 		const tokens = this.getTokens(user);
 		await this.saveRefreshToken(user.id, tokens.refreshToken);
-		// console.log(`tokens are access [${tokens accessToken}], refresh [${tokens.refresh_token}]`);
 		return tokens;
 	}
 
@@ -174,7 +167,6 @@ export class AuthService {
 			method: "POST",
 			body: formData
 		}).then(response => response.json())
-		console.log("\x1b[32mResponse data is :\x1b[0m", tokenRequest)
 
 		//Fetch info about the received token
 		const tokenInfo = await fetch('https://api.intra.42.fr/oauth/token/info', {
@@ -182,7 +174,6 @@ export class AuthService {
 				"Authorization": `Bearer ${tokenRequest.access_token}`
 			}
 		}).then(response => response.json())
-		console.log("\x1b[32mToken Info is :\x1b[0m", tokenInfo)
 
 		//Make request using that token
 		const { id: userId, email, login: username, image: imageURL, ...rest } = await fetch('https://api.intra.42.fr/v2/me', {
@@ -192,6 +183,7 @@ export class AuthService {
 		}).then(response => response.json())
 
 		//Proof the token is valid
+		/*
 		console.log(`
 			userID : ${userId}
 			userEmail : ${email}
@@ -199,13 +191,13 @@ export class AuthService {
 			imageURL : ${imageURL.link}
 					`)
 		console.log("Other keys", Object.keys(rest))
+		*/
 
 		//Must use COOKIE to send access token because we cannot send Data Back AND send a redirect
 		const { refreshToken, accessToken, dfaToken, newUserId } = await this.login42API({ stud: true, email, password: "42" })
 		if (newUserId) {
 			try {
 				const img = await fetch(imageURL.link).then((response) => response.arrayBuffer())
-				console.log("img is : >\x1b[33m", img, "\x1b[0m<")
 				await sharp(img).resize(200, 200).toFile(`/usr/src/app/avatars/${newUserId}.png`)
 			} catch (e) {
 				console.log("Failed to sharp intra img url : ", e)

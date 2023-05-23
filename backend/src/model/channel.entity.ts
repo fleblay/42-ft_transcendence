@@ -39,7 +39,6 @@ export class Channel {
 
 	@AfterInsert()
 	afterInsert() {
-		console.log('Inserted Channel');
 		this.server.emit('chat.message.new', {content: this.name, id: this.id});
 	}
 }

@@ -26,6 +26,7 @@ export class UsersService implements OnModuleInit {
 		@Inject(forwardRef(() => FriendsService)) private friendsService: FriendsService,
 		private chatService: ChatService,
 	) {
+		return;
 		setInterval(() => { console.log("\x1b[34mConnected users are : \x1b[0m", this.connectedUsers) }, 5000)
 	}
 
@@ -40,7 +41,6 @@ export class UsersService implements OnModuleInit {
 	async onModuleInit() {
 		const adminUser = await this.repo.findOne({ where: { username: "admin" } })
 		if (!adminUser) {
-			console.log("creating admin user")
 			const admin = this.create({
 				username: "admin",
 				email: "admin@42.fr",
@@ -50,9 +50,7 @@ export class UsersService implements OnModuleInit {
 	}
 
 	async create(dataUser: Partial<User>) {
-		//console.log(`create user ${dataUser?.username} : ${dataUser?.email} : ${dataUser?.password}`);
 		const user: User = await this.repo.save({ ...dataUser, dfaSecret: authenticator.generateSecret() })
-		console.log("save user :", user);
 		if (dataUser.stud)
 			user.achievements.push("stud")
 		const savedUser: User = await this.repo.save(user);
@@ -102,7 +100,7 @@ export class UsersService implements OnModuleInit {
 		try {
 			return await this.repo.findOneBy({ username });
 		} catch (e) {
-			console.log("Error while findOneByUsername : ", e)
+			console.log("Not findind user by username", username)
 			return null
 		}
 	}
@@ -133,7 +131,6 @@ export class UsersService implements OnModuleInit {
 	}
 
 	isConnected(id: number): boolean {
-		// console.log(`id is ${id}user found connected status is`, this.connectedUsers.get(id))
 		return (this.connectedUsers.get(+id) != undefined)
 	}
 
@@ -145,7 +142,6 @@ export class UsersService implements OnModuleInit {
 	}
 
 	changeStatus(id: number, { newStatus, oldStatus }: { newStatus?: UserStatus, oldStatus?: UserStatus }) {
-		// console.log('changing status : new ', newStatus, 'old :', oldStatus)
 		if (!this.isConnected(id))
 			this.addConnectedUser(id);
 
@@ -162,7 +158,6 @@ export class UsersService implements OnModuleInit {
 	}
 
 	disconnect(id: number) {
-		console.log("user.service.disconnect")
 		this.changeStatus(id, { oldStatus: "online" })
 	}
 
@@ -173,7 +168,7 @@ export class UsersService implements OnModuleInit {
 				.resize(200, 200)
 				.toFile(path)
 		} catch (err) {
-			console.log("error while resizing image", err)
+			console.log("Got error while uploading avatar")
 			throw new BadRequestException("Unsupported format");
 		}
 		if (!user.achievements.includes("picture"))

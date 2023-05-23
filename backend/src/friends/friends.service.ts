@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, forwardRef } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FriendRequest, FriendRequestStatus } from "../model/friend-request.entity";
@@ -28,30 +28,23 @@ export class FriendsService {
 
 		const friend = await this.usersService.findOne(friendId);
 		if (!friend) {
-			console.log("User not found");
-			return null;
+			throw new BadRequestException("User not found");
 		}
 		if (user.id === friendId) {
-			console.log("You can't add yourself as a friend");
-			return null;
+			throw new BadRequestException("You can't add yourself as a friend");
 		}
 		if (friend.blockedId.includes(user.id)) {
-			console.log("You can't add as user that has blocked you");
-			return null;
+			throw new BadRequestException("You can't add as user that has blocked you");
 		}
 		if (await this.getFriendRequest(user, friendId)) {
-			console.log("You already sent a friend request to this user");
-			return null;
+			throw new BadRequestException("You already sent a friend request to this user");
 		}
 		const newRequest = this.friendReqRepo.create({
 			sender: user,
 			receiver: friend,
 			status: 'pending'
 		});
-		console.log("new friend request :", newRequest)
 		const save_request = await this.friendReqRepo.save(newRequest);
-		console.log("save friend request :", save_request)
-
 		this.usersService.unblockUser(user, friendId);
 		const newFriend = this.generateFriend(user, friend, newRequest);
 
@@ -74,18 +67,15 @@ export class FriendsService {
 	async acceptFriend(user: User, friendId: number) {
 		const friend = await this.usersService.findOne(friendId);
 		if (!friend) {
-			console.log("User not found");
-			return;
+			throw new BadRequestException("User not found");
 		}
 
 		if (user.id === friendId) {
-			console.log("You can't add yourself as a friend");
-			return;
+			throw new BadRequestException("You can't add yourself as a friend");
 		}
 		const friendRequest = await this.getFriendRequest(user, friendId, 'pending');
 		if (!friendRequest) {
-			console.log("You don't have a friend request from this user");
-			return;
+			throw new BadRequestException("You don't have a friend request from this user");
 		}
 		friendRequest.status = 'accepted';
 		this.friendReqRepo.save(friendRequest);
@@ -119,12 +109,12 @@ export class FriendsService {
 	async removeFriend(user: User, friendId: number) {
 		const friend = await this.usersService.findOne(friendId);
 		if (!friend) {
-			console.log("User not found");
+			throw new BadRequestException("User not found");
 			return;
 		}
 		const friendRequest = await this.getFriendRequest(user, friendId);
 		if (!friendRequest) {
-			console.log("You are not friends with this user");
+			throw new BadRequestException("You are not friends with this user");
 			return null;
 		}
 		const removeFriend = this.generateFriend(user, friendRequest.sender.id === user.id ? friendRequest.receiver : friendRequest.sender, friendRequest);
@@ -172,12 +162,12 @@ export class FriendsService {
 	async getFriendRequest(user: User, friendId: number, status?: FriendRequestStatus): Promise<FriendRequest | null> {
 		const friend = await this.usersService.findOne(friendId);
 		if (!friend) {
-			console.log("User not found");
+			throw new BadRequestException("User not found");
 			return null;
 		}
 
 		if (user.id === friendId) {
-			console.log("You can't add yourself as a friend");
+			throw new BadRequestException("You can't add yourself as a friend");
 			return null;
 		}
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { GameService } from './game.service'
 import { UUID, UserState } from '../type';
 import { ATGuard } from '../users/guard/access-token.guard';
@@ -38,7 +38,7 @@ export class GameController {
 	@Get("/quit/:gameId")
 	async quitGame(@Param('gameId') gameId: UUID, @CurrentUser() user: User) {
 		if (!user) {
-			throw new Error("No user");
+			throw new BadRequestException("No user");
 		}
 		return await this.gameService.quitGame(user.id, gameId)
 	}
@@ -49,10 +49,9 @@ export class GameController {
 	async getLeaderboard(@Param('page', ValideIdPipe) page: number) {
 		const pageNumber = +page;
 		if (isNaN(pageNumber) || pageNumber < 0) {
-			throw new Error("Invalid page number");
+			throw new BadRequestException("Invalid page number");
 		}
 		const games = await this.gameService.getListGames(+page);
-		//console.log('games: ', games);
 		return games;
 	}
 
@@ -61,7 +60,6 @@ export class GameController {
 	async getHistory(@Param('id', ValideIdPipe) id: number) {
 
 		const games = await this.gameService.getListGamesByUser(id);
-		//console.log('games: ', games);
 		return games;
 	}
 
