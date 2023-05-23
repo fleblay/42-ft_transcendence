@@ -13,18 +13,19 @@ interface InvitedFriendsProps {
     invited?: { [id: number]: boolean };
 }
 
-export function InvitedFriends({isConnected = false, type, invited = {}}: InvitedFriendsProps) {
+export function InvitedFriends({isConnected = false, type, invited}: InvitedFriendsProps) {
     
     type ShortDMChannel = { id: number, friend: Member }
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [dmChannelsList, setDMChannelsList] = useState<null | ShortDMChannel[]>(null);
-	const [invitedFriends, setInvitedFriends] = useState<{ [id: number]: boolean }>(invited);
+	const [invitedFriends, setInvitedFriends] = useState<{ [id: number]: boolean }>(invited || {});
 	const auth = useAuthService();
 	const { channelId } = useParams();
     const { idGame } = useParams<{ idGame: string }>();
 
     useEffect(() => {
-        setInvitedFriends(invited);
+        if (invited)
+            setInvitedFriends(invited);
     }, [invited])
 
 	function inviteFriend(dmChannel: ShortDMChannel, username: string) {
