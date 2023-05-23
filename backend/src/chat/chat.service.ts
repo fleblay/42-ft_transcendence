@@ -41,8 +41,6 @@ export class ChatService implements OnModuleInit {
 			await this.joinChannel(adminUser, channelId, { owner: true })
 			//console.log("creating general channel", channelId)
 			await this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
-			await this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
-			await this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
 		}
 	}
 
