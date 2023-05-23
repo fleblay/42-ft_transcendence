@@ -56,9 +56,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 		if (!auth.user) return;
 
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
-			console.log("fetching user data")
 			setUserData(response.data);
-			console.log(response.data)
 		}).catch((error) => { }).then(() => {
 
 			if (idPlayer !== undefined && auth.user && parseInt(idPlayer) === auth.user.id) {
@@ -68,9 +66,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 				setItsMe(false);
 				if (idPlayer !== undefined) {
 					apiClient.get(`/api/friends/${idPlayer}`).then((response) => {
-						console.log("get relation");
 						setRelation(response.data);
-						console.log(response.data);
 					}).catch((error) => {
 
 					}).then(() => {
@@ -94,7 +90,6 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 	React.useEffect(() => {
 		if (!socket) return;
 		function updateComponent(data: any) {
-			console.log("update component")
 			if (userData) {
 				setDisplayUpdate(!displayUpdate);
 				if (setRender)
