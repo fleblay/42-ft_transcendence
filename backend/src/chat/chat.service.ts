@@ -39,7 +39,6 @@ export class ChatService implements OnModuleInit {
 		if (!generalChannel) {
 			const channelId = await this.createChannel({ name: "general", private: false })
 			await this.joinChannel(adminUser, channelId, { owner: true })
-			//console.log("creating general channel", channelId)
 			await this.newMessage(adminUser, channelId, { content: "Welcome to the general channel" })
 			await this.newMessage(adminUser, channelId, { content: "vscode is better than vim" })
 			await this.newMessage(adminUser, channelId, { content: "Minitalk is for bouffons" })
@@ -133,14 +132,12 @@ export class ChatService implements OnModuleInit {
 				}
 			}
 		})
-		//console.log("joinChannel : ", channel, options)
 		if (!channel)
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} does not exist`)
 		if (channel.password && !options.owner && (!options.password || !await verifyPassword(channel.password, options.password)))
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} is protected and password provided is missing or false`)
 		if (channel.private && (!options.owner && channel.members.find((member) => (member.user.id == user.id))?.role != "owner"))
 			throw new ForbiddenException(`joinChannel : channel with id ${channelId} is private, and you are not an admin or the owner of the channel`)
-		//console.log("joinChannel2 : ", channel, options)
 		let addedUser: User = user
 		if (options?.targetUsername) {
 			addedUser = await this.usersService.findOneByUsername(options.targetUsername) as User
@@ -182,7 +179,6 @@ export class ChatService implements OnModuleInit {
 			}
 		});
 		this.wsServer.to(`/chat/myChannels/${addedUser!.id}`).emit('chat.modify.channel', channel);
-		console.log("emit To all Members in join channel : ", channelId, "chat.modify.channel");
 		this.emitToAllMembers(channelId, 'chat.modify.channel', this.cbEmitAll);
 
 		if (!channel.private) {
@@ -264,10 +260,8 @@ export class ChatService implements OnModuleInit {
 			content: messageData.content
 		});
 		await this.messagesRepo.save(newMessage);
-		//console.log("newMessage : ", newMessage);
 		this.wsServer.to(`/chat/${channelId}`).emit('chat.message.new', newMessage);
 		const nameOfEmmiter = newMessage.channel.directMessage ? "unreadMessage.dm" : "unreadMessage.channel";
-		console.log("Emit newMessage : ", nameOfEmmiter)
 		this.emitToAllMembers(channelId, nameOfEmmiter, async (member: Member) => {
 			const unreadMessages = await this.getUnreadMessages(member.user, channelId);
 			return {
@@ -506,7 +500,6 @@ export class ChatService implements OnModuleInit {
 
 	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {
 		const channel = await this.getOneChannel(channelId);
-		console.log("emitToAllMembers : ", channel, event);
 		if (!channel)
 			return;
 		for (const member of channel.members) {
@@ -652,7 +645,6 @@ export class ChatService implements OnModuleInit {
 		});
 		if (!member || !member.lastRead)
 			return 0;
-		//console.log("getUnreadMessages : ", member.lastRead);
 
 
 		return await this.messagesRepo.count({
@@ -667,10 +659,8 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async getDMChannel(me: User, friend: Partial<User>): Promise<Channel | null> {
-		//console.log("getDMChannel : ", me, friend);
 		if (!friend.id || friend.id === me.id)
 			return null;
-		//console.log("getDMChannel :searching channel");
 		const member = await this.membersRepo.findOne({
 			where: {
 				user: {
@@ -715,10 +705,8 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async joinDirectMessage(user: User, targetUser: number) {
-		console.log("joinDirectMessage : ", user, targetUser);
 		// check if channel exists
 		const channel = await this.getDMChannel(user, { id: targetUser });
-		console.log("joinDirectMessage : ", channel);
 		if (channel) {
 			channel.members.forEach((member) => {
 				member.left = false;
@@ -741,11 +729,8 @@ export class ChatService implements OnModuleInit {
 				throw new NotFoundException('Friend not found');
 
 			const channelId = await this.createChannel(directMessage);
-			//console.log("joinDirectMessage : channel created", channelId)
 			await this.joinChannel(user, channelId, { owner: true });
-			//console.log("joinDirectMessage : channel joined", channelId)
 			await this.joinChannel(user, channelId, { targetUsername: friendUser.username });
-			//console.log("joinDirectMessage : channel joined", channelId)
 			return channelId;
 		}
 	}

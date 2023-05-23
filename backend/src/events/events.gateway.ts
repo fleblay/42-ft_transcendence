@@ -86,7 +86,6 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	async handleConnection(socket: Socket) {
 		const bearerToken = socket.handshake.auth?.token
-		// console.log("event gateway handleConnection", bearerToken);
 		const foundUser = await this.authService.validateAccessToken(bearerToken)
 
 		if (!foundUser)
@@ -133,12 +132,10 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	@SubscribeMessage('game.create')
 	create(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): string {
-		console.log("New create event")
 		this.updateSocket(client, "gamecreate")
 		try {
 			const gameId = this.gameService.create(data.options)
 			//const gameId = this.gameService.create(data[0].map)
-			//console.log("Game id is : ", gameId);
 			return gameId
 		}
 		catch (e) {
@@ -148,14 +145,10 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	@SubscribeMessage('game.findOrCreate')
 	findOrCreate(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameCreateDto): string {
-		console.log("New findOrCreate event")
 		this.updateSocket(client, "findOrCreate")
 		try {
-			console.log('trying to find or create game', data)
 			//const gameId = this.gameService.findOrCreate(data[0].map)
 			const gameId = this.gameService.findOrCreate(user, data.options)
-			console.log('After log', gameId)
-			//console.log("Game id is : ", gameId);
 			return gameId
 		}
 
@@ -166,13 +159,10 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
 	@SubscribeMessage('game.join')
 	handleJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: GameJoinDto): string {
-		console.log("New join event")
 		this.updateSocket(client, "join")
 
 		try {
 			const { gameId, gameInfo } = this.gameService.join(client, user, data.gameId)
-			//console.log("Game id is : ", gameId);
-			console.log("join event ok so far")
 			return JSON.stringify({ gameId, gameInfo });
 		}
 		catch (e) {
@@ -197,13 +187,11 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 	@SubscribeMessage('client.component.join')
 	async handleClientComponentJoin(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: { subscription: string }) {
 		this.updateSocket(client, "client.component.join");
-		console.log("client.component.join", user.username, data.subscription)
 		await client.join(data.subscription);
 	}
 
 	@SubscribeMessage('client.component.leave')
 	handleClientComponentLeave(@ConnectedSocket() client: Socket, @EventUserDecorator() user: User, @MessageBody() data: { unsubscription: string }): void {
-		console.log("client.component.leave", user.username, data.unsubscription)
 		client.leave(data.unsubscription);
 	}
 }

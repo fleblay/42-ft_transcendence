@@ -45,7 +45,6 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 				return response;
 			},
 			async (error) => {
-				console.log("error in interceptor", error);
 				const { config, response: { status, data: { message } } } = error;
 				const originalRequest = config;
 				if (status === 498) {

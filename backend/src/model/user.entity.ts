@@ -72,19 +72,5 @@ export class User{
 	@OneToMany(() => Notification , (notification) => notification.user)
 	@JoinTable({})
 	notifications: Notification[];
-/* 	@AfterInsert()
-	logInsert() {
-		console.log(`insert User with id ${this.id}`);
-	}
-
-	@AfterUpdate()
-	logUpdate() {
-		console.log(`update User with id ${this.id}`);
-	}
-
-	@AfterRemove()
-	logRemove() {
-		console.log(`remove User with id ${this.id}`);
-	} */
 
 }

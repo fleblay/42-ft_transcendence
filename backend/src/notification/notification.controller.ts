@@ -18,7 +18,6 @@ export class NotificationController {
 
     @Get('/noread')
     async getNoReadNotifications(@CurrentUser() user: User) {
-        ////console.log("get no read notifications");
         return await this.notificationService.getNoReadNotifications(user);
     }
 

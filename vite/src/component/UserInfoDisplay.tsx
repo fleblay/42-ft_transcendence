@@ -135,8 +135,8 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 			customOff('page.player', updateUserData);
 		})
 	}, [socket, userData]);
-	
-	
+
+
 	const joinDm = () => {
 		apiClient.post(`/api/chat/dm/${idPlayer}/join`).then((response) => {
 			console.log("joinChannel", response);
@@ -145,21 +145,19 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 			console.log(error);
 		});
 	}
-	
-	
+
+
 
 	const handleUnblockUser = (idPlayer: string | undefined) => {
 		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
-			console.log("unblockUser", response);
 			setIsBlocked(false);
 		}).catch((error) => {
 			console.log(error);
 		});
 	}
-	
+
 	const handleBlockUser = (idPlayer: string | undefined) => {
 		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
-			console.log("block user", response);
 			setIsBlocked(true);
 		}).catch((error) => {
 			console.log(error);
@@ -169,7 +167,6 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 
 	const handleAddFriend = () => {
 		apiClient.post(`/api/friends/add/${idPlayer}`).then((response) => {
-			console.log("reponseAddFriend", response.data);
 			if (response.data) {
 				setRelation(response.data);
 			}
@@ -180,7 +177,6 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 
 	const handleAcceptFriend = () => {
 		apiClient.post(`/api/friends/accept/${idPlayer}`).then((response) => {
-			console.log("reponseAcceptFriend", response.data);
 			if (response.data) {
 				setRelation(response.data);
 			}
@@ -245,7 +241,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 					</Box>
 					{itsMe ? <UpdateProfil /> : (
 						<>
-							{relation?.requestStatus === "accepted" && <IconButton color='primary' sx={{ mr: 'auto', marginTop: '5px' }} onClick={joinDm}><EmailIcon /></IconButton>}			
+							{relation?.requestStatus === "accepted" && <IconButton color='primary' sx={{ mr: 'auto', marginTop: '5px' }} onClick={joinDm}><EmailIcon /></IconButton>}
 							{auth.user && userData && !userData.blockedId.includes(auth.user?.id) && renderButton(relation) || <Box sx={{ml : 'auto', mr: 1, mt: 2, mb: 2}}></Box>}
 							{displayBlocked && isBlocked ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleUnblockUser(idPlayer)}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleBlockUser(idPlayer)}>block</Button>}
 						</>

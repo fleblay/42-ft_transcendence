@@ -174,7 +174,6 @@ export class Game {
 		if (!foundPlayer)
 			return
 		if (input.move !== undefined) {
-			//console.log(`Input is ${input.move}`)
 			if (foundPlayer.shoot.active == false)
 				foundPlayer.shoot.pos.y = foundPlayer.pos + foundPlayer.paddleLength / 2
 			switch (input.move) {
@@ -245,7 +244,6 @@ export class Game {
 		savedGame.players = this.players.map((player) => player.user);
 		savedGame.score = this.players.map((player) => player.score);
 		savedGame.winner = (this.players[0].score > this.players[1].score) ? this.players[0].user : this.players[1].user;
-		console.log("generateSavedGamedInfo : ", savedGame)
 		return savedGame;
 	}
 
@@ -481,7 +479,7 @@ export class Game {
 
 			//Condition fin de jeu
 			if (!this.players.every((player) => player.score < this.victoryRounds)) {
-				console.log(`Game ended with ${this.victoryRounds} round`)
+				console.log(`Game ${this.gameId} ended with ${this.victoryRounds} round`)
 				this.status = GameStatus.end
 			}
 		}

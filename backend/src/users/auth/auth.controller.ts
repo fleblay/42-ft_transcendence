@@ -62,7 +62,6 @@ export class AuthController {
 	@Get('/logout')
 	@UseGuards(ATGuard)
 	async logout(@Request() req: ExpressRequest, @Response({ passthrough: true }) res: ExpressResponse) {
-		//console.log('logout');
 		const refreshToken = req.cookies['refresh_token'];
 		res.cookie('access_token', '', { maxAge: 0 });
 		res.cookie('refresh_token', '', { httpOnly: true, maxAge: 0 });
@@ -95,10 +94,8 @@ export class AuthController {
 	@HttpCode(200)
 	@UseGuards(ATGuard)
 	async turnDfaOn(@CurrentUser() user: User, @Request() req: ExpressRequest, @Body() { code }: DfaCodeDto) {
-		console.log('turnDfaOn', code)
 
 		const isValidCode = this.authService.is2faCodeValid(code, user)
-		console.log('isValidCode', isValidCode)
 		if (!isValidCode)
 			throw new UnauthorizedException("I don't think so")
 		this.authService.turnOnDfa(user.id)
