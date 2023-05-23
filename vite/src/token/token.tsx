@@ -26,7 +26,6 @@ function removeCookie(key: string) : void {
 	}
 
 export function getAccessToken() {
-	//console.log('Begin getAccessToken')
 	return getCookieValue("access_token")
 }
 

@@ -27,9 +27,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 	const requestMessages = useCallback(() => {
 		apiClient.get<Message[]>(`/api/chat/channels/${channelId}/messages`).then(({ data }) => {
 			setMessages(data.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()));
-		}).catch((error) => {
-			console.log(error);
-		});
+		}).catch((error) => {});
 	}, [channelId]);
 
 	useEffect(() => {
@@ -98,9 +96,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 
 		apiClient.post(`/api/chat/channels/${channelId}/messages`, message).then((response) => {
 			setMessageToSend("");
-		}).catch((error) => {
-			console.log(error);
-		});
+		}).catch((error) => {});
 	};
 
 	const sendGameMessage = async () => {
@@ -111,9 +107,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		customEmit('game.create', {}, (gameId: string) => {
 			apiClient.post(`/api/chat/channels/${channelId}/messages`, { content: message, gameId }).then((response) => {
 				setMessageToSend("");
-			}).catch((error) => {
-				console.log(error);
-			});
+			}).catch((error) => {});
 			navigate(`/game/${gameId}`);
 		});
 	}
@@ -123,7 +117,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		apiClient.get<plainUser[]>(`/api/users/blocked`).then(({ data }) => {
 			setBlockedList(data.map((user) => user.id));
 		}).catch((error) => {
-			console.log(error);
+			
 		});
 		function onBlockUser({ userId, targetId, event }: { userId: number, targetId: number, event: string }) {
 			setBlockedList((blockedList) => {
@@ -148,7 +142,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 			if (me)
 				setMutedState(Date.parse(me.muteTime) > Date.now())
 		}).catch((error) => {
-			console.log(error);
+			
 		});
 
 		function onBeingMuted({ modifyMember: upDatedMember }: { modifyMember: Member }) {

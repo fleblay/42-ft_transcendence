@@ -26,20 +26,14 @@ interface UserInfoDisplayProps {
 
 export const handleUnblockUser = (idPlayer: string | undefined) => {
 	apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
-		console.log("unblockUser", response);
-		//setChangeRelation(!changeRelation);
 	}).catch((error) => {
-		console.log(error);
 	});
 }
 
 export const handleBlockUser = (idPlayer: string | undefined) => {
 	apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
-		console.log("block user", response);
-		//setChangeRelation(!changeRelation);
 
 	}).catch((error) => {
-		console.log(error);
 	});
 }
 
@@ -59,16 +53,11 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 
 	React.useEffect(() => {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
-			console.log("response", response);
 			setUserData(response.data);
-			console.log("userData in user info display", userData);
-		}).catch((error) => {
-			console.log(error);
-		});
+		}).catch((error) => {});
 	}, [idPlayer, displayUpdate])
 
 	React.useEffect(() => {
-		console.log("idPlayer", idPlayer);
 		if (!auth.user) return;
 		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id) {
 			setItsMe(true);
@@ -77,22 +66,17 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 			setItsMe(false);
 			if (idPlayer !== undefined) {
 				apiClient.get(`/api/friends/${idPlayer}`).then((response) => {
-					console.log("response friend:", response.data);
 					setRelation(response.data);
 				}).catch((error) => {
-					console.log(error);
 
 				});
-				console.log("idPlayer fetch blocked", idPlayer);
 				apiClient.get(`/api/users/getBlocked/${idPlayer}`).then((response) => {
 					if (response.data) {
-						console.log("response blocked:", response.data);
 						setIsBlocked(true);
 					}
 					else
 						setIsBlocked(false);
 				}).catch((error) => {
-					console.log(error);
 				});
 			}
 
@@ -104,7 +88,6 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 	React.useEffect(() => {
 		if (!socket) return;
 		function updateComponent(data: any) {
-			console.log("custom on data", data);
 			if (userData) {
 				setDisplayUpdate(!displayUpdate);
 				if (setRender)
@@ -126,7 +109,6 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 	React.useEffect(() => {
 		if (!socket) return;
 		function updateUserData(data: any) {
-			console.log("data", data);
 			if (userData)
 				setUserData({ ...userData, ...data });
 		}
@@ -139,10 +121,8 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 	
 	const joinDm = () => {
 		apiClient.post(`/api/chat/dm/${idPlayer}/join`).then((response) => {
-			console.log("joinChannel", response);
 			navigate(`/chat/${response.data}`);
 		}).catch((error) => {
-			console.log(error);
 		});
 	}
 	
@@ -150,57 +130,46 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 
 	const handleUnblockUser = (idPlayer: string | undefined) => {
 		apiClient.post(`/api/users/unblockUser/${idPlayer}`).then((response) => {
-			console.log("unblockUser", response);
 			setIsBlocked(false);
 		}).catch((error) => {
-			console.log(error);
 		});
 	}
 	
 	const handleBlockUser = (idPlayer: string | undefined) => {
 		apiClient.post(`/api/users/blockUser/${idPlayer}`).then((response) => {
-			console.log("block user", response);
 			setIsBlocked(true);
 		}).catch((error) => {
-			console.log(error);
 		});
 	}
 
 
 	const handleAddFriend = () => {
 		apiClient.post(`/api/friends/add/${idPlayer}`).then((response) => {
-			console.log("reponseAddFriend", response.data);
 			if (response.data) {
 				setRelation(response.data);
 			}
 		}).catch((error) => {
-			console.log(error);
 		});
 	}
 
 	const handleAcceptFriend = () => {
 		apiClient.post(`/api/friends/accept/${idPlayer}`).then((response) => {
-			console.log("reponseAcceptFriend", response.data);
 			if (response.data) {
 				setRelation(response.data);
 			}
 		}).catch((error) => {
-			console.log(error);
 		});
 	}
 
 	const handleRemoveFriend = () => {
 		apiClient.post(`/api/friends/remove/${idPlayer}`).then((response) => {
-			console.log("reponseRemoveFriend", response.data);
 			setRelation(null);
 		}).catch((error) => {
-			console.log(error);
 		});
 	}
 
 	const renderButton = (relation: Friend | null) => {
 
-		console.log("relation", relation);
 		if (!relation)
 			return <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend}>Add Friend</Button>;
 

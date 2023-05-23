@@ -12,7 +12,6 @@ export function FakeGames() {
 				await apiClient.get("/api/game/fake")
 				setInfo(`Successfully added ${number} fake games to history !`)
 			} catch (e) {
-				console.log(e)
 				setInfo("Error. More info in console")
 			}
 		}

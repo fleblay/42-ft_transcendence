@@ -50,7 +50,6 @@ export function FriendList() {
 
 	React.useEffect(() => {
 		function onPlayerEvent({ userId, event, targetId }: { userId: number, targetId?: number, event: string }) {
-			console.log("onPlayerEvent :", event)
 			setTabs(event.includes('add') ? 'pending' : 'accepted')
 			setRender(!render)
 		}
@@ -62,9 +61,7 @@ export function FriendList() {
 
 	React.useEffect(() => {
 		if (!auth.user) return;
-		console.log('Fetching friends')
 		apiClient.get(`/api/friends?status=${tabs}`).then((response) => {
-			console.log('Friends: ', response.data);
 			setFriendList((oldList) => {
 				return { ...oldList, [tabs]: response.data };
 			});

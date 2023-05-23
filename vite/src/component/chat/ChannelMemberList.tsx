@@ -33,8 +33,6 @@ function userUpDateState(me: Member | null, setMe: Dispatch<SetStateAction<Membe
 	for (const [key, value] of Object.entries(memberList)) {
 		const member: Member | undefined = value.find((member) => member.user.id == userId)
 		if (member) {
-			console.log("Found user in :", key)
-			console.log("event is :", event)
 			switch (event) {
 				case ("leave"):
 					member.states.pop()
@@ -110,7 +108,6 @@ function subscribeToMemberEvents(addSubscription: (sub: string) => (() => void) 
 
 	const fxArray: ((() => void) | void)[] = []
 
-	console.log("updating subscription list")
 	for (const [key, value] of Object.entries(memberList)) {
 		value.forEach((member) => {
 			fxArray.push(addSubscription(`/player/${member.user.id}`))
@@ -124,7 +121,6 @@ function removeOldMember(oldMemberId: number, memberList: memberList): memberLis
 	for (const [key, value] of Object.entries(memberList)) {
 		const oldMemberIndex: number = value.findIndex((member) => member.id == oldMemberId)
 		if (oldMemberIndex != -1) {
-			console.log("Found oldmember in :", key)
 			value.splice(oldMemberIndex, 1)
 			break
 		}
@@ -138,7 +134,6 @@ function removeOldMember(oldMemberId: number, memberList: memberList): memberLis
 }
 
 function addNewMember(newMember: Member, memberList: memberList): memberList {
-	console.log("newMember : ", newMember)
 	if ((newMember.role == "admin" || newMember.role == "owner") && !newMember.left)
 		memberList.admins.push(newMember)
 	else if (newMember.banned)
@@ -147,7 +142,6 @@ function addNewMember(newMember: Member, memberList: memberList): memberList {
 		memberList.muted.push(newMember)
 	else if (!newMember.left)
 		memberList.regulars.push(newMember)
-	console.log("new member list", memberList)
 	return ({
 		admins: [...memberList.admins],
 		banned: [...memberList.banned],
@@ -169,11 +163,9 @@ export function MemberList({ channelId }: { channelId: string }) {
 		if (!memberListFetched.current)
 			return
 		function onMemberUpdate({ modifyMember: upDatedMember }: { modifyMember: Member }) {
-			console.log("onMemberUpdate", upDatedMember);
 			removeOldMember(upDatedMember.id, memberList)
 			setMemberList(addNewMember(upDatedMember, memberList))
 			if (upDatedMember.id == me!.id) {
-				console.log("I have changed : ", upDatedMember)
 				setMe(upDatedMember)
 				if (upDatedMember.left)
 					navigate(`/chat`);
@@ -181,20 +173,17 @@ export function MemberList({ channelId }: { channelId: string }) {
 		}
 
 		function onMemberJoin({ joinedMember }: { joinedMember: Member }) {
-			console.log("onMemberJoin", joinedMember);
 			setMemberList(addNewMember(joinedMember, memberList))
 			unSubscribeFxArray.current = subscribeToMemberEvents(addSubscription, memberList)
 		}
 
 		function onMemberLeave({ leftMember }: { leftMember: Member }) {
-			console.log("onMemberLeft", leftMember, me);
 			setMemberList(removeOldMember(leftMember.id, memberList))
 		}
 
 		function onPlayerEvent({ userId, event, targetId }: { userId: number, targetId?: number, event: string }) {
 			if (!userId || !event)
 				return
-			console.log("onPlayerEvent", userId, event);
 			setMemberList(userUpDateState(me, setMe, userId, event, memberList, targetId))
 		}
 
@@ -219,7 +208,6 @@ export function MemberList({ channelId }: { channelId: string }) {
 	useEffect(() => {
 		memberListFetched.current = false
 		apiClient.get(`/api/chat/channels/${channelId}/members`).then(({ data }: { data: Member[] }) => {
-			console.log("memberlist fetched is: ", data);
 			const newMemberList: memberList = {
 				admins: data.filter((member) => ((member.role == "admin" || member.role == "owner")) && !member.left),
 				banned: data.filter((member) => member.banned),
@@ -235,10 +223,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 			setMemberList(newMemberList)
 			if (auth.user)
 				setMe(data.find((member) => member.user.id == auth.user!.id) || null)
-			console.log("Je suis : ", me)
-		}).catch((error) => {
-			console.log(error);
-		}).then(() => memberListFetched.current = true)
+		}).catch((error) => {}).then(() => memberListFetched.current = true)
 	}, [channelId]);
 
 	function GenerateMemberActionList({ member }: { member: Member }): JSX.Element {
@@ -295,37 +280,23 @@ export function MemberList({ channelId }: { channelId: string }) {
 		const handleClickLeave = () => {
 			setAnchorEl(null);
 			apiClient.post(`/api/chat/channels/${channelId}/leave`, { kick: true }).
-				then(() => console.log("Leave : OK"))
-				.catch((error) => {
-					console.log(error);
-				});
+				then()
+				.catch((error) => {});
 			navigate(`/chat/`);
 		};
 
 		const handleClickKick = () => {
 			setAnchorEl(null);
 			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { kick: true }).
-				then(() => console.log("Kick : OK"))
-				.catch((error) => {
-					console.log(error);
-				});
+				then()
+				.catch((error) => {});
 		};
 
 		const handleClickBan = () => {
 			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { ban: (!member.banned), kick: (!member.banned ? true : undefined)}).
-				then(() => console.log("Ban : OK"))
+				then()
 				.catch((error) => {
-					console.log(error);
 				});
-				/*
-			if (!member.banned) {
-				apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { kick: true }).
-					then(() => console.log("Ban : OK"))
-					.catch((error) => {
-						console.log(error);
-					});
-			}
-			*/
 			setAnchorEl(null);
 		};
 
@@ -334,18 +305,16 @@ export function MemberList({ channelId }: { channelId: string }) {
 			muteEnd.setFullYear(1970)
 
 			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { mute: muteEnd.toISOString() }).
-				then(() => console.log(`Mute till ${muteEnd.toISOString()}: OK`))
+				then()
 				.catch((error) => {
-					console.log(error);
 				});
 			setAnchorEl(null);
 		};
 
 		const handleClickChangeRole = () => {
 			apiClient.post(`/api/chat/channels/${channelId}/members/${member.id}`, { role: (member.role == "regular") ? "admin" : "regular" }).
-				then(() => console.log("Change role OK"))
+				then()
 				.catch((error) => {
-					console.log(error);
 				});
 			setAnchorEl(null);
 		};
@@ -388,7 +357,6 @@ export function MemberList({ channelId }: { channelId: string }) {
 	}
 
 	function GenerateMemberGroup({ groupname, groupMembers, me }: { groupname: string, groupMembers: Member[], me: Member | null }): JSX.Element {
-		//console.log('rendering membergroup, me is : ', me)
 		return (<>
 			<Typography component="div">{groupname}</Typography>
 			<List disablePadding>

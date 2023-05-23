@@ -58,7 +58,6 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
         if (idPlayer === undefined) return;
         let id = parseInt(idPlayer) as number;
 		apiClient.get(`/api/game/history/${id}`).then((response) => {
-			console.log(response.data);
 			setListGames(response.data)
 		})
 	}, [])

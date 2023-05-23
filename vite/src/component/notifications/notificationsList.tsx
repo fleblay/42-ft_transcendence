@@ -24,7 +24,6 @@ export function NotificationsList() {
 
 	React.useEffect(() => {
 		apiClient.get("/api/notification/mynotifications").then((response) => {
-			console.log("notification : ", response);
 			if (response.data.length === 0) {
 				setNotifications(null);
 				return;
@@ -35,7 +34,7 @@ export function NotificationsList() {
 			}, {});
 			setNotifications(result);
 		}).catch((error) => {
-			console.log(error);
+			
 		});
     }, [auth.user])
 
@@ -54,18 +53,15 @@ export function NotificationsList() {
         if (!socket) return;
 
 		const addNotification = (data: Notification) => {
-			console.log("notification new in list", data);
 			apiClient.post(`/api/notification/ack/${data.id}`).then((response) => {
-				console.log("notification ack", response);
 			}).catch((error) => {
-				console.log(error);
+				
 			});
 			setNotifications((notifications) => {
 				return { ...notifications, [data.id]: data };
 			});
 		}
 		const deleteNotification = (id: number) => {
-			console.log("notification delete", id);
 			setNotifications((notifications) => {
 				let newNotifications = { ...notifications };
 				delete newNotifications[id];
@@ -115,7 +111,6 @@ export function NotificationsList() {
 									return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 								})
 								.map((notification: Notification, index, array) => {
-									console.log("notification", notification);
 									switch (notification.type) {
 										case 'friendRequest':
 											return (<NotificationRequestFriend key={notification.id} notification={notification} index={index} array={array} />)

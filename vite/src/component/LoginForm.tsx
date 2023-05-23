@@ -37,7 +37,6 @@ export function LoginForm() {
 			email: loginForm.get("email") as string,
 			password: loginForm.get("password") as string
 		};
-		console.log("About to start logging process")
 
 		auth.login(loginData).catch((error) => {
 			let errorInfo = {
@@ -46,7 +45,6 @@ export function LoginForm() {
 				message: error?.response?.data?.message
 			}
 			setInfo(`Login failed : ${errorInfo.status} - ${errorInfo.statusText}${" : " + (errorInfo.message || "No additional info")}`)
-			console.log(error)
 		});
 	};
 

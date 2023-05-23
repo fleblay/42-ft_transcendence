@@ -139,10 +139,8 @@ export function ChatPage() {
 			apiClient.get<ChannelInfo>(`/api/chat/channels/${channelId}/info`).then(({ data }) => {
 				setChannelInfo(data);
 			}).catch((error) => {
-				console.log("catch error", error.response.data.statusCode, error.response.data.message)
 				if (error.response.data.statusCode === 400 && error.response.data.message === "Invalid ID")
 					navigate('/chat');
-				console.log(error);
 			});
 		}
 

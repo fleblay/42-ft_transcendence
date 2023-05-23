@@ -57,18 +57,13 @@ export const ChannelBrowser: FC = () => {
 				return map;
 			}, {});
 			setPublicChannels(result);
-		}).catch((error) => {
-			console.log(error);
-		});
+		}).catch((error) => {});
 	}, []);
 
 	const joinChannel = (channelId: number, password?: string) => {
 		apiClient.post(`/api/chat/channels/${channelId}/join`, { password }).then((response) => {
-			console.log("joinChannel", response);
 			navigate(`/chat/${channelId}`);
-		}).catch((error) => {
-			console.log(error);
-		});
+		}).catch((error) => {});
 	}
 
 	return (

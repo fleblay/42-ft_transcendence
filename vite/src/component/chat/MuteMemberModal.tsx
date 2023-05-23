@@ -28,7 +28,7 @@ export function MuteMemberModal({ openModal, onClose, channelId, member }: { ope
 				onClose();
 			})
 			.catch((error) => {
-				console.log(error);
+				
 			});
 	}
 

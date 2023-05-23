@@ -37,8 +37,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		function displayListEvent() {
-			console.log('List of events on', listOn.current)
-			console.log('List of subscriptions', subscription)
+			//console.log('List of events on', listOn.current)
+			//console.log('List of subscriptions', subscription)
 		}
 		const intervalId = setInterval(displayListEvent, 5000)
 		return () => clearInterval(intervalId)
@@ -67,10 +67,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 				}
 			})
 			function onConnect() {
-				console.log('Connected to socket')
 				setSocket(temporarySocket)
 			}
-			console.log("Socket Creation")
 
 			temporarySocket.on('connect', onConnect);
 			return () => {
@@ -79,11 +77,11 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		}
 
 		function onMessage(data: any) {
-			console.log('Receiving a message')
-			console.log(data)
+			//console.log('Receiving a message')
+			//console.log(data)
 		}
 		function onDisconnect() {
-			console.log('Disconnected from socket')
+			//console.log('Disconnected from socket')
 		}
 		socket.on('disconnect', onDisconnect);
 		socket.on('message', onMessage)
@@ -100,34 +98,24 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
 	React.useEffect(() => {
 		if (socket && nav.to != nav.from && nav.from.startsWith('/game/')) {
-			console.log("Leaving game page")
 			const gameId = nav.from.split('/')[2]
 			if (gameId) {
-				console.log(`quit Game : ${gameId}`)
 				apiClient.get(`/api/game/quit/${gameId}`)
 			}
 		}
 	}, [nav])
 
-/* 	React.useEffect(() => {
-		if (socket && auth.user) {
-			console.log("Emitting client.nav", nav)
-			customEmit('client.nav', { to: nav.to, from: nav.from })
-		}
-	}, [nav, auth.user, socket]) */
 
 	function addSubscription(sub: string) {
 		if (!socket?.connected) return;
 
 		if (sub === "") return;
-		console.log(`Subscribing to ${sub}`)
 		customEmit('client.component.join', { subscription: sub })
 		setSubscription(newSubscription => {
 			if (newSubscription.includes(sub)) return newSubscription;
 			return [...newSubscription, sub]
 		})
 		return () => {
-			console.log(`Unsubscribing to ${sub}`)
 			customEmit('client.component.leave', { unsubscription: sub })
 			setSubscription((newSubscription) => newSubscription.filter((sub) => sub !== sub))
 		}

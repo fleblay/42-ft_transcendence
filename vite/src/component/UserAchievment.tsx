@@ -58,7 +58,6 @@ function RenderSwitch({ userData }: { userData: UserInfo | null }): JSX.Element 
 
 export function UserAchivement() {
 	const { userData } = useContext(UserDataContext);
-	console.log("userdata is", userData)
 	return (
 		<>
 			<Box position="static" sx={{ height: 'auto' }}>

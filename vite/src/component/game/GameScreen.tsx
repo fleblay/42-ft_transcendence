@@ -56,11 +56,9 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 			const response = JSON.parse(stringResponse)
 
 			if (response.error) {
-				//console.log('Game join got error:', response.error);
 				setLoading(LoadingStatus.Failed);
 			}
 			else {
-				//console.log('game.join', response.gameId, response.gameInfo);
 				setGameInfo(response.gameInfo as IgameInfo);
 				setLoading(LoadingStatus.Loaded);
 			}
@@ -70,7 +68,6 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 	useEffect(() => {
 		if (!gameInfo)
 			return
-		//console.log('gameInfo.status', gameInfo.status);
 		if (gameInfo.status === GameStatus.playing || gameInfo.status === GameStatus.start) {
 			setActiveStep(2);
 		}
@@ -100,7 +97,6 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 		}
 
 		function onCountdown(data: number) {
-			//console.log('game.countdown', data);
 			setCountdown(data);
 		}
 		socket.on('game.update', onGameUpdate)
@@ -130,7 +126,6 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 				id: channel.id,
 				friend: channel.members.find((member) => member.user.id !== auth.user?.id),
 			})).filter(channel => channel.friend) as ShortDMChannel[]
-			console.log('friendsList', invitedFriends, channelsList);
 			setDMChannelsList(channelsList
 				.filter(channel => channel.friend.isConnected)
 			);
@@ -207,13 +202,11 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 	const [canvasRatio, setCanvasRatio] = useState<number>(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
 	const [displayInfo, setDisplayInfo] = useState<boolean>(false);
 
-	//console.log('ballTrailPositions in game screen', ballTrailPositions);
 	const handleClick = () => {
 		setDisplayInfo(!displayInfo)
 	}
 
 	useEffect(() => {
-		//console.log("width", width);
 		setCanvasRatio(0.8 * Math.min(width / canvasWidth, window.innerHeight / canvasHeight))
 		if (bottomRef.current)
 			bottomRef.current.scrollIntoView({ behavior: "smooth" })
@@ -238,7 +231,6 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
 			e.preventDefault();
-			//console.log(`>${e.key}<`)
 			if (e.key === 'ArrowUp' && keyDown.up === false) {
 				setKeyDown({ up: true, down: false, shoot: false })
 			}
@@ -279,7 +271,6 @@ export function GameScreen({ gameInfo, gameId, bottomRef, width, ballTrailPositi
 		const reverseBallTrailPositions = [...ballTrailPositions].reverse();
 		if (!context.current || !ballTrailPositions) return;
 		let trailOpacity = 0.5;
-		//console.log("drawBallTrail in drawbal", ballTrailPositions);
 		for (let i = 0; i < reverseBallTrailPositions.length; i++) {
 			const ballTrailPosition = reverseBallTrailPositions[i];
 			trailOpacity = (1 - (i + 1) * 0.1) * trailOpacity;

@@ -16,7 +16,6 @@ export function MyError() {
 
     React.useEffect(() => {
         if (error) {
-            console.log("error in my error", error);
             setOpen(true);
             switch (error.status) {
                 case 200:

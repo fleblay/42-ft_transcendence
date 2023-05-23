@@ -27,12 +27,9 @@ export function FinishGames() {
 
 	function getData() {
 		apiClient.get(`/api/game/list/${gamePage}`).then((response) => {
-			console.log("gameList :", response.data);
 			setListGames(response.data)
 		})
-			.catch(() => {
-				console.log("\x1b[32mError\x1b[0m")
-			})
+			.catch(() => {})
 	}
 
 	useEffect(() => {
@@ -45,7 +42,6 @@ export function FinishGames() {
 
 	useEffect(() => {
 		function resetGamePage() {
-			console.log("event received")
 			setGamePage(0)
 			getData()
 		}

@@ -58,7 +58,6 @@ const FriendDisplay: FC<FriendDisplayProps> = ({ originalFriend, index, array })
 
 	useEffect(() => {
 		function onFriendUpdate({ userId, event }: { userId: number, event: string }) {
-			console.log("onFriendUpdate", userId, event);
 			switch (event) {
 				case "connected":
 					setFriend((oldFriend) => {
@@ -83,11 +82,8 @@ const FriendDisplay: FC<FriendDisplayProps> = ({ originalFriend, index, array })
 
 	const joinDm = (userId: number) => {
 		apiClient.post(`/api/chat/dm/${userId}/join`).then((response) => {
-			console.log("joinChannel", response);
 			navigate(`/chat/${response.data}`);
-		}).catch((error) => {
-			console.log(error);
-		});
+		}).catch((error) => {});
 	}
 	return (
 		<ListItem key={friend.id} sx={{
@@ -133,7 +129,6 @@ export const FriendsBrowser: FC = () => {
 
 	useEffect(() => {
 		function onFriendUpdate({ status, friend }: { status: 'removed' | 'update', friend: Friend }) {
-			console.log("onFriendUpdate status", status, friend);
 			if (status === 'removed') {
 				setFriendList((oldFriendList) => {
 					const newFriendList = new Map(oldFriendList);
@@ -154,9 +149,7 @@ export const FriendsBrowser: FC = () => {
 
 	useEffect(() => {
 		if (!auth.user) return;
-		console.log('Fetching friends')
 		apiClient.get(`/api/friends?status=accepted`).then((response) => {
-			console.log("Friends", response);
 			let result: Map<number, Friend> = new Map();
 			response.data.forEach((friend: Friend) => {
 				result.set(friend.id, friend);

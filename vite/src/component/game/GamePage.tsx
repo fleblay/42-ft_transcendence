@@ -25,7 +25,6 @@ export function GamePage() {
 	const { idGame } = useParams();
 
 	useEffect(() => {
-		console.log("id", idGame);
 		if (idGame && activeStep === 0) {
 			setActiveStep(1);
 		}
@@ -54,7 +53,6 @@ export function GamePage() {
 	}, [])
 
 	useEffect(() => {
-		console.log("id", idGame);
 
 		if (idGame) {
 			setActiveStep(1);

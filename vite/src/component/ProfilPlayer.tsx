@@ -21,7 +21,6 @@ export function ProfilPlayer() {
 	const navigate = useNavigate();
 
 	React.useEffect(() => {
-		console.log("idPlayer", idPlayer);
 		if (!auth.user) return;
 		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id)
 			setItsMe(true);
@@ -31,12 +30,9 @@ export function ProfilPlayer() {
 
 	React.useEffect(() => {
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
-			console.log("response", response);
 			setUserData(response.data);
-			console.log("userData in profil player", userData);
 		}).catch((error) => {
 			navigate('/404');
-			console.log(error);
 		});
 	}, [idPlayer])
 

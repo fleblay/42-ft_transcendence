@@ -19,7 +19,6 @@ export function CreateChannelModal({ openCreateChannel, handleClose }: { openCre
         event.preventDefault();
         const ChannelForm = new FormData(event.currentTarget);
 
-        console.log("createChannel");
 
         const name = ChannelForm.get('name') as string;
         if (name.length < 1 || name.length > 15) {
@@ -33,15 +32,12 @@ export function CreateChannelModal({ openCreateChannel, handleClose }: { openCre
             password: (channelType === 'protected') ? ChannelForm.get("password") as string : ""
         }
         apiClient.post(`/api/chat/channels/create`, channelParams).then((response) => {
-            console.log("channels/create", "ok");
-            console.log(response.data);
+
             handleClose();
             setError("");
             navigate(`/chat/${response.data}`);
         }
-        ).catch((error) => {
-            console.log("create channel", error);
-        });
+        ).catch((error) => {});
     };
 
     return (

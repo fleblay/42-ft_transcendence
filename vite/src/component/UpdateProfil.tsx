@@ -77,7 +77,6 @@ export function UpdateProfil() {
 			return;
 		}
 		const formData = new FormData();
-		console.log(file);
 		formData.append('image', fileToBlob(file as File));
 		apiClient.post('/api/users/uploadAvatar', formData, {
 			headers: {
@@ -85,10 +84,8 @@ export function UpdateProfil() {
 			}
 		}).then((response) => {
 			setResponseFile("Image uploaded successfully");
-			console.log(response);
 		}).catch((error) => {
 			setResponseFile("Error while uploading image");
-			console.log(error);
 		});
 	};
 
@@ -103,11 +100,9 @@ export function UpdateProfil() {
 	const handleAuthenticator = () => {
 		const code = result;
 		apiClient.post('/api/auth/turn-on-2fa', { code }).then(() => {
-			console.log("2fa turned on");
 			setDfa(true);
 			setOpenDfa(false);
 		}).catch((error) => {
-			console.log(error);
 			setDfaError("Invalid code");
 		});
 	}
@@ -138,12 +133,9 @@ export function UpdateProfil() {
 				setDfa(false);
 				return
 			}
-			console.log(response.data);
 			setBase64Img(response.data)
 		})
-			.catch((error) => {
-				console.log(error);
-			});
+			.catch((error) => {});
 	}
 
 	return (

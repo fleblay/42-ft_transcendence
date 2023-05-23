@@ -33,9 +33,6 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 				if (access_token) {
 					config.headers.Authorization = `Bearer ${access_token}`;
 				}
-				else {
-					console.log("no token");
-				}
 				return config;
 			}
 		);
@@ -45,7 +42,6 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 				return response;
 			},
 			async (error) => {
-				console.log("error in interceptor", error);
 				const { config, response: { status, data: { message } } } = error;
 				const originalRequest = config;
 				if (status === 498) {
@@ -55,13 +51,11 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 							axios.get('/api/auth/refresh')
 								.then((response) => {
 									if (response.status === 200) {
-										console.log("Access token refreshed");
 										resolve(axios(originalRequest));
 										onRefreshed();
 									}
 								})
 								.catch((error) => {
-									console.log("Error refreshing access token", error);
 									delAccessToken()
 									navigate("/login", { replace: true });
 									reject(error);
@@ -81,7 +75,6 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 
 				}
 				else {
-					console.log("error in interceptor", error);
 					if (!error.response.config.noError)
 						setError({ message, status });
 					if (error.response.config.noRedirect)
@@ -110,77 +103,3 @@ function InterceptorAxios({ children }: { children: JSX.Element }) {
 }
 export default apiClient;
 export { InterceptorAxios }
-
-/* const apiClient = axios.create({});
-
-apiClient.interceptors.request.use(
-	async (config) => {
-		const access_token = getAccessToken()
-		if (access_token) {
-			config.headers.Authorization = `Bearer ${access_token}`;
-		}
-		else {
-			console.log("no token");
-		}
-		return config;
-	}
-);
-
-
-apiClient.interceptors.response.use(
-	(response) => {
-		return response;
-	},
-	async (error) => {
-		const {setError} = useContext(ErrorProviderContext);
-		const { config, response: { status , message} } = error;
-		const originalRequest = config;
-		if (status === 498)
-		{
-			if (!isResfreshing) {
-				isResfreshing = true;
-				return new Promise((resolve, reject) => {
-					axios.get('/api/auth/refresh')
-						.then((response) => {
-							if (response.status === 200) {
-								console.log("Access token refreshed");
-								resolve(axios(originalRequest));
-								onRefreshed();
-							}
-						})
-						.catch((error) => {
-							console.log("Error refreshing access token", error);
-							delAccessToken()
-							delRefreshToken()
-							reject(error);
-						})
-						.finally(() => {
-							isResfreshing = false;
-						});
-				});
-			}
-
-			const retryOriginalRequest = new Promise((resolve) => {
-				subscribeTokenRefresh(() => {
-					resolve(axios(originalRequest));
-				});
-			}
-			);
-			return retryOriginalRequest;
-
-		}
-		else
-		{
-			error = { message, status};
-			console.log("error in interceptor", error);
-			setError(error);
-			return Promise.reject(error);
-		}
-	}
-);
-
-
-
-
-export default apiClient;
- */

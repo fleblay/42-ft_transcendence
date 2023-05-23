@@ -22,30 +22,24 @@ export function NotifcationBar() {
 
     React.useEffect(() => {
         apiClient.get("/api/notification/noread").then((response) => {
-            console.log("notifications no read", response);
             setNotifications(response.data);
                 return;
         }).catch((error) => {
-            console.log(error);
+            
         });
         if (!auth.user) return;
         return addSubscription(`/notification/${auth.user.id}`);
     }, [auth.user])
 
     React.useEffect(() => {
-        console.log("socket", socket)
         if (!socket) return;
         const addBellNotification = (data: Notification) => {
-            console.log("notification new bell", data);
-            console.log("location", currentLocation);
             if (currentLocation === `/chat/${data.contentId}` && data.type === "directMessage")
             {
-                console.log("ack");
                 apiClient.post(`/api/notification/ack/${data.id}`).then((response) => {
-                    console.log("notification ack", response);
                 }
                 ).catch((error) => {
-                    console.log(error);
+                    
                 });
                 return;
             }

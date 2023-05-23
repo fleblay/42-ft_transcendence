@@ -41,7 +41,6 @@ export function DfaForm() {
 
         axios.post('/api/auth/validate-dfa', { code: result })
             .then(async (response) => {
-                console.log('/game')
                 await auth.getUser(true)
                 navigate("/game", { replace: true });
             }).catch((error) => {
@@ -51,7 +50,6 @@ export function DfaForm() {
                     message: error?.response?.data?.message
                 }
                 setInfo(`Login failed : ${errorInfo.status} - ${errorInfo.statusText}${" : " + (errorInfo.message || "No additional info")}`)
-                console.log(error)
             });
     };
 

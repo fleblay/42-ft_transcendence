@@ -16,19 +16,6 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
 	const [userData, setUserData] = useState<UserInfo | null>(null);
 
 
-	useEffect(() => {
-		console.log("create userDataProvider")
-	}, [])
-
-	useEffect(() => {
-		console.log("userDataProvider:", userData)
-	}, [userData])
-
-	useEffect(() => {
-		console.log("setUSerData", userData)
-	}, [setUserData])
-
-
 
 
 

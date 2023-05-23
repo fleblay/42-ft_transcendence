@@ -28,7 +28,6 @@ export const NotificationDirectMessage: FC<NotificationDirectMessageProps> = ({ 
     const navigate = useNavigate();
 
     const viewMessage = () => {
-        console.log("viewMessage", notification.contentId);
         navigate(`/chat/${notification.contentId}`);
     }
 

@@ -12,10 +12,7 @@ import { useAuthService } from "../../auth/AuthService";
 
 const joinChannel = (channelId: number) => {
 	apiClient.post(`/api/chat/channels/${channelId}/join`).then((response) => {
-		console.log("joinChannel", response);
-	}).catch((error) => {
-		console.log(error);
-	});
+	}).catch((error) => {});
 }
 
 
@@ -37,7 +34,6 @@ export function MyChannelsList() {
 
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
-			console.log("onModifyChannel", data)
 			if (!data || data.directMessage == true)
 				return;
 			setMyChannelsList(channelList => ({ ...channelList, [data.id]: data }));
@@ -45,12 +41,11 @@ export function MyChannelsList() {
 		function onDeleteChannel(id : number) {
 			if(!id)
 				return
-			setMyChannelsList(channelList => { delete channelList[id]; console.log(channelList); return {...channelList}; });
+			setMyChannelsList(channelList => { delete channelList[id]; return {...channelList}; });
 			if (channelId && +channelId == id)
 				navigate(`/chat`);
 		}
 		function onUnreadMessage(data: { unreadMessages: number, id: number }) {
-			console.log("onUnreadMessage.channel", data);
 			if (!channelId || +channelId != data.id)
 				setMyChannelsList(channelList => ({ ...channelList, [data.id]: { ...channelList[data.id], unreadMessages: data.unreadMessages } }));
 		}
@@ -67,14 +62,11 @@ export function MyChannelsList() {
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/my`).then((response) => {
-			console.log("MyChannelsList", response);
 			setMyChannelsList(response.data.reduce((map: { [id: number]: Channel }, obj: Channel) => {
 				map[obj.id] = obj;
 				return map;
 			}, {}));
-		}).catch((error) => {
-			console.log(error);
-		});
+		}).catch((error) => {});
 	}, []);
 
 

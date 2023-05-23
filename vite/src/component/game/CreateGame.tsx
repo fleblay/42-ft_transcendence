@@ -66,18 +66,10 @@ export function CreateGame() {
 		}
 		else {
 			customEmit(privateGame ? 'game.create' : 'game.findOrCreate', { options }, (gameId: string) => {
-				console.log("game created", gameId);
 				navigate(`/game/${gameId}`);
-				console.log("nav ok", gameId);
 			});
 		}
 	}
-	useEffect(() => {
-		console.log("createGame mounted");
-		return () => {
-			console.log("createGame unmounted");
-		}
-	}, []);
 
 	return (
 		<Box sx={{

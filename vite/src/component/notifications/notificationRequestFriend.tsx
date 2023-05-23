@@ -37,17 +37,14 @@ export const NotificationRequestFriend: FC<NotificationRequestFriendProps> = ({ 
 
 	React.useEffect(() => {
 		apiClient.get(`/api/friends/${notification.contentId}`).then((response) => {
-			console.log("response", response);
 			setFriend(response.data);
-			console.log("userData", friend);
 		}).catch((error) => {
-			console.log(error);
+			
 		});
 	}, [notification.contentId])
 
 	React.useEffect(() => {
 		function onFriendUpdate({ userId, event }: { userId: number, event: string }) {
-			console.log("onFriendUpdate", userId, event);
 			switch (event) {
 				case "connected":
 					setFriend((oldFriend) => {
@@ -75,12 +72,11 @@ export const NotificationRequestFriend: FC<NotificationRequestFriendProps> = ({ 
 
 	const handleAcceptFriend = () => {
 		apiClient.post(`/api/friends/accept/${notification.contentId}`).then((response) => {
-			console.log("reponseAcceptFriend", response.data);
 			if (response.data) {
 				setFriend(response.data);
 			}
 		}).catch((error) => {
-			console.log(error);
+			
 		});
 	}
 

@@ -17,10 +17,8 @@ interface FriendDisplayProps {
 
 export const joinDm = (userId: number, navigate: NavigateFunction) => {
 	apiClient.post(`/api/chat/dm/${userId}/join`).then((response) => {
-		console.log("joinChannel", response);
 		navigate(`/chat/${response.data}`);
 	}).catch((error) => {
-		console.log(error);
 	});
 }
 
@@ -36,7 +34,6 @@ const FriendDisplay: FC<FriendDisplayProps> = ({ originalMember, channel, mooveT
 
 	useEffect(() => {
 		function onFriendUpdate({ userId, event }: { userId: number, event: string }) {
-			console.log("onFriendUpdate", userId, event);
 			switch (event) {
 				case "connected":
 					setMember((oldMember) => {
@@ -89,8 +86,6 @@ export function MyDirectMessageList() {
 
 	useEffect(() => {
 		apiClient.get(`/api/chat/channels/dm`).then((response) => {
-			console.log("MyDmList", response);
-			console.log("MyDmList data", response.data);
 			if (response.data.length == 0)
 				return;
 			setMyDmList(response.data.reduce((map: { [id: number]: Channel }, obj: Channel) => {
@@ -99,16 +94,13 @@ export function MyDirectMessageList() {
 				map[obj.id] = obj;
 				return map;
 			}, {}));
-		}).catch((error) => {
-			console.log(error);
-		});
+		}).catch((error) => {});
 	}, []);
 
 	const { channelId } = useParams()
 
 	useEffect(() => {
 		function onModifyChannel(data: Channel) {
-			console.log("onModifyChannel dm", data)
 			if (!data)
 				return;
 			if (data.members.length != 2)
@@ -119,12 +111,11 @@ export function MyDirectMessageList() {
 		function onDeleteChannel(id: number) {
 			if (!id)
 				return
-			setMyDmList(channelList => { delete channelList[id]; console.log(channelList); return { ...channelList }; });
+			setMyDmList(channelList => { delete channelList[id]; return { ...channelList }; });
 			if (channelId && +channelId == id)
 				navigate(`/chat`);
 		}
 		function onUnreadMessage(data: { unreadMessages: number, id: number }) {
-			console.log("onUnreadMessage.dm", data);
 			if (!channelId || +channelId != data.id)
 				setMyDmList(channelList => ({ ...channelList, [data.id]: { ...channelList[data.id], unreadMessages: data.unreadMessages } }));
 		}
@@ -157,7 +148,6 @@ export function MyDirectMessageList() {
 			{Object.values(myDmList)
 				.sort((a: Channel, b: Channel) => b.unreadMessages - a.unreadMessages)
 				.map((channel: Channel) => {
-					console.log("channel", channel);
 					const friend = channel.members[0].user.id == auth.user?.id ? channel.members[1] : channel.members[0];
 					return (
 						<FriendDisplay key={channel.id} originalMember={friend} channel={channel} mooveToChannel={mooveToChannel} />

@@ -28,10 +28,7 @@ export function InvitedFriends({isConnected = false, type, invited = {}}: Invite
     }, [invited])
 
 	function inviteFriend(dmChannel: ShortDMChannel, username: string) {
-        console.log("id", idGame)
-        console.log("channelId", channelId);
 		if (!dmChannel) return;
-        console.log("inviteFriend", dmChannel, username);
         if (idGame && type === "game")
             apiClient.post(`/api/chat/channels/${dmChannel.id}/messages`, { content: `Join my private game.`, gameId: idGame })
         if (channelId && type === "chat")
@@ -48,7 +45,6 @@ export function InvitedFriends({isConnected = false, type, invited = {}}: Invite
 				id: channel.id,
 				friend: channel.members.find((member) => member.user.id !== auth.user?.id),
 			})).filter(channel => channel.friend) as ShortDMChannel[]
-			console.log('friendsList', invitedFriends, channelsList);
             if (isConnected)
                 setDMChannelsList(channelsList.filter(channel => channel.friend.isConnected));
             else 

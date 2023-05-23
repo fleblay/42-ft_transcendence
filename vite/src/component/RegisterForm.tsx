@@ -39,7 +39,6 @@ export function RegisterForm() {
 				message: error?.response?.data?.message
 				}
 			setInfo(`Login failed : ${errorInfo.status} - ${errorInfo.statusText}${" : " + (errorInfo.message || "No additional info")}`)
-			console.log(error)
 		});
 	};
 

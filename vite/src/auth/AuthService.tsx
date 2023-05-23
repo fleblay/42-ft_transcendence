@@ -40,16 +40,13 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 			})
 			if (response.status === 200) {
 				setUser(response.data);
-				console.log("AuthService : me is :", response.data)
 				if (allRoutes.find(el => el.path === window.location.pathname)?.public) {
 					if (!ignoreLogMsg)
 						setError({ status: 200, message: 'Already logged in' })
 					nav('/game', { replace: true })
 				}
 			}
-		} catch (error) {
-			console.log("Not connected", error);
-		}
+		} catch (error) {}
 	}
 
 	useEffect(() => {
@@ -67,7 +64,6 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 					resolve();
 				})
 				.catch((error) => {
-					console.log(error);
 					reject(error);
 				});
 		})
@@ -84,14 +80,12 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 					}
 					else {
 						const { from } = location.state || {}
-						console.log('im login, redirect to', from?.pathname);
 						nav(from?.pathname || '/', { replace: true })
 					}
 					await getUser(true)
 					resolve();
 				})
 				.catch((error) => {
-					console.log('login catch', error);
 					reject(error);
 				});
 		})
@@ -107,7 +101,6 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 					resolve()
 				})
 				.catch((error) => {
-					console.log('logout catch', error);
 					reject(error);
 				});
 		})

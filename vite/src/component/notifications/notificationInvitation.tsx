@@ -31,7 +31,6 @@ export const NotificationInvitation: FC<NotificationInvitationProps> = ({ notifi
     const navigate = useNavigate();
 
     const viewMessage = () => {
-        console.log("viewMessage", notification.contentId);
         navigate(`/chat/${notification.contentId}`);
     }
 

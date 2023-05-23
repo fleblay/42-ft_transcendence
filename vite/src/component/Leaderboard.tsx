@@ -127,9 +127,7 @@ export function Leaderboard() {
 					</Container>
 				)
 			})
-			.catch((error) => {
-				console.log(error)
-			})
+			.catch((error) => {})
 	}
 
 	return (
