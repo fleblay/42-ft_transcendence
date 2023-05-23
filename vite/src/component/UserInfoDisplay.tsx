@@ -52,37 +52,39 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 	const navigate = useNavigate();
 
 	React.useEffect(() => {
+
+		if (!auth.user) return;
+
 		apiClient.get(`/api/users/${idPlayer}`).then((response) => {
 			setUserData(response.data);
-		}).catch((error) => {});
-	}, [idPlayer, displayUpdate])
+		}).catch((error) => { }).then(() => {
 
-	React.useEffect(() => {
-		if (!auth.user) return;
-		if (idPlayer !== undefined && parseInt(idPlayer) === auth.user.id) {
-			setItsMe(true);
-		}
-		else {
-			setItsMe(false);
-			if (idPlayer !== undefined) {
-				apiClient.get(`/api/friends/${idPlayer}`).then((response) => {
-					setRelation(response.data);
-				}).catch((error) => {
-
-				});
-				apiClient.get(`/api/users/getBlocked/${idPlayer}`).then((response) => {
-					if (response.data) {
-						setIsBlocked(true);
-					}
-					else
-						setIsBlocked(false);
-				}).catch((error) => {
-				});
+			if (idPlayer !== undefined && auth.user && parseInt(idPlayer) === auth.user.id) {
+				setItsMe(true);
 			}
+			else {
+				setItsMe(false);
+				if (idPlayer !== undefined) {
+					apiClient.get(`/api/friends/${idPlayer}`).then((response) => {
+						setRelation(response.data);
+					}).catch((error) => {
 
-		}
+					}).then(() => {
+						apiClient.get(`/api/users/getBlocked/${idPlayer}`).then((response) => {
+							if (response.data) {
+								setIsBlocked(true);
+							}
+							else
+								setIsBlocked(false);
+						}).catch((error) => {
+						});
+					}
+					);
+				}
+			}
+		});
 
-	}, [auth.user, idPlayer, displayUpdate])
+	}, [auth.user, idPlayer, displayUpdate]);
 
 
 	React.useEffect(() => {
@@ -185,7 +187,8 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 					else
 						return <Button variant="outlined" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAcceptFriend}>Accept Request</Button>;
 				}
-
+			default:
+				return <Button variant="contained" sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }} onClick={handleAddFriend}>Add Friend</Button>;
 		}
 	}
 
@@ -215,7 +218,7 @@ export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }:
 					{itsMe ? <UpdateProfil /> : (
 						<>
 							{relation?.requestStatus === "accepted" && <IconButton color='primary' sx={{ mr: 'auto', marginTop: '5px' }} onClick={joinDm}><EmailIcon /></IconButton>}
-							{auth.user && userData && !userData.blockedId.includes(auth.user?.id) && renderButton(relation) || <Box sx={{ml : 'auto', mr: 1, mt: 2, mb: 2}}></Box>}
+							{auth.user && userData && !userData.blockedId.includes(auth.user?.id) && renderButton(relation) || <Box sx={{ ml: 'auto', mr: 1, mt: 2, mb: 2 }}></Box>}
 							{displayBlocked && isBlocked ? <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleUnblockUser(idPlayer)}>unblock</Button> : <Button variant="outlined" color="error" sx={{ ml: '1', mr: 3, mt: 2, mb: 2 }} onClick={() => handleBlockUser(idPlayer)}>block</Button>}
 						</>
 					)}

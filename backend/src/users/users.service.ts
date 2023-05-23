@@ -201,7 +201,10 @@ export class UsersService implements OnModuleInit {
 			console.log("User is already blocked");
 			return;
 		}
-		await this.friendsService.removeFriend(user, blockedId);
+		try {
+			await this.friendsService.removeFriend(user, blockedId);
+		}
+		catch (e) {}
 		user.blockedId.push(blockedId);
 		this.server.to(`/player/${user.id}`).emit('page.player', { userId: user.id, targetId: blockedId, event: "blocked" })
 		this.server.to(`/player/${blockedId}`).emit('page.player', { userId: user.id, targetId: blockedId, event: "me-blocked" })
