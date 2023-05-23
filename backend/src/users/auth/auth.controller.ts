@@ -1,4 +1,4 @@
-import { Controller, Request, Query, Redirect, Response, Body, HttpCode, UnauthorizedException } from '@nestjs/common';
+import { Controller, Request, Query, Redirect, Response, Body, HttpCode, UnauthorizedException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { Response as ExpressResponse, Request as ExpressRequest } from 'express'
 import { Get } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common';
@@ -97,7 +97,7 @@ export class AuthController {
 
 		const isValidCode = this.authService.is2faCodeValid(code, user)
 		if (!isValidCode)
-			throw new UnauthorizedException("I don't think so")
+			throw new BadRequestException("invalid dfa code")
 		this.authService.turnOnDfa(user.id)
 	}
 
@@ -108,10 +108,10 @@ export class AuthController {
 		// get user
 		const user = await this.authService.validateDfaToken(req.cookies['dfa_token'])
 		if (!user)
-			throw new UnauthorizedException("I don't think so")
+			throw new UnauthorizedException("User not found")
 		const isValidCode = this.authService.is2faCodeValid(code, user)
 		if (!isValidCode)
-			throw new UnauthorizedException("I don't think so")
+			throw new UnauthorizedException("Invalid dfa code")
 		const tokens = this.authService.getTokens(user);
 		if (tokens.accessToken && tokens.refreshToken) {
 			this.authService.saveRefreshToken(user.id, tokens.refreshToken);
