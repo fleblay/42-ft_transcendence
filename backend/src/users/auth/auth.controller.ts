@@ -64,7 +64,8 @@ export class AuthController {
 		const refreshToken = req.cookies['refresh_token'];
 		res.cookie('access_token', '', { sameSite: 'lax', maxAge: 0 });
 		res.cookie('refresh_token', '', { sameSite: 'lax', httpOnly: true, maxAge: 0 });
-		return this.authService.deleteRefreshToken(refreshToken);
+		await this.authService.deleteRefreshToken(refreshToken);
+		return { ok: true };
 	}
 	@Get('/42externalauth')
 	redirectTo42Api(@Response({ passthrough: true }) res: ExpressResponse) {
