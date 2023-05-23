@@ -117,9 +117,11 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 		apiClient.get<plainUser[]>(`/api/users/blocked`).then(({ data }) => {
 			setBlockedList(data.map((user) => user.id));
 		}).catch((error) => {
-			
+
 		});
 		function onBlockUser({ userId, targetId, event }: { userId: number, targetId: number, event: string }) {
+			if (userId !== user?.id)
+				return;
 			setBlockedList((blockedList) => {
 				if (event === "unblocked")
 					return blockedList.filter((id) => id !== targetId);
@@ -142,7 +144,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 			if (me)
 				setMutedState(Date.parse(me.muteTime) > Date.now())
 		}).catch((error) => {
-			
+
 		});
 
 		function onBeingMuted({ modifyMember: upDatedMember }: { modifyMember: Member }) {
