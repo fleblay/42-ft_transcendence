@@ -47,7 +47,6 @@ clean: stop-all rm-all rm-vol rm-net
 
 fclean : clean rm-modules
 	docker system prune -f --volumes -a
-	rm -rf nginx/avatars
 	find nginx/avatars -type f ! -name "default.png" ! -name "1.png" -exec rm {} +
 	rm -rf ./.env
 
