@@ -17,6 +17,7 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 		apiClient.get(`/api/chat/channels/${channelInfo.id}/members`).then((response) => {
 			setListMembers(response.data
 				.filter((member: Member) => member.left === false)
+				.filter((member: Member) => member.banned === false)
 				.map((member: Member) => member.user.id))
 		})
 	}, [channelInfo, open])
