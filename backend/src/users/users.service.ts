@@ -187,7 +187,7 @@ export class UsersService implements OnModuleInit {
 			throw new BadRequestException("Username is the same");
 		if (newUsername.length < 3 || newUsername.length > 10)
 			throw new BadRequestException("Username must be between 3 and 10 characters");
-		if (await this.findOneByUsername(newUsername.toLocaleLowerCase('en-US')))
+		if (await this.findOneByUsername(newUsername))
 			throw new BadRequestException("Username already taken");
 		user.username = newUsername;
 		const savedUser: User = await this.repo.save(user);
