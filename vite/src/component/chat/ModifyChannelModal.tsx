@@ -14,11 +14,11 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 	useEffect(() => {
 		if (!open) return;
 		if (!channelInfo) return;
-		apiClient.get(`/api/chat/channels/${channelInfo.id}/members`).then((response) => {
-			setListMembers(response.data
-				.filter((member: Member) => member.left === false)
-				.filter((member: Member) => member.banned === false)
-				.map((member: Member) => member.user.id))
+		apiClient.get(`/api/chat/channels/${channelInfo.id}/members`).then(({data}) => {
+			const values = data
+				.filter((member: Member) => !member.left || member.banned)
+				.map((member: Member) => member.user.id)
+			setListMembers(values)
 		})
 	}, [channelInfo, open])
 
