@@ -504,7 +504,7 @@ export class ChatService implements OnModuleInit {
 	}
 	}
 
-	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channe?: Channel) => Promise<any>) {
+	async emitToAllMembers(channelId: number, event: string, cb: (member: Member, channel?: Channel) => Promise<any>) {
 		const channel = await this.getOneChannel(channelId);
 		console.log("emitToAllMembers : ", channel, event);
 		if (!channel)
