@@ -3,6 +3,7 @@ ALL_CONTAINERS		:= $(shell docker ps -a -q)
 ALL_VOLUMES			:= $(shell docker volume ls -q)
 ALL_NETWORK			:= $(shell docker network ls --filter type=custom -q)
 
+#docker compose exec -ti postgres /bin/bash
 #export PGPASSWORD="$POSTGRES_PASSWORD" ; psql -d postgres -U $POSTGRES_USER
 #/d to list tables
 #select id, username, password from "user";
@@ -46,7 +47,7 @@ clean: stop-all rm-all rm-vol rm-net
 
 fclean : clean rm-modules
 	docker system prune -f --volumes -a
-	rm -rf nginx/avatars
+	find nginx/avatars -type f ! -name "default.png" ! -name "1.png" -exec rm {} +
 	rm -rf ./.env
 
 #####CLEANING#####
