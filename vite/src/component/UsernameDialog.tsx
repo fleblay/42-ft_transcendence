@@ -50,7 +50,7 @@ export const UsernameDialog: React.FC<UsernameDialogProps> = ({ open = true, qui
 			}}
 		>
 			<DialogTitle>
-				{"You don't have a username."}
+				{"Choose a username."}
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText>
