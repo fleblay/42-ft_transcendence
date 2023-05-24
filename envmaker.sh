@@ -7,7 +7,7 @@ then
 fi
 
 RANDOMINPUT=()
-for i in `seq 0 5`
+for i in `seq 0 9`
 do
 	RANDOMINPUT[$i]=$(cat /dev/urandom | LC_ALL=C tr -dc '[:alpha:]' | fold -w 20 | head -n 1)
 done
@@ -30,6 +30,9 @@ sed -i $EXTENSION "s/\(COOKIE_KEY=\).*/\1${RANDOMINPUT[2]}/" .env
 sed -i $EXTENSION "s/\(TOKEN_KEY=\).*/\1${RANDOMINPUT[3]}/" .env
 sed -i $EXTENSION "s/\(RANDOM_NUMBER1=\).*/\1${RANDOMINPUT[4]}/" .env
 sed -i $EXTENSION "s/\(RANDOM_NUMBER2=\).*/\1${RANDOMINPUT[5]}/" .env
+sed -i $EXTENSION "s/\(SECRET_ACCESS=\).*/\1${RANDOMINPUT[6]}/" .env
+sed -i $EXTENSION "s/\(SECRET_REFRESH=\).*/\1${RANDOMINPUT[7]}/" .env
+sed -i $EXTENSION "s/\(SECRET_DFA=\).*/\1${RANDOMINPUT[8]}/" .env
 
 HOSTNAME=$(uname -n)
 if [[ "$HOSTNAME" == *".clusters.42paris.fr" ]]

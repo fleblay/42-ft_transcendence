@@ -16,9 +16,9 @@ import * as sharp from 'sharp';
 var http = require('http');
 var fs = require('fs');
 
-const access_token_options = { expiresIn: '1d', secret: 'access' };
-const refresh_token_options = { expiresIn: '10d', secret: 'refresh' };
-const dfa_token_options = { expiresIn: '1h', secret: 'dfa_secret' };
+const access_token_options = { expiresIn: '1d', secret: process.env.SECRET_ACCESS };
+const refresh_token_options = { expiresIn: '7d', secret: process.env.SECRET_REFRESH };
+const dfa_token_options = { expiresIn: '1h', secret: process.env.SECRET_DFA };
 
 @Injectable()
 export class AuthService {

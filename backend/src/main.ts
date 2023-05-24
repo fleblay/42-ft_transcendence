@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-const session = require('express-session');
 import * as cookieParser from 'cookie-parser';
 import { TypeOrmFilter } from './typeorm.filter';
 import { UnauthorizedExceptionFilter } from './unauthorizedException.filter';
@@ -12,13 +11,7 @@ if (process.env.NODE_ENV === 'production') {
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
-	app.use(session({
-			secret: 'secret', // secret key for signing cookies
-			resave: false, // save session even if unmodified false by default for performance
-			saveUninitialized: false, // save session even if no data false by default for security
-			cookie: { maxAge: 360000 } // 1 hour
-		})
-	);
+
 	app.use(cookieParser())
 	app.useGlobalFilters(new TypeOrmFilter);
 	app.useGlobalFilters(new UnauthorizedExceptionFilter);
