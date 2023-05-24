@@ -83,7 +83,6 @@ export class ChatController {
 	}
 
 
-	// NOTE: A TESTER
 	// to: /chat emit :chat.new.channel
 	@Post('channels/create')
 	async createChannel(@CurrentUser() user: User, @Body() body: CreateChannelDto): Promise<number> {
@@ -92,7 +91,6 @@ export class ChatController {
 		return channelId;
 	}
 
-	// NOTE: A TESTER
 	// to: /chat/${channelId} emit :chat.join.channel
 	@Post('channels/:id/join')
 	async joinChannel(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: JoinChannelDto): Promise<void> {
@@ -109,7 +107,6 @@ export class ChatController {
 		return this.chatService.getMessages(user, channelId);
 	}
 
-	// NOTE: A TESTER
 	// to: /chat/${channelId} emit :chat.new.message
 	@Post('channels/:id/messages')
 	async createMessage(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number, @Body() body: NewMessageDto): Promise<void> {
@@ -120,7 +117,6 @@ export class ChatController {
 	getChannelName(@CurrentUser() user: User, @Param('id', ValideIdPipe) channelId: number): Promise<ChannelInfo | undefined> {
 		return this.chatService.getChannelInfo(user, channelId);
 	}
-	// NOTE: A TESTER
 	@Get('channels/:id/members')
 	async getChannelMembers(@Param('id', ValideIdPipe) channelId: number): Promise<Partial<Member>[]> {
 		let members = await this.chatService.getChannelMembers(channelId);

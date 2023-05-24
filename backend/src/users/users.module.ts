@@ -16,7 +16,7 @@ import { NotificationModule } from '../notification/notification.module';
 	imports: [
 		TypeOrmModule.forFeature([User, RefreshToken]),
 		JwtModule.register({
-			secret: process.env.SECRET_REFRESH, // not secure at all need to be changed in production  put in a .env file
+			secret: process.env.SECRET_REFRESH,
 			signOptions: { expiresIn: '600s' },
 		}),
 		forwardRef(() => GameModule),

@@ -34,7 +34,6 @@ export const UsernameDialog: React.FC<UsernameDialogProps> = ({ open = true, qui
 				if (response.status === 200) {
 					if (typeof quit === 'function')
 						quit();
-					// NOTE: Do i need to reload Or return the user from the response ?
 					navigate(0)
 				}
 			})

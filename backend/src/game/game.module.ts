@@ -14,7 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
 		forwardRef(() => UsersModule),
 		TypeOrmModule.forFeature([SavedGame]),
 		JwtModule.register({
-			secret: process.env.SECRET_ACCESS, // not secure at all need to be changed in production  put in a .env file
+			secret: process.env.SECRET_ACCESS,
 			signOptions: { expiresIn: '600s' },
 		})	
 	]

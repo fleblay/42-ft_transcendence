@@ -56,7 +56,7 @@ export class AuthService {
 
 	async validateAccessToken(bearerToken: string): Promise<User | null> {
 		try {
-			const jwtResponse = this.jwtService.verify<{ sub: number, email: string }>(bearerToken, access_token_options) // compliant to security rules of year 3000
+			const jwtResponse = this.jwtService.verify<{ sub: number, email: string }>(bearerToken, access_token_options)
 			return await this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
 			console.log(`Error in validate Token access is ${e}`)
@@ -66,7 +66,7 @@ export class AuthService {
 
 	async validateDfaToken(dfaToken: string): Promise<User | null> {
 		try {
-			const jwtResponse = this.jwtService.verify(dfaToken, dfa_token_options) // compliant to security rules of year 3000
+			const jwtResponse = this.jwtService.verify(dfaToken, dfa_token_options)
 			return await this.usersService.findOne(jwtResponse.sub)
 		} catch (e) {
 			console.log(`Error in validate Dfa access is ${e}`)

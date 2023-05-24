@@ -10,7 +10,7 @@ import { UsersModule } from '../users.module';
 	imports: [
 		TypeOrmModule.forFeature([RefreshToken]),
 		JwtModule.register({
-			secret: process.env.SECRET_ACCESS, // not secure at all need to be changed in production  put in a .env file
+			secret: process.env.SECRET_ACCESS,
 			signOptions: { expiresIn: '60s' },
 		}),
 		UsersModule
