@@ -112,12 +112,26 @@ export class GameService {
 
 
 	async getListGamesByUser(id: number) {
-		const fullDB = await this.repo.createQueryBuilder("game")
-			.leftJoin("game.players", "player")
-			.addSelect(['player.id', 'player.username'])
-			.orderBy("date", "DESC")
-			.getMany()
-		return fullDB.filter((element: SavedGame) => element.players.find((player) => player.id == id) != undefined);
+		const gameHistory = await  this.repo.find({
+			relationLoadStrategy: "query",
+			where: {
+				players: {
+					id: id
+				}
+			},
+			order: {
+				date: 'DESC'
+			},
+			relations : {players : true, winner : true},
+			select: {
+				id: true,
+				players: { id: true, username: true },
+				score: true,
+				winner: { id: true, username: true },
+				date: true
+			},
+		})
+		return gameHistory
 	}
 
 	async saveFakeGame() {

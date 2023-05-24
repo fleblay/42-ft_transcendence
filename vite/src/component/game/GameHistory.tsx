@@ -37,7 +37,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
             players: game.players,
             score: game.score.sort((a: number, b: number) => b - a).join(' : '),
             date: formattedDate(game.date),
-            winner: game.players[0].username,
+            winner: game.winner,
         }
     });
 
@@ -102,9 +102,7 @@ export function GameHistory( { idPlayer }: { idPlayer: string | undefined }) {
 								</TableCell>
 								<TableCell align="right">{row.score}</TableCell>
 								<TableCell align="right">{dayjs(row.date).fromNow()}</TableCell>
-								<TableCell align="right">
-                                <Link key={row.players[0].id} component={LinkRouter} to={`/player/${row.players[0].id}`}>{row.players[0].username} </Link>
-                                </TableCell>
+								<TableCell align="right">{row.winner.username}</TableCell>
 							</TableRow>
                         )
                         )}
