@@ -43,7 +43,8 @@ export class UsersController {
 				userConnected: this.usersService.isConnected(user.id)
 			})
 		});
-		allUsers.sort((a, b) => b.points - a.points)
+		allUsers.forEach((user)=> user.rank = (user.rank < 0 ? Infinity : user.rank))
+		allUsers.sort((a, b) => a.rank - b.rank)
 		return allUsers
 	}
 
