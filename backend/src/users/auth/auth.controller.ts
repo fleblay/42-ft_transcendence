@@ -30,8 +30,8 @@ export class AuthController {
 		// token dans X-Refresh-Token
 		const refreshToken = req.cookies['refresh_token'];
 		const tokens = await this.authService.refreshToken(refreshToken) as Tokens;
-		res.cookie('access_token', tokens.accessToken, { sameSite: true, maxAge: AccessTokenTime });
-		res.cookie('refresh_token', tokens.refreshToken, { sameSite: true, httpOnly: true, maxAge: RefreshTokenTime});
+		res.cookie('access_token', tokens.accessToken, { sameSite: 'lax', maxAge: AccessTokenTime });
+		res.cookie('refresh_token', tokens.refreshToken, { sameSite: 'lax', httpOnly: true, maxAge: RefreshTokenTime});
 		return { ok: true };
 	}
 
