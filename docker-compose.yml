@@ -37,7 +37,7 @@ services:
       context: ./vite
     env_file:
       - .env
-    restart: on-failure #A changer en prod
+    restart: on-failure
     volumes:
       - ./vite:/www/vite/
     networks:

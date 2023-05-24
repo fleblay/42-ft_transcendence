@@ -91,7 +91,6 @@ export class AuthController {
 	}
 
 	@Post('turn-on-2fa')
-	@HttpCode(200)
 	@UseGuards(ATGuard)
 	async turnDfaOn(@CurrentUser() user: User, @Request() req: ExpressRequest, @Body() { code }: DfaCodeDto) {
 
@@ -102,7 +101,6 @@ export class AuthController {
 	}
 
 	@Post('validate-dfa')
-	@HttpCode(200)
 	@UseGuards(DfaGuard)
 	async validateDfa(@Body() { code }: DfaCodeDto, @Request() req: ExpressRequest, @Response({ passthrough: true }) res: ExpressResponse) {
 		// get user
