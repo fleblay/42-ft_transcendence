@@ -115,7 +115,7 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 
 	function inviteFriendToGame(dmChannel: ShortDMChannel) {
 		if (!idGame || !dmChannel) return;
-		apiClient.post(`/api/chat/channels/${dmChannel.id}/messages`, { content: `Join my private game.`, gameId: idGame })
+		apiClient.post(`/api/chat/channels/${dmChannel.id}/messages`, { content: `Join my private game.`, gameId: idGame }).catch(() => {})
 
 		setInvitedFriends({ ...invitedFriends, [dmChannel.friend.user.id]: true })
 		closeFriendsList();
@@ -129,14 +129,14 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 			setDMChannelsList(channelsList
 				.filter(channel => channel.friend.isConnected)
 			);
-		})
+		}).catch(() => {})
 	}
 
 	function handleFriendsList(event: React.MouseEvent<HTMLButtonElement>) {
 		fetchFriendsList();
 		setAnchorEl(event.currentTarget);
 	}
-	
+
 	function closeFriendsList() {
 		setAnchorEl(null);
 	}
@@ -167,7 +167,7 @@ export function GameModule({ setActiveStep, width, setResult, bottomRef }: Igame
 							{
 								gameInfo.private && <InvitedFriends type='game' isConnected/>
 							}
-					
+
 
 						</div>
 					}

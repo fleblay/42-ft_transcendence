@@ -28,7 +28,7 @@ export const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) 
 				prev[game.id] = game;
 				return prev;
 			}, {}));
-		});
+		}).catch(() => {});
 		return addSubscription('game.current');
 	}, []);
 

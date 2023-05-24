@@ -28,8 +28,7 @@ export function FinishGames() {
 	function getData() {
 		apiClient.get(`/api/game/list/${gamePage}`).then((response) => {
 			setListGames(response.data)
-		})
-			.catch(() => {})
+		}).catch(() => {})
 	}
 
 	useEffect(() => {

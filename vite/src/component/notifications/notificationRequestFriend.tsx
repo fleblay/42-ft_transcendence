@@ -38,9 +38,7 @@ export const NotificationRequestFriend: FC<NotificationRequestFriendProps> = ({ 
 	React.useEffect(() => {
 		apiClient.get(`/api/friends/${notification.contentId}`).then((response) => {
 			setFriend(response.data);
-		}).catch((error) => {
-			
-		});
+		}).catch((error) => { });
 	}, [notification.contentId])
 
 	React.useEffect(() => {
@@ -75,9 +73,7 @@ export const NotificationRequestFriend: FC<NotificationRequestFriendProps> = ({ 
 			if (response.data) {
 				setFriend(response.data);
 			}
-		}).catch((error) => {
-			
-		});
+		}).catch((error) => { });
 	}
 
 	const viewProfil = () => {

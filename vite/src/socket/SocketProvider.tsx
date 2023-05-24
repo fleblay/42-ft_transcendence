@@ -102,7 +102,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		if (socket && nav.to != nav.from && nav.from.startsWith('/game/')) {
 			const gameId = nav.from.split('/')[2]
 			if (gameId) {
-				apiClient.get(`/api/game/quit/${gameId}`)
+				apiClient.get(`/api/game/quit/${gameId}`).catch(() => {})
 			}
 		}
 	}, [nav])

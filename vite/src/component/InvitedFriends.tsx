@@ -14,7 +14,7 @@ interface InvitedFriendsProps {
 }
 
 export function InvitedFriends({isConnected = false, type, invited}: InvitedFriendsProps) {
-    
+
     type ShortDMChannel = { id: number, friend: Member }
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [dmChannelsList, setDMChannelsList] = useState<null | ShortDMChannel[]>(null);
@@ -28,17 +28,17 @@ export function InvitedFriends({isConnected = false, type, invited}: InvitedFrie
             setInvitedFriends(invited);
     }, [invited])
 
-	function inviteFriend(dmChannel: ShortDMChannel, username: string) {
-		if (!dmChannel) return;
+    function inviteFriend(dmChannel: ShortDMChannel, username: string) {
+        if (!dmChannel) return;
         if (idGame && type === "game")
-            apiClient.post(`/api/chat/channels/${dmChannel.id}/messages`, { content: `Join my private game.`, gameId: idGame })
+            apiClient.post(`/api/chat/channels/${dmChannel.id}/messages`, { content: `Join my private game.`, gameId: idGame }).catch(() => { })
         if (channelId && type === "chat")
             apiClient.post(`/api/chat/channels/${channelId}/join`, {
-			username: username,
-		});
-		setInvitedFriends({ ...invitedFriends, [dmChannel.friend.user.id]: true })
-		closeFriendsList();
-	}
+                username: username,
+            }).catch(() => {});
+        setInvitedFriends({ ...invitedFriends, [dmChannel.friend.user.id]: true })
+        closeFriendsList();
+    }
 
 	function fetchFriendsList() {
 		apiClient.get<Channel[]>('/api/chat/channels/dm').then(({ data }) => {
@@ -48,24 +48,24 @@ export function InvitedFriends({isConnected = false, type, invited}: InvitedFrie
 			})).filter(channel => channel.friend) as ShortDMChannel[]
             if (isConnected)
                 setDMChannelsList(channelsList.filter(channel => channel.friend.isConnected));
-            else 
+            else
                 setDMChannelsList(channelsList);
-		})
+		}).catch(() => {})
 	}
 
 	function handleFriendsList(event: React.MouseEvent<HTMLButtonElement>) {
 		fetchFriendsList();
 		setAnchorEl(event.currentTarget);
 	}
-	
+
 	function closeFriendsList() {
 		setAnchorEl(null);
 	}
-    
+
     return (
         <>
             <IconButton color="primary" sx={{ ml: 2 }} size='small' onClick={handleFriendsList}>
-                Invite a friend 
+                Invite a friend
                 <PersonAdd />
             </IconButton>
 

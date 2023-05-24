@@ -19,7 +19,7 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 				.filter((member: Member) => !member.left || member.banned)
 				.map((member: Member) => member.user.id)
 			setListMembers(values)
-		})
+		}).catch(() => {})
 	}, [channelInfo, open])
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -36,6 +36,8 @@ export const ModifyChannelModal: React.FC<{ channelInfo: ChannelInfo | null, ope
 			name: name,
 			password: channelForm.get('password') || ''
 		}).then(() => {
+			handleClose();
+		}).catch((err) => {
 			handleClose();
 		})
 	}

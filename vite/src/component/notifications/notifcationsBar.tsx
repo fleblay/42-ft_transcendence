@@ -24,9 +24,7 @@ export function NotifcationBar() {
         apiClient.get("/api/notification/noread").then((response) => {
             setNotifications(response.data);
                 return;
-        }).catch((error) => {
-            
-        });
+        }).catch((error) => { });
         if (!auth.user) return;
         return addSubscription(`/notification/${auth.user.id}`);
     }, [auth.user])
@@ -38,9 +36,7 @@ export function NotifcationBar() {
             {
                 apiClient.post(`/api/notification/ack/${data.id}`).then((response) => {
                 }
-                ).catch((error) => {
-                    
-                });
+                ).catch((error) => { });
                 return;
             }
             if (currentLocation === "/notification")
@@ -65,19 +61,19 @@ export function NotifcationBar() {
         })
     }, [socket, currentLocation]);
 
-    
+
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setNotifications(0);
         navigate("/notification");
     };
 
-  
+
 
     return (
         <>
             <IconButton  size="large"
-            
+
                             aria-label="account of current user"
                             aria-controls="menu-appbar"
                             aria-haspopup="true"
