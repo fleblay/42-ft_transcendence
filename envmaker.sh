@@ -38,6 +38,13 @@ HOSTNAME=$(uname -n)
 if [[ "$HOSTNAME" == *".clusters.42paris.fr" ]]
 then
 	echo -e "\x1b[33m42paris device : changing HOSTNAME from localhost to ${HOSTNAME}\x1b[0m"
+elif [[ "$HOSTNAME" == "fred-LPD3" ]]
+then
+	echo -e "\x1b[33mLPD3\x1b[0m"
+	sed -i $EXTENSION "s/\(PUBLIC_URL=\).*/\1https:\/\/leblay.dev:443/" .env
+	sed -i $EXTENSION -e "/.*listen 8080.*/{r fred-LPD3.conf" -e "d}" ./nginx/nginx.conf
+	sed -i $EXTENSION "s/8080/443/g" ./docker-compose.yml
+	sed -i $EXTENSION "s/\(.*\/nginx\/avatars:\/www\/avatars.*\)/\1\n      - \/etc\/letsencrypt\/archive\/leblay.dev:\/etc\/letsencrypt\/live\/leblay.dev:ro\n/" ./docker-compose.yml
 else
 	echo -e "\x1b[33m42Outside 42paris : HOSTNAME set to localhost to\x1b[0m"
 	HOSTNAME="localhost"

@@ -23,7 +23,7 @@ const dfa_token_options = { expiresIn: '1h', secret: process.env.SECRET_DFA };
 @Injectable()
 export class AuthService {
 
-	redirectURI = `http://${process.env.HOSTNAME}:8080/api/auth/42auth`
+	redirectURI = `${process.env.PUBLIC_URL || "http://localhost:8080"}/api/auth/42auth`
 
 	constructor(@InjectRepository(RefreshToken) private repo: Repository<RefreshToken>, private usersService: UsersService, private jwtService: JwtService) { }
 

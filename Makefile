@@ -33,8 +33,8 @@ build: .env.template backend/Dockerfile
 	bash envmaker.sh dev
 	mkdir -p nginx/avatars
 	docker-compose build
-	curl https://leblay.dev/normi.png -sSo nginx/avatars/default.png
-	curl https://leblay.dev/xav.png -sSo nginx/avatars/1.png
+	#curl https://leblay.dev/normi.png -sSo nginx/avatars/default.png
+	#curl https://leblay.dev/xav.png -sSo nginx/avatars/1.png
 
 
 down:
