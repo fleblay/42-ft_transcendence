@@ -51,6 +51,8 @@ then
 	sed -i $EXTENSION "s/\(PUBLIC_URL=\).*/\1https:\/\/jremy.dev:443/" .env
 	sed -i $EXTENSION -e "/.*listen 8080.*/{r jremy.conf" -e "d}" ./nginx/nginx.conf
 	sed -i $EXTENSION "s/8080/443/g" ./docker-compose.yml
+	sed -i $EXTENSION "s/\(.*\/nginx\/avatars:\/www\/avatars.*\)/\1\n      - \/etc\/letsencrypt\/archive\/jremy.dev:\/etc\/letsencrypt\/live\/jremy.dev:ro\n/" ./docker-compose.yml
+
 
 
 
