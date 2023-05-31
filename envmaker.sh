@@ -52,10 +52,6 @@ then
 	sed -i $EXTENSION -e "/.*listen 8080.*/{r jremy.conf" -e "d}" ./nginx/nginx.conf
 	sed -i $EXTENSION "s/8080/443/g" ./docker-compose.yml
 	sed -i $EXTENSION "s/\(.*\/nginx\/avatars:\/www\/avatars.*\)/\1\n      - \/etc\/letsencrypt\/live\/jremy.dev:\/etc\/letsencrypt\/live\/jremy.dev:ro\n/" ./docker-compose.yml
-
-
-
-
 else
 	echo -e "\x1b[33m42Outside 42paris : HOSTNAME set to localhost to\x1b[0m"
 	HOSTNAME="localhost"
