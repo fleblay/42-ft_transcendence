@@ -65,15 +65,12 @@ static serve of avatars files (.png) and front-end app file (.js / .html / .css)
 Transpilation and minification from typescript to javascript
 exits on success
 
-### Nest
+### Nest :
 expose api routes for use in frontend
 serves as an intermidary between client and postgre Database
 
-### PostgreSQL
+### PostgreSQL :
 handle CRUD operations on website database
-
-## Back Architecture :
-
 
 ## Data Architecture :
 
