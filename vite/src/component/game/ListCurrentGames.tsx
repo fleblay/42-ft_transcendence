@@ -72,7 +72,7 @@ export const ListCurrentGames: React.FC<ListCurrentGamesProps> = ({ joinGame }) 
 											index !== 0 && <Typography variant="h6">{player.score}</Typography>
 										}
 										<Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-											<Avatar sx={{ width: 24, height: 24, mb: 1 }} src={`/avatars/${player.id}.png`} />
+											<Avatar sx={{ width: 24, height: 24, mb: 1 }} src={`${import.meta.env.BASE_URL}/avatars/${player.id}.png`} />
 											{player.username}
 										</Box>
 										{

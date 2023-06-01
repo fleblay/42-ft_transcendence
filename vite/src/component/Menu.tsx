@@ -146,7 +146,7 @@ export function MenuBar() {
 
 					<Box display="flex" sx={{ flexGrow: 0, marginLeft: 'auto' }}>
 						<Button onClick={handleOpenUserMenu} sx={{ color: 'white', display: 'flex', gap: 1, fontWeight: 700 }}>
-							<Avatar alt={auth.user?.username} src={`/avatars/${auth.user?.id}.png`} />
+							<Avatar alt={auth.user?.username} src={`${import.meta.env.BASE_URL}/avatars/${auth.user?.id}.png`} />
 							{auth.user?.username}
 						</Button>
 						<Menu

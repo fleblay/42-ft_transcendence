@@ -49,7 +49,7 @@ export function LoginForm() {
 	};
 
 	const handle42login = () => {
-			window.location.replace(`/api/auth/42externalauth`)
+			window.location.replace(`${import.meta.env.BASE_URL}/api/auth/42externalauth`)
 	}
 
 	return (

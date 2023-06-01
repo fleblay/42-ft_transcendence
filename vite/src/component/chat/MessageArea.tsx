@@ -188,7 +188,7 @@ export function MessageArea({ channelId }: MessageAreaProps) {
 							<ChatMsg
 								key={i}
 								side={messages[0].owner.user.id === user?.id ? 'right' : 'left'}
-								avatar={`/avatars/${messages[0].owner.user.id}.png`}
+								avatar={`${import.meta.env.BASE_URL}/avatars/${messages[0].owner.user.id}.png`}
 								messages={messages}
 								username={messages[0].owner.user.username}
 								blocked={blockedList.includes(messages[0].owner.user.id)}

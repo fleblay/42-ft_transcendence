@@ -67,6 +67,7 @@ export class AuthController {
 		await this.authService.deleteRefreshToken(refreshToken);
 		return { ok: true };
 	}
+
 	@Get('/42externalauth')
 	redirectTo42Api(@Response({ passthrough: true }) res: ExpressResponse) {
 		res.redirect(302, `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.API_CLIENT_ID}&redirect_uri=${encodeURI(this.authService.redirectURI)}&response_type=code`)
@@ -81,12 +82,12 @@ export class AuthController {
 		const tokens = await this.authService.validate42Code(query.code)
 		if (tokens.dfaToken) {
 			res.cookie('dfa_token', tokens.dfaToken, { sameSite: 'lax', httpOnly: false, maxAge: DfaTokenTime });
-			res.redirect(302, '/dfa')
+			res.redirect(302, `${process.env.PUBLIC_URL}/dfa`)
 		}
 		else if (tokens.accessToken && tokens.refreshToken) {
 			res.cookie('access_token', `${tokens.accessToken}`,  { sameSite: 'lax', httpOnly: false, maxAge: AccessTokenTime })
 			res.cookie('refresh_token', `${tokens.refreshToken}`,  { sameSite: 'lax', httpOnly: true, maxAge: RefreshTokenTime })
-			res.redirect(302, '/')
+			res.redirect(302, `${process.env.PUBLIC_URL}`)
 		}
 	}
 

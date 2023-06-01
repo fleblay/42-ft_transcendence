@@ -29,7 +29,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 		if (!socket)
 			return null
 		if (!access_token) {
-			window.location.replace(`/login`)
+			window.location.replace(`${import.meta.env.BASE_URL}/login`)
 			}
 		const usedCallback = callback ? callback : () => { }
 		return socket.emit(eventname, { ...data, _access_token: access_token }, usedCallback)
@@ -66,7 +66,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 			const temporarySocket = io({
 				auth: {
 					token: getAccessToken(),
-				}
+				},
+				path: `${import.meta.env.BASE_URL}/socket.io`
 			})
 			function onConnect() {
 				setSocket(temporarySocket)

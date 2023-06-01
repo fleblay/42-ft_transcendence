@@ -99,7 +99,7 @@ const FriendDisplay: FC<FriendDisplayProps> = ({ originalFriend, index, array })
 				variant="dot"
 				color={friend.online ? "success" : "error"}
 			>
-				<Avatar src={`/avatars/${friend.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
+				<Avatar src={`${import.meta.env.BASE_URL}/avatars/${friend.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
 			</StyledBadge>
 
 				<ListItemText primary={
