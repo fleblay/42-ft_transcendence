@@ -1,6 +1,6 @@
-# ft_transcendenc [![jremy's 42 ft_transcendence Score](https://badge42.vercel.app/api/v2/cl27cprhd001109mercwbbu5l/project/3008041)](https://github.com/JaeSeoKim/badge42)
+# ft_transcendence [![jremy's 42 ft_transcendence Score](https://badge42.vercel.app/api/v2/cl27cprhd001109mercwbbu5l/project/3008041)](https://github.com/JaeSeoKim/badge42)
 
-### Description :
+## Description :
 
 This project is the final projet of 42 cursus 
 
@@ -11,11 +11,11 @@ Technologies which use :
 - react
 - nginx
 
-### Team : 
+## Team : 
 
 [Fred](https://profile.intra.42.fr/users/fle-blay),[Marius](https://profile.intra.42.fr/users/mbraets),  [Jonathan](https://profile.intra.42.fr/users/jremy) 
 
-### Usage :
+## Usage :
 
 ```
  	~/$> git clone https://github.com/jremy42/42-ft_transcendence.git
@@ -25,22 +25,18 @@ Technologies which use :
 requirement : Make | Docker
 
 complient for deployement in aws => [you can try here](jremy.dev)
+
 complient for deployement in private webserver => [you can try here](fle-blay.dev)
-### Docker Stack :
+## Docker Stack :
 
 shema docker 
 
-### Back Architecture :
+## Back Architecture :
 
 
-### Front Architecture :
+## Front Architecture :
 
 
-### What have we learned? :
+## What have we learned? :
 
-- How to utilize an nginx configuration file.
-- Design of a server utilizing the epoll() function and its framework.
-- The HTTP protocol in its entirety.
-- The overall operation of a server and its interaction with CGI.
-
-### ressources:
+## ressources:
