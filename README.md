@@ -56,20 +56,20 @@ Compliant for deployement in private webserver => [you can try here](https://leb
   <img src="./info/stack_docker.jpg" width="100%">
 </p>
 
-###Nginx :
+### Nginx :
 ingress point listening on 443 with ssl
 reverse proxy for nestjs backend api calls
 static serve of avatars files (.png) and front-end app file (.js / .html / .css) 
 
-###Vite :
+### Vite :
 Transpilation and minification from typescript to javascript
 exits on success
 
-###Nest
+### Nest
 expose api routes for use in frontend
 serves as an intermidary between client and postgre Database
 
-###PostgreSQL
+### PostgreSQL
 handle CRUD operations on website database
 
 ## Back Architecture :
