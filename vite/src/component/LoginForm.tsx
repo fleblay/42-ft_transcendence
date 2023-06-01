@@ -1,5 +1,5 @@
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import TextField from '@mui/material/TextField';
 import Button, { buttonClasses } from '@mui/material/Button';
@@ -7,6 +7,10 @@ import { Container } from "@mui/system";
 import { Paper, Box, Typography, Grid, SvgIcon, Alert } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthService } from "../auth/AuthService";
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
+import * as React from 'react';
+
+import { Alert as MuiAlert } from '@mui/material';
 
 export interface LoginData {
 	email: string;
@@ -27,8 +31,13 @@ export function LoginForm() {
 	let navigate = useNavigate();
 	let auth = useAuthService();
 	const [info, setInfo] = useState<string>(auth.user ? "Already Logged in" : "")
+	const [open, setOpen] = useState<boolean>(false);
 
+	useEffect(() => {
+		if (window.orientation !== undefined  || navigator.userAgent.indexOf('IEMobile') !== -1)
+			setOpen(true);
 
+	}, [])
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -52,8 +61,17 @@ export function LoginForm() {
 			window.location.replace(`${import.meta.env.BASE_URL}/api/auth/42externalauth`)
 	}
 
+	const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        setOpen(false);
+    };
+
 	return (
 		<div>
+			<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical:"top", horizontal:'center' }}>
+                <Alert severity="warning" onClose={handleClose} sx={{ width: '100%' }}>
+					"this page is not optimized for mobile, please use a computer"
+                </Alert>
+            </Snackbar>
 			<Container maxWidth="xs" sx={{ mb: 4 }}>
 				<Paper variant="outlined" elevation={0} sx={{ borderRadius: '16px', boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.2)', p: 2, textAlign: "center" }}>
 					<Box sx={{ my: 5 }}>
