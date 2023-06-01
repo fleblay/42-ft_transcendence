@@ -21,6 +21,7 @@ import { MyError } from './component/Error';
 import { InterceptorAxios } from './auth/interceptor.axios';
 import { NotificationsList } from './component/notifications/notificationsList';
 import { NotFound } from './component/404';
+import { Footer } from './component/Footer'
 
 export interface Destinations {
 	name: string,
@@ -152,6 +153,9 @@ function App() {
 									<Route path='*' element={<NotFound />} />
 								</Route>
 							</Routes>
+							<RequireAuth>
+								<Footer />
+							</RequireAuth>
 						</SocketProvider>
 					</Layout>
 				</InterceptorAxios>
