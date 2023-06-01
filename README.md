@@ -7,18 +7,30 @@
 
 ## Description :
 
-This project is the final projet of 42 cursus 
+This project is the final projet of 42 cursus common core.
 
-Technologies which use :
+The goal of this project is to create online pong app, including :
+ - a chat interface
+ - a matchmaking system
+ - a friendship relation system
+ - notifications alert
+ - 2fa with google authenticator
+ - spectate mode
+ - login with 42 api
 
+Technologies used :
 - docker
-- nestjs
+- node/nestjs
 - react
-- nginx
+
+Languages used :
+- Typescript
+- Bash
+- Yaml
 
 ## Team : 
 
-[Fred](https://profile.intra.42.fr/users/fle-blay),[Marius](https://profile.intra.42.fr/users/mbraets),  [Jonathan](https://profile.intra.42.fr/users/jremy) 
+[Fred](https://profile.intra.42.fr/users/fle-blay), [Marius](https://profile.intra.42.fr/users/mbraets), [Jonathan](https://profile.intra.42.fr/users/jremy) 
 
 ## Usage :
 
@@ -27,6 +39,7 @@ Technologies which use :
 	~/$> cd 42-ft_transcendence
   	~/42-ft_transcendence> Make
 ```
+
 requirement : Make | Docker
 
 complient for deployement in aws => [you can try here](https://jremy.dev)
@@ -37,6 +50,7 @@ complient for deployement in private webserver => [you can try here](https://leb
 <p align="center">
   <img src="./info/stack_docker.jpg" width="100%">
 </p>
+
 
 ## Back Architecture :
 
