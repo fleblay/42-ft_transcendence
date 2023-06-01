@@ -29,12 +29,14 @@ Technologies which use :
 ```
 requirement : Make | Docker
 
-complient for deployement in aws => [you can try here](jremy.dev)
+complient for deployement in aws => [you can try here](https://jremy.dev)
 
-complient for deployement in private webserver => [you can try here](fle-blay.dev)
+complient for deployement in private webserver => [you can try here](https://leblay.dev/pong)
 ## Docker Stack :
 
-shema docker 
+<p align="center">
+  <img src="./info/stack_docker.jpg" width="100%">
+</p>
 
 ## Back Architecture :
 
