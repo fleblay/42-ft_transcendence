@@ -3,26 +3,39 @@ ALL_CONTAINERS		:= $(shell docker ps -a -q)
 ALL_VOLUMES			:= $(shell docker volume ls -q)
 ALL_NETWORK			:= $(shell docker network ls --filter type=custom -q)
 
+#docker compose exec -ti postgres /bin/bash
+#export PGPASSWORD="$POSTGRES_PASSWORD" ; psql -d postgres -U $POSTGRES_USER
+#\d to list tables
+#select id, email, username, password from "user";
+
+
 all: build
 	docker-compose up --no-build
 
-#MACOS specific
+42:
+	docker-compose up --build
 
+#MACOS specific
 kill:
 	pkill Docker
 
 docker:
 	open -g /Applications/Docker.app/
+#MACOS specific
 
 detach: build
 	docker-compose up --no-build -d
 
-follow:
+follow: detach
 	docker-compose logs -f
 
 build: .env.template backend/Dockerfile
-	bash envmaker.sh
+	bash envmaker.sh dev
+	mkdir -p nginx/avatars
 	docker-compose build
+	#curl https://leblay.dev/normi.png -sSo nginx/avatars/default.png
+	#curl https://leblay.dev/xav.png -sSo nginx/avatars/1.png
+
 
 down:
 	docker-compose down -t 3
@@ -34,6 +47,8 @@ clean: stop-all rm-all rm-vol rm-net
 
 fclean : clean rm-modules
 	docker system prune -f --volumes -a
+	find nginx/avatars -type f ! -name "default.png" ! -name "1.png" -exec rm {} +
+	rm -rf ./.env
 
 #####CLEANING#####
 stop-all :

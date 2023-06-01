@@ -1,0 +1,32 @@
+GET http://localhost:8080/api/users/channels
+
+###
+
+GET http://localhost:8080/api/chat/channels/public
+
+###
+
+POST http://localhost:8080/api/chat/channels/
+content-type: application/json
+
+{
+	"name": "test",
+	"private": false
+}
+
+###
+
+GET http://localhost:8080/api/chat/channels/1/messages?offset=0
+
+###
+
+POST http://localhost:8080/api/chat/channels/1/messages
+content-type: application/json
+
+{
+	"content": "test"
+}
+
+###
+
+GET http://localhost:8080/api/chat/channels/1/info

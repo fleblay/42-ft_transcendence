@@ -1,11 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import {readFileSync} from 'fs'
+import { checker } from 'vite-plugin-checker'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	base: '/',
-	plugins: [react()],
+	base: new URL(process.env.PUBLIC_URL).pathname,
+	plugins: [
+		react(),
+		checker({
+			typescript: true
+		})
+	],
 	server: {
 		/*
 		https: {
@@ -18,5 +23,5 @@ export default defineConfig({
 	},
 	build: {
 		sourcemap: true,
-	}
+	},
 })

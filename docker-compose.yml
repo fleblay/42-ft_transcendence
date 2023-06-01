@@ -5,7 +5,6 @@ volumes:
 
 networks:
   backend:
-  frontend:
 
 services:
   postgres:
@@ -28,6 +27,7 @@ services:
       - postgres
     volumes:
       - ./backend:/usr/src/app
+      - ./nginx/avatars:/usr/src/app/avatars
     networks:
       - backend
     ports:
@@ -37,7 +37,7 @@ services:
       context: ./vite
     env_file:
       - .env
-    restart: always #A changer en prod
+    restart: on-failure
     volumes:
       - ./vite:/www/vite/
     networks:
@@ -51,5 +51,6 @@ services:
       - 8080:8080
     volumes:
       - ./vite/dist:/www/vite/dist
+      - ./nginx/avatars:/www/avatars
     networks:
       - backend

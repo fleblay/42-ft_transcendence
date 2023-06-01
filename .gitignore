@@ -34,8 +34,12 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 */*.swp
+*.orig
 
 #env
 *.env
+
+# Avatars
+nginx/avatars/*.png
 
 vite/dist

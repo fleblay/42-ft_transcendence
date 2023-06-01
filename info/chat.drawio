@@ -1,0 +1,34 @@
+<mxfile host="app.diagrams.net" modified="2023-05-02T11:02:23.312Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" etag="2JXEAds8wiCA1OToern1" version="21.2.4" type="github">
+  <diagram name="Page-1" id="SXBy33HGTGCM2ABj4akK">
+    <mxGraphModel dx="331" dy="793" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="oOMU8jvEREvurnDbreHT-1" value="Message" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="485" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="oOMU8jvEREvurnDbreHT-3" value="Message id : id&lt;br&gt;Many to one Autor : Member&lt;br&gt;Many to one to: Channel&lt;br&gt;message: string&lt;br&gt;date : date" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="oOMU8jvEREvurnDbreHT-1">
+          <mxGeometry x="10" y="30" width="180" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="oOMU8jvEREvurnDbreHT-4" value="Channel" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="490" width="240" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="oOMU8jvEREvurnDbreHT-5" value="ChannelId : id&lt;br&gt;one to many message[] : Message[]&lt;br&gt;Many to Many members[] : Member[]&lt;br&gt;type : private | public | protected&lt;br&gt;Password : string&lt;br&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="oOMU8jvEREvurnDbreHT-4">
+          <mxGeometry x="10" y="30" width="230" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="oOMU8jvEREvurnDbreHT-6" value="User" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="290" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="oOMU8jvEREvurnDbreHT-10" value="one to many memberList : menber[]&lt;br&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="oOMU8jvEREvurnDbreHT-6">
+          <mxGeometry x="20" y="40" width="230" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="oOMU8jvEREvurnDbreHT-8" value="Member" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="240" width="240" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="oOMU8jvEREvurnDbreHT-9" value="Many to one Channel : Channel&lt;br&gt;Many to one user : User&lt;br&gt;role : &quot;Owner&quot; &quot;Admin&quot; &quot;Moldu&quot;&lt;br&gt;lastRead : MessageId&lt;br&gt;mute : date&lt;br&gt;ban : bool&lt;br&gt;kicked: bool" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="oOMU8jvEREvurnDbreHT-8">
+          <mxGeometry x="10" y="30" width="230" height="160" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

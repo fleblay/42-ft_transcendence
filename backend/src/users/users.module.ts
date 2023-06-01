@@ -1,29 +1,32 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { AuthService } from './auth/auth.service';
-import { User } from 'src/model/user.entity';
+import { User } from '../model/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import passport, { Passport } from 'passport';
-import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './strategy/jwt.strategy';
-import { RefreshToken } from 'src/model/refresh-token';
-import { RefreshTokenStrategy } from './strategy/refreshToken.strategy';
-import { AccessTokenStrategy } from './strategy/accessToken.strategy';
+import { RefreshToken } from '../model/refresh-token.entity';
+import {GameModule} from '../game/game.module'
+import { FriendsModule } from 'src/friends/friends.module';
+import { ChatModule } from '../chat/chat.module';
+import { SavedGameSubscriber } from '../model/saved-game.subscriber';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([User, RefreshToken]),
-		PassportModule,
 		JwtModule.register({
-			secret: 'secret', // not secure at all need to be changed in production  put in a .env file
+			secret: process.env.SECRET_REFRESH,
 			signOptions: { expiresIn: '600s' },
-		})
+		}),
+		forwardRef(() => GameModule),
+		forwardRef(() => FriendsModule),
+		forwardRef(() => ChatModule),
+		forwardRef(() => NotificationModule),
 	],
 	controllers: [UsersController],
-	providers: [AuthService, UsersService, LocalStrategy, JwtStrategy, RefreshTokenStrategy, AccessTokenStrategy],
-	exports: [AuthService, UsersService],
+	providers: [AuthService, UsersService, SavedGameSubscriber ],
+	exports: [AuthService, UsersService, SavedGameSubscriber],
 })
 export class UsersModule { }
+//
