@@ -36,7 +36,6 @@ export function LoginForm() {
 	useEffect(() => {
 		if (window.orientation !== undefined  || navigator.userAgent.indexOf('IEMobile') !== -1)
 			setOpen(true);
-
 	}, [])
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -69,7 +68,7 @@ export function LoginForm() {
 		<div>
 			<Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical:"top", horizontal:'center' }}>
                 <Alert severity="warning" onClose={handleClose} sx={{ width: '100%' }}>
-					"this page is not optimized for mobile, please use a computer"
+					this page is not optimized for mobile, please use a computer
                 </Alert>
             </Snackbar>
 			<Container maxWidth="xs" sx={{ mb: 4 }}>
