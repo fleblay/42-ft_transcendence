@@ -117,9 +117,6 @@
         <mxCell id="vPFpvlaYt1FcN0yEDJOL-1" value="&lt;b style=&quot;font-size: 17px;&quot;&gt;vite&lt;br&gt;&lt;/b&gt;Build typescript&lt;br&gt;&amp;nbsp;application on volume&lt;br&gt;www/dist which is sharing with nginx container.&amp;nbsp;&lt;br&gt;Exit on success" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="470" y="460" width="146.67" height="140" as="geometry" />
         </mxCell>
-        <mxCell id="vPFpvlaYt1FcN0yEDJOL-1" value="&lt;b&gt;vite&lt;br&gt;&lt;/b&gt;- build front&lt;br&gt;and exit" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="469.99999999999994" y="460" width="146.67" height="110" as="geometry" />
-        </mxCell>
         <mxCell id="vPFpvlaYt1FcN0yEDJOL-2" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1" source="vPFpvlaYt1FcN0yEDJOL-1" target="xaLoWIlu8mRHAP46BQhi-27">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="375" y="480" as="sourcePoint" />
