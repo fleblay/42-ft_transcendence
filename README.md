@@ -42,12 +42,13 @@ the website will be available on http://localhost:8080 !
 	~/$> cd 42-ft_transcendencen && Make
 ```
 
-requirements : 
+Requirements : 
 - Make
 - Docker
 
-compliant for deployement in aws => [you can try here](https://jremy.dev)
-compliant for deployement in private webserver => [you can try here](https://leblay.dev/pong)
+Compliant for deployement in aws => [you can try here](https://jremy.dev)
+
+Compliant for deployement in private webserver => [you can try here](https://leblay.dev/pong)
 
 ## Docker Stack :
 
@@ -55,12 +56,26 @@ compliant for deployement in private webserver => [you can try here](https://leb
   <img src="./info/stack_docker.jpg" width="100%">
 </p>
 
+###Nginx :
+ingress point listening on 443 with ssl
+reverse proxy for nestjs backend api calls
+static serve of avatars files (.png) and front-end app file (.js / .html / .css) 
+
+###Vite :
+Transpilation and minification from typescript to javascript
+exits on success
+
+###Nest
+expose api routes for use in frontend
+serves as an intermidary between client and postgre Database
+
+###PostgreSQL
+handle CRUD operations on website database
 
 ## Back Architecture :
 
 
-## Front Architecture :
-
+## Data Architecture :
 
 ## What have we learned? :
 
