@@ -34,17 +34,21 @@ Languages used :
 
 ## Usage :
 
+Simply clone the git repository in the directory of your choice and run make.
+the website will be available on http://localhost:8080 ! 
+
 ```
  	~/$> git clone https://github.com/jremy42/42-ft_transcendence.git
-	~/$> cd 42-ft_transcendence
-  	~/42-ft_transcendence> Make
+	~/$> cd 42-ft_transcendencen && Make
 ```
 
-requirement : Make | Docker
+requirements : 
+- Make
+- Docker
 
-complient for deployement in aws => [you can try here](https://jremy.dev)
+compliant for deployement in aws => [you can try here](https://jremy.dev)
+compliant for deployement in private webserver => [you can try here](https://leblay.dev/pong)
 
-complient for deployement in private webserver => [you can try here](https://leblay.dev/pong)
 ## Docker Stack :
 
 <p align="center">
