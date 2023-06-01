@@ -30,8 +30,7 @@ services:
       - ./nginx/avatars:/usr/src/app/avatars
     networks:
       - backend
-    ports:
-      - 3000:3000
+      
   vite:
     build:
       context: ./vite
