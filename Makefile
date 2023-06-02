@@ -15,6 +15,9 @@ all: build
 42:
 	docker-compose up --build
 
+without-vite:
+	docker-compose up --scale vite=0
+
 #MACOS specific
 kill:
 	pkill Docker
