@@ -46,7 +46,7 @@ Requirements :
 - Make
 - Docker
 
-Compliant for deployement in aws => [you can try here](https://jremy.dev)
+Compliant for deployement in aws => [you can try here](https://transcendence.jremy.dev)
 
 Compliant for deployement in private webserver => [you can try here](https://leblay.dev/pong)
 
