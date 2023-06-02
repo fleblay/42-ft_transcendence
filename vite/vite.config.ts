@@ -4,7 +4,7 @@ import { checker } from 'vite-plugin-checker'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	base: '/',
+	base: new URL(process.env.PUBLIC_URL).pathname,
 	plugins: [
 		react(),
 		checker({

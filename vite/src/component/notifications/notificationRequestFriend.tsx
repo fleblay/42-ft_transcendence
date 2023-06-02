@@ -107,7 +107,7 @@ export const NotificationRequestFriend: FC<NotificationRequestFriendProps> = ({ 
 				borderColor: (theme: Theme) => theme.palette.grey[300]
 			}}>
 
-				<Avatar src={`/avatars/${notification.contentId}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
+				<Avatar src={`${import.meta.env.BASE_URL}/avatars/${notification.contentId}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
 				<ListItemText primary={notification.name} />
 				<ListItemText secondary={ dayjs(notification.createdAt).fromNow() } />
 				<RenderButton />

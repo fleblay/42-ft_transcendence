@@ -373,7 +373,7 @@ export function MemberList({ channelId }: { channelId: string }) {
 								}
 							}}
 						>
-							<Avatar alt="User Photo" src={`/avatars/${member.user.id}.png`} />
+							<Avatar alt="User Photo" src={`${import.meta.env.BASE_URL}/avatars/${member.user.id}.png`} />
 						</Badge>
 
 						<Box sx={{ display: "flex", alignContent: "center" }} >

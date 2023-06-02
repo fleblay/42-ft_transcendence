@@ -17,8 +17,9 @@ function subscribeTokenRefresh(cb: any) {
 	subscribers.push(cb);
 }
 
-const apiClient = axios.create({});
-
+const apiClient = axios.create({
+	baseURL: import.meta.env.BASE_URL
+	});
 
 
 function InterceptorAxios({ children }: { children: JSX.Element }) {

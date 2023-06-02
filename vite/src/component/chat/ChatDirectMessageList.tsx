@@ -65,7 +65,7 @@ const FriendDisplay: FC<FriendDisplayProps> = ({ originalMember, channel, mooveT
 					variant="dot"
 					color={member.isConnected ? "success" : "error"}
 				>
-					<Avatar src={`/avatars/${member.user.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
+					<Avatar src={`${import.meta.env.BASE_URL}/avatars/${member.user.id}.png`} sx={{ margin: 1, width: '40px', height: '40px' }} />
 				</StyledBadge>
 				<Badge badgeContent={channel.unreadMessages} color="primary">
 					<ListItemText primary={member.user.username} />
