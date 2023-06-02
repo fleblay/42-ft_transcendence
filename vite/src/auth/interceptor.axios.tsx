@@ -18,7 +18,7 @@ function subscribeTokenRefresh(cb: any) {
 }
 
 const apiClient = axios.create({
-	baseURL: import.meta.env.BASE_URL !== undefined ? import.meta.env.BASE_URL : "https://transcendence.jremy.dev:443",
+	baseURL: import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL,
 	});
 
 
