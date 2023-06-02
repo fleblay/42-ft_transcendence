@@ -58,7 +58,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	let register = async (registerData: RegisterData): Promise<void> => {
 		return new Promise((resolve, reject) => {
 			axios
-				.post(import.meta.env.BASE_URL + "/api/auth/register", registerData)
+				.post(import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL + "/api/auth/register", registerData)
 				.then(async () => {
 					await getUser(true)
 					resolve();
@@ -72,7 +72,7 @@ export function AuthService({ children }: { children: React.ReactNode }) {
 	let login = async (loginData: LoginData): Promise<void> => {
 		return new Promise((resolve, reject) => {
 			axios
-				.post(import.meta.env.BASE_URL + "/api/auth/login", loginData)
+				.post(import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL + "/api/auth/login", loginData)
 				.then(async ({ data }) => {
 					if (data.needDfa) {
 						nav("/dfa", { replace: true });
