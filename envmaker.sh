@@ -56,6 +56,7 @@ then
 else
 	echo -e "\x1b[33m42Outside 42paris : HOSTNAME set to localhost to\x1b[0m"
 	HOSTNAME="localhost"
+	sed -i $EXTENSION "s/\(PUBLIC_URL=\).*/\1localhost/" .env
 fi
 sed -i $EXTENSION "s/\(HOSTNAME=\).*/\1${HOSTNAME}/" .env
 
