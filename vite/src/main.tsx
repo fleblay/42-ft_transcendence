@@ -65,6 +65,8 @@ const themeDark = createTheme({
 	}
 });
 
+console.log("Base url is :", import.meta.env.BASE_URL)
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<BrowserRouter basename={import.meta.env.BASE_URL}>
 		<RouterProvider>
