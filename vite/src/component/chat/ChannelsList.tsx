@@ -97,7 +97,7 @@ export function MyChannelsList() {
 									if (member.left)
 										return null;
 								return (
-								 <Avatar key={member.id} src={`${import.meta.env.BASE_URL}/avatars/${member.user.id}.png`} />
+								 <Avatar key={member.id} src={`${(import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL)}/avatars/${member.user.id}.png`} />
 								)})}
 							</AvatarGroup>
 						</ListItemButton>

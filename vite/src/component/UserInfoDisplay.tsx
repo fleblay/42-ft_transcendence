@@ -42,7 +42,7 @@ export const handleBlockUser = (idPlayer: string | undefined) => {
 export function UserInfoDisplay({ idPlayer, displayBlocked, setRender, render }: UserInfoDisplayProps) {
 
 	const [userData, setUserData] = useState<UserInfo | null>(null);
-	const imgPath = `${import.meta.env.BASE_URL}/avatars/${idPlayer}.png`;
+	const imgPath = `${(import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL)}/avatars/${idPlayer}.png`;
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 	const { customEmit, socket, customOn, customOff, addSubscription } = useContext(SocketContext);
 	const [relation, setRelation] = useState<Friend | null>(null);

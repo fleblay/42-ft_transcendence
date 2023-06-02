@@ -112,7 +112,7 @@ export const ChannelBrowser: FC = () => {
 							{
 								channel.owner && (
 									<Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', marginRight: 1 }}>
-										<Avatar src={`${import.meta.env.BASE_URL}/avatars/${channel.owner?.id || 'default'}.png`} sx={{ width: 24, height: 24 }}>
+										<Avatar src={`${(import.meta.env.BASE_URL === "/" ? "" : import.meta.env.BASE_URL)}/avatars/${channel.owner?.id || 'default'}.png`} sx={{ width: 24, height: 24 }}>
 											{channel.owner?.username[0]}
 										</Avatar>
 										<Typography variant="body2" color="text.secondary">
