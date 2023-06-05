@@ -16,7 +16,6 @@ const CustomLink = styled(Link)
 
 export function Footer() {
     return (
-        <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
             <Container maxWidth="lg" >
                 <Grid container direction="column" alignItems="center">
                     <Grid item xs={12}>
@@ -31,7 +30,6 @@ export function Footer() {
                     </Grid>
                 </Grid>
             </Container>
-        </AppBar>
     )
 }
 

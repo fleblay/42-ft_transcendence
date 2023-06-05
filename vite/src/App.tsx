@@ -14,7 +14,7 @@ import { UserDataProvider } from './userDataProvider/userDataProvider';
 import { DfaForm } from './component/DfaForm';
 import { GamePage } from './component/game/GamePage';
 import { ChatPage } from './component/chat/ChatPage';
-import { CircularProgress, Paper, Stack } from '@mui/material';
+import { Box, CircularProgress, Paper, Stack } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { MyError } from './component/Error';
@@ -94,68 +94,74 @@ function App() {
 					<Layout>
 
 						<SocketProvider>
-							<RequireAuth>
-								<MenuBar />
-							</RequireAuth>
+							<Box sx={{ position: 'relative', minHeight: '100vh' }}>
+								<Box component="main" sx={{ pb: '60px' }}>
+									<RequireAuth>
+										<MenuBar />
+									</RequireAuth>
 
-							<Routes>
-								<Route>
-									<Route path="/login" element={<LoginForm />} />
-									<Route path="/register" element={<RegisterForm />} />
-									<Route path="/dfa" element={<DfaForm />} />
-									<Route path="/" element={<Navigate to='/game' replace />} />
-									<Route path="game/">
-										<Route path=":idGame" element={
-											<RequireAuth>
-												<GamePage />
-											</RequireAuth>
-										} />
-										<Route path="" element={
-											<RequireAuth>
-												<GamePage />
-											</RequireAuth>
-										} />
-									</Route>
+									<Routes>
+										<Route>
+											<Route path="/login" element={<LoginForm />} />
+											<Route path="/register" element={<RegisterForm />} />
+											<Route path="/dfa" element={<DfaForm />} />
+											<Route path="/" element={<Navigate to='/game' replace />} />
+											<Route path="game/">
+												<Route path=":idGame" element={
+													<RequireAuth>
+														<GamePage />
+													</RequireAuth>
+												} />
+												<Route path="" element={
+													<RequireAuth>
+														<GamePage />
+													</RequireAuth>
+												} />
+											</Route>
 
-									<Route path="chat/:channelId?" element={
-										<RequireAuth>
-											<ChatPage />
-										</RequireAuth>
-									} />
-									<Route path="/leaderboard" element={
-										<RequireAuth>
-											<>
-												<Leaderboard />
-												<br />
-												<FakeGames />
-											</>
-										</RequireAuth>
-									} />
-									<Route path="/player/">
-										<Route path=":idPlayer" element={
-											<RequireAuth>
-												<UserDataProvider>
-													<ProfilPlayer />
-												</UserDataProvider>
-											</RequireAuth>
-										} />
-									</Route>
-									<Route path="/friends" element={
-										<RequireAuth>
-											<FriendList />
-										</RequireAuth>
-									} />
-									<Route path="/notification" element={
-										<RequireAuth>
-											<NotificationsList />
-										</RequireAuth>
-									} />
-									<Route path='*' element={<NotFound />} />
-								</Route>
-							</Routes>
-							<RequireAuth>
-								<Footer />
-							</RequireAuth>
+											<Route path="chat/:channelId?" element={
+												<RequireAuth>
+													<ChatPage />
+												</RequireAuth>
+											} />
+											<Route path="/leaderboard" element={
+												<RequireAuth>
+													<>
+														<Leaderboard />
+														<br />
+														<FakeGames />
+													</>
+												</RequireAuth>
+											} />
+											<Route path="/player/">
+												<Route path=":idPlayer" element={
+													<RequireAuth>
+														<UserDataProvider>
+															<ProfilPlayer />
+														</UserDataProvider>
+													</RequireAuth>
+												} />
+											</Route>
+											<Route path="/friends" element={
+												<RequireAuth>
+													<FriendList />
+												</RequireAuth>
+											} />
+											<Route path="/notification" element={
+												<RequireAuth>
+													<NotificationsList />
+												</RequireAuth>
+											} />
+											<Route path='*' element={<NotFound />} />
+										</Route>
+									</Routes>
+								</Box>
+								<Box component="footer" sx={{ position: 'fixed', bottom: 0, width: '100%', p: 2, bg: 'primary.main', color: 'white' }}>
+									<RequireAuth>
+										<Footer />
+									</RequireAuth>
+								</Box>
+							</Box>
 						</SocketProvider>
 					</Layout>
 				</InterceptorAxios>
