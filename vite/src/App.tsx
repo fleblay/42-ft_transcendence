@@ -22,6 +22,8 @@ import { InterceptorAxios } from './auth/interceptor.axios';
 import { NotificationsList } from './component/notifications/notificationsList';
 import { NotFound } from './component/404';
 import { Footer } from './component/Footer'
+import { SnackbarProvider, VariantType, useSnackbar } from 'notistack';
+
 
 export interface Destinations {
 	name: string,
@@ -94,8 +96,9 @@ function App() {
 					<Layout>
 
 						<SocketProvider>
-							<Box sx={{ position: 'relative', minHeight: '100vh' }}>
-								<Box component="main" sx={{ pb: '60px' }}>
+						<Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+								<SnackbarProvider maxSnack={3}>
+								<Box component="main" sx={{ flexGrow: 1 }}>
 									<RequireAuth>
 										<MenuBar />
 									</RequireAuth>
@@ -156,11 +159,12 @@ function App() {
 										</Route>
 									</Routes>
 								</Box>
-								<Box component="footer" sx={{ position: 'fixed', bottom: 0, width: '100%', p: 2, bg: 'primary.main', color: 'white' }}>
+								<Box component="footer" sx={{ bottom: 0, width: '100%', p: 2, color: 'white', bgcolor: '#3f51b5' }}>
 									<RequireAuth>
 										<Footer />
 									</RequireAuth>
 								</Box>
+								</SnackbarProvider>
 							</Box>
 						</SocketProvider>
 					</Layout>

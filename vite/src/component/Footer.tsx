@@ -5,18 +5,19 @@ import { Link } from 'react-router-dom'
 import styled from '@emotion/styled'
 
 const CustomLink = styled(Link)
-({
-    textDecoration: 'none',
-    color: 'white',
-    '&:hover': {
+    ({
         textDecoration: 'none',
         color: 'white',
-    }
-})
+        '&:hover': {
+            textDecoration: 'none',
+            color: 'white',
+        }
+    })
 
 export function Footer() {
     return (
-            <Container maxWidth="lg" >
+
+            <Container maxWidth="lg" sx={{ bg: 'primary.main' }}>
                 <Grid container direction="column" alignItems="center">
                     <Grid item xs={12}>
                         <Typography color="white" variant="subtitle1">
@@ -32,5 +33,3 @@ export function Footer() {
             </Container>
     )
 }
-
-
