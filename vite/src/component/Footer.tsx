@@ -25,7 +25,7 @@ export function Footer() {
                         </Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <CustomLink to="https://github.com/Fredo971" target="_blank"> Fle-blay </CustomLink>
+                        <CustomLink to="https://github.com/fleblay" target="_blank"> Fleblay </CustomLink>
                         <CustomLink to="https://github.com/ImHoppy" target="_blank"> Mbraets </CustomLink>
                         <CustomLink to="https://github.com/jremy42" target="_blank"> Jremy </CustomLink>
                     </Grid>
