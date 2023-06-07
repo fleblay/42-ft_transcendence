@@ -53,6 +53,7 @@ The ft_transcendence project involved creating a website for online multiplayer 
 ## 📂 Project Structure
 
 <details closed>
+
 ```bash
 repo
 ├── Makefile
@@ -272,6 +273,7 @@ repo
 
 38 directories, 177 files
 ```
+
 </details>
 
 ## 🚀 Getting Started
