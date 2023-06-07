@@ -74,6 +74,10 @@ handle CRUD operations on website database
 
 ## Data Architecture :
 
+<p align="center">
+  <img src="./info/db_model.png" width="100%">
+</p>
+
 ## What have we learned? :
 
 ## ressources:
