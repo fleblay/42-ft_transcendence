@@ -318,9 +318,9 @@ API_CLIENT_ID=
 API_CLIENT_SECRET=
 ```
 
-Compliant for deployement in aws => you can try here
+Compliant for deployement in aws => [you can try here](https://transcendence.jremy.dev)
 
-Compliant for deployement in private webserver => you can try here
+Compliant for deployement in private webserver => [you can try here](https://leblay.dev/pong)
 
 ---
 ### 🤖 Stack docker
