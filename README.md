@@ -281,7 +281,8 @@ repo
 ### ✅ Prerequisites
 
 Before you begin, ensure that you have the following prerequisites installed:
-    - docker
+   
+   - docker
 
 ### 🖥 Installation
 
