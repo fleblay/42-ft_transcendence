@@ -323,7 +323,7 @@ Compliant for deployement in aws => [you can try here](https://transcendence.jre
 Compliant for deployement in private webserver => [you can try here](https://leblay.dev/pong)
 
 ---
-### 🤖 Stack docker
+### 🤖 Docker stack
 
 <p align="center">
   <img src="./info/stack_docker.jpg" width="100%">
