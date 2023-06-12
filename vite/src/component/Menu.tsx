@@ -20,7 +20,7 @@ const pages = [
 	{ label: 'Chat', path: 'chat' }
 ];
 const menu = [
-	{ label: 'My profil', path: 'myprofil' },
+	{ label: 'My profile', path: 'myprofil' },
 	{ label: 'Friends', path: 'friends' },
 	{ label: 'Logout', path: 'logout' }
 ];

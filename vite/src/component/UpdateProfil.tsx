@@ -151,7 +151,7 @@ export function UpdateProfil() {
 			<Button
 				variant="contained" sx={{ ml: 1, mr: 1, mt: 2, mb: 2 }} onClick={handleOpenImg}
 			>
-				Edit profil picture
+				Edit profile picture
 			</Button>
 			<Modal open={openImg} onClose={handleCloseImg} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 				<Container maxWidth="sm" className="centered-container" >
